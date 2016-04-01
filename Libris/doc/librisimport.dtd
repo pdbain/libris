@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ENTITY % boolean "(true|false)">
+<!ELEMENT librisimport (field)*>
+<!ELEMENT field (default|column*)>
+<!ATTLIST field
+	id CDATA #REQUIRED
+>
+<!ELEMENT default EMPTY>
+<!ATTLIST default
+	data CDATA #REQUIRED
+>
+<!ELEMENT column (translate*)>
+<!ATTLIST column
+	columnNum CDATA #REQUIRED
+	match CDATA #IMPLIED
+	includeOnMatch %boolean; "false"
+>
+<!ELEMENT translate EMPTY>
+<!ATTLIST translate
+	from CDATA #REQUIRED
+	to CDATA #REQUIRED
+>
