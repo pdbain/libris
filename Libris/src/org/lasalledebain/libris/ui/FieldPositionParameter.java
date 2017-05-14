@@ -8,14 +8,6 @@ import org.lasalledebain.libris.exception.DatabaseException;
 public class FieldPositionParameter {
 	public String id;
 	int fieldNum = -1;
-	public int getFieldNum() {
-		return fieldNum;
-	}
-
-	public void setFieldNum(int fieldNum) {
-		this.fieldNum = fieldNum;
-	}
-
 	public int width;
 	public int height;
 	public int hspan;
@@ -25,16 +17,21 @@ public class FieldPositionParameter {
 	public boolean carriageReturn;
 	public int across;
 
-	public boolean getReturn() {
-		return carriageReturn;
-	}
-
-	public int getAcross() {
-		return across;
-	}
-
 	public FieldPositionParameter() {
+		id = "";
+		fieldNum = -1;
+		width = 0;
+		height = 0;
 		hspan = 0;
+		vspan = 0;
+		title = null;
+		controlType = "";
+		carriageReturn = false;
+		across = 0;
+	}
+
+	public void setControlType(String controlType) {
+		this.controlType = controlType;
 	}
 
 	public void setParams(HashMap<String, String> values) throws DatabaseException {
@@ -70,12 +67,28 @@ public class FieldPositionParameter {
 		}
 	}
 
+	public int getFieldNum() {
+		return fieldNum;
+	}
+
+	public void setFieldNum(int fieldNum) {
+		this.fieldNum = fieldNum;
+	}
+
 	public String getControlType() {
 		return controlType;
 	}
 
 	public String getId() {
 		return id;
+	}
+
+	public boolean getReturn() {
+		return carriageReturn;
+	}
+
+	public int getAcross() {
+		return across;
 	}
 
 	public int getWidth() {

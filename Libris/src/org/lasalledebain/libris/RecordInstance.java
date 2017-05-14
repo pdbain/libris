@@ -4,34 +4,42 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.RecordDataException;
+import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.index.Group;
+import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
+import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class RecordInstance extends Record implements  LibrisXMLConstants {
-	private RecordId id;
+	private int id;
+	private String name;
 
 	Field[] recordData;
-	RecordId groups[][];
+	GroupMember affiliations[];
 	boolean editable = false;
 	private RecordTemplate template;
 	private long filePosition = -1;
 	private long dataLength = -1;
 	private LibrisAttributes attributes;
+	
+	private static final GroupMember[] dummyAffiliations = new GroupMember[0];
 
 	public RecordInstance(RecordTemplate recordTemplate) {
 		template = recordTemplate;
+		name = null;
+		affiliations = null;
 		recordData = new Field[template.getNumFields()];
 		for (int i = 0; i < recordData.length; ++i) {
 			recordData[i] = null;
@@ -61,6 +69,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		int position = template.getFieldIndex(fid);
 		setField(position, values);
 	}
+	
 	@Override
 	public Field addFieldValue(int position, String fieldData) throws InputException {
 		if (null == recordData[position]) {
@@ -126,57 +135,95 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		return addFieldValue(position, fieldData);
 	}
 	
-	public Field getField(String id) throws InputException {
-		int i = template.getFieldIndex(id);
-		Field f = recordData[i];
-		if (isEditable() && (null == f)) {
-			try {
-				f = template.newField(i);
-				recordData[i] = f;
-			} catch (InputException e) {
-				throw new FieldDataException("cannot create new "+id, e);
-			}
-		}
-		return f;
+	@Override
+	public Field addFieldValuePair(int fieldNum, String fieldValue, String extraValue)
+	throws InputException {
+		if (null == recordData[fieldNum]) {
+			recordData[fieldNum] = template.newField(fieldNum);
+		} 
+		recordData[fieldNum].addValuePair(fieldValue, extraValue);
+		return recordData[fieldNum];
 	}
-	
-
 
 	@Override
-	public Field getField(int fieldNum) throws InputException {
-		Field f = recordData[fieldNum];
-		if (null == f) {
-			if (isEditable()) {
+	public Field addFieldValuePair(String fieldName, String value, String extraValue)
+			throws InputException {
+		int fieldNum = template.getFieldIndex(fieldName);
+		return addFieldValuePair(fieldNum, value, extraValue);
+	}
+
+	@Override
+	public Field getField(String fieldId) throws InputException {
+		int i = template.getFieldIndex(fieldId);
+		return getField(i);
+	}
+	
+	@Override
+	public Field getField(int fieldNum) throws InputException  {
+		Field fld = recordData[fieldNum];
+		if (isEditable()) {
+			if (null == fld) {
 				try {
-					f = template.newField(fieldNum);
-					recordData[fieldNum] = f;
+					fld = template.newField(fieldNum);
+					recordData[fieldNum] = fld;
 				} catch (InputException e) {
 					throw new FieldDataException("cannot create new "+id, e);
 				}
 			}
+		} else if ((null != fld) && fld.isEmpty()) {
+			fld = null;
 		}
-		return f;
+		return fld;
 	}
-	
+
 	@Override
-	public Field getFieldWithInheritance(int fieldNum, RecordList records)
-			throws LibrisException {
+	public  FieldValue getFieldValue(int fieldNum) throws InputException {
 		Field fld = getField(fieldNum);
-		if (null == fld) {
+		if ((null == fld) || fld.isEmpty()) {
+			fld = getDefaultField(fieldNum);
+		}
+		FieldValue firstFieldValue = (null == fld) ? null: fld.getFirstFieldValue();
+		return firstFieldValue;
+	}
+
+	@Override
+	public Field getDefaultField(int fieldNum) throws InputException {
+		Field fld;
+		if (null == template.records) {
+			fld = template.getDefaultField(fieldNum);					
+		} else {
 			int parentGroup = template.getInheritanceGroup(fieldNum);
 			if (Group.NULL_GROUP == parentGroup) {
 				fld = template.getDefaultField(fieldNum);
 			} else {
-				RecordId parentRecordId = getParent(parentGroup);
-				if (!parentRecordId.isNull()) {
-					Record parentRecord = records.getRecord(parentRecordId);
+				int parentRecordId = getParent(parentGroup);
+				if (!RecordId.isNull(parentRecordId)) {
+					Record parentRecord = template.records.getRecord(parentRecordId);
+					if (null == parentRecord) {
+						throw new InputException("Cannot locate parent record "+parentRecordId);
+					}
 					fld = parentRecord.getField(fieldNum);
+					if (null == fld) {
+						fld = parentRecord.getDefaultField(fieldNum);
+					}
 				} else {
 					fld = template.getDefaultField(fieldNum);					
 				}
 			}
 		}
 		return fld;
+	}
+
+	@Override
+	public Field getDefaultField(String fieldId) throws InputException {
+		int i = template.getFieldIndex(fieldId);
+		return getDefaultField(i);
+	}
+
+	@Override
+	public FieldValue getFieldValue(String fieldId) throws InputException {
+		int i = template.getFieldIndex(fieldId);
+		return getFieldValue(i);
 	}
 
 	@Override
@@ -204,6 +251,18 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	}
 	public FieldType getFieldType(String fid) {
 		return template.getFieldType(fid);
+	}
+	@Override
+	public void getKeywords(int[] fieldList, RecordKeywords keywordList) throws InputException {
+		for (int fieldNum: fieldList) {
+			Field fld = getField(fieldNum);
+			if (null != fld) {
+				String values = fld.getValuesAsString();
+				if ((null != values) && !values.isEmpty()) {
+					keywordList.addKeywords(Arrays.asList(values.split("\\W+")));
+				}
+			}
+		}
 	}
 	private class FieldIterator implements Iterator<Field>, Iterable<Field> {
 	
@@ -238,20 +297,20 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	public void fromXml(ElementManager mgr) throws LibrisException  {
 		HashMap<String, String> attrs = mgr.parseOpenTag();
 		this.attributes = new LibrisAttributes(attrs);
-		setRecordId(new RecordId(attributes.get(XML_RECORD_ID_ATTR)));
+		setRecordId(RecordId.toId(attributes.get(XML_RECORD_ID_ATTR)));
+		setName(attributes.get(XML_RECORD_NAME_ATTR));
 		while (mgr.hasNext()) {
 			String nextId = mgr.getNextId();
 			if (XML_MEMBER_TAG != nextId) {
 				break;
 			}
 			ElementManager memberMgr = mgr.nextElement();
-			GroupMember mem = new GroupMember(template.getGroupDefs());
+			GroupMember mem = new GroupMember(template.getGroupDefs(), null);
 			mem.fromXml(memberMgr);
-			int groupNum = mem.getGroupNum();
-			setParentId(groupNum, mem.getParent());
-			for (RecordId id: mem.getAffiliations()) {
-				addAffiliate(groupNum, id);
+			if (null == affiliations) {
+				affiliations = new GroupMember[template.getNumGroups()];
 			}
+			affiliations[mem.getGroupNum()] = mem;		
 		}
 		while (mgr.hasNext()) {
 			ElementManager fieldManager = mgr.nextElement();
@@ -262,10 +321,20 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
-		String recordNumberString = getRecordId().toString();
+		String recordNumberString = RecordId.toString(getRecordId());
 		LibrisAttributes attrs = new LibrisAttributes();
 		attrs.setAttribute(XML_RECORD_ID_ATTR, recordNumberString);
+		if (null != name) {
+			attrs.setAttribute(XML_RECORD_NAME_ATTR, name);
+		}
 		output.writeStartElement(XML_RECORD_TAG, attrs, false);
+		if (null != affiliations) {
+			for (GroupMember m: affiliations) {
+				if (null != m) {
+					m.toXml(output);
+				}
+			}
+		}
 		for (Field f: recordData) {
 			if ((null != f) && !f.isEmpty()) {
 				f.toXml(output);
@@ -278,7 +347,8 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	@Override
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
-		buff.append(getRecordId()); buff.append('\n');
+		buff.append(RecordId.toString(getRecordId())); 
+		buff.append('\n');
 		for (Field f:recordData) {
 			if (null == f) {
 				continue;
@@ -290,20 +360,27 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		return buff.toString();
 	}
 	
-	public void setRecordId(RecordId newId) throws RecordDataException {
-		this.id = newId;
-	}
-	@Override
-	public void setRecordId(int recId) throws DatabaseException {
-		try {
-			setRecordId(new RecordId(recId));
-		} catch (DatabaseException e) {
-			throw new DatabaseException("could not create record ID "+recId, e);
-		}
-	}
-	public RecordId getRecordId() {
+	public int getRecordId() {
 		return id;
 	}
+	
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public void setName(String newName) throws InputException {
+		if ((null != newName) && newName.isEmpty()) {
+			this.name = null;
+		} else {
+			if (!validateRecordName(newName)) {
+				throw new InputException("Record name "+newName+" is illegal");
+			}
+			this.name = newName;
+		}
+	}
+
 	@Override
 	public void setEditable(boolean newValue) {
 		editable = newValue;
@@ -334,65 +411,107 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	}
 	@Override
 	public String generateTitle(String[] fieldIds) {
-		StringBuffer buff = new StringBuffer();
-		if (null != id) {
-			buff.append(id.toString());
-		}
-		for (String fieldId: fieldIds) {
-			Field fld;
-			try {
-				fld = getField(fieldId);
-			} catch (InputException e) {
-				continue;
+		StringBuffer buff = new StringBuffer("[");
+		String idString = (RecordId.getNullId() == id)? "<unknown>": RecordId.toString(id);
+		buff.append(idString);
+		buff.append("]: ");
+		if (null != name) {
+			buff.append(name);
+		} else {
+			boolean firstField = true;
+			for (String fieldId: fieldIds) {
+				Field fld;
+				try {
+					fld = getField(fieldId);
+				} catch (InputException e) {
+					continue;
+				}
+				if (null == fld) {
+					continue;
+				}
+				String value = fld.getValuesAsString();
+				if (!firstField) {
+					buff.append("; ");
+				}
+				firstField = false;
+				buff.append(value);
 			}
-			if (null == fld) {
-				continue;
+			if (0 == buff.length()) {
+				buff.append("Untitled");
 			}
-			String value = fld.getValuesAsString();
-			if (buff.length() != 0) {
-				buff.append("; ");
-			}
-			buff.append(value);
-		}
-		if (0 == buff.length()) {
-			buff.append("Untitled");
 		}
 		return buff.toString();
 	}
 	@Override
+	public int[] getAffiliates(int groupNum) throws InputException {
+		int result[];
+		if ((null != affiliations) && (null != affiliations[groupNum])) {
+			result = affiliations[groupNum].getAffiliations();
+		} else {
+			result = GroupMember.getDummyAffiliations();
+		}
+		return result;
+	}
+
+	@Override
 	public boolean equals(Object comparand) {
+		boolean result = true;
 		if (!Record.class.isInstance(comparand)) {
-			return false;
+			result = false;
 		} else {
 			Record otherRec = (Record) comparand;
-			if (otherRec.getFieldIds().length != getFieldIds().length) {
-				return false;
-			}
-			for (Field fld: recordData) {
+			for (int i = 0; i < template.getNumGroups(); ++i) {
 				try {
-					if (null == fld) {
-						continue;
-					}
-					String nextId = fld.getFieldId();
-					Field otherField = otherRec.getField(nextId);
-					if (null == otherField) {
-						return false;
-					}
-					if (!fld.equals(otherField)) {
-						return false;
+					
+					int[] myAffiliations = getAffiliates(i);
+					int [] otherAffiliations = otherRec.getAffiliates(i);
+					if (!Arrays.equals(myAffiliations, otherAffiliations)) {
+						return false;						
 					}
 				} catch (InputException e) {
+					LibrisDatabase.librisLog(Level.WARNING, "Error getting affilaitions", e);
 					return false;
 				}
 			}
-			return true;
+			if (otherRec.getFieldIds().length != getFieldIds().length) {
+				result = false;
+			} else {
+				for (Field fld: recordData) {
+					try {
+						if (null == fld) {
+							continue;
+						}
+						String nextId = fld.getFieldId();
+						Field otherField = otherRec.getField(nextId);
+						result = isFieldEqual(fld, otherField);
+					} catch (InputException e) {
+						result = false;
+					}
+					if (!result) {
+						break;
+					}
+				}
+			}
+			return result;
 		}
+		return result;
 	}
 	
+	private boolean isFieldEqual(Field f1, Field f2) {
+		boolean result = true;
+		if (f1.isEmpty()) {
+			if ((null != f2) && !f2.isEmpty()) {
+				result = false;
+			}
+		} else {
+			result = f1.equals(f2);
+		}
+		return result;
+	}
 	
 	@Override
 	public Record duplicate() throws DatabaseException, FieldDataException  {
-		RecordInstance otherRec = new RecordInstance(template);
+		Record otherRec = new RecordInstance(template);
 		otherRec.setEditable(true);
 		for (int i = 0; i < recordData.length; ++i) {
 			Field fld = recordData[i];
@@ -419,7 +538,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	}
 	@Override
 	public int compareTo(Record comparand) {
-		int result = id.compareTo(comparand.getRecordId());
+		int result = Integer.signum(id - comparand.getRecordId());
 		return result;
 	}
 	@Override
@@ -433,72 +552,117 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	/* Group management */
 	
 	@Override
-	public void setParentId(int groupNum, RecordId parent) {
-		addGroupMember(groupNum, parent, true);
-	}
-	@Override
-	public void addAffiliate(int groupNum, RecordId affiliate) {
-		addGroupMember(groupNum, affiliate, false);
-	}
-	@Override
-	public Iterable<RecordId> getAffiliates(int groupNum) {	
-		final Iterator<RecordId> affiliatesIterator = Arrays.asList(groups[groupNum]).iterator();
-		return new Iterable<RecordId>() {
-			@Override
-			public Iterator<RecordId> iterator() {
-				affiliatesIterator.next(); /* flush the parent */
-				return affiliatesIterator;
-			}		
-		};
-	}
-	@Override
-	public RecordId getParent(int groupNum) {
-		if (groupNum < 0) {
-			return RecordId.getNullId();
-		} else if ((null == groups) || (null == groups[groupNum])) {
-			return null;
+	public void setParent(int groupNum, int parent) throws FieldDataException {
+		if ((null == affiliations) || (null == affiliations[groupNum])) {
+			ensureAffiliation(groupNum);
+			affiliations[groupNum].addIntegerValue(parent);
 		} else {
-			return groups[groupNum][0];
+			affiliations[groupNum].setParent(parent);
 		}
 	}
 	
-	private void addGroupMember(int groupNum, RecordId parent,
-			boolean addAtFront) {
-		RecordId[] groupVec = ensureGroupCapacity(groupNum);
-		if (null == groupVec[0]) {
-			groupVec[0] = parent;
-		} else {
-			boolean found = false;
-			for (int i = 0; i < groupVec.length; ++i) {
-				if (groupVec[i].equals(parent)) {
-					RecordId temp = groupVec[0];
-					groupVec[0] = groupVec[i];
-					groupVec[i] = temp;
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				RecordId temp[] = new RecordId[groupVec.length+1];
-				if (addAtFront) {
-					System.arraycopy(groupVec, 0, temp, 1, groupVec.length);
-					temp[0] = parent;
-				} else {
-					System.arraycopy(groupVec, 0, temp, 0, groupVec.length);
-					temp[groupVec.length] = parent;
-				}
-				groups[groupNum] = temp;
-			}
+	@Override
+	public void setParent(String groupId, Record parent) throws FieldDataException {
+		int grpNum = template.getGroupNum(groupId);
+		if (-1 == grpNum) {
+			throw new FieldDataException("group "+groupId+" not recognized");
 		}
-	}
-	private RecordId[] ensureGroupCapacity(int groupNum) {
-		if (null == groups) {
-			groups = new RecordId[template.getNumGroups()][];
-		}
-		if (null == groups[groupNum]) {
-			groups[groupNum] = new RecordId[1];
-		};
-		return groups[groupNum];
+		setParent(grpNum, parent.getRecordId());
 	}
 
+	@Override
+	public boolean hasAffiliations() {
+		if (null != affiliations) {
+			for (int i = 0; i < affiliations.length; ++i) {
+				if (hasAffiliations(i)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public boolean hasAffiliations(int groupNum) {
+		return (null != affiliations) && (null != affiliations[groupNum]) && (affiliations[groupNum].getNumberOfValues() > 0);
+	}
+
+	@Override
+	public short getNumAffiliatesAndParent(int groupNum) {
+		short numAffiliates = 0;
+		if (hasAffiliations() && (null != affiliations[groupNum])) {
+			numAffiliates = (byte) affiliations[groupNum].getNumberOfValues();
+		}
+		return numAffiliates;
+	}
+
+	@Override
+	public void addAffiliate(int groupNum, int affiliate) throws FieldDataException {
+		addGroupMember(groupNum, affiliate, false);
+	}
+
+	@Override
+	public void addAffiliate(String groupId, Record affiliate) throws FieldDataException {
+		int groupNum = template.getGroupNum(groupId);
+		if (-1 == groupNum) {
+			throw new FieldDataException("group "+groupId+" not recognized");
+		}
+		addGroupMember(groupNum, affiliate.getRecordId(), false);
+	}
+
+	@Override
+	public int getParent(int groupNum) {
+		if (groupNum < 0) {
+			return RecordId.getNullId();
+		} else if ((null == affiliations) || (null == affiliations[groupNum])) {
+			return RecordId.getNullId();
+		} else {
+			return affiliations[groupNum].getParent();
+		}
+	}
+	
+	
+	@Override
+	public int getParent(String groupId) {
+		int groupNum = template.getGroupNum(groupId);
+		return getParent(groupNum);
+	}
+
+	private void addGroupMember(int groupNum, int parent,
+			boolean addAtFront) throws FieldDataException {
+		ensureAffiliation(groupNum);
+		affiliations[groupNum].addIntegerValue(parent);
+	}
+
+	private void ensureAffiliation(int groupNum) {
+		if (null == affiliations) {
+			affiliations = new GroupMember[template.getNumGroups()];
+		}
+		if (null == affiliations[groupNum]) {
+			GroupDefs grpDefs = template.getGroupDefs();
+			affiliations[groupNum] = new GroupMember(grpDefs, grpDefs.getGroupDef(groupNum));
+		}
+	}
+
+	@Override
+	public void setRecordId(int recId) {
+		id = recId;
+	}
+
+	@Override
+	public GroupMember[] getMembers() {
+		return (null == affiliations) ? dummyAffiliations: affiliations;
+	}
+	@Override
+	public GroupMember getMember(int groupNum) {
+		return (null == affiliations) ? null: affiliations[groupNum];
+	}
+	
+	@Override
+	public void setMember(int groupNum, GroupMember newMember) {
+		if (null == affiliations) {
+			ensureAffiliation(groupNum);
+		}
+		affiliations[groupNum] = newMember;
+	}
 }

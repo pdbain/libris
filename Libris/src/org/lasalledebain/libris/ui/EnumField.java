@@ -101,10 +101,10 @@ public class EnumField extends GuiControl {
 				String valueId = legalValues.getChoiceId(currentValue);
 				return new FieldEnumValue(legalValues, valueId);
 			} else {
-				return new FieldEnumValue(legalValues, currentValue, valueSelector.getSelectedItem().toString());
+				return new FieldEnumValue(legalValues, EnumFieldChoices.INVALID_CHOICE, valueSelector.getSelectedItem().toString());
 			}
 		} else {
-			return new FieldEnumValue(legalValues, currentValue, valueSelector.getSelectedItem().toString());
+			return new FieldEnumValue(legalValues, EnumFieldChoices.INVALID_CHOICE, valueSelector.getSelectedItem().toString());
 		}
 	}
 	@Override
@@ -150,5 +150,10 @@ public class EnumField extends GuiControl {
 	public void setRestricted(boolean restricted) {
 		super.setRestricted(restricted);
 		valueSelector.setEditable(!restricted);
+	}
+
+	@Override
+	public boolean isEditable() {
+		return valueSelector.isEditable();
 	}
 }

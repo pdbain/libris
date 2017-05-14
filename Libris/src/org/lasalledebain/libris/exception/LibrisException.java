@@ -44,7 +44,7 @@ public abstract class LibrisException extends Exception {
 	}
 
 	/**
-	 * Detstructively read the latest exception thrown on the current thread.
+	 * Destructively read the latest exception thrown on the current thread.
 	 * @return last exception thrown.
 	 */
 	public static LibrisException getLastException() {

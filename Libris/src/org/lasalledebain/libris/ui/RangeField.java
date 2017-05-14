@@ -155,4 +155,18 @@ public class RangeField extends GuiControl {
 		}
 	}
 
+	@Override
+	public boolean isEditable() {
+		if ((null == ranges) || (ranges.size() == 0)){
+			return false;
+		} else {
+			JTextField[] v = ranges.get(0);
+			if (v.length == 0) {
+				return false;
+			} else {
+				return v[0].isEditable();
+			}
+		}
+	}
+
 }

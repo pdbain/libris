@@ -12,7 +12,6 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 
 public class RandomAccessBrowserList implements
 	ListModel {
@@ -20,18 +19,18 @@ public class RandomAccessBrowserList implements
 		HashSet<ListDataListener> listeners;
 		ArrayList<BrowserRow> rowList;
 		int startIndex, endIndex;
-		HashMap<RecordId, BrowserRow> rowMap;
+		HashMap<Integer, BrowserRow> rowMap;
 		private String[] fieldIds;
 		public RandomAccessBrowserList(String[] fieldIds) {
 			this.fieldIds = fieldIds;
 			listeners = new HashSet<ListDataListener>(1);
 			rowList = new ArrayList<BrowserRow>(BrowserWindow.LIST_LIMIT);
-			rowMap = new HashMap<RecordId, BrowserRow>(BrowserWindow.LIST_LIMIT);
+			rowMap = new HashMap<Integer, BrowserRow>(BrowserWindow.LIST_LIMIT);
 			startIndex = endIndex = 0;
 		}
 		public int add(Record rec) {
 			int posn = 0;
-			final RecordId recId = rec.getRecordId();
+			final Integer recId = rec.getRecordId();
 			if (!rowMap.containsKey(recId)) {
 				BrowserRow row = new BrowserRow(rec, fieldIds);
 				if (rowList.size() == BrowserWindow.LIST_LIMIT) {
@@ -48,6 +47,21 @@ public class RandomAccessBrowserList implements
 			return(posn);
 		}
 		
+		public int remove(Record rec) {
+			int posn = 0;
+			final int recId = rec.getRecordId();
+			if (rowMap.containsKey(recId)) {
+				BrowserRow victim = rowMap.remove(recId);
+				int victimPos = rowList.indexOf(victim);
+				rowList.remove(victimPos);
+				posn = rowList.size() - 1;
+				ListDataEvent evt = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, victimPos, victimPos);
+				for (ListDataListener l: listeners) {
+					l.contentsChanged(evt);
+				}
+			}
+			return(posn);
+		}
 		@Override
 		public void addListDataListener(ListDataListener l) {
 			listeners.add(l);

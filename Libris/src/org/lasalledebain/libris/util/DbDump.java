@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisFileManager;
+import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.indexes.RecordHeader;
 
 public class DbDump {
@@ -28,8 +29,13 @@ public class DbDump {
 			System.exit(1);
 		}
 		out = System.out;
-		LibrisFileManager fm = new LibrisFileManager(dbFileObj, null);
-		dumpRecords(fm);
+		LibrisFileManager fm;
+		try {
+			fm = new LibrisFileManager(dbFileObj, null);
+			dumpRecords(fm);
+		} catch (UserErrorException e) {
+			System.err.println("Cannot open database: "+e.getMessage());
+		}
 	}
 
 	private static void dumpRecords(LibrisFileManager fm) {

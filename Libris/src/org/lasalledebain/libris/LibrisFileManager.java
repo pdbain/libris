@@ -2,32 +2,41 @@ package org.lasalledebain.libris;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.exception.UserErrorException;
 
 public class LibrisFileManager {	
-	private static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
-	private static final String POSITION_FILENAME = "positions";
-	private static final String PROPERTIES_FILENAME = "properties";
-	private static final String RECORDS_FILENAME = "records";
-	private static final String JOURNAL_FILENAME = "journal";
 	/**
 	 * XML representation of the schema and database records
 	 */
 	private File databaseFile;
 	/**
-	 * Native representation of database records.
+	 * Location of indexes, native copy of records, etc.
 	 */
 	private File auxDirectory;
+	private static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
+	private static final String POSITION_FILENAME = "positions";
+	private static final String PROPERTIES_FILENAME = "properties";
+	private static final String RECORDS_FILENAME = "records";
+	private static final String JOURNAL_FILENAME = "journal";
+	 static final String NAMEDRECORDS_FILENAME_ROOT = "namedrecs_";
+	 static final int NAMED_RECORDS_INDEX_LEVELS = Integer.getInteger("org.lasalledebain.libris.namedrecsindexlevels", 2);
 	private FileAccessManager propertiesFileMgr;
 	private FileAccessManager recordsFileMgr;
 	private FileAccessManager positionFileMgr;
 	private FileAccessManager schemaAccessMgr;
+	private ArrayList<FileAccessManager> namedRecsFileMgrs;
 	
+	public ArrayList<FileAccessManager> getNamedRecsFileMgrs() {
+		return namedRecsFileMgrs;
+	}
+
 	private final HashSet<FileAccessManager> activeManagers;
 	private final HashSet<FileAccessManager> expendableFiles;
 	ReentrantLock mgrLock;
@@ -39,14 +48,17 @@ public class LibrisFileManager {
 	private FileAccessManager journalAccessMgr;
 	private FileAccessManager databaseAccessMgr;
 
-	public LibrisFileManager(File dbFile, File dbDir) {
-		File myDbDir = dbDir;
+	public LibrisFileManager(File dbFile, File auxDir) throws UserErrorException {
 		activeManagers = new HashSet<FileAccessManager>();
 		expendableFiles = new HashSet<FileAccessManager>();
-		if (null == dbDir) {
-			myDbDir =dbFile.getParentFile();
+		databaseFile = dbFile;
+		if (!databaseFile.exists()) {
+			throw new UserErrorException("database file "+dbFile+" dos not exist");
 		}
-		open(dbFile, myDbDir);
+		if (null == auxDir) {
+			auxDirectory =databaseFile.getParentFile();
+		}
+		open(databaseFile, auxDirectory);
 		mgrLock  = new ReentrantLock();
 		locked = false;
 	}
@@ -109,10 +121,9 @@ public class LibrisFileManager {
 		return (databaseFile == null)? "<no database file given>": databaseFile.getParent();
 	}
 
-	public void open(File dbFile, File dbDir) {
-		setDatabaseFile(dbFile);
+	public void open(File databaseFile, File auxDir) {
 		try {
-			setAuxiliaryFiles(dbDir);
+			setAuxiliaryFiles(auxDir);
 		} catch (DatabaseException e) {
 			LibrisException.saveException(e);
 		}
@@ -140,15 +151,6 @@ public class LibrisFileManager {
 		if (suffixPosition > 0) {
 			directoryName = directoryName.substring(0, suffixPosition);
 		}
-		auxDirectory = new File(databaseDir, AUX_DIRECTORY_NAME+'_'+directoryName);
-
-		positionFileMgr = new FileAccessManager(auxDirectory, POSITION_FILENAME);
-		activeManagers.add(positionFileMgr);
-		expendableFiles.add(positionFileMgr);
-
-		recordsFileMgr = new FileAccessManager(auxDirectory, RECORDS_FILENAME);
-		activeManagers.add(recordsFileMgr);
-		expendableFiles.add(recordsFileMgr);
 
 		journalAccessMgr = new FileAccessManager(new File(auxDirectory, JOURNAL_FILENAME));
 		activeManagers.add(journalAccessMgr);
@@ -156,9 +158,25 @@ public class LibrisFileManager {
 		databaseAccessMgr = new FileAccessManager(databaseFile);
 		activeManagers.add(databaseAccessMgr);
 		
-		propertiesFileMgr = new FileAccessManager(new File(auxDirectory, PROPERTIES_FILENAME));
-		activeManagers.add(propertiesFileMgr);
-		expendableFiles.add(propertiesFileMgr);
+		propertiesFileMgr = makeExpendableAccessManager(PROPERTIES_FILENAME);
+		auxDirectory = new File(databaseDir, AUX_DIRECTORY_NAME+'_'+directoryName);
+		positionFileMgr = makeExpendableAccessManager(POSITION_FILENAME);
+		recordsFileMgr = makeExpendableAccessManager(RECORDS_FILENAME);
+		
+
+		namedRecsFileMgrs = new ArrayList<FileAccessManager>(1+NAMED_RECORDS_INDEX_LEVELS);
+		namedRecsFileMgrs.add(makeExpendableAccessManager(NAMEDRECORDS_FILENAME_ROOT+"data"));
+		for (int i = 0; i < NAMED_RECORDS_INDEX_LEVELS; ++i) {
+			namedRecsFileMgrs.add(makeExpendableAccessManager(NAMEDRECORDS_FILENAME_ROOT+"index"+(i+1)));
+		}
+	
+	}
+
+	public FileAccessManager makeExpendableAccessManager(String fileName) {
+		FileAccessManager mgr = new FileAccessManager(auxDirectory, fileName);
+		activeManagers.add(mgr);
+		expendableFiles.add(mgr);
+		return mgr;
 	}
 	
 	public synchronized FileAccessManager makeAccessManager(File managedFile) {

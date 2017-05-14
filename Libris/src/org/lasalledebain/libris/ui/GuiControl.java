@@ -1,18 +1,18 @@
 package org.lasalledebain.libris.ui;
 
 import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.FocusListener;
+import java.util.Arrays;
 
 import org.lasalledebain.libris.EnumFieldChoices;
-import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
 public abstract class GuiControl {
-	private FieldPosition fieldInfo;
+	private FieldInfo fldInfo;
 	private ModificationTracker modMon;
-	protected Field recordField;
 	public boolean isSingleValue() {
 		return singleValue;
 	}
@@ -32,6 +32,7 @@ public abstract class GuiControl {
 	boolean singleValue;
 	boolean restricted;
 	boolean empty = true;
+	protected Frame parentFrame = null;
 
 	public boolean isEmpty() {
 		return empty;
@@ -40,7 +41,7 @@ public abstract class GuiControl {
 	public abstract void setFieldValue(String controlValue) throws FieldDataException;
 
 	public void setFieldValues(String controlValue, String extraValue) throws DatabaseException {
-		throw new DatabaseException("cannot set multiple values for "+fieldInfo.getId());
+		throw new DatabaseException("cannot set multiple values for "+fldInfo.getId());
 	}
 
 	public abstract void setFieldValue(FieldValue newValue) throws FieldDataException;
@@ -52,15 +53,25 @@ public abstract class GuiControl {
 	 */
 	public abstract FieldValue getFieldValue() throws FieldDataException;
 	
+	public Iterable<FieldValue> getFieldValues() throws FieldDataException {
+		FieldValue firstField = getFieldValue();
+		if (null != firstField) {
+			return Arrays.asList();
+		} else {
+			return firstField;
+		}
+	}
+	
 	public abstract Component getGuiComponent();
 	public void setLegalValues(EnumFieldChoices legalValues) {
 		return;
 	}
-	public void setFieldPosition(FieldPosition fieldInfo) {
-		this.fieldInfo = fieldInfo;
+	public void setFieldInfo(FieldInfo fieldInfo) {
+		this.fldInfo = fieldInfo;
 	}
 
 	public abstract void setEditable(boolean editable);
+	public abstract boolean isEditable();
 	
 	protected void setModified(boolean modified) {
 		modMon.setModified(modified);
@@ -85,5 +96,9 @@ public abstract class GuiControl {
 
 	public void addFocusListener(FocusListener focusTracker) {
 		getFocusComponent().addFocusListener(focusTracker);
+	}
+	
+	public int getNumValues() {
+		return 1;
 	}
 }

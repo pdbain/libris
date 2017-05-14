@@ -1,11 +1,11 @@
 package org.lasalledebain.libris.field;
 
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.FieldMasterCopy;
+import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
 
 public class PairField extends GenericField implements Field {
-	public PairField(FieldMasterCopy template) {
+	public PairField(FieldTemplate template) {
 		super(template);
 	}
 

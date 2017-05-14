@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.BucketOverflowFileManager;

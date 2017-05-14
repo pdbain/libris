@@ -6,12 +6,11 @@ import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.FieldMasterCopy;
+import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.ui.EmptyField;
@@ -51,7 +50,7 @@ public abstract class GenericField implements Field {
 		return template.isRestricted();
 	}
 
-	FieldMasterCopy template;
+	protected FieldTemplate template;
 	/**
 	 * Allows a field to have multiple values;
 	 */
@@ -95,13 +94,10 @@ public abstract class GenericField implements Field {
 
 	@Override
 	public void setValues(FieldValue[] valueArray) throws FieldDataException {
-		deleteAllvalues();
-		for (FieldValue v: valueArray) {
-			addFieldValue(v);
-		}
+		setValues(valueArray);
 	}
 
-	public GenericField(FieldMasterCopy template) {
+	public GenericField(FieldTemplate template) {
 		super();
 		this.template = template;
 	}
@@ -228,7 +224,7 @@ public abstract class GenericField implements Field {
 	public String toString() {
 		return getFieldId()+": "+getValuesAsString();
 	}
-	public static Field fromXml(ElementManager fieldManager, Record fieldList) throws XmlException, DatabaseException, InputException {
+	public static Field fromXml(ElementManager fieldManager, Record rec) throws XmlException, DatabaseException, InputException {
 		HashMap<String, String> attrs = fieldManager.parseOpenTag();
 		String elementContents;
 		if (fieldManager.hasContent()) {
@@ -239,20 +235,19 @@ public abstract class GenericField implements Field {
 		String valueAttr = attrs.get(LibrisXMLConstants.XML_ENUMCHOICE_VALUE_ATTR);
 		String extraValueAttr = attrs.get(LibrisXMLConstants.XML_EXTRA_VALUE_ATTR);
 		String fieldId = attrs.get(LibrisXMLConstants.XML_FIELD_ID_ATTR);
-		Field f;
-		f = fieldList.getField(fieldId);
+		Field f = null;
 		if (!elementContents.isEmpty()) {
 			if (!valueAttr.isEmpty()) {
 				throw new XmlException(fieldManager.getStartEvent(), "field element must be empty if value attribute is used");
 			}
-			f.addValue(elementContents);
+			rec.addFieldValue(fieldId, elementContents);
 		} else {
 			if ((null != extraValueAttr) && !extraValueAttr.isEmpty()) {
-				f.addValuePair(valueAttr, extraValueAttr);
+				f = rec.addFieldValuePair(fieldId, valueAttr, extraValueAttr);
 			} else if ((null != valueAttr) && !valueAttr.isEmpty()) {
-				f.addValue(valueAttr);
+				f = rec.addFieldValue(fieldId, valueAttr);
 			} else {
-				throw new InputException("value and extraValue empty: "+fieldList.getRecordId());
+				throw new InputException("value and extraValue empty: "+rec.getRecordId());
 			}
 		}
 		fieldManager.parseClosingTag();
@@ -331,145 +326,5 @@ public abstract class GenericField implements Field {
 	@Override
 	public Field getReadOnlyView() {
 		return new ReadOnlyField(this);
-	}
-	private class ReadOnlyField implements Field {
-		public ReadOnlyField(Field actualField) {
-			this.actualField = actualField;
-		}
-
-		Field actualField;
-		@Override
-		public void addIntegerValue(int value) throws FieldDataException {
-			throw new FieldDataException("field is read-only");
-		}
-
-		@Override
-		public void addValue(String data) throws FieldDataException {
-			throw new FieldDataException("field is read-only");
-		}
-
-		@Override
-		public void addValuePair(String value, String extraValue)
-		throws FieldDataException {
-			throw new FieldDataException("field is read-only");
-		}
-
-		@Override
-		public void addValuePair(Integer value, String extraValue)
-		throws FieldDataException {
-			throw new FieldDataException("field is read-only");
-		}
-
-		@Override
-		public void changeValue(String string) throws FieldDataException {
-			throw new FieldDataException("field is read-only");
-		}
-
-		@Override
-		public void changeValue(FieldValue fieldValue)
-		throws FieldDataException {
-			throw new FieldDataException("field is read-only");
-		}
-
-		@Override
-		public Field duplicate() throws FieldDataException {
-			return actualField.duplicate();
-		}
-
-		@Override
-		public boolean equals(Field comparand) {
-			return actualField.equals(comparand);
-		}
-
-		@Override
-		public String getFieldId() {
-			return actualField.getFieldId();
-		}
-
-		@Override
-		public Iterable<FieldValue> getFieldValues() {
-			return actualField.getFieldValues();
-		}
-
-		@Override
-		public FieldValue getFirstFieldValue() {
-			return actualField.getFirstFieldValue();
-		}
-
-		@Override
-		public EnumFieldChoices getLegalValues() {
-			return actualField.getLegalValues();
-		}
-
-		@Override
-		public int getNumberOfValues() {
-			return actualField.getNumberOfValues();
-		}
-
-		@Override
-		public FieldType getType() {
-			return actualField.getType();
-		}
-
-		@Override
-		public String getValuesAsString() {
-			return actualField.getValuesAsString();
-		}
-
-		@Override
-		public boolean isEmpty() {
-			return actualField.isEmpty();
-		}
-
-		@Override
-		public boolean isReadOnly() {
-			return true;
-		}
-
-		@Override
-		public boolean isRestricted() {
-			return actualField.isRestricted();
-		}
-
-		@Override
-		public boolean isSingleValue() {
-			return actualField.isSingleValue();
-		}
-
-		@Override
-		public boolean isTrue() throws FieldDataException {
-			return actualField.isTrue();
-		}
-
-		@Override
-		public Field getReadOnlyView() {
-			return this;
-		}
-
-		@Override
-		public FieldValue removeValue() {
-			throw new InternalError("changing read-only field");
-		}
-
-		@Override
-		public void setValues(FieldValue[] valueArray) throws FieldDataException {
-			throw new InternalError("changing read-only field");
-		}
-
-		@Override
-		public void setValues(Iterable<FieldValue> values) throws FieldDataException {
-			throw new InternalError("changing read-only field");
-		}
-
-		@Override
-		public LibrisAttributes getAttributes() throws XmlException {
-			return actualField.getAttributes();
-		}
-
-		@Override
-		public void toXml(ElementWriter output) throws LibrisException {
-			return;
-		}
-
 	}
 }

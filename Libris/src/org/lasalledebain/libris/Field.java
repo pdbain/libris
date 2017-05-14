@@ -8,8 +8,8 @@ public interface Field extends XmlExportable {
 	public enum FieldType {T_FIELD_UNKNOWN, 
 		T_FIELD_STRING, // short string
 		T_FIELD_TEXT, // long string
-		T_FIELD_BOOLEAN, T_FIELD_INTEGER, T_FIELD_INDEXENTRY, T_FIELD_ENUM, T_FIELD_PAIR // value pair
-		;
+		T_FIELD_BOOLEAN, T_FIELD_INTEGER, T_FIELD_INDEXENTRY, T_FIELD_ENUM, T_FIELD_PAIR, // value pair
+		T_FIELD_AFFILIATES;
 	}
 	public void addValue(String data) throws FieldDataException;
 	public void addIntegerValue(int value) throws FieldDataException;

@@ -1,6 +1,5 @@
 package org.lasalledebain.libris.xmlUtils;
 
-import java.io.File;
 import java.io.OutputStream;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -93,9 +92,18 @@ public class ElementWriter implements LibrisXMLConstants {
 	public void decreaseIndent() throws XmlException {
 		--indent;
 		if (indent < 0) {
-			XmlException exc = new XmlException("undererflow indent");
+			XmlException exc = new XmlException("underflow indent");
 			throw exc;
 		}
+	}
+	public String getTitle() {
+		return null;
+	}
+	public String getId() {
+		return null;
+	}
+	public int getFieldNum() {
+		return 0;
 	}
 	public static String makeOpeningTag(String tagName) {
 		String buff = "<"+tagName+">";

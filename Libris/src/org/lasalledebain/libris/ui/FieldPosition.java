@@ -1,59 +1,29 @@
 package org.lasalledebain.libris.ui;
 
-import java.util.HashMap;
 import java.util.Iterator;
 
-import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.ui.GuiControlFactory.ControlConstructor;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class FieldPosition implements Iterable<FieldPosition>, LibrisXMLConstants, GuiConstants {
+public class FieldPosition extends FieldInfo implements Iterable<FieldPosition> {
+	protected final int fieldNum;
+	int height = -1, width = -1, vpos = -1, hpos = -1, hspan = -1, vspan = -1;
+	private FieldPosition prevLink;
+	private Layout containingLayout;
+	protected final ControlConstructor control;
+
 	public boolean isCarriageReturn() {
 		return carriageReturn;
 	}
 
-	int height = -1, width = -1, vpos = -1, hpos = -1, hspan = -1, vspan = -1;
-	private String id, title;
-	public String getTitle() {
-		return title;
-	}
-
-	private FieldPosition prevLink;
-	private Layout containingLayout;
-	private ControlConstructor control;
-	private final String controlTypeName;
-	public String getControlTypeName() {
-		return controlTypeName;
-	}
-
 	private boolean carriageReturn = false;
-	private int fieldNum;
-	static private HashMap<FieldType, String> defaultControlType = initializeDefaultControlTypes();
-
-	public ControlConstructor getControlContructor() {
-		return control;
-	}
-
-	private static HashMap<FieldType, String> initializeDefaultControlTypes() {
-		HashMap<FieldType, String> temp = new HashMap<FieldType, String>();
-		temp.put(FieldType.T_FIELD_BOOLEAN, GuiConstants.GUI_CHECKBOX);
-		temp.put(FieldType.T_FIELD_ENUM, GuiConstants.GUI_ENUMFIELD);
-		temp.put(FieldType.T_FIELD_INDEXENTRY, GuiConstants.GUI_TEXTFIELD);
-		temp.put(FieldType.T_FIELD_INTEGER, GuiConstants.GUI_TEXTFIELD);
-		temp.put(FieldType.T_FIELD_PAIR, GuiConstants.GUI_PAIRFIELD);
-		temp.put(FieldType.T_FIELD_STRING, GuiConstants.GUI_TEXTFIELD);
-		temp.put(FieldType.T_FIELD_TEXT, GuiConstants.GUI_TEXTBOX);
-		return temp;
-	}
-
-	public String getId() {
-		return id;
-	}
-
 	public FieldPosition(Layout containingLayout, FieldPosition previous, FieldPositionParameter params) throws DatabaseException {
-		id = params.getId();
+		super(containingLayout, params.getControlType(), params.getId(), params.getTitle());
+		control=GuiControlFactory.getControlConstructor(controlTypeName);
+		if (null == control) {
+			throw new DatabaseException("unrecognized control type "+controlTypeName);
+		}
 		fieldNum = params.getFieldNum();
 		width = params.getWidth();
 		height = params.getHeight();
@@ -71,23 +41,7 @@ public class FieldPosition implements Iterable<FieldPosition>, LibrisXMLConstant
 		} else {
 			hpos = vpos = 0;
 		}
-		String controlType = params.getControlType();
-		if (controlType.equals(LibrisXMLConstants.DEFAULT_GUI_CONTROL)) {
-			controlTypeName = GUI_TEXTBOX;
-			controlType = defaultControlType.get(containingLayout.getFieldType(id));
-		} else {
-			controlTypeName = controlType;
-		}
-		this.control=GuiControlFactory.getControlConstructor(controlType);
-		if (null == control) {
-			throw new DatabaseException("unrecognized control type "+controlType);
-		}
 		prevLink = previous;
-		this.containingLayout = containingLayout;
-		title = params.getTitle();
-		if ((null == title) || title.isEmpty()) {
-			title = containingLayout.getFieldTitle(id);
-		}
 		checkForOverlap();
 	}
 
@@ -104,6 +58,14 @@ public class FieldPosition implements Iterable<FieldPosition>, LibrisXMLConstant
 			}
 			cursor = cursor.prevLink;
 		}
+	}
+
+	public ControlConstructor getControlContructor() {
+		return control;
+	}
+
+	public int getFieldNum() {
+		return fieldNum;
 	}
 
 	public int getHeight() {
@@ -204,10 +166,6 @@ public class FieldPosition implements Iterable<FieldPosition>, LibrisXMLConstant
 		}
 		attrs.setAttribute(XML_LAYOUTFIELD_CONTROL_ATTR, controlTypeName);
 		return attrs;
-	}
-
-	public int getFieldNum() {
-		return fieldNum;
 	}
 
 }

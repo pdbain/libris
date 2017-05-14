@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.xmlUtils;
 
+
 public interface LibrisXMLConstants {
 
 	public static final String tabsAsString = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
@@ -19,9 +20,9 @@ public interface LibrisXMLConstants {
 	public static final String XML_GROUPDEF_STRUCTURE_HIERARCHICAL = "hierarchical";
 	public static final String XML_GROUPDEF_STRUCTURE_FLAT = "flat";
 	public static final String XML_RECORD_ID_ATTR = "id";
+	public static final String XML_RECORD_NAME_ATTR = "name";
 	public static final String XML_MEMBER_GROUP_ATTR = "group";
 	public static final String XML_MEMBER_PARENT_ATTR = "parent";
-	public static final String XML_MEMBER_TITLE_ATTR = "title";
 	public static final String XML_DATABASE_DATE_ATTR = "date";
 	public static final String XML_LIBRIS_TAG = "libris";
 	public static final String XML_METADATA_TAG = "metadata";

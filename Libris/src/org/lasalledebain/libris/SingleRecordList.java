@@ -2,34 +2,20 @@ package org.lasalledebain.libris;
 
 import java.util.Iterator;
 
-import org.lasalledebain.libris.exception.LibrisException;
-
-public class SingleRecordList extends RecordList implements Iterator<Record> {
+public class SingleRecordList extends RecordList implements Iterator<Record>, Iterable<Record> {
 	Record rec;
 	int position;
-	public SingleRecordList(LibrisDatabase database, Record rec) {
-		this(database);
+	public SingleRecordList(Record rec) {
 		this.rec = rec;
 	}
 
-	public SingleRecordList(LibrisDatabase database) {
-		super(database);
+	public SingleRecordList() {
 		position = 0;
 	}
 
-	@Override
-	public Record getRecord(RecordId id) throws LibrisException {
-		if ((null != rec) && (rec.getRecordId().equals(id))) {
-			return rec;
-		} else {
-			return null;
-		}
-	}
-
-	@Override
 	public Iterator<Record> iterator() {
-		
-		return new SingleRecordList(database, rec);
+
+		return new SingleRecordList(rec);
 	}
 
 	@Override
@@ -46,6 +32,15 @@ public class SingleRecordList extends RecordList implements Iterator<Record> {
 	@Override
 	public void remove() {
 		return;
+	}
+
+	@Override
+	public Record getRecord(int id) {
+		if ((null != rec) && (rec.getRecordId() == id)) {
+			return rec;
+		} else {
+			return null;
+		}
 	}
 
 }

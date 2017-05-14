@@ -17,7 +17,7 @@ public class CheckBox extends GuiControl {
 
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
-			if (!isEditable) {
+			if (!editable) {
 				control.setState(!control.getState());
 			} else {
 				setModified(true);
@@ -27,7 +27,7 @@ public class CheckBox extends GuiControl {
 	}
 
 	Checkbox control;
-	private boolean isEditable;
+	private boolean editable;
 	public CheckBox(String title, int height, int width) {
 		control = new Checkbox(title);
 		control.addItemListener(new CheckboxListener());
@@ -57,9 +57,14 @@ public class CheckBox extends GuiControl {
 	}
 
 	@Override
-	public void setEditable(boolean editable) {
-		isEditable = editable;
+	public void setEditable(boolean edtable) {
+		editable = edtable;
 		control.setEnabled(editable);
+	}
+
+	@Override
+	public boolean isEditable() {
+		return editable;
 	}
 
 

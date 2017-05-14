@@ -16,9 +16,11 @@ import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 public class Records implements Iterable<Record>{
 
 	private LibrisRecordsFileManager recMgr;
+	LibrisDatabase db;
 
 	public Records(LibrisDatabase db, LibrisFileManager fileMgr) throws LibrisException {
 		recMgr = new LibrisRecordsFileManager(db, db.isReadOnly(), db.getSchema(), fileMgr);
+		this.db = db;
 	}
 
 	public RecordsReader getNativeRecordsReader() {
@@ -47,4 +49,7 @@ public class Records implements Iterable<Record>{
 		return recMgr.iterator();
 	}
 
+	public Iterator<Record> iterator(String prefix) {
+		return db.getNamedRecords().iterator();
+	}
 }

@@ -8,9 +8,6 @@ public abstract class LibrisRecordMap {
 
 	int numKeys = 0;
 	public long recordsElementPosition;
-	void putRecordPosition(RecordId recId, long recordPosition) throws DatabaseException {
-		putRecordPosition(recId.getRecordNumber(), recordPosition);
-	}
 	
 	public abstract void flush() throws DatabaseException;
 	public abstract void close() throws DatabaseException;
@@ -29,9 +26,10 @@ public abstract class LibrisRecordMap {
 	 * @return file position, or 0 if the record is not found
 	 * @throws RecordDataException
 	 */
-	public long get(RecordId recId) throws DatabaseException {
-		return getRecordPosition(recId.getRecordNumber());
+	public long get(int recId) throws DatabaseException {
+		return getRecordPosition(recId);
 	}
+
 	/**
 	 * @return number of records in the index
 	 * @throws DatabaseException

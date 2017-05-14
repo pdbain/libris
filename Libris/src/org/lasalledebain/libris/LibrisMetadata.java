@@ -1,6 +1,5 @@
 package org.lasalledebain.libris;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -22,7 +21,7 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 
 	private LibrisDatabase database;
 	private Layouts myLayouts;
-	private RecordId lastRecordId;
+	private int lastRecordId;
 	private int savedRecords;
 	private int modifiedRecords;
 	private boolean schemaInline;
@@ -65,12 +64,10 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 
 	public void saveProperties(FileOutputStream propertiesFile) throws IOException {
 			usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_SAVED, getCurrentDateString());
-			String lastId = lastRecordId.toString();
+			String lastId = RecordId.toString(lastRecordId);
 			usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_RECORD_ID, lastId);
-			usageProperties.setProperty(LibrisConstants.PROPERTY_RECORD_COUNT, Integer.toString(savedRecords));
+			usageProperties.setProperty(LibrisConstants.PROPERTY_RECORD_COUNT, (0 == savedRecords)? "0": Integer.toString(savedRecords));
 			usageProperties.setProperty(LibrisConstants.PROPERTY_DATABASE_BRANCH, database.getBranchString());
-			final String lastChild = database.getLastChildString();
-				usageProperties.setProperty(LibrisConstants.PROPERTY_DATABASE_LAST_CHILD, lastChild.toString());
 			usageProperties.store(propertiesFile, "");
 	}
 
@@ -90,19 +87,16 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 		int branchNum = 0;
 		String branchString = usageProperties.getProperty(LibrisConstants.PROPERTY_DATABASE_BRANCH);
 		branchNum = DatabaseAttributes.parseBranchString(branchString);
-		if (null != recordIdString) {
+		if ((null != recordIdString) && !recordIdString.isEmpty()) {
 			try {
-				lastRecordId = new RecordId(recordIdString);
+				lastRecordId = RecordId.toId(recordIdString);
 				lastRecOkay = true;
 			} catch (LibrisException e) {
 				return e;
 			}
+		} else {
+			lastRecordId = RecordId.getNullId();
 		}
-		database.setBranch(branchNum);
-		String lastChildString = usageProperties.getProperty(LibrisConstants.PROPERTY_DATABASE_LAST_CHILD);
-
-		int lastChild = DatabaseAttributes.parseBranchString(lastChildString);
-		database.setLastChild(lastChild);
 		return null;
 	}
 
@@ -110,14 +104,21 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 		return (DateFormat.getDateTimeInstance()).format(new Date());
 	}
 
-	public synchronized RecordId getLastRecordId() {
+	public synchronized int getLastRecordId() {
 		return lastRecordId;
 	}
-	public synchronized void setLastRecordId(RecordId recordId) {
-		lastRecordId = recordId;
+	
+	public synchronized void setLastRecordId(final int recId) {
+		if ((RecordId.isNull(lastRecordId)) || ((recId > lastRecordId))) {
+			lastRecordId = recId;
+		}
 		lastRecOkay = true;
 	}
 
+	public synchronized int newRecordId() {
+		int newId = ++lastRecordId;
+		return newId;
+	}
 	public boolean isMetadataOkay() {
 		return lastRecOkay;
 	}
@@ -166,6 +167,18 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 			LibrisMetadata otherMetadat = (LibrisMetadata) comparand;
 			return myLayouts.equals(otherMetadat.myLayouts);
 		}
+	}
+
+	public int getFieldNum() {
+		return 0;
+	}
+
+	public String getId() {
+		return null;
+	}
+
+	public String getTitle() {
+		return null;
 	}
 	
 	

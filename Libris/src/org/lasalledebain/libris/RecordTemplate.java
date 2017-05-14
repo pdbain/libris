@@ -12,8 +12,8 @@ public class RecordTemplate {
 	/**
 	 * Array of the field templates in the order listed in the schema
 	 */
-	FieldMasterCopy[] fieldMasters;
-	
+	FieldTemplate[] fieldMasters;
+
 	/**
 	 * read-only fields with default values
 	 */
@@ -27,42 +27,46 @@ public class RecordTemplate {
 	// TODO test setting, getting fields by index, ID
 	// TODO test duplicate IDs
 	private Schema dbSchema;
-	GroupDefs groupDefs;
+	private GroupDefs grpDefs;
+	public RecordList records;
 
-	
 	public GroupDefs getGroupDefs() {
-		return groupDefs;
+		return grpDefs;
 	}
-	
+
 	public int getInheritanceGroup(int fieldNum) {
 		return fieldMasters[fieldNum].getInheritanceGroup();
 	}
 
-	public RecordTemplate(Schema s, int initialNumFields) {
+	public int getGroupNum(String groupName) {
+		int groupNum = grpDefs.groupIdToNum(groupName);
+		return groupNum;
+	}
+	private RecordTemplate(Schema s, int initialNumFields) {
 		this.numFields = 0;
 		dbSchema = s;
-		fieldMasters = new FieldMasterCopy[initialNumFields];
+		fieldMasters = new FieldTemplate[initialNumFields];
 		defaultFields = new Field[initialNumFields];
 		existingFieldIds = new HashSet<String>(initialNumFields);
-		groupDefs = dbSchema.getGroupDefs();
-		numGroups = (null == groupDefs) ? 0 : groupDefs.getNumGroups();
+		grpDefs = dbSchema.getGroupDefs();
+		numGroups = (null == grpDefs) ? 0 : grpDefs.getNumGroups();
 	}
 
-	public RecordTemplate(Schema s) {
-		this(s, 0);
-	}
-	
 	public static RecordTemplate templateFactory(Schema s) throws InputException {
+		return templateFactory(s, null);
+	}
+	public static RecordTemplate templateFactory(Schema s, RecordList recs) throws InputException {
 		String[] fieldIds = s.getFieldIds();
 		RecordTemplate recTemplate = new RecordTemplate(s, fieldIds.length);
 		for (String id: fieldIds) {
 			recTemplate.addField(id);
 		}
+		recTemplate.records = recs;
 		return recTemplate;
 	}
-	public void addField(String fieldId) throws InputException {
+	private void addField(String fieldId) throws InputException {
 		if (numFields >= fieldMasters.length) {
-			FieldMasterCopy[] newFtList = new FieldMasterCopy[numFields+1];
+			FieldTemplate[] newFtList = new FieldTemplate[numFields+1];
 			Field[] newDefaultFields = new Field[numFields+1];
 			System.arraycopy(fieldMasters, 0, newFtList, 0, fieldMasters.length);
 			System.arraycopy(defaultFields, 0, newDefaultFields, 0, defaultFields.length);
@@ -71,7 +75,7 @@ public class RecordTemplate {
 		if (existingFieldIds.contains(fieldId)) {
 			throw new InputException("duplicate field "+fieldId);
 		} else {
-			FieldMasterCopy f = dbSchema.getFieldTemplate(fieldId);
+			FieldTemplate f = dbSchema.getFieldTemplate(fieldId);
 			if (null == f) {
 				throw new InputException("field "+fieldId+" not defined in schema");
 			}
@@ -85,7 +89,7 @@ public class RecordTemplate {
 		}
 		++numFields;
 	}
-	
+
 	public Record makeRecord() {
 		return new RecordInstance(this);
 	}

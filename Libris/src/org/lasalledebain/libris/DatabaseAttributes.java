@@ -79,5 +79,14 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 		}
 		return super.iterator();
 	}
+	public int getFieldNum() {
+		return 0;
+	}
+	public String getId() {
+		return null;
+	}
+	public String getTitle() {
+		return null;
+	}
 
 }

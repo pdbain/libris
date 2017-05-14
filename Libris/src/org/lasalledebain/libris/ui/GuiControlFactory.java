@@ -17,45 +17,35 @@ public abstract class GuiControlFactory {
 		HashMap<String, ControlConstructor> map = new HashMap<String, ControlConstructor>(12);
 
 		try {
-			String cName = GuiConstants.GUI_TEXTBOX.intern();
+			String cName = GuiConstants.GUI_TEXTBOX;
 			map.put(cName, new TextboxConstructor());
 			
-			cName = GuiConstants.GUI_TEXTFIELD.intern();
+			cName = GuiConstants.GUI_TEXTFIELD;
 			map.put(cName, new TextfieldConstructor());
 			
-			cName = GuiConstants.GUI_PAIRFIELD.intern();
+			cName = GuiConstants.GUI_PAIRFIELD;
 			map.put(cName, new RangefieldConstructor());
 			
-			cName = GuiConstants.GUI_CHECKBOX.intern();
+			cName = GuiConstants.GUI_CHECKBOX;
 			map.put(cName, new CheckboxConstructor());
-			cName = GuiConstants.GUI_ENUMFIELD.intern();
+			
+			cName = GuiConstants.GUI_ENUMFIELD;
 			map.put(cName, new EnumfieldConstructor());
+			
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		}
 		return map;
 	}
 	
-	static GuiControl makeControl(ControlConstructor controlConstructor, 
-			FieldPosition fieldInfo, String initialValue) throws DatabaseException {
-		try {
-			GuiControl control = controlConstructor.makeControl(fieldInfo.getTitle(), fieldInfo.getHeight(), fieldInfo.getWidth());
-			control.setFieldPosition(fieldInfo);
-			control.setFieldValue(initialValue);
-			return control;
-		} catch (Exception e) {
-			throw new DatabaseException(e);
-		}
-	}
-
-	static UiField makeControl(FieldPosition fieldInfo, Field recordField, ModificationTracker modTrk) throws DatabaseException {
+	static MultipleValueUiField makeMultiControlField(FieldPosition fieldPosn, Field recordField, ModificationTracker modTrk) throws DatabaseException {
 		try {
 			int numValues = recordField.getNumberOfValues();
-			final ControlConstructor ctrlConst = fieldInfo.getControlContructor();
-			UiField guiFld = new UiField(fieldInfo, ctrlConst.labelField(), 
+			final ControlConstructor ctrlConst = fieldPosn.getControlContructor();
+			MultipleValueUiField guiFld = new MultipleValueUiField(fieldPosn, ctrlConst.labelField(), 
 					recordField, numValues, modTrk);
 			if (0 == numValues) {
-				GuiControl control = guiFld.addControl(modTrk.isModifiable());
+				guiFld.addControl(modTrk.isModifiable());
 			} else {
 				for (FieldValue v: recordField.getFieldValues()) {
 					GuiControl control = guiFld.addControl(modTrk.isModifiable());
@@ -68,9 +58,9 @@ public abstract class GuiControlFactory {
 		}
 	}
 
-	static GuiControl newControl(FieldPosition fieldInfo,
+	static GuiControl newControl(FieldPosition fieldPosn,
 			Field recordField, ModificationTracker modTrk, boolean editable) throws FieldDataException {
-		GuiControl control = fieldInfo.getControlContructor().makeControl(fieldInfo, modTrk);
+		GuiControl control = fieldPosn.getControlContructor().makeControl(fieldPosn, modTrk);
 		EnumFieldChoices legalValues = recordField.getLegalValues();
 		control.setLegalValues(legalValues);
 		control.setEditable(editable);
@@ -87,11 +77,18 @@ public abstract class GuiControlFactory {
 	
 	public static abstract class ControlConstructor {
 		public abstract GuiControl makeControl(String title, int height, int width);
-		public GuiControl makeControl(FieldPosition fieldInfo, ModificationTracker modTrk)
+		public GuiControl makeControl(FieldInfo fldInfo, ModificationTracker modTrk) {
+			GuiControl ctrl = makeControl(fldInfo.getTitle(), 0, 0);
+			ctrl.setFieldInfo(fldInfo);
+			ctrl.setModificationTracker(modTrk);
+			return ctrl;
+		}
+		
+		public GuiControl makeControl(FieldPosition fieldPosn, ModificationTracker modTrk)
 		{
-			GuiControl ctrl = makeControl(fieldInfo.getTitle(), fieldInfo.getHeight(), 
-					fieldInfo.getWidth());
-			ctrl.setFieldPosition(fieldInfo);
+			GuiControl ctrl = makeControl(fieldPosn.getTitle(), fieldPosn.getHeight(), 
+					fieldPosn.getWidth());
+			ctrl.setFieldInfo(fieldPosn);
 			ctrl.setModificationTracker(modTrk);
 			return ctrl;
 		}
@@ -132,4 +129,4 @@ public abstract class GuiControlFactory {
 			return new EnumField(height, width);
 		}		
 	}
-}
+	}

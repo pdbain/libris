@@ -7,6 +7,7 @@ import java.util.logging.Level;
 
 import javax.swing.JPanel;
 
+import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
@@ -22,64 +23,21 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public abstract class Layout implements XmlExportable, LibrisXMLConstants {
-LibrisDatabase db = null;
-	public Layout(LibrisDatabase db) {
-		super();
-		this.db = db;
-	}
-
-
-	@Override
-	public LibrisAttributes getAttributes() {
-		LibrisAttributes attrs = new LibrisAttributes();
-		attrs.setAttribute(XML_LAYOUT_ID_ATTR, getId());
-		if (null != title) {
-			attrs.setAttribute(LibrisXMLConstants.XML_LAYOUT_TITLE_ATTR, title);
-		}
-		attrs.setAttribute(XML_LAYOUT_TYPE_ATTR, getLayoutType());
-		attrs.setAttribute(XML_LAYOUT_HEIGHT_ATTR, Integer.toString(getHeight()));
-		attrs.setAttribute(XML_LAYOUT_WIDTH_ATTR, Integer.toString(getWidth()));
-		return attrs;
-	}
-
-
-	@Override
-	public void toXml(ElementWriter output) throws LibrisException {
-		output.writeStartElement(XML_LAYOUT_TAG, getAttributes(), false);
-		for (String user: layoutUsers) {
-			LibrisAttributes  attr = new LibrisAttributes();
-			attr.setAttribute(XML_LAYOUT_USEDBY_ATTR, user);
-			output.writeStartElement(XML_LAYOUTUSAGE_TAG, attr, true);
-		}
-		
-		for (FieldPosition f: fieldList) {
-			LibrisAttributes attr = f.getAttributes();
-			output.writeStartElement(XML_LAYOUTFIELD_TAG, attr, true);
-		}
-		output.writeEndElement();
-	}
-
-	private String title = null;
-	private String id;
 	protected int height;
 	protected int width;
 	Schema mySchema = null;
-	protected ArrayList<FieldPosition> fieldList;
+	protected ArrayList<FieldPosition> bodyFieldList;
 	Vector <String> layoutUsers;
 	protected FieldPosition positionList = null;
+	private String id;
+	private String title = null;
 	
-	public Layout(Schema schem) {
+	public Layout(Schema schem) throws DatabaseException {
 		mySchema = schem;
-		fieldList = new ArrayList<FieldPosition>();
+		bodyFieldList = new ArrayList<FieldPosition>();
 		layoutUsers = new Vector<String>(1);
 	}
 	
-	private void parseUsage(ElementManager layoutMgr) throws InputException  {
-		HashMap<String, String> attrs = layoutMgr.parseOpenTag();
-		String usedBy = attrs.get(XML_LAYOUT_USEDBY_ATTR);
-		layoutUsers.add(usedBy);
-	}
-
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -112,16 +70,16 @@ LibrisDatabase db = null;
 		
 		fParams.setParams(values);
 		fParams.setFieldNum(mySchema.getFieldNum(fParams.getId()));
-		addField(fParams);
+		addBodyField(fParams);
 		if (fieldMgr.hasNext()) {
 			throw new XmlException(fieldMgr, "layoutfield cannot contain other elements");
 		}	
 	}
 
-	public void addField(FieldPositionParameter fParams) throws DatabaseException {
+	public void addBodyField(FieldPositionParameter fParams) throws DatabaseException {
 		FieldPosition l = new FieldPosition(this, positionList, fParams);
 		positionList = l;
-		fieldList.add(l);
+		bodyFieldList.add(l);
 	}
 
 	void setHeight(String h) {
@@ -134,8 +92,8 @@ LibrisDatabase db = null;
 		return title;
 	}
 
-	abstract ArrayList<UiField> layOutFields(Record rec, JPanel recordPanel, ModificationTracker modTrk)
-	throws DatabaseException;
+	abstract ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
+	throws DatabaseException, LibrisException;
 	
 	public void setIdAndTitle(String myTitle, String myId) throws DatabaseException {
 		if (null == myId) {
@@ -147,7 +105,7 @@ LibrisDatabase db = null;
 
 	public String[] getFieldIds() {
 		Vector<String> fieldIds = new Vector<String>();
-		for (FieldPosition p: fieldList) {
+		for (FieldPosition p: bodyFieldList) {
 			fieldIds.add(p.getId());
 		}
 		return fieldIds.toArray(new String[fieldIds.size()]);
@@ -166,8 +124,8 @@ LibrisDatabase db = null;
 	}
 
 	FieldPosition[] getFields() {
-		FieldPosition[] positions = new FieldPosition[fieldList.size()];
-		fieldList.toArray(positions);
+		FieldPosition[] positions = new FieldPosition[bodyFieldList.size()];
+		bodyFieldList.toArray(positions);
 		return positions;
 	}
 	
@@ -177,15 +135,9 @@ LibrisDatabase db = null;
 		return mySchema.getFieldType(id);
 	}
 
-	public int getNumberOfFields() {
-		// TODO getNumberOfFields
-		return 0;
-	}
-
 	public Iterable<String> getLayoutUsers() {
 		return layoutUsers;
 	}
-
 
 	static Layout fromXml(Schema schem, ElementManager layoutMgr)
 	throws InputException, DatabaseException {
@@ -219,6 +171,42 @@ LibrisDatabase db = null;
 	}
 
 
+	@Override
+	public void toXml(ElementWriter output) throws LibrisException {
+		output.writeStartElement(XML_LAYOUT_TAG, getAttributes(), false);
+		for (String user: layoutUsers) {
+			LibrisAttributes  attr = new LibrisAttributes();
+			attr.setAttribute(XML_LAYOUT_USEDBY_ATTR, user);
+			output.writeStartElement(XML_LAYOUTUSAGE_TAG, attr, true);
+		}
+		
+		for (FieldPosition f: bodyFieldList) {
+			LibrisAttributes attr = f.getAttributes();
+			output.writeStartElement(XML_LAYOUTFIELD_TAG, attr, true);
+		}
+		output.writeEndElement();
+	}
+
+
+	@Override
+	public LibrisAttributes getAttributes() {
+		LibrisAttributes attrs = new LibrisAttributes();
+		attrs.setAttribute(XML_LAYOUT_ID_ATTR, getId());
+		if (null != title) {
+			attrs.setAttribute(LibrisXMLConstants.XML_LAYOUT_TITLE_ATTR, title);
+		}
+		attrs.setAttribute(XML_LAYOUT_TYPE_ATTR, getLayoutType());
+		attrs.setAttribute(XML_LAYOUT_HEIGHT_ATTR, Integer.toString(getHeight()));
+		attrs.setAttribute(XML_LAYOUT_WIDTH_ATTR, Integer.toString(getWidth()));
+		return attrs;
+	}
+
+	private void parseUsage(ElementManager layoutMgr) throws InputException  {
+		HashMap<String, String> attrs = layoutMgr.parseOpenTag();
+		String usedBy = attrs.get(XML_LAYOUT_USEDBY_ATTR);
+		layoutUsers.add(usedBy);
+	}
+
 	protected void validate() throws InputException {
 		return;
 	}
@@ -230,8 +218,27 @@ LibrisDatabase db = null;
 			Layout otherLayout = (Layout) obj;
 			return otherLayout.getAttributes().equals(getAttributes());
 		} catch (ClassCastException e) {
-			db.log(Level.WARNING, "Type mismatch in Layout.equals()", e);
+			LibrisDatabase.librisLogger.log(Level.WARNING, "Type mismatch in Layout.equals()", e);
 			return false;
 		}
+	}
+
+
+	protected Field getField(Record rec, int fieldNum)
+			throws LibrisException {
+				Field fld = null;
+				try {
+					fld = rec.getField(fieldNum);
+					if (null == fld) {
+						fld = rec.getDefaultField(fieldNum);
+					}
+				} catch (InputException e) {
+					throw new DatabaseException("Error in layout \""+getId()+"\"", e);			
+				}
+				return fld;
+			}
+
+	public int getFieldNum() {
+		return 0;
 	}
 }

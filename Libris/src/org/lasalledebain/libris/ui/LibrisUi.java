@@ -1,16 +1,17 @@
 package org.lasalledebain.libris.ui;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 public interface LibrisUi {
 
-	public LibrisDatabase openDatabase(LibrisParameters params);
 	public LibrisDatabase openDatabase();
 	public LibrisDatabase getDatabase();
 	public void databaseOpened(LibrisDatabase librisDatabase) throws DatabaseException, DatabaseException;
@@ -24,7 +25,7 @@ public interface LibrisUi {
 	public void indicateModified(boolean isModified);
 	public void setEditable(boolean editable) throws LibrisException;
 
-	public abstract void displayRecord(RecordId recordId) throws LibrisException;
+	public abstract void displayRecord(int recordId) throws LibrisException;
 
 	public abstract void alert(String msg, Exception e);
 
@@ -77,8 +78,13 @@ public interface LibrisUi {
 
 	void setSelectedField(UiField selectedField);
 
+	public void setRecordName(NamedRecordList namedRecs) throws InputException;
+	
 	public abstract void arrangeValues();
 
 	public void repaint();
 	Record newRecord();
+	public void rebuildDatabase() throws LibrisException;
+	void setAuxiliaryDirectory(File auxDir);
+	void setDatabaseFile(File dbFile);
 }

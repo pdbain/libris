@@ -44,7 +44,6 @@ public class LibrisEmptyAttributes extends LibrisAttributes {
 
 	@Override
 	public void setNext(LibrisAttributes next) {
-		// TODO Auto-generated method stub
 		super.setNext(next);
 	}
 

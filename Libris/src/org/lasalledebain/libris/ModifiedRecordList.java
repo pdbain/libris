@@ -3,14 +3,13 @@ package org.lasalledebain.libris;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.exception.InputException;
 
 public class ModifiedRecordList extends RecordList {
 
-	TreeMap<RecordId, Record> modifiedRecords;
-	public ModifiedRecordList(LibrisDatabase database) {
-		super(database);
-		modifiedRecords = new TreeMap<RecordId, Record>();
+	TreeMap<Integer, Record> modifiedRecords;
+	public ModifiedRecordList() {
+		modifiedRecords = new TreeMap<Integer, Record>();
 	}
 
 	@Override
@@ -28,12 +27,13 @@ public class ModifiedRecordList extends RecordList {
 		modifiedRecords.put(rec.getRecordId(), rec);
 		return true;
 	}
-	@Override
-	public Record getRecord(RecordId id) throws LibrisException {
-		return modifiedRecords.get(id);
-	}
 
 	public void clear() {
 		modifiedRecords.clear();
+	}
+
+	@Override
+	public Record getRecord(int id) throws InputException {
+		return modifiedRecords.get(id);
 	}
 }

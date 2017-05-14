@@ -13,7 +13,6 @@ import javax.xml.stream.XMLStreamException;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -30,7 +29,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
 public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter, LibrisXMLConstants {
-	HashMap<RecordId, RecordIdAndLength> journalIndex;
+	HashMap<Integer, RecordIdAndLength> journalIndex;
 
 	public static LibrisJournalFileManager createLibrisJournalFileManager(
 			LibrisDatabase database, FileAccessManager journalFileMr) throws LibrisException {
@@ -47,7 +46,7 @@ public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter
 	private LibrisJournalFileManager(LibrisDatabase database, FileAccessManager journalFileMr) throws LibrisException  {
 		this.database = database;
 		databaseProperties = database.getAttributes();
-		journalIndex = new HashMap<RecordId, RecordIdAndLength>();
+		journalIndex = new HashMap<Integer, RecordIdAndLength>();
 		try {
 			if (!database.isReadOnly()) {
 				boolean initializeFile = false;
@@ -88,7 +87,7 @@ public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter
 		if (database.isReadOnly()) {
 			throw new UserErrorException("database is read only");
 		}
-		RecordId id = rec.getRecordId();
+		int id = rec.getRecordId();
 		xmlBuffer.reset();
 		rec.toXml(xmlWriter);
 		try {
@@ -138,7 +137,7 @@ public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter
 		}
 	}
 
-	public boolean removeRecord(RecordId id) throws LibrisException {
+	public boolean removeRecord(int id) throws LibrisException {
 		try {
 			if (journalIndex.containsKey(id)) {
 				RecordIdAndLength entry = journalIndex.get(id);
@@ -202,6 +201,18 @@ public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter
 		return iter;
 	}
 
+	public int getFieldNum() {
+		return 0;
+	}
+
+	public String getId() {
+		return null;
+	}
+
+	public String getTitle() {
+		return null;
+	}
+
 	private class JournalFileRecordIterator implements Iterator<Record> {
 
 		private ElementManager dbMgr, recsMgr;
@@ -217,7 +228,7 @@ public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter
 				dbMgr.parseOpenTag(); /* database */
 				recsMgr = dbMgr.nextElement();
 				recsMgr.parseOpenTag();
-				recTemplate = RecordTemplate.templateFactory(database.getSchema());
+				recTemplate = RecordTemplate.templateFactory(database.getSchema(), null);
 			} catch (IOException e) {
 				throw new InputException("exception opening journal file", e);
 			}

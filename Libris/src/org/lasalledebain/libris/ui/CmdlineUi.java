@@ -1,18 +1,25 @@
 package org.lasalledebain.libris.ui;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import javax.swing.JOptionPane;
 
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
+
+	public CmdlineUi(String dbFilePath, String auxPath, boolean readOnly) throws LibrisException {
+		super(new File(dbFilePath), new File(auxPath), readOnly);
+		if (doIndexing) {
+			rebuildDatabase();
+		}
+	}
 
 	@Override
 	public void exit() {
@@ -20,19 +27,11 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 		
 	}
 
-	private boolean editable;
 	BufferedReader cmdlineInput;
-	public CmdlineUi(LibrisDatabase db) {
-		super(new String[0]);
-		cmdlineInput = new BufferedReader(new InputStreamReader(System.in));
-	}
-
-	public CmdlineUi(String[] args) {
-		super(args);
-	}
-
+	private boolean doIndexing;
 	@Override
 	public void databaseClosed() {
+		super.databaseClosed();
 		return;
 	}
 
@@ -43,11 +42,10 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 
 	@Override
 	public void setEditable(boolean edible) {
-		editable = edible;
 	}
 
 	@Override
-	public void displayRecord(RecordId recordId) throws LibrisException {
+	public void displayRecord(int recordId) throws LibrisException {
 		alert("displayRecord not implemented");
 	}
 
@@ -121,11 +119,18 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 
 	@Override
 	public void put(Record newRecord) throws DatabaseException {
-		throw new InternalError(getClass().getName()+".put() not implemented");
-
-		
+		throw new InternalError(getClass().getName()+".put() not implemented");	
 	}
 
 	public void repaint() {
 	}
+
+	public void rebuildDatabase(File databaseFile) {
+	}
+
+	@Override
+	public void setRecordName(NamedRecordList namedRecs) throws InputException {
+		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
+	}
+
 }

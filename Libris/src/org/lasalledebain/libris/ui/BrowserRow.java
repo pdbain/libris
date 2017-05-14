@@ -4,12 +4,11 @@
 package org.lasalledebain.libris.ui;
 
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.FieldDataException;
 
 class BrowserRow {
 	Record rec;
-	RecordId recId;
+	int recId;
 	private String recValue;
 	/**
 	 * @param rec
@@ -25,7 +24,8 @@ class BrowserRow {
 	public String toString() {
 		return recValue;
 	}
-	public RecordId getRecordId() {
+	
+	public int getRecordId() {
 		return recId;
 	}
 }

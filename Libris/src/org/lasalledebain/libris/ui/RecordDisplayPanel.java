@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -18,7 +17,6 @@ import javax.swing.event.ChangeListener;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisMenu.NewRecordListener;
@@ -46,6 +44,7 @@ public class RecordDisplayPanel extends JPanel {
 	private String[] titleFieldIds;
 	private ModificationListener modListener;
 	private JButton closeButton;
+	private LibrisMenu menu;
 
 	public RecordDisplayPanel(LibrisDatabase librisDatabase, LibrisGui mainGui) {
 		this.mainGui = mainGui;
@@ -59,20 +58,23 @@ public class RecordDisplayPanel extends JPanel {
 		add(openRecordPanes);
 		setMinimumSize(new Dimension(200, 50));
 		setPreferredSize(new Dimension(890, 500));
+		menu = mainGui.getMenu();
 	}
 
-	void addRecord(Record record, boolean editable) throws DatabaseException {
-		RecordWindow rw = new RecordWindow(database.getUi(), recLayout, record, true, modListener);
+	void addRecord(Record record, boolean editable) throws LibrisException {
+		RecordWindow rw = new RecordWindow(mainGui, recLayout, record, true, modListener);
 		rw.setModified(false);
 		rw.setEditable(editable);
 		addRecordWindow(rw);
+		menu.setRecordEditEnabled(editable);
 	}
 // FIXME summary view not shown
-	public void displayRecord(RecordId recId) throws LibrisException {
+
+	public void displayRecord(int recId) throws LibrisException {
 		for (int i= 0; i < openRecords.size(); ++i) {
 			RecordWindow r = openRecords.get(i);
-			final RecordId recordId = r.getRecordId();
-			if ((null != recordId) && recordId.equals(recId)) {
+			final int recordId = r.getRecordId();
+			if (recordId == recId) {
 				openRecordPanes.setSelectedIndex(i);
 				return; /* already have the record */
 			}
@@ -218,7 +220,6 @@ public class RecordDisplayPanel extends JPanel {
 			Record currentRecord = currentRecordWindow.getRecord();
 			try {
 				if (enter) {
-					database.checkIfdatabaseIndexed(Messages.getString("LibrisDatabase.unindexed_do_index"));
 					currentRecordWindow.enter();
 					database.put(currentRecord);
 					mainGui.put(currentRecord);
@@ -240,6 +241,8 @@ public class RecordDisplayPanel extends JPanel {
 				openRecords.remove(selectedRecordIndex);
 				openRecordPanes.remove(selectedRecordIndex);
 				currentRecordWindow.close();
+				currentRecord.setEditable(false);
+				menu.setEditRecordState();
 			}
 		}
 	}		
@@ -282,6 +285,7 @@ public class RecordDisplayPanel extends JPanel {
 			int currentRecordIndex = openRecordPanes.getSelectedIndex();
 			removeRecord(currentRecordIndex);
 		}
+		menu.setEditRecordState();
 	}
 
 	private void removeRecord(int index) {

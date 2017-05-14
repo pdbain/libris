@@ -1,13 +1,13 @@
 package org.lasalledebain.libris.field;
 
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.FieldMasterCopy;
+import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
 
 public class IndexEntryField extends GenericField implements Field {
 	private int value;
 
-	public IndexEntryField(FieldMasterCopy template) {
+	public IndexEntryField(FieldTemplate template) {
 		super(template);
 	}
 

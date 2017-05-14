@@ -6,40 +6,13 @@ package org.lasalledebain.libris.ui;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 
-import org.lasalledebain.libris.LibrisConstants.DatabaseUsageMode;
-
 /**
  * @author pdbain
  * keeps track of whether a data have changed. 
  */
 public class ModificationTracker {
-	private boolean modified = false;
+	private boolean modified;
 	private boolean modifiable;
-	public boolean isModifiable() {
-		return modifiable;
-	}
-
-
-	public void setModifiable(boolean modifiable) {
-		this.modifiable = modifiable;
-	}
-
-
-	private DatabaseUsageMode usage;
-	private ActionListener modificationListener;
-	String dialogueMessage;
-	private LibrisUi ui;
-	public LibrisUi getUi() {
-		return ui;
-	}
-
-
-	/**
-	 * @param database usage indicate whether we are using a GUI, command line, or batch
-	 * @param parentComponent Java component
-	 * @param dialogueMessage string to use the query of the user wants to store the changed data
-	 * @param title 
-	 */
 	/**
 	 * @param ui user interface (GUI, command line, batch, etc.)
 	 * @param modificationListener 
@@ -54,8 +27,25 @@ public class ModificationTracker {
 		ui.setSelectedField(null);
 		ui.fieldSelected(false);
 		setModifiable(false);
+		modified = false;
 	}
 
+
+	public boolean isModifiable() {
+		return modifiable;
+	}
+
+
+	public void setModifiable(boolean modifiable) {
+		this.modifiable = modifiable;
+	}
+
+	private ActionListener modificationListener;
+	String dialogueMessage;
+	private LibrisUi ui;
+	public LibrisUi getUi() {
+		return ui;
+	}
 
 	public synchronized boolean isModified() {
 		return modified;
@@ -79,9 +69,9 @@ public class ModificationTracker {
 		return Dialogue.NO_OPTION;
 	}
 
-	public void select(UiField selectedField) {
-		ui.setSelectedField(selectedField);
-		selectedField.setSelected(true);
+	public void select(UiField uiField) {
+		ui.setSelectedField(uiField);
+		uiField.setSelected(true);
 		ui.fieldSelected(true);
 	}
 

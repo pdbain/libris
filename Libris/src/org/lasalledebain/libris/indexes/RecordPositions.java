@@ -1,6 +1,5 @@
 package org.lasalledebain.libris.indexes;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.lasalledebain.libris.FileAccessManager;
@@ -31,15 +30,16 @@ public class RecordPositions {
 	/**
 	 * @param recId record ID
 	 * @return position of the start of the record's header, or 0 if not found
+	 * @throws DatabaseException 
 	 * @throws DatabaseException
 	 */
-	public long getRecordFilePosition(RecordId recId) throws DatabaseException  {
+	public long getRecordFilePosition(int recId) throws DatabaseException {
 		final long filePos = recordMap.get(recId);
 		return filePos;
 	}
 
-	public void setRecordFilePosition(RecordId recordId, long pos) throws DatabaseException {
-		recordMap.putRecordPosition(recordId.getRecordNumber(), pos);
+	public void setRecordFilePosition(int recordId, long pos) throws DatabaseException {
+		recordMap.putRecordPosition(recordId, pos);
 	}
 	
 	public void close() throws DatabaseException {

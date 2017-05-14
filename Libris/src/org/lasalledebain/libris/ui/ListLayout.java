@@ -11,7 +11,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class ListLayout extends Layout {
 
-	public ListLayout(Schema schem) {
+	public ListLayout(Schema schem) throws DatabaseException {
 		super(schem);
 	}
 
@@ -21,7 +21,7 @@ public class ListLayout extends Layout {
 	}
 
 	@Override
-	ArrayList<UiField> layOutFields(Record rec, JPanel recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
 			throws DatabaseException {
 		// TODO write ListLayout.layOutFields
 		return null;

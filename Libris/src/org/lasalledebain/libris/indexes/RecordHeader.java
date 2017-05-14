@@ -116,6 +116,8 @@ public class RecordHeader implements Iterable<RecordHeader>{
 		save();
 	}
 
+	// TODO add replace(current, newHeader)
+	
 	public static byte[] formatHeader(int prev, int next, int dataSize) throws IOException {
 		ByteArrayOutputStream result = new ByteArrayOutputStream(12);
 		DataOutputStream resultStream = new DataOutputStream(result);

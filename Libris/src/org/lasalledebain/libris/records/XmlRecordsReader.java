@@ -1,9 +1,7 @@
 package org.lasalledebain.libris.records;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -84,6 +82,18 @@ public class XmlRecordsReader implements RecordsReader, Iterator<Record>,LibrisX
 		return;
 	}
 
+	public int getFieldNum() {
+		return 0;
+	}
+
+	public String getId() {
+		return null;
+	}
+
+	public String getTitle() {
+		return null;
+	}
+
 	public static void importXmlRecords(LibrisDatabase database, File source) throws LibrisException {
 		LibrisMetadata metadata = database.getMetadata();
 		try {
@@ -98,7 +108,7 @@ public class XmlRecordsReader implements RecordsReader, Iterator<Record>,LibrisX
 			}
 			ElementManager recordsMgr = librisXmlMgr.nextElement();
 			XmlRecordsReader recordsRdr = new XmlRecordsReader(database, recordsMgr);
-			int lastId = -1;
+			int lastId = 0;
 			metadata.setSavedRecords(0);
 			LibrisFileManager fileMgr = database.getFileMgr();
 			FileAccessManager recordsFileMgr = fileMgr.getRecordsFileMgr();
@@ -114,19 +124,17 @@ public class XmlRecordsReader implements RecordsReader, Iterator<Record>,LibrisX
 				}
 				importer.putRecord(r);
 				++numAdded;
-				database.log(Level.FINE, "importXmlRecords put record "+r.getRecordId()); //$NON-NLS-1$
-				RecordId recId = r.getRecordId();
-				int numericId = recId.getRecordNumber();
-				lastId = Math.max(lastId, numericId);
+				database.log(Level.FINE, "importXmlRecords put record "+RecordId.toString(r.getRecordId())); //$NON-NLS-1$
+				int recId = r.getRecordId();
+				lastId = Math.max(lastId, recId);
 			}
 			metadata.setSavedRecords(numAdded);
 			importer.finish(nonEmpty);
 			recordsFileMgr.releaseOpStream();
 			recPosns.close();
-			RecordId lastRecordId = new RecordId(lastId);
 			librisXmlMgr.closeFile();
 			database.closeDatabaseSource();
-			metadata.setLastRecordId(lastRecordId);
+			metadata.setLastRecordId(lastId);
 		} catch (XmlException e) {
 			throw new DatabaseException(Messages.getString("XmlRecordsReader.1"), e); //$NON-NLS-1$
 

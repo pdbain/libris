@@ -6,21 +6,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import javax.swing.JOptionPane;
-
 import org.lasalledebain.libris.DatabaseAttributes;
+import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.DatabaseNotIndexedException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.UserErrorException;
 
 public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
-
+	
 	@Override
 	public Record newRecord() {
 		return null;
@@ -57,15 +53,22 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	protected static Preferences librisPrefs;
 	protected static Object prefsSync = new Object();
 	protected Logger uiLogger;
-	private boolean readOnly;
+	boolean readOnly;
 	private UiField selectedField;
-	protected LibrisParameters parameters;
-	protected LibrisDatabase database;
 	protected String uiTitle;
-	private LibrisDatabase currentDatabase;
+	protected LibrisDatabase currentDatabase;
+	private File databaseFile;
+	private File auxDirectory;
 
 	public UiField getSelectedField() {
 		return selectedField;
+	}
+
+	public LibrisUiGeneric(File dbFile, File auxDir,
+			boolean readOnly) throws LibrisException {
+		this();
+		databaseFile = dbFile;
+		auxDirectory = auxDir;
 	}
 
 	public LibrisUiGeneric() {
@@ -74,12 +77,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		readOnly = false;
 		fieldSelected(false);
 		setSelectedField(null);
-		parameters = null;
-	}
-
-	public LibrisUiGeneric(String[] args) {
-		this();
-		parameters = new LibrisParameters(args);
 	}
 
 	@Override
@@ -90,51 +87,35 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 	@Override
 	public abstract void alert(String msg);
-	
+
 	public void fatalError(Exception e, String msg) {
 		alert(msg+e.getMessage());
 		e.printStackTrace();
 		System.exit(1);
 	}
 
-	public LibrisDatabase openDatabase(LibrisParameters params) {
-		String dbFileName;
-		File sf = params.getDatabaseFile();
-		dbFileName = sf.getAbsolutePath();
+	public LibrisDatabase openDatabase() {
+		if (null != currentDatabase) {
+			alert("Cannot open "+databaseFile.getAbsolutePath()+" because "+currentDatabase.getDatabaseFile().getAbsolutePath()+" is open");
+		}
 		try {
-			try {
-				database = LibrisDatabase.open(new LibrisParameters(this, readOnly, sf));
-			} catch (DatabaseNotIndexedException e) {
-				int confirmResult = confirm("Database is not indexed. Rebuild now?");
-				if (JOptionPane.YES_OPTION == confirmResult) {
-					database = LibrisDatabase.rebuild(new LibrisParameters(this, sf));
-					if (null == database) {
-						fatalError(LibrisDatabase.openException, "cannot rebuild database");
-					}
-				} else {
-					return database;
-				}
-				if (readOnly) {
-					database = LibrisDatabase.open(new LibrisParameters(this, true, false, sf));							
-				}
-			} 
+			currentDatabase = new LibrisDatabase(databaseFile, auxDirectory, this, readOnly);
+			if (!currentDatabase.isIndexed()) {
+				alert("database "+databaseFile.getAbsolutePath()+" is not indexed.  Please re-index.");
+				return null;
+			}
+			currentDatabase.open();
 		} catch (Exception e) {
 			alert("Error opening database", e);
-			// TODO rebuild index
-			return database;
+			return currentDatabase;
 		}
-		if (null == database) {
-			fatalError(LibrisDatabase.openException, "cannot open database");
-		}
-		database.setDatabaseFile(dbFileName);
-		librisPrefs.put(LibrisDatabase.DATABASE_FILE, dbFileName);
-		return database;
+		getLibrisPrefs().put(LibrisDatabase.DATABASE_FILE, databaseFile.getAbsolutePath());
+		return currentDatabase;
 	}
 
-	@Override
-	public void close(boolean allWindows, boolean closeGui) {
-		currentDatabase = null;
-		uiLogger.log(Level.FINE, "UI close");
+	public void rebuildDatabase() throws LibrisException {
+			LibrisDatabase indexDb = Libris.buildAndOpenDatabase(databaseFile);
+			indexDb.close();
 	}
 
 	@Override
@@ -144,11 +125,10 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	}
 
 	@Override
-	public void displayRecord(RecordId recordId) throws LibrisException {
+	public void displayRecord(int recordId) throws LibrisException {
 		// TODO Auto-generated method stub
 
 	}
-
 	@Override
 	public void pasteToField() {
 		// TODO Auto-generated method stub
@@ -161,6 +141,16 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		return null;
 	}
 
+	public boolean isDatabaseSelected() {
+		return (null != databaseFile);
+	}
+
+	 public void setAuxiliaryDirectory(File auxDir) {
+		 auxDirectory = auxDir;
+	}
+	 public void setDatabaseFile(File dbFile) {
+		 databaseFile = dbFile;
+	}
 
 	@Override
 	public void recordsAccessible(boolean accessible) {
@@ -184,6 +174,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 	@Override
 	public void databaseOpened(LibrisDatabase db) throws DatabaseException {
+		currentDatabase = db;
 		String title = NO_DATABASE_OPENED;
 		if (null != db) {
 			DatabaseAttributes databaseAttributes = db.getAttributes();
@@ -225,31 +216,11 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		return;
 	}
 
-	@Override
 	public void setSelectedField(UiField selectedField) {
 		this.selectedField = selectedField;
 	}
 
-	protected boolean isParameterError() {
-		UserErrorException paramException = parameters.getErrorException();
-		if (null != paramException) {
-			System.err.println(paramException.getMessage());
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	public void repaint() {
-	}
-
-	public boolean isDatabaseSelected() {
-		return (null != parameters.getDatabaseFile());
-	}
-
-	public LibrisDatabase openDatabase() {
-		currentDatabase = openDatabase(this.parameters);
-		return currentDatabase;
 	}
 
 	public static void setLoggingLevel(Logger myLogger) {

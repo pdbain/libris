@@ -8,9 +8,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
-import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 public class RecordWindow extends JPanel {
@@ -18,19 +17,21 @@ public class RecordWindow extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = -8603864809213149500L;
-	LibrisUi ui;
+	LibrisWindowedUi ui;
 	Layout recordLayout;
 	private String title;
-	private RecordId recordId;
+	private int recordId;
 	private JPanel recordPanel;
 	private final Record record;
 	ArrayList<UiField> guiFields = new ArrayList<UiField>();
 	
-	public RecordWindow(LibrisUi ui, Layout layout, Record rec, boolean editable, ActionListener modificationListener) throws DatabaseException {
+	public RecordWindow(LibrisWindowedUi ui, Layout layout, Record rec, boolean editable, 
+			ActionListener modificationListener) throws LibrisException {
 		this(ui, layout, rec, new Point(0, 0), editable, modificationListener);
 	}
 
-	public RecordWindow(LibrisUi ui, Layout layout, Record rec, Point position, boolean editable, ActionListener modificationListener) throws DatabaseException {
+	public RecordWindow(LibrisWindowedUi ui, Layout layout, Record rec, Point position, boolean editable, 
+			ActionListener modificationListener) throws LibrisException {
 		recordId = rec.getRecordId();
 		title = layout.getTitle();
 		this.record = rec;
@@ -41,7 +42,7 @@ public class RecordWindow extends JPanel {
 		modTracker.setModifiable(editable);
 		recordPanel = new JPanel();
 		layOutFields(layout, rec, recordPanel, modTracker);
-		 add(recordPanel);
+		add(recordPanel);
 		recordPanel.setVisible(true);
 		ui.fieldSelected(false);
 		ui.setSelectedField(null);
@@ -58,7 +59,8 @@ public class RecordWindow extends JPanel {
 		recordPanel.setVisible(true);
 	}
 	
-	public RecordWindow(LibrisUi ui, Layout myGuiLayout, Record rec, Point point, ActionListener modificationListener) throws DatabaseException {
+	public RecordWindow(LibrisWindowedUi ui, Layout myGuiLayout, Record rec, Point point, 
+			ActionListener modificationListener) throws LibrisException {
 		this(ui, myGuiLayout,  rec,  point, false, modificationListener);
 	}
 
@@ -75,12 +77,12 @@ public class RecordWindow extends JPanel {
 	 * @param c
 	 * @param recordPanel
 	 * @param modTrk 
-	 * @throws DatabaseException
+	 * @throws LibrisException 
 	 */
 	private void layOutFields(Layout layout, Record rec, JPanel recordPanel, ModificationTracker modTrk)
-			throws DatabaseException {
+			throws LibrisException {
 		setSize(layout.getWidth(), layout.getHeight());
-		guiFields = layout.layOutFields(rec, recordPanel, modTrk);
+		guiFields = layout.layOutFields(rec, ui, recordPanel, modTrk);
 	}
 	
 	public Record enter() throws LibrisException {
@@ -129,7 +131,7 @@ public class RecordWindow extends JPanel {
 		this.title = title;
 	}
 
-	public RecordId getRecordId() {
+	public int getRecordId() {
 		return recordId;
 	}
 
@@ -164,7 +166,8 @@ public class RecordWindow extends JPanel {
 	public UiField getField(String fieldId) {
 		UiField result = null;
 		for (UiField f: guiFields) {
-			if (f.getRecordField().getFieldId() == fieldId) {
+			Field fld = f.getRecordField();
+			if (fld.getFieldId() == fieldId) {
 				result = f;
 				break;
 			}

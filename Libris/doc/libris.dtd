@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ENTITY % boolean "(true|false)">
-<!ENTITY % controltype "(radiobutton|checkbox|textbox|textfield|rangefield|enumfield)">
+<!ENTITY % controltype "(radiobutton|checkbox|textbox|textfield|rangefield|enumfield|names)">
 <!ENTITY % usagetype "(newrecord|formdisplay|summarydisplay|formentry|tabledisplay)">
 <!ENTITY % groupstructure "(flat|hierarchical)">
 
@@ -10,8 +10,6 @@
 	schemaversion NMTOKEN #REQUIRED
 	schemalocation NMTOKEN #IMPLIED
 	databasename NMTOKEN #IMPLIED
-	branch NMTOKEN #IMPLIED
-	lastchild NMTOKEN #IMPLIED
 	date CDATA #IMPLIED" >
 	
 <!ATTLIST libris  %databaseAttributes; >
@@ -53,6 +51,7 @@
 <!--
 Define the indexes in the database
 -->
+<!-- there are at most 255 members per group and at most 255 groups -->
 <!ELEMENT groupdefs (groupdef*) >
 
 <!ELEMENT groupdef EMPTY >
@@ -116,13 +115,13 @@ Represents a document or a index item
 	id ID #REQUIRED 
 	revision CDATA #IMPLIED
 	replaces IDREF #IMPLIED
+	name CDATA
 >
 
 <!ELEMENT member (affiliation*) >
 <!ATTLIST member 
 	group CDATA #REQUIRED
-	parent ID #IMPLIED
-	title CDATA #IMPLIED
+	parent ID #REQUIRED
 >
 <!ATTLIST affiliation 
 	affiliate ID #REQUIRED

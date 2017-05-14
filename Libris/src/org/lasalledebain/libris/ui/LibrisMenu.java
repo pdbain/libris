@@ -9,20 +9,23 @@ import java.util.HashSet;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.DatabaseNotIndexedException;
+import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 
 /**
@@ -224,6 +227,25 @@ public class LibrisMenu {
 		paste.setAccelerator(getAcceleratorKeystroke('V'));
 		editMenuRecordCommands.add(paste);
 
+		JMenuItem recordName = new JMenuItem("Record name...");
+		recordName.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					database.getUi().setRecordName(database.getNamedRecords());
+				} catch (InputException exc) {
+					throw new InternalError("Error setting name", exc);
+				}
+			}
+			
+		});
+		edMenu.add(recordName);
+		recordName.setAccelerator(getAcceleratorKeystroke('N', java.awt.event.InputEvent.CTRL_DOWN_MASK));
+
+		editMenuRecordCommands.add(recordName);
+		recordName.setEnabled(false);
+
 		JMenuItem newValue = new JMenuItem("New field value");
 		newValue.addActionListener(new ActionListener() {
 			@Override
@@ -296,7 +318,8 @@ public class LibrisMenu {
 		
 		editRecord = new JCheckBoxMenuItem("Edit record");
 		editRecord.setAccelerator(getAcceleratorKeystroke('E', java.awt.event.InputEvent.SHIFT_DOWN_MASK));
-		editRecord.addActionListener(new EditRecordListener());
+		editRecordListener = new EditRecordListenerImpl();
+		editRecord.addActionListener(editRecordListener);
 		recMenu.add(editRecord);
 		editRecord.setEnabled(!guiMain.isReadOnly());
 		editRecord.setState(false);
@@ -323,6 +346,11 @@ public class LibrisMenu {
 		recordMenu.setEnabled(enabled);
 		setRecordDuplicateRecordEnabled(false);
 		setRecordEnterRecordEnabled(false);
+		setEditRecordState();
+	}
+
+	public void setEditRecordState() {
+		editRecordListener.setEditingState();
 	}
 
 	private JMenu createSearchMenu() {
@@ -346,9 +374,6 @@ public class LibrisMenu {
 		JCheckBoxMenuItem editLayouts = new JCheckBoxMenuItem("Edit layouts");
 		editLayouts.addActionListener(new editLayoutListener(editLayouts));
 		orgMenu.add(editLayouts);
-		JMenuItem rebuildIndex = new JMenuItem("Rebuild index");
-		rebuildIndex.addActionListener(new RebuildIndexListener());
-		orgMenu.add(rebuildIndex);
 		orgMenu.add("Quick search ...");
 		return orgMenu;
 	}
@@ -372,9 +397,7 @@ public class LibrisMenu {
 	
 	public class OpenDatabaseListener implements ActionListener {
 
-		private boolean readOnly;
 		public OpenDatabaseListener() {
-			this.readOnly = false;
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
@@ -388,8 +411,12 @@ public class LibrisMenu {
 				dbLocation = new File(userDir);
 			}
 			chooser = new JFileChooser(dbLocation);
+			Box buttonPanel = new Box(BoxLayout.Y_AXIS);
 			JCheckBox roCheckbox = new JCheckBox("Read-only", false);
-			chooser.setAccessory(roCheckbox);
+			buttonPanel.add(roCheckbox);
+			JCheckBox reIndexCheckbox = new JCheckBox("Build indexes", false);
+			buttonPanel.add(reIndexCheckbox);
+			chooser.setAccessory(buttonPanel);
 			chooser.setSelectedFile(dbLocation);
 			FileNameExtensionFilter librisFileFilter = new FileNameExtensionFilter(
 					"Libris files",
@@ -401,11 +428,20 @@ public class LibrisMenu {
 			}
 			int option = chooser.showOpenDialog(guiMain.getMainFrame());
 			if (option == JFileChooser.APPROVE_OPTION) {
-				readOnly = roCheckbox.isSelected();
+				roCheckbox.isSelected();
 				File sf = chooser.getSelectedFile();
-				String dbFileName = "null";
 				if (sf != null) {
-					openDatabase(librisPrefs, sf);
+					if (reIndexCheckbox.isSelected()) {
+						try {
+							Libris.buildIndexes(sf, guiMain);
+						} catch (Exception e) {
+							guiMain.alert("Error building indexes", e);
+							return;
+						}
+						guiMain.alert("Database successfully indexed");
+					} else {
+						openDatabase(sf);
+					}
 				}
 				try {
 					librisPrefs.sync();
@@ -415,36 +451,18 @@ public class LibrisMenu {
 			}
 		}
 
-		private void openDatabase(Preferences librisPrefs, File sf) {
-			String dbFileName;
-			dbFileName = sf.getAbsolutePath();
+		private void openDatabase(File dbFile) {
+			
+			guiMain.setDatabaseFile(dbFile);
 			try {
-				try {
-					database = LibrisDatabase.open(new LibrisParameters(guiMain, readOnly, sf));
-				} catch (DatabaseNotIndexedException e) {
-					int confirmResult = guiMain.confirm("Database is not indexed. Rebuild now?");
-					if (JOptionPane.YES_OPTION == confirmResult) {
-						database = LibrisDatabase.rebuild(new LibrisParameters(guiMain, sf));
-						if (null == database) {
-							guiMain.fatalError(LibrisDatabase.openException, "cannot rebuild database");
-						}
-					} else {
-						return;
-					}
-					if (readOnly) {
-						database = LibrisDatabase.open(new LibrisParameters(guiMain, true, false, sf));							
-					}
-				} 
+				database = guiMain.openDatabase();
 			} catch (Exception e) {
 				guiMain.alert("Error opening database", e);
 				// TODO rebuild index
 				return;
 			}
-			if (null == database) {
-				guiMain.fatalError(LibrisDatabase.openException, "cannot open database");
-			}
-			database.setDatabaseFile(dbFileName);
-			librisPrefs.put(LibrisDatabase.DATABASE_FILE, dbFileName);
+			Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+			librisPrefs.put(LibrisDatabase.DATABASE_FILE, dbFile.getAbsolutePath());
 			guiMain.getMainFrame().toFront();
 		}
 	}
@@ -485,7 +503,7 @@ public class LibrisMenu {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (null != database) {
-				database.close(false);
+				database.close();
 			}
 		}
 		
@@ -505,7 +523,11 @@ public class LibrisMenu {
 
 	class NewRecordListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			guiMain.newRecord();
+			if (!database.isIndexed()) {
+				guiMain.alert("Please index database");
+			} else {
+				guiMain.newRecord();
+			}
 		}
 	}
 	
@@ -531,7 +553,7 @@ public class LibrisMenu {
 		
 	}
 	
-	class EditRecordListener implements ActionListener {
+	class EditRecordListenerImpl implements ActionListener {
 
 		public void actionPerformed(ActionEvent evt) {
 			boolean wasEditable = guiMain.isEditable();
@@ -543,17 +565,29 @@ public class LibrisMenu {
 			}
 		}
 		
+		public void setEditingState() {
+			boolean isEditable = false;
+			if (null != guiMain) {
+				isEditable = guiMain.isEditable();
+			}
+			editRecord.setState(isEditable);
+		}
 	}
 	
 	class RebuildIndexListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-				try {
-					if (null != database) {
-						database.buildIndexes();
-					}
-				} catch (LibrisException e) {
-					guiMain.fatalError(e, "error rebuilding indexes");
+			if (null != database) {
+				File dbFile = database.getDatabaseFile();
+
+				if (!database.close()) {
+					guiMain.alert("Please save database before rebuildiing");
 				}
+				try {
+					guiMain.rebuildDatabase();
+				} catch (LibrisException e) {
+					guiMain.alert("error rebuilding database", e);
+				}
+			}
 		}
 	}
 	
@@ -576,6 +610,7 @@ public class LibrisMenu {
 	}
 
 	private static final String DATABASE_FILE = "DATABASE_FILE";
+	private EditRecordListenerImpl editRecordListener;
 	public void enableFieldValueOperations(boolean selected) {
 		for (JMenuItem m: editMenuFieldValueCommands) {
 			m.setEnabled(selected);

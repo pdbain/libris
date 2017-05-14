@@ -218,4 +218,16 @@ private static ElementShape makeLayoutUsageXmlShape() {
 	public ElementShape getShape(String elementTag) {
 		return myShapes.get(elementTag);
 	}
+
+	public String getTitle() {
+		return null;
+	}
+
+	public String getId() {
+		return null;
+	}
+
+	public int getFieldNum() {
+		return 0;
+	}
 }

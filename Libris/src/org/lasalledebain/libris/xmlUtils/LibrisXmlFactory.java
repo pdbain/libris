@@ -1,6 +1,5 @@
 package org.lasalledebain.libris.xmlUtils;
 
-import java.io.File;
 import java.io.Reader;
 
 import javax.xml.namespace.QName;

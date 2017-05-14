@@ -1,0 +1,2 @@
+/Users/pdbain/pdbsandbox/libris/src/.metadata/.plugins/org.eclipse.jdt.core/4238209716.index
+/Users/pdbain/pdbsandbox/libris/src/.metadata/.plugins/org.eclipse.jdt.core/4108599240.index

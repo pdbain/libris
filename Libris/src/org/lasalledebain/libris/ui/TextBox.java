@@ -61,4 +61,9 @@ public class TextBox extends GuiControl {
 	public void setEditable(boolean editable) {
 		control.setEditable(editable);
 	}
+	@Override
+	public boolean isEditable() {
+		return control.isEditable();
+	}
+
 }

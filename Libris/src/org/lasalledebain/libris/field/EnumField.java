@@ -2,11 +2,11 @@ package org.lasalledebain.libris.field;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.FieldMasterCopy;
+import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
 
 public class EnumField extends GenericField implements Field {
-	public EnumField(FieldMasterCopy template) {
+	public EnumField(FieldTemplate template) {
 		super(template);
 	}
 

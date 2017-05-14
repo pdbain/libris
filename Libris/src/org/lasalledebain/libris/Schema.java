@@ -20,15 +20,23 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
 public class Schema implements LibrisXMLConstants {
+	public Schema() {
+		enumSets = new TreeMap<String, EnumFieldChoices>();
+		fieldList = new ArrayList<FieldTemplate>();
+		fieldNumById = new HashMap<String, Short>();
+		fieldIds = new ArrayList<String>();
+		fieldTitles = new ArrayList<String>();
+	}
+
 	public GroupDefs getGroupDefs() {
 		return myGroupDefs;
 	}
 
-	TreeMap<String, EnumFieldChoices> enumSets = new TreeMap<String, EnumFieldChoices>();
-	ArrayList<FieldMasterCopy> fieldList = new ArrayList<FieldMasterCopy>();
-	HashMap <String, Short> fieldNumById = new HashMap<String, Short>();
-	ArrayList<String> fieldIds = new ArrayList<String>();
-	ArrayList<String> fieldTitles = new ArrayList<String>();
+	TreeMap<String, EnumFieldChoices> enumSets;
+	ArrayList<FieldTemplate> fieldList;
+	HashMap <String, Short> fieldNumById;
+	ArrayList<String> fieldIds;
+	ArrayList<String> fieldTitles;
 	String fieldIdArray[];
 	String fieldTitleArray[];
 	private LibrisDatabase database;
@@ -50,6 +58,9 @@ public class Schema implements LibrisXMLConstants {
 		ElementManager groupDefsManager = schemaManager.nextElement(XML_GROUPDEFS_TAG);
 		myGroupDefs = new GroupDefs();
 		myGroupDefs.fromXml(groupDefsManager);
+		for (GroupDef gd: myGroupDefs) {
+			addField(gd);
+		}
 
 		ElementManager fieldDefsManager = schemaManager.nextElement(XML_FIELDDEFS_TAG);
 		parseFieldDefs(fieldDefsManager);
@@ -70,8 +81,10 @@ public class Schema implements LibrisXMLConstants {
 			es.toXml(xmlWriter);
 		}
 
-		for (FieldMasterCopy recField: fieldList) {
-			recField.toXml(xmlWriter);
+		for (FieldTemplate recField: fieldList) {
+			if (FieldType.T_FIELD_AFFILIATES != recField.getFtype()) {
+				recField.toXml(xmlWriter);
+			}
 		}
 		xmlWriter.writeEndElement(); /* fielddefs */
 		myIndexDefs.toXml(xmlWriter);
@@ -101,7 +114,7 @@ public class Schema implements LibrisXMLConstants {
 			nextId = fieldDefsManager.getNextId();
 			if (nextId.equals(LibrisXMLConstants.XML_FIELDDEF_TAG)) {
 				ElementManager fieldDefManager = fieldDefsManager.nextElement();
-				FieldMasterCopy f = new FieldMasterCopy();
+				FieldTemplate f = new FieldTemplate();
 				f.fromXml(this, fieldDefManager);
 				String fId = f.getFieldId();
 				if (fieldNumById.containsKey(fId)) {
@@ -120,7 +133,7 @@ public class Schema implements LibrisXMLConstants {
 		return enumSets.put(enumSetId, enumSet);
 	}
 
-	public void addField(FieldMasterCopy field) {
+	public void addField(FieldTemplate field) {
 		String fieldId = field.getFieldId();
 		fieldIds.add(fieldId);
 		fieldTitles.add(field.getFieldTitle());
@@ -131,10 +144,14 @@ public class Schema implements LibrisXMLConstants {
 	public EnumFieldChoices getEnumSet(String id) {
 		return enumSets.get(id);
 	}
+	
+	public int getNumFields() {
+		return fieldIds.size();
+	}
 
 	public String[] getFieldIds() {
 		if (null == fieldIdArray) {
-			fieldIdArray = new String[fieldIds.size()];
+			fieldIdArray = new String[getNumFields()];
 			fieldIds.toArray(fieldIdArray);
 		}
 		return fieldIdArray;
@@ -162,27 +179,32 @@ public class Schema implements LibrisXMLConstants {
 		}
 	}
 	
-	public Iterable <FieldMasterCopy> getFields() {
+	public Iterable <FieldTemplate> getFields() {
 		return fieldList;
 	}
 
-	public FieldMasterCopy getFieldTemplate(String id) {
+	public FieldTemplate getFieldTemplate(String id) {
 		return fieldList.get(fieldNumById.get(id));
 	}
 
 	public FieldType getFieldType(String i) {
-		FieldMasterCopy f = fieldList.get(fieldNumById.get(i));
+		Short fieldNum = fieldNumById.get(i);
+		FieldTemplate f = fieldList.get(fieldNum);
 		FieldType t = f.getFtype();
 		return t;
 	}
 
 	public FieldType getFieldType(short fieldNum) {
-		FieldMasterCopy f = fieldList.get(fieldNum);
+		FieldTemplate f = fieldList.get(fieldNum);
 		return f.getFtype();
 	}
 	
 	public GroupDef getGroupDef(String groupName) {
 		return myGroupDefs.getGroupDef(groupName);
+	}
+
+	public String getGroupId(int groupNum) {
+		return fieldIdArray[groupNum];
 	}
 
 	public Iterable<String> getGroupIds() {
@@ -206,5 +228,21 @@ public class Schema implements LibrisXMLConstants {
 			database.log(Level.WARNING, "Incompatible comparand in "+getClass().getName()+".equals()", e);
 			return false;
 		}
+	}
+
+	public boolean hasGroups() {
+		return myGroupDefs.getNumGroups() != 0;
+	}
+
+	public int getFieldNum() {
+		return 0;
+	}
+
+	public String getId() {
+		return null;
+	}
+
+	public String getTitle() {
+		return null;
 	}
 }

@@ -19,11 +19,9 @@ class FilteringFieldImporter implements LibrisXMLConstants, LibrisConstants {
 
 	ArrayList<FieldDataSource> sources;
 	private short fieldNum;
-	private Schema databaseSchema;
 
 	public FilteringFieldImporter(ElementManager fmgr, Schema schem) throws DatabaseException, InputException, XmlException {
 		
-		databaseSchema = schem;
 		sources = new ArrayList<FieldDataSource>();
 		HashMap<String, String> attrs = fmgr.parseOpenTag();
 		String idString = attrs.get(XML_LIBRISIMPORT_FIELD_ID_ATTR);
@@ -57,6 +55,18 @@ class FilteringFieldImporter implements LibrisXMLConstants, LibrisConstants {
 		return result;
 	}
 	
+	public int getFieldNum() {
+		return 0;
+	}
+
+	public String getId() {
+		return null;
+	}
+
+	public String getTitle() {
+		return null;
+	}
+
 	private abstract class FieldDataSource {
 		abstract Field addFieldValue(Record rec, FieldValueStringList[] row) throws DatabaseException, InputException;
 	}

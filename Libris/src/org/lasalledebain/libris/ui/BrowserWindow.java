@@ -61,9 +61,9 @@ public class BrowserWindow extends JPanel {
 		moreButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				recordList = getRecords(recordsIterator); // user records as ListModel
-				chooser.setModel(recordList);
-			}			
+				doRefresh();
+			}
+
 		});
 		refreshButton.addActionListener(new ActionListener() {
 			@Override
@@ -104,12 +104,12 @@ public class BrowserWindow extends JPanel {
 		return chooser.getSelectedIndex();
 	}
 
-	public RecordId getSelectedRecordId() {
+	public int getSelectedRecordId() {
 		BrowserRow chosenRecord = (BrowserRow) chooser.getSelectedValue();
 		if (null != chosenRecord) {		
 			return chosenRecord.getRecordId();
 		} else {
-			return null;
+			return RecordId.getNullId();
 		}
 	}
 
@@ -117,11 +117,24 @@ public class BrowserWindow extends JPanel {
 		return recordList.getSize();
 	}
 
-	public void addRecord(Record rec) throws DatabaseException {
+	void doRefresh() {
+		recordList = getRecords(recordsIterator); // user records as ListModel
+		chooser.setModel(recordList);
+	}			
+
+	 public void addRecord(Record rec) throws DatabaseException {
+		removeRecord(rec);
 		if (null == recordList) {
-			initialize(new SingleRecordList(database, rec));
+			initialize(new SingleRecordList(rec));
 		} else {
 			int index =  recordList.add(rec);
+			chooser.ensureIndexIsVisible(index);
+		}
+	}
+	
+	public void removeRecord(Record rec) {
+		if (null != recordList) {
+			int index =  recordList.remove(rec);
 			chooser.ensureIndexIsVisible(index);
 		}
 	}
@@ -151,11 +164,11 @@ public class BrowserWindow extends JPanel {
 
 	public void displaySelectedRecord() {
 		BrowserRow chosenRecord = (BrowserRow) chooser.getSelectedValue();
-		RecordId recId = chosenRecord.getRecordId();
+		int recId = chosenRecord.getRecordId();
 		try {
 			gui.displayRecord(recId);
 		} catch (LibrisException e) {
-			gui.alert("error displaying record "+recId.toString(), e);
+			gui.alert("error displaying record "+recId, e);
 		}
 	}
 

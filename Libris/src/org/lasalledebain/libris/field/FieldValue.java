@@ -52,7 +52,7 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 		}
 		return count;
 	}
-
+	
 	public abstract String getValueAsString();
 	
 	public LibrisAttributes getValueAsAttributes() throws FieldDataException {

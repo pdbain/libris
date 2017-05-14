@@ -10,12 +10,12 @@ import org.lasalledebain.libris.exception.DatabaseException;
 
 public class TableLayout extends Layout {
 
-	public TableLayout(Schema schem) {
+	public TableLayout(Schema schem) throws DatabaseException {
 		super(schem);
 	}
 
 	@Override
-	public void addField(FieldPositionParameter params)
+	public void addBodyField(FieldPositionParameter params)
 			throws DatabaseException {
 		throw new InternalError(getClass().getName()+" not implemented");
 	}
@@ -26,7 +26,7 @@ public class TableLayout extends Layout {
 	}
 
 	@Override
-	ArrayList<UiField> layOutFields(Record rec, JPanel recordPanel,
+	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel,
 			ModificationTracker modTrk)
 			throws DatabaseException {
 		// TODO write TableLayout.layOutFields

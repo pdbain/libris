@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -17,10 +16,10 @@ import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
+import org.lasalledebain.libris.ModifiedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordInstance;
-import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -36,7 +35,7 @@ import org.lasalledebain.libris.records.RecordsReader;
 public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>, LibrisConstants {
 
 	private static final long MINIMUM_RECORDS_FILE_LENGTH = 2*RecordHeader.getHeaderLength(); /* head & tail, record and free */
-
+// TODO test oversize records
 	/**
 	 * 
 	 * Record file: 2 doubly-linked lists, each represented by a RecordHeader:
@@ -45,16 +44,27 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 	 * 
 	 * Record format:
 	 * 	header
-	 *  2 bytes size of field index
 	 * 	4 bytes record ID.
+	 * 	1 byte flags
+	 * 		bit 0: isGroupMember: set if there is parent/affiliate data
+	 * 		bit 1: hasName: set if the record has a name
+	 * 	if record has name
+	 * 		name
+	 *  if record has groups
+	 * 		Group data:
+	 * 		for each group:
+	 * 			1 byte: 0 if no parent, 1 if parent, n < 256 if there are (n-1) affiliates
+	 * 			parent id (if any)
+	 * 			affiliate IDs (if any)
+	 *  2 bytes size of field index
 	 * 	field index
 	 * 		2 bytes fieldID
 	 * 		data:
 	 * 			4 bytes field offset to string or string pair data; or
-	 * 			4 bytes field contents for integer;
-	 * 			2 bytes field for enum in range
-	 * 				4 extra bytes offset to string extravalue if out of range 
-	 * 			1 byte boolean
+	 * 				4 bytes field contents for integer;
+	 * 				2 bytes field for enum in range
+	 * 					4 extra bytes offset to string extravalue if out of range 
+	 * 				1 byte boolean
 	 * 		fields are in the same order in the file as in the index.
 	 * records:
 	 * 	fields are native size of the field. 
@@ -201,7 +211,7 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 	 * @throws DatabaseException
 	 */
 	public void putRecord(Record recData) throws DatabaseException {
-		database.log(Level.FINE, "LibrisRecordsFileManager.putRecord "+recData.getRecordId());
+		database.log(Level.FINE, "LibrisRecordsFileManager.putRecord "+getRecordIdString(recData));
 		byte[] recordBuffer = null;
 		try {
 			 recordBuffer = formatRecord(dbSchema, recData);
@@ -216,10 +226,14 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 			recordsFileStore.write(recordBuffer);
 			recPosns.setRecordFilePosition(recData.getRecordId(), allocatedPosition);
 		} catch (IOException e) {
-			throw new DatabaseException("error writing record "+recData.getRecordId(), e);
+			throw new DatabaseException("error writing record "+getRecordIdString(recData), e);
 		} catch (OutputException e) {
-			throw new DatabaseException("error writing record "+recData.getRecordId(), e);
+			throw new DatabaseException("error writing record "+getRecordIdString(recData), e);
 		}
+	}
+
+	static private String getRecordIdString(Record recData) {
+		return RecordId.toString(recData.getRecordId());
 	}
 
 	/**
@@ -234,13 +248,41 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 	 */
 	static byte[] formatRecord(Schema dbSchema, Record recData)
 			throws DatabaseException, OutputException {
-		ByteArrayOutputStream recordBuffer;
-		recordBuffer = new ByteArrayOutputStream(256);
-		ByteArrayOutputStream fieldIndex = new ByteArrayOutputStream();
-		ByteArrayOutputStream fieldValues = new ByteArrayOutputStream();
-		DataOutputStream indexStream = new DataOutputStream(fieldIndex);
-		DataOutputStream valuesStream = new DataOutputStream(fieldValues);
+		ByteArrayOutputStream recordBuffer = new ByteArrayOutputStream(256);
 		DataOutputStream recordBufferStream = new DataOutputStream(recordBuffer);
+		ByteArrayOutputStream fieldIndex = new ByteArrayOutputStream();
+		DataOutputStream indexStream = new DataOutputStream(fieldIndex);
+		ByteArrayOutputStream fieldValues = new ByteArrayOutputStream();
+		DataOutputStream valuesStream = new DataOutputStream(fieldValues);
+		ByteArrayOutputStream groupBuffer = null;
+		DataOutputStream groupBufferStream = null;
+		byte flags = 0;
+		boolean hasGroups = recData.hasAffiliations();
+		String recName = recData.getName();
+		if (null != recName) {
+			flags |= LibrisConstants.RECORD_HAS_NAME;
+		}
+		if (hasGroups) {
+			flags |= LibrisConstants.RECORD_HAS_GROUPS;
+			int numGroups = dbSchema.getGroupDefs().getNumGroups();
+			groupBuffer = new ByteArrayOutputStream(5*dbSchema.getGroupDefs().getNumGroups());
+			groupBufferStream = new DataOutputStream(groupBuffer);
+			for (int groupNum=0; groupNum < numGroups; ++groupNum) {
+				int numAffiliates = recData.getNumAffiliatesAndParent(groupNum);
+				try {
+					groupBufferStream.writeByte(numAffiliates);
+					if (numAffiliates > 0) {
+						for (int id:recData.getAffiliates(groupNum)) {
+							groupBufferStream.writeInt(id);
+						}
+					}
+				} catch (IOException e) {
+					throw new OutputException("error writing group "+dbSchema.getGroupId(groupNum), e);
+				} catch (InputException e) {
+					throw new OutputException("error writing group "+dbSchema.getGroupId(groupNum), e);
+				}			
+			}
+		}
 
 		for (Field f: recData.getFields()) {
 			try {
@@ -254,7 +296,7 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 					{
 						int fieldValue = fv.getValueAsInt();
 						if ((fieldValue < ENUM_VALUE_OUT_OF_RANGE) || (fieldValue > Short.MAX_VALUE)) {
-							throw new DatabaseException("Record "+recData.getRecordId()+" field "+fieldNum+" out of range");
+							throw new DatabaseException("Record "+getRecordIdString(recData)+" field "+fieldNum+" out of range");
 						}
 						indexStream.writeShort(fieldValue);
 						if (ENUM_VALUE_OUT_OF_RANGE == fieldValue) {
@@ -279,7 +321,7 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 							indexStream.writeInt(oldValueEnd);
 							valuesStream.writeUTF(fv.getValueAsString());
 						} catch (UTFDataFormatException e) {
-							throw new DatabaseException("UTF format exception in "+recData.getRecordId()+" field "+fieldNum);
+							throw new DatabaseException("UTF format exception in "+getRecordIdString(recData)+" field "+fieldNum);
 						}
 						break;
 					case T_FIELD_PAIR:
@@ -290,9 +332,9 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 							valuesStream.writeUTF(secondValue);
 							indexStream.writeInt(oldValueEnd);
 						} catch (UTFDataFormatException e) {
-							throw new DatabaseException("UTF format exception in "+recData.getRecordId()+" field "+fieldNum);
+							throw new DatabaseException("UTF format exception in "+getRecordIdString(recData)+" field "+fieldNum);
 						} catch (FieldDataException e) {
-							throw new DatabaseException("Invalid data in "+recData.getRecordId()+" field "+fieldNum);
+							throw new DatabaseException("Invalid data in "+getRecordIdString(recData)+" field "+fieldNum);
 							}
 						break;
 					}
@@ -302,50 +344,80 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 			}
 		}
 		try {
+			recordBufferStream.writeInt(recData.getRecordId());
+			recordBufferStream.writeByte(flags);
+			if (null != recName) {
+				recordBufferStream.writeUTF(recName);
+			}
+			if (hasGroups) {
+				recordBufferStream.write(groupBuffer.toByteArray());
+			}
 			indexStream.writeInt(fieldValues.size()); /* pointer to padding */
 			recordBufferStream.writeShort(fieldIndex.size());
-			recordBufferStream.writeInt(recData.getRecordId().getRecordNumber());
 			recordBufferStream.write(fieldIndex.toByteArray());
 			recordBufferStream.write(fieldValues.toByteArray());
 			recordBufferStream.flush();
 		} catch (IOException e) {
-			throw new OutputException("error writing record "+recData.getRecordId(), e);
+			throw new OutputException("error writing record "+getRecordIdString(recData), e);
 		}
 		return recordBuffer.toByteArray();
 	}
-	public Record getRecord(RecordId id) throws InputException, DatabaseException {
-		long pos = recPosns.getRecordFilePosition(id);
-		if (pos > 0) try {
-			recordsFileStore.seek(pos);
-			Record rec = readRecord(pos);
-			return rec;
+	public Record getRecord(int id) throws InputException {
+		try {
+			long pos = recPosns.getRecordFilePosition(id);
+			if (pos > 0) {
+				recordsFileStore.seek(pos);
+				Record rec = readRecord(pos);
+				return rec;
+			}
 		} catch (IOException e) {
+			throw new InputException("Error accessing records file", e);
+		} catch (DatabaseException e) {
 			throw new InputException("Error accessing records file", e);
 		}
 		return null;
 	}
 
-	public void removeRecord(RecordId rid) throws DatabaseException {
+public void removeRecord(int rid) throws DatabaseException {
 	
-		try {
-			long recordFilePosition = recPosns.getRecordFilePosition(rid);
-			if (0 != recordFilePosition) {
-				RecordHeader currentHeader = 
-					RecordHeader.createRecordHeaderFromDataPosition(recordsFileStore, recordFilePosition);
-				recordList.remove(currentHeader);
-				freeList.add(currentHeader);
-			} else {
-				throw new DatabaseException("error deleting record "+rid);
-			}
-		} catch (IOException e) {
-			throw new DatabaseException("error writing record file", e);
+	try {
+		long recordFilePosition = recPosns.getRecordFilePosition(rid);
+		if (0 != recordFilePosition) {
+			RecordHeader currentHeader = 
+				RecordHeader.createRecordHeaderFromDataPosition(recordsFileStore, recordFilePosition);
+			recordList.remove(currentHeader);
+			freeList.add(currentHeader);
+		} else {
+			throw new DatabaseException("error deleting record "+rid);
 		}
+	} catch (IOException e) {
+		throw new DatabaseException("error writing record file", e);
 	}
+}
 
 	private Record readRecord(long recordPosition) throws InputException, DatabaseException {
 		try {
-			int indexSize = recordsFileStore.readShort() & 0x0000ffff;
 			int recId = recordsFileStore.readInt();
+			RecordInstance r = new RecordInstance(database.getMainRecordTemplate());
+			r.setRecordId(recId);
+
+			byte flags = recordsFileStore.readByte();
+			if (0 != (flags & LibrisConstants.RECORD_HAS_NAME)) {
+				String recName = recordsFileStore.readUTF();
+				r.setName(recName);
+			}
+
+			if (0 != (flags & LibrisConstants.RECORD_HAS_GROUPS)) {
+				int numGroups = dbSchema.getGroupDefs().getNumGroups();
+				for (int groupNum=0; groupNum < numGroups; ++groupNum) {
+					int numAffiliates = recordsFileStore.readByte() & 0x000000ff;
+					for (int affNo = 0; affNo < numAffiliates; ++affNo) {
+						int affiliate = recordsFileStore.readInt();
+						r.addAffiliate(groupNum, affiliate);
+					}
+				}
+			}
+			int indexSize = recordsFileStore.readShort() & 0x0000ffff;
 			byte indexData[] = new byte[indexSize];
 			int bytesRead = recordsFileStore.read(indexData);
 			if (bytesRead < indexSize) {
@@ -353,10 +425,8 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 			}
 			long valueBase = recordsFileStore.getFilePointer();
 
-			RecordInstance r = new RecordInstance(RecordTemplate.templateFactory(dbSchema));
 			ByteArrayInputStream fieldIndex = new ByteArrayInputStream(indexData);
 			DataInputStream indexStream = new DataInputStream(fieldIndex);
-			r.setRecordId(recId);
 
 			short fieldNum = LibrisConstants.NULL_FIELD_NUM;
 			int indexCursor = 0;
@@ -430,32 +500,44 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 
 	private class RecordIterator implements Iterator<Record> {
 		Iterator<RecordHeader> rhi;
-		private RecordHeader currentRecord = null;
-		private Iterator<Record> modifiedRecordsIterator;
+		private RecordHeader currentHeader;
+		private ModifiedRecordList modifiedRecords;
+		int nextId;
+		final int lastId = database.getLastRecordId();
+		private int currentId;
 
 		private RecordIterator() {
+			currentHeader = null;
+			nextId = 1;
+			currentId = RecordId.getNullId();
 			rhi = recordList.iterator();
-			modifiedRecordsIterator = database.getModifiedRecords().iterator();
+			modifiedRecords = database.getModifiedRecords();
 		}
 		
 		@Override
 		public boolean hasNext() {
-			return rhi.hasNext() || modifiedRecordsIterator.hasNext();
+			return (nextId <= lastId);
 		}
 
+		
 		@Override
 		public Record next() {
 			try {
-				Record result = null;
-				if (rhi.hasNext()) {
-					currentRecord = rhi.next();
-					result = readRecord(currentRecord.getDataPosition());
-				} else {
-					result = modifiedRecordsIterator.next();
+				Record result = modifiedRecords.getRecord(nextId);
+				if (null == result) {
+					while ((currentId < nextId) && rhi.hasNext()) {
+						currentHeader = rhi.next();
+						result = readRecord(currentHeader.getDataPosition());
+						currentId = result.getRecordId();
+					}
+					if ((null == result) || (currentId != nextId)) {
+						result = getRecord(nextId);
+					}
 				}
+				++nextId;
 				return result;
 			} catch (Exception e) {
-				throw new InternalError("error in LibrisRecordsFileManager.next", e);//LibrisDatabase.setLastException(e);
+				throw new InternalError("error in LibrisRecordsFileManager.next", e);
 			}
 		}
 

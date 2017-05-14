@@ -1,0 +1,26 @@
+import java.util.ArrayList;
+
+import org.apache.xml.utils.IntVector;
+
+/*
+ * Created on Dec 23, 2004
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+
+/**
+ * @author pdbain
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class RecordList {
+	IntVector result;
+	public void addrecord(int recordNum) {
+		result.addElement(recordNum);
+	}
+	public IntVector getList() {
+		return(result);
+	}
+}

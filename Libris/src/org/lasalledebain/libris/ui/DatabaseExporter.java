@@ -126,7 +126,7 @@ public class DatabaseExporter {
 		includeSchemaControl.setSelected(true);
 		includeRecordsControl.setSelected(true);
 		JFileChooser exportFileChooser = new JFileChooser(lastExportFile);
-		if (lastExportFile.isFile()) {
+		if ((null != lastExportFile) && lastExportFile.isFile()) {
 			exportFileChooser.setSelectedFile(lastExportFile);
 		}
 		exportFileChooser.setApproveButtonText("Export");

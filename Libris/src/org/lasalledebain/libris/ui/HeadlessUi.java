@@ -1,20 +1,27 @@
 package org.lasalledebain.libris.ui;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class HeadlessUi extends LibrisUiGeneric implements LibrisUi {
+public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	private String schemaPath;
 	private int confirmValue;
 	private boolean accessible; 
 
 	public HeadlessUi() {
-		super(new String[0]);
+		super();
+	}
+
+	public HeadlessUi(File dbFile) throws LibrisException {
+		super(dbFile);
 	}
 
 	public Logger getuiLogger() {
@@ -57,13 +64,8 @@ public class HeadlessUi extends LibrisUiGeneric implements LibrisUi {
 	}
 
 	@Override
-	public void databaseClosed() {
-		return;
-	}
-
-	@Override
-	public void displayRecord(RecordId recordId) throws LibrisException {
-		uiLogger.log(Level.FINE, recordId.toString());
+	public void displayRecord(int recordId) throws LibrisException {
+		uiLogger.log(Level.FINE, RecordId.toString(recordId));
 	}
 
 	@Override
@@ -113,4 +115,15 @@ public class HeadlessUi extends LibrisUiGeneric implements LibrisUi {
 		// TODO write headlessUI.exit()
 		
 	}
+	@Override
+	public void setRecordName(NamedRecordList namedRecs) throws InputException {
+		// TODO write setRecordName
+		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
+	}
+
+	@Override
+	public void close(boolean allWindows, boolean closeGui) {
+		return;
+	}
+
 }

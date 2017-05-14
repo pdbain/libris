@@ -32,4 +32,16 @@ public class IndexDef implements LibrisXMLConstants, XmlExportable {
 		}
 	}
 
+	public String getTitle() {
+		return null;
+	}
+
+	public String getId() {
+		return null;
+	}
+
+	public int getFieldNum() {
+		return 0;
+	}
+
 }

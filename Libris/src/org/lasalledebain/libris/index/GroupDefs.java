@@ -1,6 +1,8 @@
 package org.lasalledebain.libris.index;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.lasalledebain.libris.XmlExportable;
 import org.lasalledebain.libris.XmlImportable;
@@ -13,9 +15,11 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
-public class GroupDefs implements XmlExportable, XmlImportable, LibrisXMLConstants {
+public class GroupDefs implements XmlExportable, XmlImportable, LibrisXMLConstants, Iterable<GroupDef> {
 
-	HashMap<String, GroupDef> groupList;
+	LinkedHashMap<String, GroupDef> groupMap;
+	ArrayList<String> groupIds;
+	ArrayList<GroupDef> defList;
 	int numGroups;
 	public static String getXmlTag() {
 		return XML_GROUPDEFS_TAG;
@@ -32,26 +36,27 @@ public class GroupDefs implements XmlExportable, XmlImportable, LibrisXMLConstan
 			return false;
 		} else {
 			GroupDefs otherGroupDefs = (GroupDefs) comparand;
-			return groupList.equals(otherGroupDefs.groupList);
+			return groupMap.equals(otherGroupDefs.groupMap);
 		}
 	}
 
 	public GroupDefs() {
-		groupList = new HashMap<String, GroupDef>();
+		groupMap = new LinkedHashMap<String, GroupDef>();
+		groupIds = new ArrayList<String>();
+		defList = new ArrayList<GroupDef>();
 		numGroups = 0;
 	}
-
+// TODO 1. Test max 255 members per group
 	@Override
 	public void fromXml(ElementManager mgr) throws InputException {
 		mgr.parseOpenTag();
 		int groupNum = 0;
 		while (mgr.hasNext()) {
-			@SuppressWarnings("unused")
-			GroupDef newGroup = new GroupDef();
+			GroupDef newGroup = new GroupDef(groupNum);
 			ElementManager groupMgr = mgr.nextElement();
 			newGroup.fromXml(groupMgr);
-			String groupName = newGroup.getId();
-			addGroup(newGroup, groupNum, groupName);
+			String groupName = newGroup.getFieldId();
+			addGroup(newGroup);
 			++groupNum;
 		}
 		numGroups = groupNum;
@@ -62,9 +67,11 @@ public class GroupDefs implements XmlExportable, XmlImportable, LibrisXMLConstan
 		return numGroups;
 	}
 
-	public void addGroup(GroupDef newGroup, int groupNum, String groupName) {
-		newGroup.setGroupNum(groupNum);
-		groupList.put(groupName, newGroup);
+	public void addGroup(GroupDef newGroup) {
+		String id = newGroup.getFieldId();
+		groupMap.put(id, newGroup);
+		groupIds.add(id);
+		defList.add(newGroup);
 	}
 
 	@Override
@@ -75,25 +82,50 @@ public class GroupDefs implements XmlExportable, XmlImportable, LibrisXMLConstan
 	@Override
 	public void toXml(ElementWriter output) throws XmlException {
 		output.writeStartElement(XML_GROUPDEFS_TAG);
-		for (GroupDef g: groupList.values()) {
+		for (GroupDef g: groupMap.values()) {
 			g.toXml(output);
 		}
 		output.writeEndElement();	
 	}
 
-	public GroupDef getGroupDef(String groupName) {
-		return groupList.get(groupName);
+	public GroupDef getGroupDef(String groupId) {
+		return groupMap.get(groupId);
+	}
+	
+	public GroupDef getGroupDef(int groupNum) {
+		return defList.get(groupNum);
 	}
 	
 	public Iterable<String> getGroupIds() {
-		return groupList.keySet();
+		return groupIds;
 	}
 
-	public int groupNameToNum(String groupName) {
-		GroupDef def = getGroupDef(groupName);
+	public int groupIdToNum(String groupId) {
+		GroupDef def = getGroupDef(groupId);
 		if (null == def) {
 			return -1;
 		}
 		return def.getGroupNum();
+	}
+	
+	@Override
+	public Iterator<GroupDef> iterator() {
+		Iterator<GroupDef> result = null;
+		if (null != groupMap) {
+			result = groupMap.values().iterator();
+		}
+		return result;
+	}
+
+	public String getTitle() {
+		return null;
+	}
+
+	public String getId() {
+		return null;
+	}
+
+	public int getFieldNum() {
+		return 0;
 	}
 }

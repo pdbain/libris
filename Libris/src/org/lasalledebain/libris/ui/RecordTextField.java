@@ -31,6 +31,11 @@ public class RecordTextField extends GuiControl {
 		});
 	}
 
+	public RecordTextField(String contents) {
+		this(0,0);
+		setFieldValue(contents);
+	}
+
 	@Override
 	public void setFieldValue(FieldValue newValue) throws FieldDataException {
 		setFieldValue(newValue.getValueAsString());
@@ -53,4 +58,10 @@ public class RecordTextField extends GuiControl {
 	public void setEditable(boolean editable) {
 		control.setEditable(editable);
 	}
+	
+	@Override
+	public boolean isEditable() {
+		return control.isEditable();
+	}
+
 }

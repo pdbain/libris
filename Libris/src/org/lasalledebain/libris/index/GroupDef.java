@@ -1,7 +1,9 @@
 package org.lasalledebain.libris.index;
 
+import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.XmlExportable;
 import org.lasalledebain.libris.XmlImportable;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -10,7 +12,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
-public class GroupDef implements XmlImportable, XmlExportable {
+public class GroupDef extends FieldTemplate implements XmlImportable, XmlExportable {
 
 	/*	<!ELEMENT groupdef EMPTY >
 
@@ -32,18 +34,30 @@ public class GroupDef implements XmlImportable, XmlExportable {
 		}
 	};
 
-	private String id;
-	private String title;
 	private GroupStructure structureType = GroupStructure.STRUCTURE_HIERARCHICAL;
 	private int groupNum;
 	
+	public GroupDef(String id, String title, int num) {
+		super(id, title, FieldType.T_FIELD_AFFILIATES);
+		groupNum = num;
+	}
+	public GroupDef(int num) {
+		ftype = FieldType.T_FIELD_AFFILIATES;
+		factory = fieldClasses.get(ftype);
+		groupNum = num;
+	}
 	@Override
-	public LibrisAttributes getAttributes() throws XmlException {
+	public boolean isContentField() {
+		return false;
+	}
+
+	@Override
+	public LibrisAttributes getAttributes() {
 		LibrisAttributes attrs = new LibrisAttributes(
-				new String[][] {{XML_GROUPDEF_ID_ATTR, id}, {XML_GROUPDEF_STRUCTURE_ATTR, getStructureType().toString()}}
+				new String[][] {{XML_GROUPDEF_ID_ATTR, fieldId}, {XML_GROUPDEF_STRUCTURE_ATTR, getStructureType().toString()}}
 				);
-		if ((null != title) && !title.isEmpty()) {
-			attrs.setAttribute(XML_GROUPDEF_TITLE_ATTR, title);
+		if ((null != fieldTitle) && !fieldTitle.isEmpty()) {
+			attrs.setAttribute(XML_GROUPDEF_TITLE_ATTR, fieldTitle);
 		}
 		return attrs;
 	}
@@ -57,8 +71,8 @@ public class GroupDef implements XmlImportable, XmlExportable {
 	public void fromXml(ElementManager mgr) throws InputException  {
 		mgr.parseOpenTag();
 		LibrisAttributes attrs = mgr.getElementAttributes();
-		id = attrs.get(XML_GROUPDEF_ID_ATTR).intern();
-		title = attrs.get(XML_GROUPDEF_TITLE_ATTR);
+		fieldId = attrs.get(XML_GROUPDEF_ID_ATTR).intern();
+		fieldTitle = attrs.get(XML_GROUPDEF_TITLE_ATTR);
 		String structureTypeName = attrs.get(XML_GROUPDEF_STRUCTURE_ATTR);
 		if (null == structureTypeName) {
 			structureTypeName = GroupStructure.STRUCTURE_HIERARCHICAL.toString();
@@ -72,7 +86,6 @@ public class GroupDef implements XmlImportable, XmlExportable {
 		} else {
 			throw new InputException("unrecognised group structure type "+structureTypeName);
 		}
-
 	}
 
 	static public ElementShape getShape() {
@@ -84,14 +97,6 @@ public class GroupDef implements XmlImportable, XmlExportable {
 		return XML_GROUPDEF_TAG;
 	}
 	
-	public String getId() {
-		return id;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
 	public GroupStructure getStructureType() {
 		return structureType;
 	}
