@@ -25,11 +25,13 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.search.KeywordFilter;
 import org.lasalledebain.libris.search.RecordFilter;
-import org.lasalledebain.libris.search.KeywordFilter.MATCH_TYPE;
+import org.lasalledebain.libris.search.RecordNameFilter;
+import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.search.RecordFilter.SEARCH_TYPE;
 
 
@@ -57,8 +59,11 @@ class FilterDialogue {
 	private final int KEYWORD_ORDINAL = 0;
 	private final int RECNAME_ORDINAL = 1;
 	private Frame ownerFrame;
-	public FilterDialogue(Schema schem, Frame ownerFrame, BrowserWindow browser) {
-		this.dbSchema = schem;
+	private int searchType;
+	private LibrisDatabase database;
+	public FilterDialogue(LibrisDatabase db, Frame ownerFrame, BrowserWindow browser) {
+		database = db;
+		this.dbSchema = db.getSchema();
 		this.ownerFrame = ownerFrame;
 		browserWindow = browser;
 		dLog = new JDialog(ownerFrame, "Filter");	
@@ -74,6 +79,7 @@ class FilterDialogue {
 	}
 
 	private void createSearchDialogue(int searchType) {
+		this.searchType = searchType;
 		JPanel dialogueContent = new JPanel();
 		dialogueContent.setLayout(new BoxLayout(dialogueContent, BoxLayout.Y_AXIS));
 		JPanel searchPanel;
@@ -172,18 +178,36 @@ class FilterDialogue {
 		return actionPanel;
 	}
 	private void doRefresh() {
-		int[] selectedFields = fChooser.getFieldNums();
-		if (0 == selectedFields.length) {
-			return;
+		switch (searchType) {
+		case KEYWORD_ORDINAL: doKeywordRefresh(); break;
+		case RECNAME_ORDINAL: doRecordNameRefresh(); break;
+		default: return;
 		}
+	}
+
+	private void doRecordNameRefresh() {
 		final boolean caseSensitive = caseSensitiveButton.isSelected();
 		String searchTerms = filterWords.getText();
 		if (!caseSensitive) {
 			searchTerms = searchTerms.toLowerCase();
 		}
 		String[] searchList = searchTerms.trim().split("\\s+");
-		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, selectedFields, searchList);
-		browserWindow.doRefresh(filter);
+		RecordNameFilter filter = new RecordNameFilter(matchType, caseSensitive, searchList);
+		browserWindow.doRefresh(database.getNamedRecords(), filter);
+	}
+
+	private void doKeywordRefresh() {
+		int[] selectedFields = fChooser.getFieldNums();
+		if (0 != selectedFields.length) {
+			final boolean caseSensitive = caseSensitiveButton.isSelected();
+			String searchTerms = filterWords.getText();
+			if (!caseSensitive) {
+				searchTerms = searchTerms.toLowerCase();
+			}
+			String[] searchList = searchTerms.trim().split("\\s+");
+			KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, selectedFields, searchList);
+			browserWindow.doRefresh(database.getRecords(), filter);
+		}
 	}
 	public class ButtonListener implements ActionListener {
 		protected ButtonListener(MATCH_TYPE mtype) {

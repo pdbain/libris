@@ -9,14 +9,14 @@ import org.lasalledebain.libris.indexes.ContainsKeywords;
 import org.lasalledebain.libris.indexes.ExactKeywordList;
 import org.lasalledebain.libris.indexes.PrefixKeywords;
 import org.lasalledebain.libris.indexes.RecordKeywords;
+import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 
-public class KeywordFilter implements RecordFilter {
+public class RecordNameFilter implements RecordFilter {
 
-	private int[] fieldList;
 	private List<String> terms;
 	private RecordKeywords recWords;
 
-	public KeywordFilter(MATCH_TYPE matchType, boolean caseSensitive, int searchList[], String searchTerms[]) {
+	public RecordNameFilter(MATCH_TYPE matchType, boolean caseSensitive, String searchTerms[]) {
 		switch (matchType) {
 		case MATCH_EXACT:
 			recWords = new ExactKeywordList(caseSensitive);
@@ -28,13 +28,13 @@ public class KeywordFilter implements RecordFilter {
 			recWords = new ContainsKeywords(caseSensitive);
 			break;
 		}
-		fieldList = searchList;
 		terms = Arrays.asList(searchTerms);
 	}
 
 	public boolean matches(Record rec) throws InputException {
 		recWords.clear();
-		rec.getKeywords(fieldList, recWords);
+		String recName = rec.getName();
+		recWords.addKeyword(recName);
 		return recWords.contains(terms);
 	}
 	
@@ -48,9 +48,5 @@ public class KeywordFilter implements RecordFilter {
 	
 	public Iterable<String> getKeywords() {
 		return recWords.getKeywords();
-	}
-
-	public int[] getFieldList() {
-		return fieldList;
 	}
 }

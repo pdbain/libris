@@ -28,6 +28,8 @@ import org.lasalledebain.libris.SingleRecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.search.KeywordFilter;
+import org.lasalledebain.libris.search.RecordFilter;
+import org.lasalledebain.libris.search.RecordNameFilter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class BrowserWindow extends JPanel {
@@ -51,7 +53,7 @@ public class BrowserWindow extends JPanel {
 
 	private RecordList recordsSource;
 
-	private KeywordFilter filter;
+	private RecordFilter filter;
 
 	public BrowserWindow(LibrisDatabase db, LibrisGui ui) throws DatabaseException {
 		super();
@@ -70,7 +72,7 @@ public class BrowserWindow extends JPanel {
 		filterView.add(icon);
 		filterView.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent arg0) {
-				new FilterDialogue(database.getSchema(), gui.getMainFrame(), BrowserWindow.this);
+				new FilterDialogue(database, gui.getMainFrame(), BrowserWindow.this);
 			}
 			public void mouseEntered(MouseEvent arg0) {}
 			public void mouseExited(MouseEvent arg0) {}
@@ -152,19 +154,19 @@ public class BrowserWindow extends JPanel {
 		chooser.setModel(recList);
 	}			
 
-	public void doRefresh(KeywordFilter filter) {
+	public void doRefresh(RecordList src, RecordFilter filter) {
 		setFilter(filter);
-		FilteredRecordList filteredList = new FilteredRecordList(recordsSource, filter);
+		FilteredRecordList filteredList = new FilteredRecordList(src, filter);
 		recordsIterator = filteredList.iterator();
 		recList = getRecords();
 		chooser.setModel(recList);
 	}
 
-	public void setFilter(KeywordFilter filter) {
+	public void setFilter(RecordFilter filter) {
 		this.filter = filter;
 	}
 
-	public KeywordFilter getFilter() {
+	public RecordFilter getFilter() {
 		return filter;
 	}
 
