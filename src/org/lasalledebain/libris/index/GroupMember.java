@@ -112,18 +112,21 @@ public class GroupMember extends GenericField implements LibrisXMLConstants, Xml
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
 		LibrisAttributes attrs = getAttributes();
-		output.writeStartElement(XML_MEMBER_TAG, attrs, affiliations.length == 0);
-		boolean first = true;
-		for (int affId: affiliations) {
-			if (first) {
-				first = false;
-				continue;
+		boolean empty = affiliations.length == 0;
+		output.writeStartElement(XML_MEMBER_TAG, attrs, empty);
+		if (!empty) {
+			boolean first = true;
+			for (int affId: affiliations) {
+				if (first) {
+					first = false;
+					continue;
+				}
+				LibrisAttributes affAttrs = new LibrisAttributes();
+				affAttrs.setAttribute(XML_MEMBER_PARENT_ATTR, Integer.toString(affId));
+				output.writeStartElement(XML_AFFILIATION_TAG, affAttrs, false);
 			}
-			LibrisAttributes affAttrs = new LibrisAttributes();
-			affAttrs.setAttribute(XML_MEMBER_PARENT_ATTR, Integer.toString(affId));
-			output.writeStartElement(XML_AFFILIATION_TAG, affAttrs, false);
+			output.writeEndElement();
 		}
-		output.writeEndElement();
 	}
 
 	@Override

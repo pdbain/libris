@@ -23,6 +23,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.InternalError;
@@ -80,6 +81,7 @@ public class LibrisMenu {
 	private final ArrayList<JMenuItem> editMenuFieldValueCommands;
 	private final ArrayList<JMenuItem> editMenuRecordCommands;
 	private JMenuItem duplicateRecord;
+	private JMenuItem childRecord;
 
 	public LibrisMenu(LibrisGui gui) {
 		this();
@@ -334,6 +336,21 @@ public class LibrisMenu {
 		recordMenuEditCommands.add(duplicateRecord);
 		duplicateRecord.setEnabled(false);
 		duplicateRecord.addActionListener(new DuplicateRecordListener());
+		
+		childRecord = new JMenuItem("New child record");
+		recMenu.add(childRecord);
+		recordMenuEditCommands.add(childRecord);
+		childRecord.setEnabled(false);
+		childRecord.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				RecordWindow rw = guiMain.getCurrentRecordWindow();
+				if (null != rw) {
+					Record rec = rw.getRecord();
+					guiMain.newChildRecord(rec, guiMain.getSelectedGroup().getGroupNum());
+				}
+			}
+		});
 		
 		recMenu.add("Link record");
 		return recMenu;

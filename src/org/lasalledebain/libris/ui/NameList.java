@@ -28,11 +28,13 @@ public class NameList extends GuiControl {
 	private boolean isEditable;
 	Vector <KeyIntegerTuple> affiliateInfo;
 	private final LibrisWindowedUi windowedUi;
+	final Record currentRecord;
 
 	public NameList(LibrisWindowedUi ui, LibrisDatabase db, Record rec, GroupDef gd) throws InputException {
 		grpDef = gd;
 		windowedUi = ui;
 		dBase = db;
+		currentRecord = rec;
 		isEditable = true;
 		setValues(rec, gd);
 	}
@@ -160,10 +162,16 @@ public class NameList extends GuiControl {
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent arg0) {
-			if (uiField.isEditable() && (2 == arg0.getClickCount())) {
-				new AffiliateEditor(uiField, windowedUi.getMainFrame(), dBase.getNamedRecordIndex(), affiliateInfo, control, grpDef.getFieldTitle());
-			}
+		public void mouseClicked(MouseEvent evt) {
+			int clickCount = evt.getClickCount();
+			windowedUi.setSelectedGroup(grpDef);
+			switch (clickCount) {
+			case 1: 
+				break;
+			case 2: 
+				new AffiliateEditor(currentRecord, uiField, windowedUi, dBase.getNamedRecordIndex(), affiliateInfo, control, grpDef);
+				break;
+			} 
 		}
 
 		@Override

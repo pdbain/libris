@@ -61,12 +61,13 @@ public class RecordDisplayPanel extends JPanel {
 		menu = mainGui.getMenu();
 	}
 
-	void addRecord(Record record, boolean editable) throws LibrisException {
+	RecordWindow addRecord(Record record, boolean editable) throws LibrisException {
 		RecordWindow rw = new RecordWindow(mainGui, recLayout, record, true, modListener);
 		rw.setModified(false);
 		rw.setEditable(editable);
 		addRecordWindow(rw);
 		menu.setRecordEditEnabled(editable);
+		return rw;
 	}
 // FIXME summary view not shown
 

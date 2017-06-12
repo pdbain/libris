@@ -3,7 +3,7 @@ package org.lasalledebain.libris.indexes;
 import java.util.AbstractSet;
 import java.util.HashSet;
 
-import org.lasalledebain.libris.search.KeywordFilter.MATCH_TYPE;
+import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 
 public class ExactKeywordList extends RecordKeywords {
 

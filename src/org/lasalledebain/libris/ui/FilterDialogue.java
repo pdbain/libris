@@ -91,6 +91,8 @@ class FilterDialogue {
 
 		dialogueContent.add(searchTypeSelector);
 		dialogueContent.add(searchPanel);
+		actionPanel = createActionPanel();
+		dialogueContent.add(actionPanel);
 		dLog.setContentPane(dialogueContent);
 		dLog.pack();
 		dLog.setLocationRelativeTo(ownerFrame);
@@ -114,9 +116,7 @@ class FilterDialogue {
 		JPanel controlPanel = createTextSearchControls();
 		
 		createSearchTermsField();
-		
-		actionPanel = createActionPanel();
-		
+				
 		JPanel searchPanel = new JPanel(new BorderLayout());
 		searchPanel.add(controlPanel, BorderLayout.NORTH);
 		searchPanel.add(filterWords, BorderLayout.CENTER);

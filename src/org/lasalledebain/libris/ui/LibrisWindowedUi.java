@@ -4,10 +4,13 @@ import java.io.File;
 
 import javax.swing.JFrame;
 
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.index.GroupDef;
 
 public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	protected JFrame mainFrame;
+	private GroupDef selectedGroupDef;
 
 	protected void initializeUi() {
 		mainFrame = new JFrame();
@@ -18,6 +21,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	public LibrisWindowedUi() {
 		super();
 		initializeUi();
+		selectedGroupDef = null;
 	}
 	
 	public LibrisWindowedUi(File dbFile) throws LibrisException {
@@ -29,5 +33,14 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		initializeUi();
 	}
 
+	public void setSelectedGroup(GroupDef grpDef) {
+		selectedGroupDef = grpDef;
+		enableNewChild();
+	}
+	public GroupDef getSelectedGroup() {
+		return selectedGroupDef;
+	}
 
+	void enableNewChild() {}
+	public abstract Record newChildRecord(Record currentRecord, int groupNum);
 }

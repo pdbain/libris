@@ -18,7 +18,11 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
+import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 
@@ -27,17 +31,18 @@ public class AffiliateEditor {
 	Frame ownerFrame;
 	JDialog dLog;
 	final Vector<KeyIntegerTuple> affInfo;
-	final JList affList;
+	final JList<KeyIntegerTuple> affList;
 	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
 	private final GuiControl guiCtrl;
-	public AffiliateEditor(final GuiControl ctrl, Frame ownerFrame, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
-			Vector<KeyIntegerTuple> affiliateInfo, JList affiliateList, String title) {
+	public AffiliateEditor(Record currentRecord, final GuiControl ctrl, LibrisWindowedUi ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
+			Vector<KeyIntegerTuple> affiliateInfo, JList affiliateList, GroupDef grpDef) {
+		final Record rec = currentRecord;
 		guiCtrl = ctrl;
 		affInfo = affiliateInfo;
 		affList = affiliateList;
-		this.ownerFrame = ownerFrame;
+		this.ownerFrame = ui.getMainFrame();
 		namedRecordIndex = namedRecIndex;
-		dLog = new JDialog(ownerFrame, title);
+		dLog = new JDialog(ownerFrame, grpDef.getFieldTitle());
 		final JPanel optionPane = new JPanel();
 		optionPane.setLayout(new BorderLayout());
 
@@ -56,8 +61,10 @@ public class AffiliateEditor {
 		nameBrowser.setEditable(false);
 		contentPanel.add(nameBrowser);
 		JTextField parentId = new JTextField(editedValue.toString());
+		JPanel buttonBar = new JPanel(new FlowLayout());
 		contentPanel.add(parentId);
 		final JButton setParentButton = new JButton("Set parent");
+		setParentButton.setEnabled(ctrl.isEditable());
 		setParentButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -69,10 +76,22 @@ public class AffiliateEditor {
 				}
 				affList.setListData(affInfo);
 				guiCtrl.setModified(true);
-				setParentButton.setEnabled(false);
+				dialogueDispose();
 			}			
 		});
-		contentPanel.add(setParentButton);
+		buttonBar.add(setParentButton);
+		final JButton newChildButton = new JButton("New child record");
+		newChildButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				int groupNum = grpDef.getGroupNum();
+				ui.newChildRecord(currentRecord, groupNum);
+				dialogueDispose();
+			}
+
+		});
+		buttonBar.add(newChildButton);
+
 		affList.addListSelectionListener(new ListSelectionListener() {
 
 			@Override
@@ -84,18 +103,12 @@ public class AffiliateEditor {
 		optionPane.add(contentPanel);
 		ActionListener buttonListener = new ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				dLog.setVisible(false);
-				dLog.dispose();
+				dialogueDispose();
 			};		
 		};
-		JPanel buttonBar = new JPanel(new FlowLayout());
-		JButton okayButton = new JButton("OK");
-		okayButton.addActionListener(buttonListener);
-		okayButton.setSelected(true);
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(buttonListener);
 		buttonBar.add(cancelButton);
-		buttonBar.add(okayButton);
 		optionPane.add(buttonBar, BorderLayout.SOUTH);
 		dLog.setContentPane(optionPane);
 		dLog.pack();
@@ -178,5 +191,10 @@ public class AffiliateEditor {
 			}
 			);
 		}
+	}
+
+	private void dialogueDispose() {
+		dLog.setVisible(false);
+		dLog.dispose();
 	}
 }

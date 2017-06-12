@@ -126,4 +126,8 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 		return;
 	}
 
+	@Override
+	public Record newChildRecord(Record currentRecord, int groupNum) {
+		return null;
+	}
 }

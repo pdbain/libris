@@ -54,8 +54,6 @@ public class LibrisGui extends LibrisWindowedUi {
 	private static final long serialVersionUID = -6063661235767540726L;
 	LibrisMenu menu;
 	private JMenuBar menuBar;
-	private JTabbedPane selectorPanel;
-	private JPanel navigateView;
 	protected BrowserWindow resultsPanel;
 	protected RecordDisplayPanel displayPanel;
 	private JSplitPane contentPane;
@@ -149,11 +147,6 @@ public class LibrisGui extends LibrisWindowedUi {
 			mainframeContents = null;
 		}
 		if (!empty) {
-			selectorPanel = new JTabbedPane();
-			navigateView = new JPanel();
-			selectorPanel.add("Navigate", navigateView);
-			navigateView.add(new JTextArea("selectorPanel"));
-
 			resultsPanel = new BrowserWindow(currentDatabase, this);
 
 			displayPanel = new RecordDisplayPanel(currentDatabase, this);
@@ -167,7 +160,7 @@ public class LibrisGui extends LibrisWindowedUi {
 			int divloc = prefs.getInt(CONTENT_PANE_DIVIDER, 285);
 			contentPane.setDividerLocation(divloc);
 
-			mainWindow = new JSplitPane(JSplitPane.VERTICAL_SPLIT, selectorPanel, contentPane);
+			mainWindow = contentPane;
 			mainWindow.setOneTouchExpandable(true);
 			mainFrame.add(mainWindow);
 			mainframeContents = mainWindow;
@@ -260,7 +253,17 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	@Override
 	public Record newRecord() {
+		Record rec = null;
+		RecordWindow rw = newRecordWindow();
+		if (null != rw) {
+			rec = rw.getRecord();
+		}
+		return rec;
+	}
+	
+	public RecordWindow newRecordWindow() {
 		Record record = null;
+		RecordWindow rw = null;
 		try {
 			record = currentDatabase.newRecord();
 			record.setEditable(true);
@@ -268,11 +271,11 @@ public class LibrisGui extends LibrisWindowedUi {
 			fatalError(e1);
 		}
 		try {
-			displayPanel.addRecord(record, true);
+			rw = displayPanel.addRecord(record, true);
 		} catch (Exception e) {
 			alert("error creating new record", e);
 		}
-		return record;
+		return rw;
 	}
 	
 	@Override
@@ -371,7 +374,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 	
 	public void setEditable(boolean editable) throws LibrisException {
-		RecordWindow rw = displayPanel.getCurrentRecordWindow();
+		RecordWindow rw = getCurrentRecordWindow();
 		boolean wasEditable = rw.isEditable();
 		rw.setEditable(!wasEditable);
 		rw.refresh();
@@ -385,14 +388,6 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
-	}
-
-	public JTabbedPane getSelectorPanel() {
-		return selectorPanel;
-	}
-
-	public JPanel getNavigateView() {
-		return navigateView;
 	}
 
 	@Override
@@ -513,7 +508,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	@Override
 	public void fieldSelected(boolean selected) {
 		if (null != menu) {
-			RecordWindow crw = displayPanel.getCurrentRecordWindow();
+			RecordWindow crw = getCurrentRecordWindow();
 			if ((null != crw) && crw.isEditable()) {
 				menu.enableFieldValueOperations(selected);
 			}
@@ -522,7 +517,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	@Override
 	public void newFieldValue() {
-		RecordWindow currentRecordWindow = displayPanel.getCurrentRecordWindow();
+		RecordWindow currentRecordWindow = getCurrentRecordWindow();
 		final UiField selectedField = getSelectedField();
 		if ((null != selectedField) &&selectedField.isMultiControl()) {
 			GuiControl ctrl;
@@ -543,7 +538,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	@Override
 	public void removeFieldValue() {
-		RecordWindow currentRecordWindow = displayPanel.getCurrentRecordWindow();
+		RecordWindow currentRecordWindow = getCurrentRecordWindow();
 		UiField f = getSelectedField();
 		Field recordField = f.getRecordField();
 		try {
@@ -558,7 +553,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	@Override
 	public void arrangeValues() {
-		RecordWindow currentRecordWindow = displayPanel.getCurrentRecordWindow();
+		RecordWindow currentRecordWindow = getCurrentRecordWindow();
 		UiField f = getSelectedField();
 		final JFrame frame = new JFrame("Arrange values");
 		if (f.isMultiControl()) {
@@ -606,7 +601,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	@Override
 	public void setRecordName(NamedRecordList namedRecs) throws InputException {
-		RecordWindow currentRecordWindow = displayPanel.getCurrentRecordWindow();
+		RecordWindow currentRecordWindow = getCurrentRecordWindow();
 		if (null != currentRecordWindow){
 			Record rec = currentRecordWindow.getRecord();
 			String newName = JOptionPane.showInputDialog("New record name", rec.getName());
@@ -632,7 +627,25 @@ public class LibrisGui extends LibrisWindowedUi {
 				}
 			}
 		}
+	}
+
+	public RecordWindow getCurrentRecordWindow() {
+		RecordWindow currentRecordWindow = displayPanel.getCurrentRecordWindow();
+		return currentRecordWindow;
 	} 
+	
+	public Record newChildRecord(Record currentRecord, int groupNum) {
+		RecordWindow rw = newRecordWindow();
+		 Record newRec = rw.getRecord();
+		try {
+			newRec.setParent(groupNum, currentRecord.getRecordId());
+			rw.refresh();
+		} catch (LibrisException e) {
+			alert("Error creating record");
+		}
+		return newRec;
+	}
+
 	@Deprecated
 	class RecordNameDialogue implements ActionListener {
 		final LibrisDatabase dBase;
@@ -643,6 +656,12 @@ public class LibrisGui extends LibrisWindowedUi {
 		public void actionPerformed(ActionEvent e) {
 			dBase.getUi().getSelectedField();
 		}
+		
+	}
+
+	@Override
+	void enableNewChild() {
+		// TODO Auto-generated method stub
 		
 	}
 

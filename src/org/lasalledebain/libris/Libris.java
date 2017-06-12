@@ -30,7 +30,7 @@ public class Libris {
 			} else if (arg.equals("-g")) {
 				isGui = true;
 			} else if (arg.equals("-c")) {
-				isGui = true;
+				isGui = false;
 			} else if (arg.equals("-x")) {
 				if ((i + 1) < args.length) {
 					auxDirpath = args[i+1];
@@ -39,8 +39,7 @@ public class Libris {
 				if (null == databaseFile) {
 					databaseFilePath = arg;
 				} else {
-					System.err.println("only one database name can be specified");
-					System.exit(1);
+					cmdlineError("only one database name can be specified");
 				}
 			}
 			++i;
@@ -49,14 +48,29 @@ public class Libris {
 		if (isGui) {
 			try {
 				File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
-				File auxDir = (null == auxDirpath) ? null : new File(auxDirpath);
-				new LibrisGui(dbFile, auxDir, readOnly);
+				File auxDir = null;
+				if ((null != dbFile) && (!dbFile.isFile())) {
+					cmdlineError(databaseFilePath+" is not a file");
+				} else {
+					if (null != auxDirpath) {
+						auxDir = new File(auxDirpath);
+					}
+				}
+				LibrisGui ui = new LibrisGui(dbFile, auxDir, readOnly);
+				if (null != dbFile) {
+					ui.openDatabase();
+				}
 			} catch (LibrisException e) {
-				System.err.println("Cannot open Libris: "+e.getMessage());
+				cmdlineError("Cannot open Libris: "+e.getMessage());
 
 			}
 		}
 
+	}
+
+	private static void cmdlineError(String msg) {
+		System.err.println(msg);
+		System.exit(1);
 	}
 
 	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
