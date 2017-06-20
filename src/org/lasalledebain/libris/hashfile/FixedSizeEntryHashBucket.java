@@ -8,12 +8,14 @@ import java.util.TreeMap;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 @SuppressWarnings("unchecked")
-public class FixedSizeEntryHashBucket <T extends HashEntry<?>> extends HashBucket {
+public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends HashBucket {
 
 	protected TreeMap<Integer, T> entries;
+	protected EntryFactory<T> entryFact;
 	private FixedSizeEntryHashBucket(RandomAccessFile backingStore,
-			int bucketNum, EntryFactory fact) {
-		super(backingStore, bucketNum, fact);
+			int bucketNum, EntryFactory eFact) {
+		super(backingStore, bucketNum);
+		entryFact = eFact;
 		entries = new TreeMap<Integer, T>();
 
 		occupancy = 4;
@@ -52,6 +54,22 @@ public class FixedSizeEntryHashBucket <T extends HashEntry<?>> extends HashBucke
 			entries.clear();
 		}
 		super.clear();
+	}
+
+	public void read() throws IOException, DatabaseException {
+		clear();
+		long fileSize = backingStore.length();
+		if (filePosition >= fileSize) {
+			return;
+		}
+		backingStore.seek(filePosition);
+		int numEntries = backingStore.readInt();
+		for (int i = 0; i < numEntries; ++i) {
+			T newEntry = entryFact.makeEntry();
+			newEntry.readData(backingStore);
+			addElement(newEntry);
+		}
+		dirty = false;
 	}
 
 	public void write() throws DatabaseException {

@@ -11,7 +11,6 @@ public abstract class HashBucket <T extends HashEntry> implements Iterable<T> {
 
 	protected int occupancy;
 	static final int BUCKET_SIZE = 4096;
-	protected EntryFactory<T> entryFact;
 	protected final int bucketNumber;
 	RandomAccessFile backingStore;
 	protected boolean dirty;
@@ -23,11 +22,10 @@ public abstract class HashBucket <T extends HashEntry> implements Iterable<T> {
 	 * @param bucketNum position in the file
 	 * @param fact Factory for hash bucket entries
 	 */
-	public HashBucket(RandomAccessFile backingStore, int bucketNum, EntryFactory<T> eFact) {
+	public HashBucket(RandomAccessFile backingStore, int bucketNum) {
 		this.backingStore = backingStore;
 		this.bucketNumber = bucketNum;
 		filePosition = bucketNumber*BUCKET_SIZE;
-		entryFact = eFact;
 	}
 
 	public abstract Iterator<T> iterator();
@@ -86,21 +84,7 @@ public abstract class HashBucket <T extends HashEntry> implements Iterable<T> {
 		dirty = true;
 	}
 	
-	public void read() throws IOException, DatabaseException {
-		clear();
-		long fileSize = backingStore.length();
-		if (filePosition >= fileSize) {
-			return;
-		}
-		backingStore.seek(filePosition);
-		int numEntries = backingStore.readInt();
-		for (int i = 0; i < numEntries; ++i) {
-			T newEntry = entryFact.makeEntry();
-			newEntry.readData(backingStore);
-			addElement(newEntry);
-		}
-		dirty = false;
-	}
+	public abstract void read() throws IOException, DatabaseException;
 
 	public int getNumEntries() throws IOException {
 		backingStore.seek(filePosition);

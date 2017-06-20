@@ -1,6 +1,5 @@
 package org.lasalledebain.libris.hashfile;
 
-import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,12 +10,10 @@ import java.nio.ByteBuffer;
  * @param <T>
  */
 @SuppressWarnings("unchecked")
-public interface HashEntry<T extends HashEntry> {
+public interface HashEntry<T extends HashEntry> extends Comparable<HashEntry> {
 
-	void readData(DataInput backingStore) throws IOException;
 	void writeData(DataOutput backingStore) throws IOException;
 	int getKey();
-	Integer getIntegerKey();
 	void setKey(int newKey);
 	/**
 	 * @return Size of the hash entry, including overhead in bucket
@@ -49,4 +46,5 @@ public interface HashEntry<T extends HashEntry> {
 	int getDataLength();
 	void readData(ByteBuffer buff, int length);
 	void setData(byte[] dat);
+
 }

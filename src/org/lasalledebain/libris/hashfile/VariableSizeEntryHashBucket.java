@@ -26,17 +26,19 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 	private BucketOverflowFileManager overflowManager;
 	public VariableSizeEntryHashBucket(RandomAccessFile backingStore,
 			int bucketNum, BucketOverflowFileManager overflowManager,
-			EntryFactory fact) {
-		super(backingStore, bucketNum, fact);
+			EntryFactory eFact) {
+		super(backingStore, bucketNum);
 		occupancy = 2;
 		this.overflowManager = overflowManager;
 		entries = new TreeMap<Integer, EntryInfo>();
 		lastEntry = null;
+		entryFact = eFact;
 	}
 	protected TreeMap<Integer, EntryInfo> entries;
 	EntryInfo lastEntry;
 	private ByteBuffer bucketEntryData;
 	private ArrayList<EntryInfo> victimList;
+	protected EntryFactory<T> entryFact;
 
 	@Override
 	protected void addToBucket(int key, HashEntry newEntry) {

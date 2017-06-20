@@ -6,17 +6,23 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.lasalledebain.libris.exception.InternalError;
+import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.HashEntry;
 
-@SuppressWarnings("unchecked")
-public class RecordPositionEntry implements HashEntry {
+/**
+ * Entry comprises 2 bytes:
+ * 4 bytes for record ID
+ * 8 bytes for record position
+ *
+ */
+public class RecordPositionEntry extends AbstractFixedSizeHashEntry {
 
 	public int getRecordId() {
-		return recordId;
+		return key;
 	}
 
 	public void setRecordId(int recordId) {
-		this.recordId = recordId;
+		key = recordId;
 	}
 
 	public long getRecordPosition() {
@@ -27,7 +33,6 @@ public class RecordPositionEntry implements HashEntry {
 		this.recordPosition = recordPosition;
 	}
 
-	int recordId;
 	long recordPosition;
 	private boolean oversize;
 	/**
@@ -35,27 +40,12 @@ public class RecordPositionEntry implements HashEntry {
 	 * @param position
 	 */
 	public RecordPositionEntry(int recordId, long position) {
-		this.recordId = recordId;
+		key = recordId;
 		recordPosition = position;
 	}
 
 	public RecordPositionEntry() {
 		return;
-	}
-
-	@Override
-	public void setKey(int newKey) {
-		recordId = newKey;
-	}
-
-	@Override
-	public int getKey() {
-		return recordId;
-	}
-
-	@Override
-	public Integer getIntegerKey() {
-		return new Integer(recordId);
 	}
 
 	@Override
@@ -84,19 +74,19 @@ public class RecordPositionEntry implements HashEntry {
 
 	@Override
 	public void readData(DataInput backingStore) throws IOException {
-		recordId = backingStore.readInt();
+		key = backingStore.readInt();
 		recordPosition = backingStore.readLong();
 	}
 
 	@Override
 	public void readData(ByteBuffer buff, int length) {
-		recordId = buff.getInt();
+		key = buff.getInt();
 		recordPosition = buff.getLong();
 	}
 
 	@Override
 	public void writeData(DataOutput backingStore) throws IOException {
-		backingStore.writeInt(recordId);
+		backingStore.writeInt(key);
 		backingStore.writeLong(recordPosition);
 	}
 

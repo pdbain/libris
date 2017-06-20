@@ -77,7 +77,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 	private LibrisRecordsFileManager recordsFile;
 	private LibrisJournalFileManager journalFile;
 	private Records databaseRecords;
-	private boolean recordsAccessible;
 	private Logger databaseLogger;
 	public static Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());;
 	private DatabaseAttributes xmlAttributes;
@@ -491,7 +490,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 	}
 	
 	private void setRecordsAccessible(boolean accessible) {
-		this.recordsAccessible = accessible;
 	}
 
 	public boolean isIndexed() {
@@ -763,6 +761,10 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		return l;
 	}
 	
+	public RecordList getChildRecords(int parent, int groupNum) {
+		return null;
+	}
+	
 	public String getRecordName(int recordNum) throws InputException {
 		Record rec = getRecord(recordNum);
 		return (null == rec) ? null: rec.getName();
@@ -780,3 +782,5 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		return 0;
 	}
 }
+
+
