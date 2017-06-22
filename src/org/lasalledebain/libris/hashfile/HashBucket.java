@@ -10,7 +10,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 public abstract class HashBucket <T extends HashEntry> implements Iterable<T> {
 
 	protected int occupancy;
-	static final int BUCKET_SIZE = 4096;
+	public static final int BUCKET_SIZE = 4096;
 	protected final int bucketNumber;
 	RandomAccessFile backingStore;
 	protected boolean dirty;
@@ -62,11 +62,6 @@ public abstract class HashBucket <T extends HashEntry> implements Iterable<T> {
 		return BUCKET_SIZE;
 	}
 	
-	public static int recordsPerBucket(EntryFactory fact) {
-		int entrySize = fact.getEntrySize();
-		return getBucketSize()/entrySize;
-	}
-
 	public abstract T findEntry(int key);
 
 	public abstract void write() throws DatabaseException;

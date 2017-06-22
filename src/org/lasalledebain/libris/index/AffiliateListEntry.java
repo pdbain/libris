@@ -1,11 +1,11 @@
 package org.lasalledebain.libris.index;
 
-import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.lasalledebain.libris.hashfile.HashEntry;
+import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
 
 /**
  * Entry comprises:
@@ -35,7 +35,6 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 		}
 	}
 
-
 	@Override
 	public void writeData(DataOutput backingStore) throws IOException {
 		backingStore.writeInt(nChildren);
@@ -48,39 +47,27 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 	}
 
 	@Override
-	public int getTotalLength() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean isOversize() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public int getDataLength() {
-		return 4 * ( + nChildren + nAffiliates);
+		return 4 * (1 + nChildren + nAffiliates);
 	}
 
-	@Override
-	public void setData(byte[] dat) {
-		// TODO Auto-generated method stub
+	public class AffiliateListEntryFactory implements VariableSizeEntryFactory<AffiliateListEntry> {
+
+		@Override
+		public HashEntry makeEntry() {
+			return new AffiliateListEntry();
+		}
+
+		@Override
+		public int getEntrySize() {
+			return 0;
+		}
+
+		@Override
+		public AffiliateListEntry makeEntry(int length) {
+			// TODO Auto-generated method stub
+			return null;
+		}
 		
 	}
-
-	@Override
-	public int compareTo(Object comparand) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public byte[] getData() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 }

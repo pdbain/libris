@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-@SuppressWarnings("unchecked")
 public class HashFile<T extends HashEntry> {
 
 	protected RandomAccessFile backingStore;
@@ -19,13 +18,13 @@ public class HashFile<T extends HashEntry> {
 	static final int CACHESIZE=8;
 	HashMap<Integer, HashBucket<T>> bucketCache;
 	int bucketAge = 0;
-	private HashBucketFactory bucketFactory;
+	private HashBucketFactory<T> bucketFactory;
 
 	/**
 	 * @param backingStore
 	 * @throws IOException accessing backing store
 	 */
-	public HashFile(RandomAccessFile backingStore, HashBucketFactory bFact, EntryFactory<T> eFact) throws IOException {
+	public HashFile(RandomAccessFile backingStore, HashBucketFactory<T> bFact, EntryFactory<T> eFact) throws IOException {
 		this.backingStore = backingStore;
 		this.entryFact = eFact;
 		this.bucketFactory = bFact;
@@ -150,7 +149,7 @@ public class HashFile<T extends HashEntry> {
 	 * @throws DatabaseException 
 	 */
 	private HashBucket<T> getBucket(int bucketNum) throws IOException, DatabaseException {
-		HashBucket buck = bucketCache.get(bucketNum);
+		HashBucket<T> buck = bucketCache.get(bucketNum);
 		++bucketAge;
 		if (bucketAge < 0) {
 			clear();
@@ -206,7 +205,7 @@ public class HashFile<T extends HashEntry> {
 		flush(false);
 	}
 
-	public int getNumRecords() throws DatabaseException {
+	public int getNumEntries() throws DatabaseException {
 		int sumSizes = 0;
 		try {
 			long fileLength = backingStore.length();
@@ -214,7 +213,7 @@ public class HashFile<T extends HashEntry> {
 				return 0;
 			}
 			for (int i=0; i < numBuckets; ++i) {
-				HashBucket buck = bucketFactory.createBucket(backingStore, i, entryFact);
+				HashBucket<T> buck = bucketFactory.createBucket(backingStore, i, entryFact);
 				sumSizes += buck.getNumEntries();
 			}
 		} catch (IOException e) {
@@ -223,9 +222,7 @@ public class HashFile<T extends HashEntry> {
 		return sumSizes;
 	}
 	
-	public boolean setSize(int numRecords) throws DatabaseException {
-		int recordsPerBucket = HashBucket.recordsPerBucket(entryFact);
-		int requestedBuckets = (numRecords+recordsPerBucket-1)/recordsPerBucket;
+	public boolean resize(int requestedBuckets) throws DatabaseException {
 		if (requestedBuckets < numBuckets) {
 			return false;
 		} else {

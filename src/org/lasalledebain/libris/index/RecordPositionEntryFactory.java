@@ -1,6 +1,5 @@
 package org.lasalledebain.libris.index;
 
-import org.lasalledebain.libris.hashfile.EntryFactory;
 import org.lasalledebain.libris.hashfile.FixedSizeEntryFactory;
 
 public class RecordPositionEntryFactory implements FixedSizeEntryFactory<RecordPositionEntry>{

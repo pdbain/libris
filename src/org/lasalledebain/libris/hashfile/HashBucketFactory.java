@@ -2,9 +2,7 @@ package org.lasalledebain.libris.hashfile;
 
 import java.io.RandomAccessFile;
 
-@SuppressWarnings("unchecked")
-public interface HashBucketFactory<T extends HashEntry<HashEntry>> {
-	@SuppressWarnings("unchecked")
+public interface HashBucketFactory<T extends HashEntry> {
 	HashBucket<T>  createBucket(RandomAccessFile backingStore,
-			int bucketNum, EntryFactory fact);
+			int bucketNum, EntryFactory<T> fact);
 }

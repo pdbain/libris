@@ -125,12 +125,12 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 		int totalRead = 0;
 		do {
 			nRead = backingStore.read(bucketBuffer, startPos, spaceRemaining);
-			if (nRead >= 0) {
+			if (nRead > 0) {
 				startPos += nRead;
 				spaceRemaining -= nRead;
 				totalRead += nRead;
 			}
-		} while (nRead >= 0);
+		} while (nRead > 0);
 
 		ByteBuffer sizeBuff =  ByteBuffer.wrap(bucketBuffer);
 		short numEntries = sizeBuff.getShort();

@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
+import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.HashFile;
 import org.lasalledebain.libris.index.RecordPositionEntry;
 import org.lasalledebain.libris.index.RecordPositionEntryFactory;
@@ -70,7 +71,9 @@ public class FileRecordMap extends LibrisRecordMap {
 	@Override
 	public boolean setSize(int numRecords) {
 		try {
-			return indexHashFile.setSize(numRecords);
+			int recordsPerBucket = 0; //FixedSizeEntryHashBucket.recordsPerBucket(eFactory);
+			int requestedBuckets = (numRecords+recordsPerBucket-1)/recordsPerBucket;
+			return indexHashFile.resize(requestedBuckets);
 		} catch (DatabaseException e) {
 			return false;
 		}
@@ -78,7 +81,7 @@ public class FileRecordMap extends LibrisRecordMap {
 
 	@Override
 	public int size() throws DatabaseException {
-		return indexHashFile.getNumRecords();
+		return indexHashFile.getNumEntries();
 	}
 
 	@Override

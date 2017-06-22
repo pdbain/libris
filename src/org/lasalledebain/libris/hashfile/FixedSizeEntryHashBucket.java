@@ -94,5 +94,10 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 		dirty = false;
 	}
 
+	public static int recordsPerBucket(FixedSizeEntryFactory<FixedSizeHashEntry> fact) {
+		int entrySize = fact.getEntrySize();
+		return getBucketSize()/entrySize;
+	}
+
 
 }
