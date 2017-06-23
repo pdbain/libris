@@ -38,9 +38,9 @@ public class HashFile<T extends HashEntry> {
 		int key = entry.getKey();
 		int bucketNum = findHomeBucket(key);
 		HashBucket<T> homeBucket = getBucket(bucketNum);
-		if (!homeBucket.addElement(entry)) {
+		if (!homeBucket.addEntry(entry)) {
 			HashBucket<T> overflowBucket = getBucket(numBuckets-1);
-			if (!overflowBucket.addElement(entry)) {
+			if (!overflowBucket.addEntry(entry)) {
 				expandAndRehash(overflowBucket);
 				homeBucket = overflowBucket = null;
 				addEntry(entry);
@@ -52,11 +52,11 @@ public class HashFile<T extends HashEntry> {
 		int bucketNum = findHomeBucket(key);
 		HashBucket<T> homeBucket = getBucket(bucketNum);
 		T foundEntry;
-		if (null != (foundEntry = homeBucket.findEntry(key))) {
+		if (null != (foundEntry = homeBucket.getEntry(key))) {
 			return foundEntry;
 		} else {
 			HashBucket<T> overflowBucket = getBucket(numBuckets-1);
-			if (null != (foundEntry = overflowBucket.findEntry(key))) {
+			if (null != (foundEntry = overflowBucket.getEntry(key))) {
 				return foundEntry;
 			}
 		}
@@ -102,7 +102,7 @@ public class HashFile<T extends HashEntry> {
 		}
 		oldOverflowBucket.clear();
 		for (T e: oldOverflowNativeEntries) {
-			oldOverflowBucket.addElement(e);
+			oldOverflowBucket.addEntry(e);
 		}
 		
 		HashBucket <T> splitBucket = getBucket(splitBucketNum);
@@ -116,7 +116,7 @@ public class HashFile<T extends HashEntry> {
 		}
 		splitBucket.clear();
 		for (T e: splitEntries) {
-			if (!splitBucket.addElement(e)) {
+			if (!splitBucket.addEntry(e)) {
 				newOverflowEntries.addAll(splitEntries.subList(splitEntries.indexOf(e), splitEntries.size()));
 				break;
 			}
@@ -126,7 +126,7 @@ public class HashFile<T extends HashEntry> {
 		if (newOverflowEntries.size() > 0) {
 			HashBucket<T> newOverflowBucket = getBucket(numBuckets-1);
 			for (T e: newOverflowEntries) {
-				if (!newOverflowBucket.addElement(e)) {
+				if (!newOverflowBucket.addEntry(e)) {
 					lastIndex = newOverflowEntries.indexOf(e);
 					break;
 				}
@@ -226,18 +226,21 @@ public class HashFile<T extends HashEntry> {
 		if (requestedBuckets < numBuckets) {
 			return false;
 		} else {
+			int numEntries = getNumEntries();
 			setNumBuckets(requestedBuckets);
-			try {
+			if (numEntries > 0) try {
 				flush();
 				for (int i = 0; i < numBuckets; ++i) {
 					HashBucket<T> buck = getBucket(i);
-					ArrayList<T> entries = new ArrayList<T>();
-					for (T e: buck) {
-						entries.add(e);
-					}
-					buck.clear();
-					for (T e: entries) {
-						addEntry(e);
+					if (buck.getNumEntries() > 0) {
+						ArrayList<T> entries = new ArrayList<T>();
+						for (T e: buck) {
+							entries.add(e);
+						}
+						buck.clear();
+						for (T e: entries) {
+							addEntry(e);
+						}
 					}
 				}
 				clear();

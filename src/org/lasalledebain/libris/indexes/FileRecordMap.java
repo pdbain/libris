@@ -71,7 +71,7 @@ public class FileRecordMap extends LibrisRecordMap {
 	@Override
 	public boolean setSize(int numRecords) {
 		try {
-			int recordsPerBucket = 0; //FixedSizeEntryHashBucket.recordsPerBucket(eFactory);
+			int recordsPerBucket = FixedSizeEntryHashBucket.entriesPerBucket(eFactory);
 			int requestedBuckets = (numRecords+recordsPerBucket-1)/recordsPerBucket;
 			return indexHashFile.resize(requestedBuckets);
 		} catch (DatabaseException e) {

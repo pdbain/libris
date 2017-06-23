@@ -39,7 +39,7 @@ public abstract class AbstractVariableSizeHashEntry implements VariableSizeHashE
 		ByteArrayOutputStream b = new ByteArrayOutputStream(getDataLength());
 		DataOutput s = new DataOutputStream(b);
 		writeData(s);
-		return null;
+		return b.toByteArray();
 	}
 
 	@Override

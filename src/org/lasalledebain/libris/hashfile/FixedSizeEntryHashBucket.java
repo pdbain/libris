@@ -34,7 +34,7 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 
 	}
 	
-	public T findEntry(int key) {
+	public T getEntry(int key) {
 		return entries.get(key);
 	}
 
@@ -67,9 +67,14 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 		for (int i = 0; i < numEntries; ++i) {
 			T newEntry = entryFact.makeEntry();
 			newEntry.readData(backingStore);
-			addElement(newEntry);
+			addEntry(newEntry);
 		}
 		dirty = false;
+	}
+
+	@Override
+	protected int getNumEntriesImpl() {
+		return entries.size();
 	}
 
 	public void write() throws DatabaseException {
@@ -94,7 +99,7 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 		dirty = false;
 	}
 
-	public static int recordsPerBucket(FixedSizeEntryFactory<FixedSizeHashEntry> fact) {
+	public static int entriesPerBucket(FixedSizeEntryFactory fact) {
 		int entrySize = fact.getEntrySize();
 		return getBucketSize()/entrySize;
 	}

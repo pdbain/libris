@@ -6,7 +6,6 @@ import java.util.Iterator;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-@SuppressWarnings("unchecked")
 public abstract class HashBucket <T extends HashEntry> implements Iterable<T> {
 
 	protected int occupancy;
@@ -35,10 +34,10 @@ public abstract class HashBucket <T extends HashEntry> implements Iterable<T> {
 	 * @return true if the entry was added, false if the bucket was full
 	 * @throws DatabaseException 
 	 */
-	public  boolean addElement(T newEntry) throws DatabaseException {
+	public  boolean addEntry(T newEntry) throws DatabaseException {
 		int key = newEntry.getKey();
 		int netLength = newEntry.getTotalLength();
-		T oldEntry = findEntry(key);
+		T oldEntry = getEntry(key);
 		if (null != oldEntry) {
 			netLength -= oldEntry.getTotalLength();
 		}
@@ -62,7 +61,7 @@ public abstract class HashBucket <T extends HashEntry> implements Iterable<T> {
 		return BUCKET_SIZE;
 	}
 	
-	public abstract T findEntry(int key);
+	public abstract T getEntry(int key);
 
 	public abstract void write() throws DatabaseException;
 
@@ -82,10 +81,17 @@ public abstract class HashBucket <T extends HashEntry> implements Iterable<T> {
 	public abstract void read() throws IOException, DatabaseException;
 
 	public int getNumEntries() throws IOException {
-		backingStore.seek(filePosition);
-		int numEntries = backingStore.readInt();
+		int numEntries;
+		if (dirty) {
+			numEntries = getNumEntriesImpl();
+		} else {
+			backingStore.seek(filePosition);
+			numEntries = backingStore.readInt();
+		}
 		return numEntries;
 	}
+
+	protected abstract int getNumEntriesImpl();
 
 	public int getAge() {
 		return age;
