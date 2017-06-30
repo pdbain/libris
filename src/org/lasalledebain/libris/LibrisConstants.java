@@ -34,5 +34,17 @@ public interface LibrisConstants {
 	public static final short ENUM_VALUE_OUT_OF_RANGE = -1;
 	public static final byte RECORD_HAS_GROUPS = 1 << 0;
 	public static final byte RECORD_HAS_NAME = 1 << 2;
-
+	
+	String DATABASE_NAME = "DATABASE";
+	public static final String SCHEMA_NAME = "SCHEMA";
+	public static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
+	public static final String POSITION_FILENAME = "positions";
+	public static final String PROPERTIES_FILENAME = "properties";
+	public static final String RECORDS_FILENAME = "records";
+	public static final String JOURNAL_FILENAME = "journal";
+	public static final String NAMEDRECORDS_FILENAME_ROOT = "namedrecs_";
+	public static final String AFFILIATES_FILENAME_ROOT = "affiliates_";
+	public static final String AFFILIATES_FILENAME_HASHTABLE_ROOT = AFFILIATES_FILENAME_ROOT+"hashstable_";
+	public static final String AFFILIATES_FILENAME_OVERFLOW_ROOT = AFFILIATES_FILENAME_ROOT+"overflow_";
+	public static final String CSV_FILE = "CSV_FILE";
 }

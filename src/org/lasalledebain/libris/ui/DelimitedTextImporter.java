@@ -35,6 +35,7 @@ import javax.swing.table.TableModel;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
@@ -81,7 +82,7 @@ public class DelimitedTextImporter {
 			if  (null == importFilterFile) {
 				imp = new DirectRecordImporter(db);
 			} else {
-				mgr = db.getFileMgr().makeAccessManager(importFilterFile);
+				mgr = db.getFileMgr().makeAccessManager(LibrisFileManager.CSV_FILE, importFilterFile);
 				imp = new FilteringRecordImporter(db, new LibrisXmlFactory(),	mgr);
 			}
 

@@ -25,6 +25,12 @@ public class FileSpaceManager implements Iterable<RecordHeader> {
 		this.dataFile = new RandomAccessFile(dataFileName, readOnly? "r": "rw");
 	}
 
+	public FileSpaceManager(RandomAccessFile raFile, File dFile, boolean readOnly) {
+		this.readOnly = readOnly;
+		this.dataFile = raFile;
+		this.dataFileName = dFile;
+	}
+
 	public void open() {
 		entryList = new RecordHeader(dataFile);
 		entryList.setFilePosition(0);

@@ -9,7 +9,6 @@ import org.lasalledebain.libris.indexes.ContainsKeywords;
 import org.lasalledebain.libris.indexes.ExactKeywordList;
 import org.lasalledebain.libris.indexes.PrefixKeywords;
 import org.lasalledebain.libris.indexes.RecordKeywords;
-import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 
 public class RecordNameFilter implements RecordFilter {
 

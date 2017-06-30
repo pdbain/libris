@@ -39,7 +39,7 @@ public class DbDump {
 	}
 
 	private static void dumpRecords(LibrisFileManager fm) {
-		FileAccessManager rf = fm.getRecordsFileMgr();
+		FileAccessManager rf = fm.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME);
 		try {
 			RandomAccessFile recordsFileStore = rf.getReadOnlyRandomAccessFile();
 			RecordHeader recordList = new RecordHeader(recordsFileStore, 0);

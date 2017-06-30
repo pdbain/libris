@@ -13,7 +13,8 @@ import java.io.RandomAccessFile;
 import java.util.HashSet;
 
 public class FileAccessManager {
-
+	
+	String managerName;
 	File myFile;
 	HashSet<InputStream> ipStreams;
 	HashSet<RandomAccessFile> raRoFiles;
@@ -34,9 +35,21 @@ public class FileAccessManager {
 		this(new File(directoryPath, filename));
 	}
 
+	public File getFile() {
+		return myFile;
+	}
+
 	public synchronized void setFile(File managedFile) {
 		close();
 		myFile = managedFile;
+	}
+
+	public String getManagerName() {
+		return managerName;
+	}
+
+	public void setManagerName(String managerName) {
+		this.managerName = managerName;
 	}
 
 	public synchronized boolean createIfNonexistent() throws IOException {

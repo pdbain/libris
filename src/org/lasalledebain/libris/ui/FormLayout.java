@@ -55,7 +55,7 @@ public class FormLayout extends Layout {
 		final boolean modifiable = modTrk.isModifiable();
 		JPanel fieldPanel = null;
 		ArrayList<UiField> guiFields = new ArrayList<UiField>();
-		int numGroups = mySchema.getNumFields();
+		int numGroups = mySchema.getNumGroups();
 		if (numGroups > 0) {
 			GroupDefs defs = mySchema.getGroupDefs();
 			JPanel groupPanel =  new JPanel(new GridLayout(1, numGroups));

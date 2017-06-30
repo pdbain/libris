@@ -2,16 +2,18 @@ package org.lasalledebain.libris;
 
 import java.util.ArrayList;
 
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.SortedKeyIntegerBucket;
 import org.lasalledebain.libris.indexes.SortedKeyValueBucketFactory;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.Records;
 
-public class IndexManager {
+public class IndexManager implements LibrisConstants {
 
 	private LibrisFileManager fileMgr;
 
@@ -20,8 +22,13 @@ public class IndexManager {
 	private LibrisMetadata metadata;
 	private LibrisDatabase db;
 	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
+	private AffiliateList affList[];
 
 	private ArrayList<FileAccessManager> namedRecsFileMgrs;
+
+	private int numGroups;
+
+	static final int NAMED_RECORDS_INDEX_LEVELS = Integer.getInteger("org.lasalledebain.libris.namedrecsindexlevels", 2);
 
 	/**
 	 * @param librisDatabase database metadata
@@ -56,10 +63,22 @@ public class IndexManager {
 
 	public void open() throws DatabaseException {
 		try {
-			namedRecsFileMgrs = fileMgr.getNamedRecsFileMgrs();
+			namedRecsFileMgrs = new ArrayList<FileAccessManager>(1+NAMED_RECORDS_INDEX_LEVELS);
+
+			namedRecsFileMgrs.add(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.NAMEDRECORDS_FILENAME_ROOT+"data"));
+			for (int i = 0; i < IndexManager.NAMED_RECORDS_INDEX_LEVELS; ++i) {
+				namedRecsFileMgrs.add(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.NAMEDRECORDS_FILENAME_ROOT+"index"+(i+1)));
+			}
 			SortedKeyValueBucketFactory<KeyIntegerTuple> bucketFactory = SortedKeyIntegerBucket.getFactory();
 			namedRecordIndex = new SortedKeyValueFileManager<KeyIntegerTuple>(namedRecsFileMgrs, 
 					bucketFactory);
+			numGroups = db.getSchema().getNumGroups();
+			affList = new AffiliateList[numGroups];
+			boolean readOnly = db.isReadOnly();
+			for (int i = 0; i < numGroups; ++i) {
+				affList[i] = new AffiliateList(fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_HASHTABLE_ROOT+i), 
+						fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT), readOnly);
+			}
 		} catch (InputException e) {
 			throw new DatabaseException("error opening namedRecordIndex", e);
 		}
@@ -81,6 +100,13 @@ public class IndexManager {
 
 	public SortedKeyValueFileManager<KeyIntegerTuple> getNamedRecordIndex() {
 		return namedRecordIndex;
+	}
+
+	public AffiliateList getAffiliateList(int groupNum) {
+		if (groupNum >= affList.length) {
+			throw new DatabaseError("cannot access group "+groupNum);
+		}
+		return affList[groupNum];
 	}
 
 }

@@ -286,7 +286,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 
 	private void openRecords() throws LibrisException, DatabaseException {
 
-		FileAccessManager propsMgr = fileMgr.getPropertiesFileMgr();
+		FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisFileManager.PROPERTIES_FILENAME);
 		synchronized (propsMgr) {
 			try {
 				FileInputStream ipFile = propsMgr.getIpStream();
@@ -310,7 +310,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 	 * 
 	 */
 	private void saveMetadata() {
-		FileAccessManager propsMgr = fileMgr.getPropertiesFileMgr();
+		FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisFileManager.PROPERTIES_FILENAME);
 		synchronized (propsMgr) {
 			try {
 				FileOutputStream opFile = propsMgr.getOpStream();

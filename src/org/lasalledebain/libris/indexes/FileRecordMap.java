@@ -7,7 +7,6 @@ import java.io.RandomAccessFile;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
-import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.HashFile;
 import org.lasalledebain.libris.index.RecordPositionEntry;
 import org.lasalledebain.libris.index.RecordPositionEntryFactory;

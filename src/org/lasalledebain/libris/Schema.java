@@ -149,6 +149,10 @@ public class Schema implements LibrisXMLConstants {
 		return fieldIds.size();
 	}
 
+	public int getNumGroups() {
+		return myGroupDefs.getNumGroups();
+	}
+
 	public String getFieldId(int fieldNum) {
 		return fieldList.get(fieldNum).fieldId;
 	}

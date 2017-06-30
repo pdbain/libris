@@ -3,7 +3,6 @@ package org.lasalledebain.libris.indexes;
 import java.io.IOException;
 
 import org.lasalledebain.libris.FileAccessManager;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 public class RecordPositions {

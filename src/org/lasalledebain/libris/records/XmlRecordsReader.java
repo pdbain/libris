@@ -111,8 +111,8 @@ public class XmlRecordsReader implements RecordsReader, Iterator<Record>,LibrisX
 			int lastId = 0;
 			metadata.setSavedRecords(0);
 			LibrisFileManager fileMgr = database.getFileMgr();
-			FileAccessManager recordsFileMgr = fileMgr.getRecordsFileMgr();
-			RecordPositions recPosns = new RecordPositions(fileMgr.getPositionFileMgr(), false);
+			FileAccessManager recordsFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME);
+			RecordPositions recPosns = new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.POSITION_FILENAME), false);
 			BulkImporter importer = new BulkImporter(database.getSchema(), recordsFileMgr.getOpStream(), recPosns);
 			importer.initialize();
 			boolean nonEmpty = false;

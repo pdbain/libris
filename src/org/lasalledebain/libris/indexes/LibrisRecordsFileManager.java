@@ -92,7 +92,7 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 	 * @throws LibrisException 
 	 */
 	public LibrisRecordsFileManager(LibrisDatabase db, boolean readOnly, Schema dbSchema, LibrisFileManager fileMgr) throws LibrisException {
-		this(db, readOnly, dbSchema, fileMgr.getRecordsFileMgr(), new RecordPositions(fileMgr.getPositionFileMgr(), readOnly));
+		this(db, readOnly, dbSchema, fileMgr.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME), new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.POSITION_FILENAME), readOnly));
 	}
 
 	public LibrisRecordsFileManager(LibrisDatabase db, boolean readOnly, Schema dbSchema, FileAccessManager recordsFile, RecordPositions recPosns) throws LibrisException {
