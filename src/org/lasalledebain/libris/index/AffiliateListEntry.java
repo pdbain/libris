@@ -31,11 +31,11 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 		children = affiliates = emptyList;
 	}
 	
-	public static int getOversizeThreashold() {
+	public static int getOversizeThreshold() {
 		return oversizeThreashold;
 	}
 
-	public static void setOversizeThreashold(int oversizeThreashold) {
+	public static void setOversizeThreshold(int oversizeThreashold) {
 		AffiliateListEntry.oversizeThreashold = oversizeThreashold;
 	}
 
@@ -72,10 +72,23 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 		Arrays.sort(children);
 	}
 	
+
 	public void addAffiliate(int newAffiliate) {
 		affiliates = Arrays.copyOf(affiliates, affiliates.length+1);
 		affiliates[affiliates.length-1] = newAffiliate;
 		Arrays.sort(affiliates);
+	}
+
+	public void addAffiliates(int addenda[], int occupancy, boolean addChildren) {
+		int[] original = addChildren? children: affiliates;
+		int[] newAffiliates = Arrays.copyOf(original, original.length+occupancy);
+		System.arraycopy(addenda, 0, newAffiliates, original.length, occupancy);
+		Arrays.sort(newAffiliates);
+		if (addChildren) {
+			children = newAffiliates;
+		} else {
+			affiliates = newAffiliates;
+		}
 	}
 
 	@Override

@@ -4,11 +4,9 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -52,7 +50,7 @@ public class AffiliateEditor {
 		if (-1 != selectedAffiliate) {
 			editedValue = (KeyIntegerTuple) affiliateList.getSelectedValue();
 		}
-		final RecordNameFilter recordFilter = new RecordNameFilter(editedValue);
+		final RecordNameChooser recordFilter = new RecordNameChooser(editedValue, namedRecIndex);
 		RecordSelectorByName nameBrowser = new RecordSelectorByName(recordFilter);
 		/* 
 		 * TODO add buttons to set parent, edit affiliates
@@ -116,69 +114,10 @@ public class AffiliateEditor {
 		dLog.setVisible(true);
 	}
 
-	private class RecordNameFilter extends DefaultComboBoxModel {
+	public static class RecordSelectorByName extends JComboBox {
+		private final RecordNameChooser recordFilter;
 
-		private StringBuffer currentPrefix;
-
-		RecordNameFilter(KeyIntegerTuple editedValue) {
-			currentPrefix = new StringBuffer(16);
-			initializeList(editedValue);
-		}
-
-		private void initializeList(KeyIntegerTuple editedValue) {
-			removeAllElements();
-			int parentNum = RecordId.getNullId();
-			if (null != editedValue) {
-				parentNum = editedValue.getValue();
-			}
-			for (KeyIntegerTuple recNameAndNumber: namedRecordIndex) {
-				addElement(recNameAndNumber);
-				if (parentNum == recNameAndNumber.getValue()) {
-					setSelectedItem(recNameAndNumber);
-					editedValue = null;
-				}
-			}
-		}
-
-		String keyTyped(char prefixChar) {
-			int lastIndex = currentPrefix.length();
-			if ((KeyEvent.VK_BACK_SPACE == prefixChar) || (KeyEvent.VK_DELETE == prefixChar)) {
-				if (lastIndex > 0) {
-
-					currentPrefix.deleteCharAt(lastIndex-1);
-					initializeList(null);
-				}
-			} else if (((lastIndex > 0) && Character.isJavaIdentifierPart(prefixChar))
-					|| (lastIndex == 0) && Character.isJavaIdentifierStart(prefixChar)) {
-				currentPrefix.append(prefixChar);
-			}
-			// TODO expand the list if characters deleted, add more if the list shrinks
-			String prefix = currentPrefix.toString();
-			int currentSize = getSize();
-			int currentIndex = 0;
-			while (currentIndex < currentSize) {
-				// TODO 1 class cast exception during typing
-				KeyIntegerTuple element = (KeyIntegerTuple) getElementAt(currentIndex);
-				String e = element.getKey();
-				if (!e.startsWith(prefix)) {
-					removeElementAt(currentIndex);
-					--currentSize;
-				} else {
-					++currentIndex;
-				}
-			}
-			if (0 == currentSize) {
-				addElement("");
-			}
-			fireContentsChanged(this, 0, currentSize-1);
-			return prefix;
-		}
-	}
-
-	public class RecordSelectorByName extends JComboBox {
-		private final RecordNameFilter recordFilter;
-
-		public RecordSelectorByName (RecordNameFilter recFilter) {
+		public RecordSelectorByName (RecordNameChooser recFilter) {
 			super(recFilter);
 			recordFilter = recFilter;
 			setKeySelectionManager(new KeySelectionManager() {
@@ -188,8 +127,16 @@ public class AffiliateEditor {
 					recordFilter.keyTyped(key);
 					return 0;
 				}
+			});
+		}
+		
+		public int getSelectedId() {
+			int id = RecordId.getNullId();
+			KeyIntegerTuple recTuple = (KeyIntegerTuple) recordFilter.getSelectedItem();
+			if (null != recTuple) {
+				id = recTuple.getValue();
 			}
-			);
+			return id;
 		}
 	}
 

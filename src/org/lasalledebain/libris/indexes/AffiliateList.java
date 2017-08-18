@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
+import org.lasalledebain.libris.exception.InternalError;
+import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.HashFile;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.index.AffiliateListEntry;
@@ -20,17 +23,15 @@ public class AffiliateList {
 	RandomAccessFile hashTableFile;
 	RandomAccessFile overflowFile;
 	FileSpaceManager overflowSpaceMgr;
-	private boolean readOnly;
 	private AffiliateListEntryFactory eFactory;
 	private HashFile<AffiliateListEntry> affiliateHashFile;
 	private BucketOverflowFileManager bucketOverflowMgr;
-	private static int[] empty;
+	private static int[] empty = new int[0];
 
 	public AffiliateList(FileAccessManager hashTableFileMgr,
 			FileAccessManager overflowFileMgr, boolean readOnly) throws DatabaseException {
 		this.hashTableFileMgr = hashTableFileMgr;
 		this.overflowFileMgr = overflowFileMgr;
-		this.readOnly = readOnly;
 		try {
 			hashTableFile = readOnly?  hashTableFileMgr.getReadOnlyRandomAccessFile(): 
 				hashTableFileMgr.getReadWriteRandomAccessFile();
@@ -38,8 +39,9 @@ public class AffiliateList {
 				overflowFileMgr.getReadWriteRandomAccessFile();
 
 			overflowSpaceMgr = new FileSpaceManager(overflowFile, overflowFileMgr.getFile(), readOnly);
+			overflowSpaceMgr.reset();
 			bucketOverflowMgr = new BucketOverflowFileManager(overflowSpaceMgr);
-		} catch (FileNotFoundException exc) {
+		} catch (FileNotFoundException | LibrisException exc) {
 			throw new DatabaseException(Messages.getString("AffiliateList.0")+hashTableFileMgr.getPath(), exc); //$NON-NLS-1$
 		}
 		eFactory = new AffiliateListEntry.AffiliateListEntryFactory();
@@ -49,6 +51,12 @@ public class AffiliateList {
 		} catch (IOException e) {
 			throw new DatabaseException(e);
 		}
+	}
+	
+	public void setSize(long expectedEntries) throws DatabaseException {
+		long totalExpectedSize = 6 * expectedEntries; /* 4 bytes per entry + 5% overhead for length and parent */
+		int requestedBuckets = (int) (totalExpectedSize/HashBucket.BUCKET_SIZE);
+		affiliateHashFile.resize(requestedBuckets);
 	}
 
 	public void close() throws DatabaseException {
@@ -71,17 +79,22 @@ public class AffiliateList {
 		}
 	}
 
-	int[] getChildren(int recordId) throws DatabaseException {
+	public int[] getChildren(int recordId) {
 		AffiliateListEntry entry;
 		entry = getEntry(recordId);
 		if (null == entry) {
 			return empty;
 		} else {
-			return entry.getChildren();
+			int[] result = entry.getChildren();
+			if (null == result) {
+				return empty;
+			} else {
+				return result;
+			}
 		}
 	}
 
-	int[] getAffiliates(int recordId) throws DatabaseException {
+	public int[] getAffiliates(int recordId) throws DatabaseException {
 		AffiliateListEntry entry;
 		entry = getEntry(recordId);
 		if (null == entry) {
@@ -91,13 +104,38 @@ public class AffiliateList {
 		}
 	}
 
-	private AffiliateListEntry getEntry(int recordId) throws DatabaseException {
+	public void addAffiliates(int parent, int affiliates[], int occupancy, boolean isChildren) throws DatabaseException {
+		AffiliateListEntry entry;
+		entry = getOrCreateEntry(parent);
+		entry.addAffiliates(affiliates, occupancy, isChildren);
+	}
+
+	private AffiliateListEntry getOrCreateEntry(int parent) throws DatabaseError {
+		AffiliateListEntry entry;
+		try {
+			entry = getEntry(parent);
+			if (null == entry) {
+				entry = eFactory.makeEntry(parent);
+				affiliateHashFile.addEntry(entry);
+			}
+		} catch (IOException | DatabaseException e) {
+			throw new InternalError("Error adding child entry for record "+parent, e);
+		}
+		return entry;
+	}
+	
+	private AffiliateListEntry getEntry(int recordId) {
 		AffiliateListEntry entry;
 		try {
 			entry = affiliateHashFile.getEntry(recordId);
 		} catch (DatabaseException | IOException e) {
-			throw new DatabaseException("Error getting affiliates for record "+recordId, e);
+			throw new DatabaseError("Error getting affiliates for record "+recordId, e);
 		}
 		return entry;
+	}
+
+	public void addChild(int parent, int child) throws DatabaseException {
+		AffiliateListEntry entry = getOrCreateEntry(parent);
+		entry.addChild(child);
 	}
 }

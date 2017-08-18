@@ -82,6 +82,7 @@ public class LibrisMenu {
 	private final ArrayList<JMenuItem> editMenuRecordCommands;
 	private JMenuItem duplicateRecord;
 	private JMenuItem childRecord;
+	private JMenuItem searchRecords;
 
 	public LibrisMenu(LibrisGui gui) {
 		this();
@@ -372,8 +373,15 @@ public class LibrisMenu {
 
 	private JMenu createSearchMenu() {
 		JMenu srchMenu = new JMenu("Search");
-		srchMenu.add("Find ...");
-		srchMenu.add("Search ...");
+		srchMenu.add("Find in record...");
+		searchRecords = srchMenu.add("Search records...");
+		searchRecords.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				guiMain.createSearchDialogue();
+			}
+		});
 		srchMenu.add("Quick search ...");
 		return srchMenu;
 	}

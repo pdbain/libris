@@ -442,6 +442,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		}
 		return buff.toString();
 	}
+	
 	@Override
 	public int[] getAffiliates(int groupNum) throws InputException {
 		int result[];

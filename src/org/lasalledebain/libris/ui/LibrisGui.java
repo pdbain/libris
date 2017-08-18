@@ -295,6 +295,9 @@ public class LibrisGui extends LibrisWindowedUi {
 		menu.setRecordEditEnabled(true);
 	}
 
+	FilterDialogue createSearchDialogue() {
+		return new FilterDialogue(currentDatabase, getMainFrame(), resultsPanel);
+	}
 	@Override
 	public void alert(String msg, Exception e) {
 		String errorString = msg;

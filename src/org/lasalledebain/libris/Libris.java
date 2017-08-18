@@ -82,6 +82,15 @@ public class Libris {
 		return result;
 	}
 
+	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi ui) throws LibrisException {
+		if (null == ui) {
+			ui = new HeadlessUi(databaseFile);
+		}
+		LibrisDatabase result = new LibrisDatabase(databaseFile, null, ui, false);
+		result.open();
+		return result;
+	}
+
 	public static void buildIndexes(File databaseFile, LibrisUi ui)
 			throws UserErrorException, DatabaseException, InputException,
 			LibrisException {

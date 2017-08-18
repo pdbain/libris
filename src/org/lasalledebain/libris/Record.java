@@ -73,6 +73,11 @@ public abstract class Record implements Comparable<Record>, XmlExportable, XmlIm
 	public abstract boolean hasAffiliations();
 	public abstract int getParent(int groupNum);
 	public abstract int getParent(String groupId);
+	/**
+	 * @param groupNum Group number to query
+	 * @return array, possibly empty, of record IDs
+	 * @throws InputException
+	 */
 	public abstract int[] getAffiliates(int groupNum) throws InputException;
 	public abstract GroupMember[] getMembers();
 	public abstract GroupMember getMember(int groupNum);

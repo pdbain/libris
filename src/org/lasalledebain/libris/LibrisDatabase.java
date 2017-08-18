@@ -27,6 +27,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.OutputException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.exception.XmlException;
+import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
@@ -80,7 +81,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 	private Logger databaseLogger;
 	public static Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());;
 	private DatabaseAttributes xmlAttributes;
-	private int lastChildBranch;
 	private boolean readOnly;
 	boolean opened;
 	public static final String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
@@ -335,7 +335,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		if (null != indexMgr) {
 			try {
 				indexMgr.close();
-			} catch (InputException e) {
+			} catch (InputException | DatabaseException e) {
 				log(Level.SEVERE, "error destroying database", e);
 			}
 		}
@@ -624,6 +624,12 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 				nri.addElement(new KeyIntegerTuple(recordName, id));
 			}
 		}
+		for (int g = 0; g < schem.getNumGroups(); ++g) {
+			int[] affiliations = rec.getAffiliates(g);
+			if (affiliations.length != 0) {
+				indexMgr.addChild(g, affiliations[0], id);
+			}
+		}
 		modifiedRecords.addRecord(rec);
 		setModified(true);
 		metadata.adjustSavedRecords(1);
@@ -761,8 +767,10 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		return l;
 	}
 	
-	public RecordList getChildRecords(int parent, int groupNum) {
-		return null;
+	public RecordList getChildRecords(int parent, int groupNum, boolean allDescendents) {
+		AffiliateList affList = indexMgr.getAffiliateList(groupNum);
+		int[] result = affList.getChildren(parent);
+		return new ArrayRecordList(getRecords(), result);
 	}
 	
 	public String getRecordName(int recordNum) throws InputException {

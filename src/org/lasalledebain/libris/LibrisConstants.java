@@ -46,5 +46,8 @@ public interface LibrisConstants {
 	public static final String AFFILIATES_FILENAME_ROOT = "affiliates_";
 	public static final String AFFILIATES_FILENAME_HASHTABLE_ROOT = AFFILIATES_FILENAME_ROOT+"hashstable_";
 	public static final String AFFILIATES_FILENAME_OVERFLOW_ROOT = AFFILIATES_FILENAME_ROOT+"overflow_";
+	static final String TEMP_ROOT = "_TEMP_";
+	static final String TEMP_CHILD_FILE = TEMP_ROOT+"child_";
+	static final String TEMP_AFFILIATE_FILE = TEMP_ROOT+"affiliate_";
 	public static final String CSV_FILE = "CSV_FILE";
 }

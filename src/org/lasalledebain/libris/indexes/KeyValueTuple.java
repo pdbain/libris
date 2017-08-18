@@ -29,7 +29,7 @@ public abstract class KeyValueTuple implements Comparable<KeyValueTuple>{
 	}
 
 	protected KeyValueTuple(String key) throws InputException {
-		if (key.length() > LibrisConstants.KEY_MAX_LENGTH) {
+		if ((null != key) && (key.length() > LibrisConstants.KEY_MAX_LENGTH)) {
 			throw new InputException("key "+key+" too long");
 		}
 		this.key = key;

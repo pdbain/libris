@@ -72,7 +72,7 @@ public class BrowserWindow extends JPanel {
 		filterView.add(icon);
 		filterView.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent arg0) {
-				new FilterDialogue(database, gui.getMainFrame(), BrowserWindow.this);
+				gui.createSearchDialogue();
 			}
 			public void mouseEntered(MouseEvent arg0) {}
 			public void mouseExited(MouseEvent arg0) {}
@@ -158,6 +158,12 @@ public class BrowserWindow extends JPanel {
 		setFilter(filter);
 		FilteredRecordList filteredList = new FilteredRecordList(src, filter);
 		recordsIterator = filteredList.iterator();
+		recList = getRecords();
+		chooser.setModel(recList);
+	}
+
+	public void doRefresh(RecordList src) {
+		recordsIterator = src.iterator();
 		recList = getRecords();
 		chooser.setModel(recList);
 	}
