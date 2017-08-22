@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.index.AffiliateListEntry;
 
 public class HashFile<T extends HashEntry> {
 

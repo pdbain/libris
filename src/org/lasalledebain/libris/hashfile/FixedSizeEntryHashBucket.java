@@ -44,6 +44,11 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 	}
 	
 	@Override
+	protected T removeFromBucket(int key) {
+		return entries.remove(key);
+	}
+
+	@Override
 	public Iterator<T> iterator() {
 		return entries.values().iterator();
 	}

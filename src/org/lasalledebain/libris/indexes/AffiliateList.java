@@ -94,6 +94,16 @@ public class AffiliateList {
 		}
 	}
 
+	public void addChild(int parent, int child) throws DatabaseException {
+		try {
+			AffiliateListEntry entry = eFactory.makeEntry(parent);
+			entry.addChild(child);
+			affiliateHashFile.addEntry(entry);
+		} catch (DatabaseException | IOException e) {
+			throw new InternalError("Error adding affiliates entry for record "+parent, e);
+		}
+	}
+
 	public int[] getAffiliates(int recordId) throws DatabaseException {
 		AffiliateListEntry entry;
 		entry = getEntry(recordId);
@@ -104,26 +114,19 @@ public class AffiliateList {
 		}
 	}
 
-	public void addAffiliates(int parent, int affiliates[], int occupancy, boolean isChildren) throws DatabaseException {
-		AffiliateListEntry entry;
-		entry = getOrCreateEntry(parent);
-		entry.addAffiliates(affiliates, occupancy, isChildren);
-	}
-
-	private AffiliateListEntry getOrCreateEntry(int parent) throws DatabaseError {
-		AffiliateListEntry entry;
+	public void addAffiliates(int parent, int affiliates[], int occupancy, boolean isChildren) {
 		try {
-			entry = getEntry(parent);
+			AffiliateListEntry entry = getEntry(parent);
 			if (null == entry) {
 				entry = eFactory.makeEntry(parent);
-				affiliateHashFile.addEntry(entry);
 			}
-		} catch (IOException | DatabaseException e) {
-			throw new InternalError("Error adding child entry for record "+parent, e);
+			entry.addAffiliates(affiliates, occupancy, isChildren);
+			affiliateHashFile.addEntry(entry);
+		} catch (DatabaseException | IOException e) {
+			throw new InternalError("Error adding affiliates entry for record "+parent, e);
 		}
-		return entry;
 	}
-	
+
 	private AffiliateListEntry getEntry(int recordId) {
 		AffiliateListEntry entry;
 		try {
@@ -132,10 +135,5 @@ public class AffiliateList {
 			throw new DatabaseError("Error getting affiliates for record "+recordId, e);
 		}
 		return entry;
-	}
-
-	public void addChild(int parent, int child) throws DatabaseException {
-		AffiliateListEntry entry = getOrCreateEntry(parent);
-		entry.addChild(child);
 	}
 }

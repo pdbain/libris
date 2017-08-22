@@ -42,7 +42,7 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 
 	@Override
 	protected void addToBucket(int key, HashEntry newEntry) {
-		EntryInfo oldEi = entries.remove(new Integer(key));
+		EntryInfo oldEi = entries.remove(key);
 		if ((null != oldEi) && oldEi.getEntry().isOversize()) {
 			addOversizeVictim(oldEi);
 		}
@@ -297,5 +297,10 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 			dirty = true;
 		}
 		
+	}
+
+	@Override
+	protected T removeFromBucket(int key) {
+		return entries.remove(key).getEntry();
 	}
 }
