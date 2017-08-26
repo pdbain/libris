@@ -53,12 +53,13 @@ public class HashFile<T extends HashEntry> {
 	public T getEntry(int key) throws IOException, DatabaseException {
 		int bucketNum = findHomeBucket(key);
 		HashBucket<T> homeBucket = getBucket(bucketNum);
-		T foundEntry;
-		if (null != (foundEntry = homeBucket.getEntry(key))) {
+		T foundEntry = homeBucket.getEntry(key);
+		if (null != foundEntry) {
 			return foundEntry;
 		} else {
 			HashBucket<T> overflowBucket = getBucket(numBuckets-1);
-			if (null != (foundEntry = overflowBucket.getEntry(key))) {
+			foundEntry = overflowBucket.getEntry(key);
+			if (null != foundEntry) {
 				return foundEntry;
 			}
 		}

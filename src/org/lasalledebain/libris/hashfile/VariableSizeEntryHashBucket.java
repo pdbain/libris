@@ -212,7 +212,7 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 
 	protected class EntryInfo {
 		int id;
-		T entry;
+		protected final T entry;
 		private long oversizeFilePosition;
 		public long getOversizeFilePosition() {
 			return oversizeFilePosition;
@@ -230,16 +230,14 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 
 		EntryInfo(int entryId, int length, boolean oversize) throws DatabaseException {
 			id = entryId;
-			entry = entryFact.makeEntry();
-			entry.setKey(id);
 			if (oversize) {
 				long position = bucketEntryData.getLong();
 				oversizeFilePosition = position;
 				byte[] dat = overflowManager.get(position);
-				entry.setData(dat);
+				entry = entryFact.makeEntry(entryId, dat);
 			} else {
 				oversizeFilePosition = -1;
-				entry.readData(bucketEntryData, length);
+				entry = entryFact.makeEntry(entryId, bucketEntryData, length);
 			}
 			entry.setOversize(oversize);
 		}
@@ -254,9 +252,6 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 
 		public T getEntry() {
 			return entry;
-		}
-		public void setEntry(T he) {
-			entry = he;
 		}
 	}
 	

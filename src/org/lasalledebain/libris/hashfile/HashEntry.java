@@ -5,16 +5,15 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**
- * @author pdbain
+ * HashEntry objects are immutable.
  *
- * @param <T>
+ * @param <T> subtype
  */
 @SuppressWarnings("unchecked")
 public interface HashEntry<T extends HashEntry> extends Comparable<HashEntry> {
 
 	void writeData(DataOutput backingStore) throws IOException;
 	int getKey();
-	void setKey(int newKey);
 	/**
 	 * @return Size of the hash entry, including overhead in bucket
 	 */
@@ -44,7 +43,4 @@ public interface HashEntry<T extends HashEntry> extends Comparable<HashEntry> {
 	 * @return Size of the data.
 	 */
 	int getDataLength();
-	void readData(ByteBuffer buff, int length);
-	void setData(byte[] dat);
-
 }

@@ -75,7 +75,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 	private boolean isModified = false;
 	private ModifiedRecordList modifiedRecords;
 	private int branch;
-	private LibrisRecordsFileManager recordsFile;
 	private LibrisJournalFileManager journalFile;
 	private Records databaseRecords;
 	private Logger databaseLogger;
@@ -111,7 +110,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		} else {
 			indexMgr.open();
 			setRecordsAccessible(true);
-			recordsFile = getRecordsFileMgr();
 			openRecords();
 			databaseOpened();		
 		}
@@ -335,22 +333,13 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		if (null != indexMgr) {
 			try {
 				indexMgr.close();
-			} catch (InputException | DatabaseException e) {
+			} catch (InputException | DatabaseException | IOException e) {
 				log(Level.SEVERE, "error destroying database", e);
 			}
 		}
 		indexMgr = null;
 		if (null != fileMgr) {
 			fileMgr.close();
-		}
-		try {
-			if (null != recordsFile) {
-				recordsFile.close();
-			}
-		} catch (LibrisException e) {
-			alert("Error closing database", e); //$NON-NLS-1$
-		} catch (IOException e) {
-			alert("Error closing database", e); //$NON-NLS-1$
 		}
 		fileMgr = null;
 		databaseRecords = null;
@@ -508,10 +497,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		return metadata.getLayouts();
 	}
 	public LibrisRecordsFileManager getRecordsFileMgr() throws LibrisException {
-		if (null == recordsFile) {
-			recordsFile = new LibrisRecordsFileManager(this, ui.isReadOnly(),getSchema(), fileMgr);
-		}
-		return recordsFile;
+		return indexMgr.getRecordsFileMgr();
 	}
 	public LibrisJournalFileManager getJournalFileMgr() throws LibrisException {
 		if (null == journalFile) {
@@ -577,7 +563,11 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		}
 		Record rec = modifiedRecords.getRecord(recId);
 		if (null == rec) {
-			rec = recordsFile.getRecord(recId);
+			try {
+				rec = indexMgr.getRecordsFileMgr().getRecord(recId);
+			} catch (Exception e) {
+				throw new InputException("Error getting record "+recId, e);
+			}
 		} 
 		if (null == rec) {
 			ui.alert("Cannot locate record "+recId); //$NON-NLS-1$

@@ -32,7 +32,7 @@ public class FileRecordMap extends LibrisRecordMap {
 			backingStore = readOnly?  backingStoreFileMgr.getReadOnlyRandomAccessFile(): backingStoreFileMgr.getReadWriteRandomAccessFile();
 		} catch (FileNotFoundException exc) {
 			throw new DatabaseException(Messages.getString("FileRecordMap.0")+positionFileMgr.getPath(), exc); //$NON-NLS-1$
-			}
+		}
 		eFactory = new RecordPositionEntryFactory();
 		try {
 			indexHashFile = new HashFile<RecordPositionEntry>(backingStore, FixedSizeEntryHashBucket.getFactory(), eFactory);

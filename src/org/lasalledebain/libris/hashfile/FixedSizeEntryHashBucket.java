@@ -35,7 +35,8 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 	}
 	
 	public T getEntry(int key) {
-		return entries.get(key);
+		T result = entries.get(key);
+		return result;
 	}
 
 	@Override
@@ -70,8 +71,7 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 		backingStore.seek(filePosition);
 		int numEntries = backingStore.readInt();
 		for (int i = 0; i < numEntries; ++i) {
-			T newEntry = entryFact.makeEntry();
-			newEntry.readData(backingStore);
+			T newEntry = entryFact.makeEntry(backingStore);
 			addEntry(newEntry);
 		}
 		dirty = false;

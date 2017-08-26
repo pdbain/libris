@@ -19,7 +19,7 @@ public class Records implements Iterable<Record>{
 	LibrisDatabase db;
 
 	public Records(LibrisDatabase db, LibrisFileManager fileMgr) throws LibrisException {
-		recMgr = new LibrisRecordsFileManager(db, db.isReadOnly(), db.getSchema(), fileMgr);
+		recMgr = db.getRecordsFileMgr();
 		this.db = db;
 	}
 

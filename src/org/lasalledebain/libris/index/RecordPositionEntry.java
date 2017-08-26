@@ -1,13 +1,7 @@
 package org.lasalledebain.libris.index;
 
-import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import org.lasalledebain.libris.exception.InternalError;
-import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
-import org.lasalledebain.libris.hashfile.HashEntry;
 
 /**
  * Entry comprises 2 bytes:
@@ -17,35 +11,22 @@ import org.lasalledebain.libris.hashfile.HashEntry;
  */
 public class RecordPositionEntry extends AbstractFixedSizeHashEntry {
 
+	final protected long recordPosition;
 	public int getRecordId() {
 		return key;
-	}
-
-	public void setRecordId(int recordId) {
-		key = recordId;
 	}
 
 	public long getRecordPosition() {
 		return recordPosition;
 	}
 
-	public void setRecordPosition(long recordPosition) {
-		this.recordPosition = recordPosition;
-	}
-
-	long recordPosition;
-	private boolean oversize;
 	/**
 	 * @param recordId
 	 * @param position
 	 */
 	public RecordPositionEntry(int recordId, long position) {
-		key = recordId;
+		super(recordId);
 		recordPosition = position;
-	}
-
-	public RecordPositionEntry() {
-		return;
 	}
 
 	@Override
@@ -72,6 +53,7 @@ public class RecordPositionEntry extends AbstractFixedSizeHashEntry {
 		return 12;
 	}
 
+	/*
 	@Override
 	public void readData(DataInput backingStore) throws IOException {
 		key = backingStore.readInt();
@@ -85,16 +67,16 @@ public class RecordPositionEntry extends AbstractFixedSizeHashEntry {
 	}
 
 	@Override
-	public void writeData(DataOutput backingStore) throws IOException {
-		backingStore.writeInt(key);
-		backingStore.writeLong(recordPosition);
-	}
-
-	@Override
 	public void setData(byte[] dat) {
 		if (dat.length != getRecordPositionEntryLength()) {
 			throw new InternalError("wrong length "+dat.length);
 		}
+	}
+*/
+	@Override
+	public void writeData(DataOutput backingStore) throws IOException {
+		backingStore.writeInt(key);
+		backingStore.writeLong(recordPosition);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
@@ -15,6 +16,7 @@ import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
+import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.SortedKeyIntegerBucket;
 import org.lasalledebain.libris.indexes.SortedKeyValueBucketFactory;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
@@ -34,6 +36,8 @@ public class IndexManager implements LibrisConstants {
 	private ArrayList<FileAccessManager> namedRecsFileMgrs;
 
 	private int numGroups;
+
+	private LibrisRecordsFileManager recordsFile;
 
 	static final int NAMED_RECORDS_INDEX_LEVELS = Integer.getInteger("org.lasalledebain.libris.namedrecsindexlevels",
 			2);
@@ -139,21 +143,20 @@ public class IndexManager implements LibrisConstants {
 						Integer key = victim.getKey();
 						cache.remove(key);
 						RecordAffiliates value = victim.getValue();
-						l.addAffiliates(key, value.affiliates, value.occupancy, isChildren);
+						l.addAffiliates(key, Arrays.copyOf(value.affiliates, value.occupancy), isChildren);
 					}
 					cache.put(parent, ra);
 				} else {
 					if (ra.addAffiliate(aff)) {
 						cache.remove(parent);
-						l.addAffiliates(parent, ra.affiliates, ra.occupancy, isChildren);
+						l.addAffiliates(parent, Arrays.copyOf(ra.affiliates, ra.occupancy), isChildren);
 					}
 				}
 			}
 			affiliateTempFMgr.delete();
 			for (Entry<Integer, RecordAffiliates> victim: cache.entrySet()) {
 				RecordAffiliates value = victim.getValue();
-				l.addAffiliates(victim.getKey(), value.affiliates, value.occupancy, isChildren);
-
+				l.addAffiliates(victim.getKey(), Arrays.copyOf(value.affiliates, value.occupancy), isChildren);
 			}
 			l.flush();
 		} catch (IOException e) {
@@ -184,11 +187,12 @@ public class IndexManager implements LibrisConstants {
 		}
 	}
 
-	public void close() throws InputException, DatabaseException {
+	public void close() throws InputException, DatabaseException, IOException {
 		flush();
 		for (FileAccessManager m : namedRecsFileMgrs) {
 			m.close();
 		}
+		recordsFile.close();
 	}
 
 	public void flush() throws InputException, DatabaseException {
@@ -204,6 +208,13 @@ public class IndexManager implements LibrisConstants {
 
 	public SortedKeyValueFileManager<KeyIntegerTuple> getNamedRecordIndex() {
 		return namedRecordIndex;
+	}
+
+	public LibrisRecordsFileManager getRecordsFileMgr() throws LibrisException {
+		if (null == recordsFile) {
+			recordsFile = new LibrisRecordsFileManager(db, db.getUi().isReadOnly(), db.getSchema(), fileMgr);
+		}
+		return recordsFile;
 	}
 
 	public void addChild(int groupNum, int parent, int child) throws DatabaseException {

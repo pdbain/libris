@@ -115,13 +115,10 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 			}
 			recordList = new RecordHeader(recordsFileStore, 0);
 			freeList = new RecordHeader(recordsFileStore, RecordHeader.getHeaderLength());
-		} catch (FileNotFoundException e) {
-			throw new DatabaseException("error opening records file", e);
 		} catch (IOException e) {
-			throw new DatabaseException("error reading records file", e);
-
+			throw new DatabaseException("error opening records file", e);
 		}
-	}
+		}
 
 	public void flush() throws DatabaseException {
 		if (null != recordList) {

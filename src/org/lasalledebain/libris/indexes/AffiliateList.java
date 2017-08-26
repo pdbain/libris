@@ -96,9 +96,14 @@ public class AffiliateList {
 
 	public void addChild(int parent, int child) throws DatabaseException {
 		try {
-			AffiliateListEntry entry = eFactory.makeEntry(parent);
-			entry.addChild(child);
-			affiliateHashFile.addEntry(entry);
+			AffiliateListEntry oldEntry = getEntry(parent);
+			AffiliateListEntry newEntry;
+			if (null == oldEntry) {
+				newEntry = eFactory.makeEntry(parent, child);
+			} else {
+				newEntry = eFactory.makeEntry(oldEntry, child, true);
+			}
+			affiliateHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {
 			throw new InternalError("Error adding affiliates entry for record "+parent, e);
 		}
@@ -114,14 +119,16 @@ public class AffiliateList {
 		}
 	}
 
-	public void addAffiliates(int parent, int affiliates[], int occupancy, boolean isChildren) {
+	public void addAffiliates(int parent, int affiliates[], boolean isChildren) {
 		try {
-			AffiliateListEntry entry = getEntry(parent);
-			if (null == entry) {
-				entry = eFactory.makeEntry(parent);
+			AffiliateListEntry oldEntry = getEntry(parent);
+			AffiliateListEntry newEntry;
+			if (null == oldEntry) {
+				newEntry = new AffiliateListEntry(parent, empty, affiliates);
+			} else {
+				newEntry = new AffiliateListEntry(oldEntry, affiliates, false);
 			}
-			entry.addAffiliates(affiliates, occupancy, isChildren);
-			affiliateHashFile.addEntry(entry);
+			affiliateHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {
 			throw new InternalError("Error adding affiliates entry for record "+parent, e);
 		}
