@@ -1,10 +1,17 @@
 package org.lasalledebain.libris;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
@@ -25,7 +32,8 @@ public class LibrisFileManager implements LibrisConstants {
 	private String[] coreAuxFiles = {
 					PROPERTIES_FILENAME,
 					POSITION_FILENAME,
-					RECORDS_FILENAME	
+					RECORDS_FILENAME, 
+					LOCK_FILENAME
 	};
 	private FileAccessManager schemaAccessMgr;
 
@@ -39,6 +47,9 @@ public class LibrisFileManager implements LibrisConstants {
 	 */
 	private FileAccessManager journalAccessMgr;
 	private FileAccessManager databaseAccessMgr;
+	private File lockFile;
+	private FileOutputStream dbLockFile;
+	private FileLock dbLock;
 
 	public LibrisFileManager(File dbFile, File auxDir) throws UserErrorException {
 		activeManagers = new HashMap<String, FileAccessManager>();
@@ -50,6 +61,7 @@ public class LibrisFileManager implements LibrisConstants {
 		if (null == auxDir) {
 			auxDirectory =databaseFile.getParentFile();
 		}
+		lockFile = new File(auxDirectory, LOCK_FILENAME);
 		open(databaseFile, auxDirectory);
 		mgrLock  = new ReentrantLock();
 		locked = false;
@@ -57,6 +69,35 @@ public class LibrisFileManager implements LibrisConstants {
 
 	public void setDatabaseFile(String databaseFileName) {
 		setDatabaseFile(new File(databaseFileName));
+	}
+	
+	public synchronized boolean  lockDatabase() {
+		try {
+			lockFile.createNewFile();
+			dbLockFile = new FileOutputStream(lockFile);
+			dbLock = dbLockFile.getChannel().tryLock();
+			if (null != dbLock) {
+				String dateString = "Locked "+DateFormat.getDateInstance().format(new Date());
+				dbLockFile.write(dateString.getBytes());
+				return true;
+			} else {
+				dbLockFile.close();
+			}
+		} catch (IOException e) {
+			LibrisDatabase.librisLogger.log(Level.SEVERE, "Error creating lock file", e);
+		}
+		return false;
+	}
+
+	public synchronized void unlockDatabase() {
+		if (null != dbLock) {
+			try {
+				dbLock.release();
+				(new RandomAccessFile(lockFile, "rw")).setLength(0);
+			} catch (IOException e) {
+				LibrisDatabase.librisLogger.log(Level.SEVERE, "Error unlocking file", e);
+			}
+		}
 	}
 
 	public boolean checkAuxFiles() {
@@ -97,7 +138,7 @@ public class LibrisFileManager implements LibrisConstants {
 	private void createAuxDirectory() throws IOException {
 		if (!auxDirectory.exists()) {
 			auxDirectory.mkdir();
-		} else if (false && !auxDirectory.isDirectory()) {
+		} else if (!auxDirectory.isDirectory()) {
 			if (!auxDirectory.delete()) {
 				throw new IOException("cannot delete "+auxDirectory.getAbsolutePath());
 			}

@@ -208,7 +208,7 @@ public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>
 	 * @throws DatabaseException
 	 */
 	public void putRecord(Record recData) throws DatabaseException {
-		database.log(Level.FINE, "LibrisRecordsFileManager.putRecord "+getRecordIdString(recData));
+		LibrisDatabase.log(Level.FINE, "LibrisRecordsFileManager.putRecord "+getRecordIdString(recData));
 		byte[] recordBuffer = null;
 		try {
 			 recordBuffer = formatRecord(dbSchema, recData);
@@ -408,9 +408,12 @@ public void removeRecord(int rid) throws DatabaseException {
 				int numGroups = dbSchema.getGroupDefs().getNumGroups();
 				for (int groupNum=0; groupNum < numGroups; ++groupNum) {
 					int numAffiliates = recordsFileStore.readByte() & 0x000000ff;
-					for (int affNo = 0; affNo < numAffiliates; ++affNo) {
-						int affiliate = recordsFileStore.readInt();
-						r.addAffiliate(groupNum, affiliate);
+					if (numAffiliates > 0) {
+						r.setParent(groupNum, recordsFileStore.readInt());
+						for (int affNo = 1; affNo < numAffiliates; ++affNo) {
+							int affiliate = recordsFileStore.readInt();
+							r.addAffiliate(groupNum, affiliate);
+						}
 					}
 				}
 			}

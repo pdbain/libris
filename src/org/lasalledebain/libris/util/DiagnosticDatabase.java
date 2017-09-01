@@ -13,6 +13,7 @@ public class DiagnosticDatabase extends LibrisDatabase {
 
 	public DiagnosticDatabase(File databaseFile) throws LibrisException, DatabaseException {
 		super(databaseFile, null, new HeadlessUi(), false);
+		getFileMgr().createAuxFiles(true);
 		HashMap<String, String> attrs = new HashMap<String, String>();
 		attrs.put(XML_DATABASE_NAME_ATTR, "unknown");
 		attrs.put(XML_SCHEMA_NAME_ATTR, "unknown");

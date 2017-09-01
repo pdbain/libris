@@ -18,12 +18,16 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseError;
@@ -51,14 +55,14 @@ class FilterDialogue {
 	private JTextField filterWords;
 	MATCH_TYPE matchType;
 	private JPanel actionPanel;
-	private final JComboBox searchTypeSelector;
+	private final JList searchTypeSelector;
 	private final int KEYWORD_ORDINAL = 0;
 	private final int RECNAME_ORDINAL = 1;
 	private final int CHILDREN_ORDINAL = 2;
 	private Frame ownerFrame;
 	private int searchType;
 	private LibrisDatabase database;
-	private JRadioButton descendentsButton;
+	private JList<String> affiliatesChooser;
 	private RecordSelectorByName nameBrowser;
 	public FilterDialogue(LibrisDatabase db, Frame ownerFrame, BrowserWindow browser) {
 		database = db;
@@ -66,14 +70,14 @@ class FilterDialogue {
 		this.ownerFrame = ownerFrame;
 		browserWindow = browser;
 		dLog = new JDialog(ownerFrame, "Filter");	
-		searchTypeSelector = new JComboBox(new String[] {"Keyword", "Record name", "Children"});
+		searchTypeSelector = new JList(new String[] {"Keyword", "Record name", "Children"});
 		searchTypeSelector.add(new JLabel("Search type"));
-		searchTypeSelector.addActionListener(new ActionListener() {
+		searchTypeSelector.addListSelectionListener(new ListSelectionListener() {			
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void valueChanged(ListSelectionEvent e) {
 				createSearchDialogue(searchTypeSelector.getSelectedIndex());
 			}
-		});	
+		});
 		createSearchDialogue(KEYWORD_ORDINAL);
 	}
 
@@ -130,7 +134,8 @@ class FilterDialogue {
 		JPanel searchPanel = new JPanel(new BorderLayout());
 		searchPanel.add(controlPanel, BorderLayout.NORTH);
 		try {
-			final RecordNameChooser recordFilter = new RecordNameChooser(new KeyIntegerTuple(null, currentId), database.getNamedRecordIndex());
+			final RecordNameChooser recordFilter = new RecordNameChooser(new KeyIntegerTuple(null, currentId), 
+					database.getNamedRecordIndex());
 			nameBrowser = new RecordSelectorByName(recordFilter);
 			searchPanel.add(nameBrowser);
 		} catch (InputException e) {
@@ -170,14 +175,13 @@ class FilterDialogue {
 	}
 	
 	private JPanel createChildSearchControls() {
-		descendentsButton = new JRadioButton("Descendents");
-		descendentsButton.setEnabled(false);
+		affiliatesChooser = new JList<>(new String[] {"Children", "Descendents", "Affiliates"});
 		
 		EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_AFFILIATES);
 		fChooser = new FieldChooser(dbSchema, searchFieldTypes, false);
 		
 		JPanel controlPanel = new JPanel();
-		controlPanel.add(descendentsButton);
+		controlPanel.add(affiliatesChooser);
 		controlPanel.add(fChooser);
 		return controlPanel;
 	}
@@ -243,7 +247,15 @@ class FilterDialogue {
 	private void doChildrenRefresh() {
 		int parent = nameBrowser.getSelectedId();
 		int fieldNum = fChooser.getFieldNum();
-		RecordList children = database.getChildRecords(parent, fieldNum, false);
+
+		int affiliateType = affiliatesChooser.getSelectedIndex();
+		Iterable<Record> children;
+		if (3 == affiliateType) {
+			boolean isDescendents = (affiliateType == 2);
+			children = database.getChildRecords(parent, fieldNum, isDescendents);
+		} else {
+			children = database.getAffiliateRecords(parent, fieldNum);			
+		}
 		browserWindow.doRefresh(children);
 	}
 

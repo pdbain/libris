@@ -300,17 +300,13 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 	@Override
 	public void alert(String msg, Exception e) {
-		String errorString = msg;
+		StringBuilder buff = new StringBuilder(msg);
+		LibrisDatabase.log(Level.WARNING, e.getMessage(), e);
 		String emessage = "";
 		if (null != e) {
-			emessage = e.getMessage();
-			if (null != emessage) {
-				errorString += ": "+emessage;
-			} else {
-				StackTraceElement location = e.getStackTrace()[0];
-				errorString += " at "+location.toString();
-			}
+			emessage = LibrisUiGeneric.formatConciseStackTrace(e, buff);
 		}
+		String errorString = buff.toString();
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		e.printStackTrace(new PrintStream(bos));
 		try {
@@ -342,7 +338,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	public void databaseOpened (LibrisDatabase db) throws DatabaseException {
+	public void databaseOpened(LibrisDatabase db) throws DatabaseException {
 		super.databaseOpened(db);
 		menu.editMenuEnableModify(readOnly);
 		destroyWindow(true);

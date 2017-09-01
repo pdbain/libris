@@ -77,7 +77,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 	private int branch;
 	private LibrisJournalFileManager journalFile;
 	private Records databaseRecords;
-	private Logger databaseLogger;
 	public static Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());;
 	private DatabaseAttributes xmlAttributes;
 	private boolean readOnly;
@@ -92,16 +91,19 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		indexMgr = new IndexManager(this, metadata, fileMgr);
 		this.ui = ui;
 		this.readOnly = readOnly;
-		databaseLogger = Logger.getLogger(LibrisDatabase.class.getName());
 		if (!readOnly) {
 			modifiedRecords = new ModifiedRecordList();			
 		}
 	}
 
 	public boolean open() throws InputException, LibrisException, DatabaseException {
-		// TODO lock a file for mutual exclusion
 		if (opened) {
 			throw new UserErrorException("Database already opened");
+		}
+		if (!fileMgr.lockDatabase()) {
+			ui.alert("Database opened by another process");
+			opened = false;
+			return false;
 		}
 		groupMgr = new GroupManager(this);
 		mainRecordTemplate = RecordTemplate.templateFactory(schem, new DatabaseRecordList(this));
@@ -113,7 +115,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 			openRecords();
 			databaseOpened();		
 		}
-		LibrisUiGeneric.setLoggingLevel(databaseLogger);
+		LibrisUiGeneric.setLoggingLevel(librisLogger);
 		if (!readOnly) {
 			modifiedRecords = new ModifiedRecordList();			
 		}
@@ -159,6 +161,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 				return false;
 			}
 		} else {
+			if (null != fileMgr) {
+				fileMgr.unlockDatabase();
+			}
 			destroy();
 			ui.databaseClosed();
 			opened = false;
@@ -174,6 +179,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		if (null != ui) {
 			ui.close(true, true);
 			ui.databaseClosed();
+		}
+		if (null != fileMgr) {
+			fileMgr.unlockDatabase();
 		}
 		destroy();
 		return true;
@@ -403,7 +411,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 			return mgr;
 		} catch (IOException e) {
 			String msg = "error opening "+filePath; //$NON-NLS-1$
-			databaseLogger.log(Level.SEVERE, msg, e); //$NON-NLS-1$
+			librisLogger.log(Level.SEVERE, msg, e); //$NON-NLS-1$
 			throw new InputException("error opening "+msg, e); //$NON-NLS-1$
 		}
 	}
@@ -600,7 +608,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		} else {
 			metadata.setLastRecordId(id);
 		}
-		databaseLogger.log(Level.FINE, "LibrisDatabase.put "+rec.getRecordId()); //$NON-NLS-1$
+		librisLogger.log(Level.FINE, "LibrisDatabase.put "+rec.getRecordId()); //$NON-NLS-1$
 		getJournalFileMgr().put(rec);
 		String recordName = rec.getName();
 		if ((null != recordName) && !recordName.isEmpty()) {
@@ -617,7 +625,12 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		for (int g = 0; g < schem.getNumGroups(); ++g) {
 			int[] affiliations = rec.getAffiliates(g);
 			if (affiliations.length != 0) {
-				indexMgr.addChild(g, affiliations[0], id);
+				if (affiliations[0] != RecordId.getNullId()) {
+					indexMgr.addChild(g, affiliations[0], id);
+				}
+				for (int i = 1; i < affiliations.length; ++i) {
+					indexMgr.addAffiliate(g, affiliations[i], id);
+				}
 			}
 		}
 		modifiedRecords.addRecord(rec);
@@ -695,24 +708,16 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		return ui.isReadOnly();
 	}
 
-	public void log(Level severity, String msg, Throwable e) {
-		databaseLogger.log(severity, msg, e);
-	}
-	static void librisLog(Level severity, String msg, Throwable e) {
+	public static void log(Level severity, String msg, Throwable e) {
 		librisLogger.log(severity, msg, e);
 	}
-	static void librisLog(Level severity, String msg) {
+	public static void log(Level severity, String msg) {
 		librisLogger.log(severity, msg);
 	}
-	public void log(Level severity, String msg, Object param) {
-		databaseLogger.log(severity, msg, param);
+	public static void log(Level severity, String msg, Object param) {
+		librisLogger.log(severity, msg, param);
 	}
-	public void log(Level severity, String msg) {
-		databaseLogger.log(severity, msg);
-	}
-	public Logger getDatabaseLogger() {
-		return databaseLogger;
-	}
+
 	public static Record[] importDelimitedTextFile(LibrisDatabase db, 
 			File dataFile, String fids[], char separatorChar)
 			throws FileNotFoundException, LibrisException {
@@ -757,10 +762,20 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XmlE
 		return l;
 	}
 	
-	public RecordList getChildRecords(int parent, int groupNum, boolean allDescendents) {
+	public Iterable<Record> getChildRecords(int parent, int groupNum, boolean allDescendents) {
 		AffiliateList affList = indexMgr.getAffiliateList(groupNum);
-		int[] result = affList.getChildren(parent);
-		return new ArrayRecordList(getRecords(), result);
+		if (allDescendents) {
+			return affList.getDescendents(parent, this.getRecords());
+		} else {
+			int[] result = affList.getChildren(parent);
+			return new ArrayRecordIterator(getRecords(), result);
+		}
+	}
+	
+	public Iterable<Record> getAffiliateRecords(int parent, int groupNum) {
+		AffiliateList affList = indexMgr.getAffiliateList(groupNum);
+			int[] result = affList.getAffiliates(parent);
+			return new ArrayRecordIterator(getRecords(), result);
 	}
 	
 	public String getRecordName(int recordNum) throws InputException {

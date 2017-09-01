@@ -1,20 +1,22 @@
 package org.lasalledebain.libris;
 
+import java.net.URL;
+
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
-
 
 public interface Field extends XmlExportable {
 	public enum FieldType {T_FIELD_UNKNOWN, 
 		T_FIELD_STRING, // short string
 		T_FIELD_TEXT, // long string
 		T_FIELD_BOOLEAN, T_FIELD_INTEGER, T_FIELD_INDEXENTRY, T_FIELD_ENUM, T_FIELD_PAIR, // value pair
-		T_FIELD_AFFILIATES;
+		T_FIELD_AFFILIATES, T_FIELD_URL;
 	}
 	public void addValue(String data) throws FieldDataException;
 	public void addIntegerValue(int value) throws FieldDataException;
 	public void addValuePair(String value, String extraValue) throws FieldDataException;
 	public void addValuePair(Integer value, String extraValue) throws FieldDataException;
+	public void addURLValue(URL value) throws FieldDataException;
 	public boolean isTrue()   throws FieldDataException;
 	public String getFieldId();
 	public FieldType getType();

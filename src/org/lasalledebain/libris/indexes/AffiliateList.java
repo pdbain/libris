@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordId;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
@@ -79,27 +82,12 @@ public class AffiliateList {
 		}
 	}
 
-	public int[] getChildren(int recordId) {
-		AffiliateListEntry entry;
-		entry = getEntry(recordId);
-		if (null == entry) {
-			return empty;
-		} else {
-			int[] result = entry.getChildren();
-			if (null == result) {
-				return empty;
-			} else {
-				return result;
-			}
-		}
-	}
-
 	public void addChild(int parent, int child) throws DatabaseException {
 		try {
 			AffiliateListEntry oldEntry = getEntry(parent);
 			AffiliateListEntry newEntry;
 			if (null == oldEntry) {
-				newEntry = eFactory.makeEntry(parent, child);
+				newEntry = eFactory.makeEntry(parent, child, true);
 			} else {
 				newEntry = eFactory.makeEntry(oldEntry, child, true);
 			}
@@ -109,7 +97,22 @@ public class AffiliateList {
 		}
 	}
 
-	public int[] getAffiliates(int recordId) throws DatabaseException {
+	public void addAffiliate(int dest, int src) throws DatabaseException {
+		try {
+			AffiliateListEntry oldEntry = getEntry(dest);
+			AffiliateListEntry newEntry;
+			if (null == oldEntry) {
+				newEntry = eFactory.makeEntry(dest, src, false);
+			} else {
+				newEntry = eFactory.makeEntry(oldEntry, src, false);
+			}
+			affiliateHashFile.addEntry(newEntry);
+		} catch (DatabaseException | IOException e) {
+			throw new InternalError("Error adding affiliates entry for record "+dest, e);
+		}
+	}
+
+	public int[] getAffiliates(int recordId) {
 		AffiliateListEntry entry;
 		entry = getEntry(recordId);
 		if (null == entry) {
@@ -123,8 +126,10 @@ public class AffiliateList {
 		try {
 			AffiliateListEntry oldEntry = getEntry(parent);
 			AffiliateListEntry newEntry;
+			int newChildren[]  = isChildren? affiliates: empty;
+			int newAffiliates[]  = isChildren? empty: affiliates;
 			if (null == oldEntry) {
-				newEntry = new AffiliateListEntry(parent, empty, affiliates);
+				newEntry = new AffiliateListEntry(parent, newChildren, newAffiliates);
 			} else {
 				newEntry = new AffiliateListEntry(oldEntry, affiliates, false);
 			}
@@ -142,5 +147,24 @@ public class AffiliateList {
 			throw new DatabaseError("Error getting affiliates for record "+recordId, e);
 		}
 		return entry;
+	}
+
+	public int[] getChildren(int recordId) {
+		AffiliateListEntry entry;
+		entry = getEntry(recordId);
+		if (null == entry) {
+			return empty;
+		} else {
+			int[] result = entry.getChildren();
+			if (null == result) {
+				return empty;
+			} else {
+				return result;
+			}
+		}
+	}
+
+	public Iterable<Record> getDescendents(int parent, RecordList masterList) {
+		return new DescendentRecordIterator(masterList, parent, this);
 	}
 }
