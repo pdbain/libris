@@ -124,6 +124,10 @@ public class LibrisGui extends LibrisWindowedUi {
 		super.setTitle(title);
 		mainFrame.setTitle(title);
 	}
+	
+	public boolean chooseDatabase() {
+		return getMenu().openDatabaseDialogue();
+	}
 
 	public LibrisDatabase openDatabase() {
 		super.openDatabase();

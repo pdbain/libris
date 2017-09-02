@@ -88,6 +88,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_LAYOUT_USER_SUMMARYDISPLAY = "summarydisplay";
 	public static final String XML_LAYOUT_TYPE_FORM = "form";
 	public static final String XML_LAYOUT_TYPE_LIST = "list";
+	public static final String XML_LAYOUT_TYPE_PARAGRAPH = "paragraph";
 	public static final String XML_LAYOUT_USER_NEWRECORD = "newrecord";
 	public static final String XML_DATABASE_BRANCH_ATTR = "branch";
 	public static final String XML_DATABASE_LASTCHILD_ATTR = "lastchild";

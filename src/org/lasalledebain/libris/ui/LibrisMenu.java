@@ -420,76 +420,83 @@ public class LibrisMenu {
 				java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | modifier, false);
 	}
 	
+	public boolean openDatabaseDialogue() {
+		boolean result = false;
+		JFileChooser chooser;
+		File dbLocation = null;
+		String userDir = System.getProperty("user.dir");
+		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+		String lastDbFileName = librisPrefs.get(LibrisDatabase.DATABASE_FILE, userDir);
+		 dbLocation = new File(lastDbFileName);
+		if (!dbLocation.exists()) {
+			dbLocation = new File(userDir);
+		}
+		chooser = new JFileChooser(dbLocation);
+		Box buttonPanel = new Box(BoxLayout.Y_AXIS);
+		JCheckBox roCheckbox = new JCheckBox("Read-only", false);
+		buttonPanel.add(roCheckbox);
+		JCheckBox reIndexCheckbox = new JCheckBox("Build indexes", false);
+		buttonPanel.add(reIndexCheckbox);
+		chooser.setAccessory(buttonPanel);
+		chooser.setSelectedFile(dbLocation);
+		FileNameExtensionFilter librisFileFilter = new FileNameExtensionFilter(
+				"Libris files",
+				LibrisConstants.FILENAME_XML_FILES_SUFFIX, "xml");
+				
+		chooser.setFileFilter(librisFileFilter);
+		if (dbLocation.isFile()) {
+			chooser.setSelectedFile(dbLocation);
+		}
+		int option = chooser.showOpenDialog(guiMain.getMainFrame());
+		if (option == JFileChooser.APPROVE_OPTION) {
+			roCheckbox.isSelected();
+			File sf = chooser.getSelectedFile();
+			if (sf != null) {
+				if (reIndexCheckbox.isSelected()) {
+					try {
+						Libris.buildIndexes(sf, guiMain);
+					} catch (Exception e) {
+						guiMain.alert("Error building indexes", e);
+						return false;
+					}
+					guiMain.alert("Database successfully indexed");
+				} else {
+					openDatabaseImpl(sf);
+				}
+				result = true;
+			}
+			try {
+				librisPrefs.sync();
+			} catch (BackingStoreException e) {
+				guiMain.alert("cannot save preferences: "+e.getMessage());
+			}
+		}
+		return result;
+	}
+
+	private void openDatabaseImpl(File dbFile) {
+		
+		guiMain.setDatabaseFile(dbFile);
+		try {
+			database = guiMain.openDatabase();
+		} catch (Exception e) {
+			guiMain.alert("Error opening database", e);
+			return;
+		}
+		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+		librisPrefs.put(LibrisDatabase.DATABASE_FILE, dbFile.getAbsolutePath());
+		guiMain.getMainFrame().toFront();
+	}
+
 	public class OpenDatabaseListener implements ActionListener {
 
 		public OpenDatabaseListener() {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			JFileChooser chooser;
-			File dbLocation = null;
-			String userDir = System.getProperty("user.dir");
-			Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
-			String lastDbFileName = librisPrefs.get(LibrisDatabase.DATABASE_FILE, userDir);
-			 dbLocation = new File(lastDbFileName);
-			if (!dbLocation.exists()) {
-				dbLocation = new File(userDir);
-			}
-			chooser = new JFileChooser(dbLocation);
-			Box buttonPanel = new Box(BoxLayout.Y_AXIS);
-			JCheckBox roCheckbox = new JCheckBox("Read-only", false);
-			buttonPanel.add(roCheckbox);
-			JCheckBox reIndexCheckbox = new JCheckBox("Build indexes", false);
-			buttonPanel.add(reIndexCheckbox);
-			chooser.setAccessory(buttonPanel);
-			chooser.setSelectedFile(dbLocation);
-			FileNameExtensionFilter librisFileFilter = new FileNameExtensionFilter(
-					"Libris files",
-					LibrisConstants.FILENAME_XML_FILES_SUFFIX, "xml");
-					
-			chooser.setFileFilter(librisFileFilter);
-			if (dbLocation.isFile()) {
-				chooser.setSelectedFile(dbLocation);
-			}
-			int option = chooser.showOpenDialog(guiMain.getMainFrame());
-			if (option == JFileChooser.APPROVE_OPTION) {
-				roCheckbox.isSelected();
-				File sf = chooser.getSelectedFile();
-				if (sf != null) {
-					if (reIndexCheckbox.isSelected()) {
-						try {
-							Libris.buildIndexes(sf, guiMain);
-						} catch (Exception e) {
-							guiMain.alert("Error building indexes", e);
-							return;
-						}
-						guiMain.alert("Database successfully indexed");
-					} else {
-						openDatabase(sf);
-					}
-				}
-				try {
-					librisPrefs.sync();
-				} catch (BackingStoreException e) {
-					guiMain.alert("cannot save preferences: "+e.getMessage());
-				}
-			}
+			openDatabaseDialogue();
 		}
 
-		private void openDatabase(File dbFile) {
-			
-			guiMain.setDatabaseFile(dbFile);
-			try {
-				database = guiMain.openDatabase();
-			} catch (Exception e) {
-				guiMain.alert("Error opening database", e);
-				// TODO rebuild index
-				return;
-			}
-			Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
-			librisPrefs.put(LibrisDatabase.DATABASE_FILE, dbFile.getAbsolutePath());
-			guiMain.getMainFrame().toFront();
-		}
 	}
 
 	private class SaveListener implements ActionListener {

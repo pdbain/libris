@@ -31,6 +31,7 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 	protected FieldPosition positionList = null;
 	private String id;
 	private String title = null;
+	final static ArrayList<UiField> emptyUiList = new ArrayList<>();
 	
 	public Layout(Schema schem) throws DatabaseException {
 		mySchema = schem;
@@ -144,13 +145,20 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 		HashMap<String, String> values = layoutMgr.parseOpenTag();
 		String layoutType = values.get(XML_LAYOUT_TYPE_ATTR);
 		Layout l;
-		if (XML_LAYOUT_TYPE_TABLE.equals(layoutType)) {
+		switch (layoutType) {
+		case XML_LAYOUT_TYPE_TABLE: 
 			l = new TableLayout(schem);
-		} else if (layoutType.equalsIgnoreCase(LibrisXMLConstants.XML_LAYOUT_TYPE_FORM)) {
+			break;
+		case LibrisXMLConstants.XML_LAYOUT_TYPE_FORM:
 			l = new FormLayout(schem);
-		} else if (layoutType.equalsIgnoreCase(LibrisXMLConstants.XML_LAYOUT_TYPE_LIST)) {
-				l = new ListLayout(schem);
-		} else {
+			break;
+		case XML_LAYOUT_TYPE_LIST:
+			l = new ListLayout(schem);
+			break;
+		case XML_LAYOUT_TYPE_PARAGRAPH:
+			l = new ParagraphLayout(schem);
+			break;
+		default:
 			throw new InputException("layout type "+layoutType+" not supported");
 		}
 		l.setHeight(values.get("height"));
