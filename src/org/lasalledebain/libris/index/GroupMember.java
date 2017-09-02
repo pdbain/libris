@@ -185,7 +185,6 @@ public class GroupMember extends GenericField implements LibrisXMLConstants, Xml
 	}
 
 	public void setParent(int parent) {
-		int loc = Arrays.binarySearch(affiliations, 1, affiliations.length, parent);
 		if ((affiliations.length > 0) && (NULL_ID == affiliations[0])) {
 			affiliations[0] = parent;
 		} else {

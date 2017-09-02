@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
@@ -22,7 +23,7 @@ public class FieldChooser extends JPanel {
 	boolean includeRecordName;
 	private Vector<FieldInfo> searchFieldList;
 	private boolean multiSelect;
-	public FieldChooser(Schema schem, EnumSet searchFieldTypes, boolean multiSelect) {
+	public FieldChooser(Schema schem, EnumSet searchFieldTypes, boolean multiSelect, String label) {
 		setLayout(new BorderLayout());
 		includeRecordName = false;
 		this.multiSelect = multiSelect;
@@ -30,6 +31,7 @@ public class FieldChooser extends JPanel {
 		searchFieldList = getSearchFieldList(schem,searchFieldTypes);
 		fieldList = new JList(searchFieldList);
 		numSearchFields = searchFieldList.size();
+		add(new JLabel(label), BorderLayout.NORTH);
 		add(fieldList, BorderLayout.CENTER);
 		if (multiSelect) {
 			selectAll();
@@ -108,7 +110,16 @@ public class FieldChooser extends JPanel {
 		 int selectedField = fieldList.getSelectedIndex();
 		 return selectedField;
 	 }
-	private void selectAll() {
+	 public void setSelectedIndex(int index) {
+		 if (index <= fieldList.getMaxSelectionIndex()) {
+			 fieldList.setSelectedIndex(index);
+		 }
+	 }
+	 public void setSelectedIndices(int[] indices) {
+		 fieldList.setSelectedIndices(indices);
+	 }
+	 
+	 private void selectAll() {
 		fieldList.setSelectionInterval(0, numSearchFields-1);
 	}
 	private void selectFirst() {

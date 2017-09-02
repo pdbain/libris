@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -47,7 +48,6 @@ import com.apple.eawt.QuitResponse;
 import com.apple.eawt.AppEvent.QuitEvent;
 
 public class LibrisGui extends LibrisWindowedUi {
-// TODO implement Link record
 	private static final String CONTENT_PANE_HEIGHT = "CONTENT_PANE_HEIGHT";
 	private static final String CONTENT_PANE_WIDTH = "CONTENT_PANE_WIDTH";
 	private static final String CONTENT_PANE_DIVIDER = "CONTENT_PANE_DIVIDER_LOCATION";
@@ -662,6 +662,19 @@ public class LibrisGui extends LibrisWindowedUi {
 	void enableNewChild() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public static void makeLabelledControl(JPanel parentPanel, Component theControl, String labelText, boolean vertical) {
+		JPanel controlPanel = new JPanel();
+		if (vertical) {
+			BoxLayout layout = new BoxLayout(controlPanel, BoxLayout.Y_AXIS);
+			controlPanel.setLayout(layout);
+		}
+		JLabel l = new JLabel(labelText);
+		l.setLabelFor(theControl);
+		controlPanel.add(l);
+		controlPanel.add(theControl);
+		parentPanel.add(controlPanel);
 	}
 
 }
