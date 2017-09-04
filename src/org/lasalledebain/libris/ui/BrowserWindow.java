@@ -117,8 +117,8 @@ public class BrowserWindow extends JPanel {
 		recordsSource = records;
 		enableNext(false);
 		final Layouts layouts = database.getLayouts();
-		this.layout = layouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
-		fieldIds = layout.getFieldIds();
+		this.myLayout = layouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
+		fieldIds = myLayout.getFieldIds();
 		recordsIterator = recordsSource.iterator();
 		recList = getRecords();
 		chooser.setModel(recList);
@@ -232,7 +232,7 @@ public class BrowserWindow extends JPanel {
 		}
 	}
 
-	Layout layout;
+	Layout myLayout;
 	private String[] fieldIds;
 
 	MouseListener chooserMouseListener = new MouseAdapter() {
