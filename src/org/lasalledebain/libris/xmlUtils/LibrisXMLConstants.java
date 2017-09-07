@@ -51,6 +51,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_RECORDS_LASTID_ATTR = "lastid";
 	public static final String XML_INDEXDEFS_TAG = "indexdefs";
 	public static final String XML_LAYOUTFIELD_TAG = "layoutfield";
+	public static final String XML_INSTANCE_TAG = "instance";
 	
 	public static final String XML_LIBRISIMPORT_TAG = "librisimport";
 	public static final String XML_LIBRISIMPORT_FIELD_TAG = "field";
@@ -90,14 +91,21 @@ public interface LibrisXMLConstants {
 	public static final String XML_LAYOUT_TYPE_LIST = "list";
 	public static final String XML_LAYOUT_TYPE_PARAGRAPH = "paragraph";
 	public static final String XML_LAYOUT_USER_NEWRECORD = "newrecord";
+	@Deprecated
 	public static final String XML_DATABASE_BRANCH_ATTR = "branch";
+	@Deprecated
 	public static final String XML_DATABASE_LASTCHILD_ATTR = "lastchild";
 	public static final String XML_DATABASE_NAME_ATTR = "databasename";
 	public static final String XML_SCHEMA_NAME_ATTR = "schemaname";
 	public static final String XML_SCHEMA_LOCATION_ATTR = "schemalocation";
 	public static final String XML_SCHEMA_VERSION_ATTR = "schemaversion";
+	@Deprecated
 	public static final String XML_RECORD_BRANCH_ATTR = "branch";
-	
+
+	public static final String XML_INSTANCE_SELFID_ATTR = "selfdbid";
+	public static final String XML_INSTANCE_PARENTID_ATTR = "parentdbid";
+	public static final String XML_INSTANCE_STARTRECID_ATTR = "startrecid";
+
 	public static final String XML_FIELDDEF_TYPE_DEFAULT_VALUE = "default";
 	public static final String XML_FIELDDEF_TYPE_STRING_VALUE = "string";
 
