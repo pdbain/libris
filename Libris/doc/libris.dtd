@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ENTITY % boolean "(true|false)">
+<!ENTITY % controltype "(radiobutton|checkbox|textbox|textfield|rangefield|enumfield|names)">
+<!ENTITY % usagetype "(newrecord|formdisplay|summarydisplay|formentry|tabledisplay)">
+<!ENTITY % groupstructure "(flat|hierarchical)">
+
+<!ELEMENT libris (metadata?, records?)>
+<!ENTITY % databaseAttributes	"
+	schemaname NMTOKEN #REQUIRED
+	schemaversion NMTOKEN #REQUIRED
+	schemalocation NMTOKEN #IMPLIED
+	databasename NMTOKEN #IMPLIED
+	date CDATA #IMPLIED" >
+	
+<!ATTLIST libris  %databaseAttributes; >
+
+<!ELEMENT metadata (schema, layouts)>
+<!ELEMENT schema (groupdefs, fielddefs, indexdefs) >
+
+<!ELEMENT fielddefs (enumset*, fielddef*) >
+
+<!ELEMENT fielddef EMPTY>
+
+<!-- Type declaration of the fields in a record 
+@attr id Unique ID for the field.  Should start with "f_"
+@attr enumset pick values from the a list.  If restricted is not set, the values can be changed.
+-->
+<!ATTLIST fielddef
+	id ID #REQUIRED 
+	title CDATA #IMPLIED
+	datatype (string|boolean|integer|valuepair|INDEXENTRY|enum) "string"
+	enumset IDREF #IMPLIED
+	default CDATA #IMPLIED
+	valueseparator CDATA #IMPLIED
+	restricted %boolean; "false"
+	singlevalue %boolean; "false"
+	editable %boolean; "true"
+	inherit ID #IMPLIED <!-- group ID. Inherit value from parent in this group -->
+	>
+
+<!ELEMENT enumset (enumchoice)+>
+<!ATTLIST enumset
+	id ID #REQUIRED
+>
+<!ELEMENT enumchoice EMPTY>
+<!ATTLIST enumchoice
+	id ID #REQUIRED
+	value CDATA #IMPLIED
+>
+	
+<!--
+Define the indexes in the database
+-->
+<!-- there are at most 255 members per group and at most 255 groups -->
+<!ELEMENT groupdefs (groupdef*) >
+
+<!ELEMENT groupdef EMPTY >
+
+<!ATTLIST groupdef
+	id ID #REQUIRED
+	title CDATA #IMPLIED
+	structure %groupstructure; "hierarchical"
+>
+<!ELEMENT indexdefs (indexdef*) >
+
+<!ELEMENT indexdef (indexfield*) >
+
+<!ELEMENT indexfield EMPTY>
+
+<!ATTLIST indexfield
+	id IDREF #REQUIRED
+	stoplist %boolean; "false"
+	method NMTOKEN "manual"
+	>
+
+<!ELEMENT layouts (layout*) >
+<!ATTLIST layout
+	id ID #REQUIRED
+	title CDATA #IMPLIED
+	type (table | list | form | text | XML) "table"
+		width NMTOKEN #IMPLIED
+	height NMTOKEN #IMPLIED
+>
+	
+<!ELEMENT layout ((layoutusage|layoutfield)*) >
+<!ELEMENT layoutfield EMPTY>
+<!ATTLIST layoutfield
+	id IDREF #REQUIRED
+	title NMTOKEN #IMPLIED
+	return %boolean; "false"
+	vspan NMTOKEN #IMPLIED
+	hspan NMTOKEN #IMPLIED
+	width NMTOKEN #IMPLIED
+	height NMTOKEN #IMPLIED
+	control %controltype; "textbox"
+>
+
+<!ELEMENT layoutusage EMPTY >
+<!ATTLIST layoutusage
+	usedby %usagetype; #REQUIRED
+>
+
+<!--
+Records section.
+-->
+<!ELEMENT records (record*)>
+<!ATTLIST records
+	lastid NMTOKEN #REQUIRED
+>
+<!--
+Represents a document or a index item
+-->
+<!ELEMENT record (member*, (field)+)>
+<!ATTLIST record
+	id ID #REQUIRED 
+	revision CDATA #IMPLIED
+	replaces IDREF #IMPLIED
+	name CDATA
+>
+
+<!ELEMENT member (affiliation*) >
+<!ATTLIST member 
+	group CDATA #REQUIRED
+	parent ID #REQUIRED
+>
+<!ATTLIST affiliation 
+	affiliate ID #REQUIRED
+>
+
+<!--
+Represents the data in the record
+@value for short values
+@id points to a <fielddef>
+-->
+<!ELEMENT field (#PCDATA)*>
+<!ATTLIST field
+	id IDREF #REQUIRED
+	value CDATA #IMPLIED
+	extravalue CDATA #IMPLIED
+>

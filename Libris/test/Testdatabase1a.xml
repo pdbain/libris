@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE libris SYSTEM "file:///Users/pdbain/Documents/workspaces/libris/libris/doc/libris.dtd">
+<libris name="test" date="2005-01-08" version="0.0">
+<metadata>
+	<schema>
+		<fielddefs>
+		<enumset id="e_onechoice">
+				<enumchoice id="ev_oc" value="onlychoice"/>
+		</enumset>
+		<enumset id="e_twochoice">
+				<enumchoice id="e_tc_1" value="choice1"/>
+				<enumchoice id="e_tc_2"  value="choice2"/>
+		</enumset>
+		<fielddef id="ef2"/>
+		<fielddef id="ef1"/>
+				<fielddef id="IntField1"/>
+				<fielddef id="IntField2"/>
+				<fielddef id="BoolField1"/>
+				<fielddef id="StringField1"/>
+								<fielddef id="StringField2"/>
+												</fielddefs>
+		<hierarchydefs></hierarchydefs>
+				<indexdefs>	
+		</indexdefs>
+	</schema>
+	<layouts></layouts>
+	<indexes>
+	</indexes>
+	<hierarchies></hierarchies>
+	</metadata>
+	<records lastid="9">
+		<record id="r1">
+			<field id="StringField1" value="abcdef" />
+			<field id="StringField2"> abc defg hijkl mnopqr</field>
+			<field id="IntField1" value="12" />
+			<field id="IntField2" value="98" />
+		</record>
+		<record id="r2">
+			<field id="StringField1" value="qwerty" />
+			<field id="StringField2"> a sd fgh jklz xcvbn</field>
+			<field id="IntField1" value="34" />
+			<field id="IntField2" value="56" />
+		</record>
+		<record id="r3">
+			<field id="StringField1" value="qwerty" />
+			<field id="IntField1" value="34" />
+		</record>
+		<record id="r4">
+			<field id="StringField2">Qazwsx Edcrfv Tgb Yhnujm</field>
+			<field id="IntField1" value="3" />
+			<field id="IntField2" value="1234567890" />
+		</record>
+		<record id="r5">
+			<field id="StringField1" value="qazwsxedcrfv tgbyhnujmikolp" />
+			<field id="StringField2">Qazwsx Edcrfv Tgb Yhnujm</field>
+			<field id="IntField1" value="3" />
+			<field id="IntField2" value="1234567890" />
+		</record>
+		<record id="r6">
+			<field id="IntField1" value="3" />
+			<field id="StringField2"> The quick brown fox jumps over the lazy dog.</field>
+			<field id="IntField2" value="1234567890" />
+		</record>
+		<record id="r7">
+			<field id="IntField1" value="3" />
+			<field id="StringField2"> The quick brown fox jumps over the lazy dog.</field>
+			<field id="IntField2" value="1234567890" />
+		</record>
+		<record id="r8">
+			<field id="BoolField1" value="true" />
+			<field id="ef1" value="onlychoice"/>
+		</record>
+		<record id="r9">
+			<field id="BoolField1" value="false" />
+			<field id="ef2" value="choice2"/>
+		</record>
+	</records>
+</libris>

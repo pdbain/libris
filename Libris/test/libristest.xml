@@ -1,0 +1,317 @@
+<libris name="test" date="2005-01-08" moddate="2005-01-08" version="0.0">
+	<schema>
+		<fielddefs>
+			<fielddef id="f_doctype" name="Document type" datatype="string" summary="true"
+			indexable="false" printable="true" visible="true"  editable="true" />
+			<fielddef id="f_author" name="Author" datatype="string"
+			summary="true" indexable="true" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_title" name="Title" datatype="string"
+			summary="true" indexable="true" printable="true"
+			visible="true"  editable="true"/>
+			<fielddef id="f_publication" name="Publication" datatype="string"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="false"/>
+			<fielddef id="f_publisher" name="Publisher" datatype="string"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="false"/>
+			<fielddef id="f_year" name="Year" datatype="INTEGER"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_month" name="Month" datatype="INTEGER"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_pages" name="Pages" datatype="INTEGERS"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_volume" name="Volume" datatype="INTEGER"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_issue" name="Issue" datatype="INTEGER"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_keywords" name="Keywords" datatype="string"
+			summary="true" indexable="true" printable="true"
+			visible="true"  editable="true"/>
+		</fielddefs>
+		<indexdefs>
+			<indexdef indexname="ID" indexmethod="manual" />
+		</indexdefs>
+	</schema>
+	<indexes>
+	</indexes>
+	<records>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author">
+E. Leonardi
+F. Neri
+M. Gerla
+P. Palnati
+			</field>
+			<field id="f_title">
+"Congestion Control in Asynchronous, High-Speed Wormhole Routing Networks"
+			</field>
+			<field id="f_publication">
+Communications Magazine
+			</field>
+			<field id="f_volume" value="34"/>
+			<field id="f_issue" value="11"/>
+			<field id="f_year" value="1996"/>
+			<field id="f_keywords">
+Myrinet slack buffers deflection routing packet switched  switching networks wormhole self-timed livelocks rate control buffering performance
+			</field>
+			<field id="f_publisher" value="IEEE"/>
+			<field id="f_month" value="Jan."/>
+		</record>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author">
+V. Catania
+G. Ficili
+D. Panno
+			</field>
+			<field id="f_title">
+Using Fuzzy Logic in ATM Source Traffic Control: Lessons and Perspectives
+			</field>
+			<field id="f_publication">
+Communications Magazine
+			</field>
+			<field id="f_volume" value="34"/>
+			<field id="f_issue" value="11"/>
+			<field id="f_year" value="1996"/>
+			<field id="f_keywords">
+ fuzzy logic traffic rate flow control policing leaky buffers bursty sources data packet switching congestion control
+			</field>
+			<field id="f_publisher" value="IEEE"/>
+			<field id="f_month" value="Jan."/>
+		</record>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author" value="S. Moshavi"/>
+			<field id="f_title">
+Multi-User Detection for DS-CDMA
+			</field>
+			<field id="f_publication">
+Communications Magazine
+			</field>
+			<field id="f_volume" value="34"/>
+			<field id="f_issue" value="10"/>
+			<field id="f_year" value="1996"/>
+			<field id="f_keywords">
+direct sequence code division multiple access spread spectrum CDMA medium access demodulation  wireless interference cancellation correlation matched filters polynomial expansion decorrelating detector successive interference subtractive
+			</field>
+			<field id="f_publisher" value="IEEE"/>
+			<field id="f_month" value="Oct."/>
+			<field id="f_pages" value="124-136"/>
+		</record>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author" value="A.R. Noerpel"/>
+			<field id="f_title">
+PACS: Personal Access Communications System: An Alternative Technology for PCS
+			</field>
+			<field id="f_publication">
+Communications Magazine
+			</field>
+			<field id="f_volume" value="34"/>
+			<field id="f_issue" value="10"/>
+			<field id="f_year" value="1996"/>
+			<field id="f_keywords">
+PACS PCS wireless low tier frequency division duplex FDD tdm TDMA antenna diversity performance air interface
+			</field>
+			<field id="f_publisher" value="IEEE"/>
+			<field id="f_month" value="Oct."/>
+			<field id="f_pages" value="138-150"/>
+		</record>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author" value="H. Erikson"/>
+			<field id="f_title">
+MBone: the Multicast Backbone
+			</field>
+			<field id="f_publication" value="CACM"/>
+			<field id="f_volume" value="37"/>
+			<field id="f_issue" value="8"/>
+			<field id="f_year" value="1994"/>
+			<field id="f_keywords">
+Internet multicast multimedia audio video routing packet switching switched networks IP broadcasting MBone backbone
+			</field>
+			<field id="f_publisher" value="ACM"/>
+			<field id="f_month" value="Aug."/>
+			<field id="f_pages" value="54-60"/>
+		</record>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author" value="P. Ceruzzi"/>
+			<field id="f_title">
+Crossing the Divide: Architectural Issues and the Emergence of the Stored Program Computer 1935-1955
+			</field>
+			<field id="f_publication">
+Annals of the History of Computing
+			</field>
+			<field id="f_volume" value="19"/>
+			<field id="f_issue" value="1"/>
+			<field id="f_year" value="1997"/>
+			<field id="f_keywords">
+Aberdeen Relay Calculator IBM Card programmed Calculator serial parallel arithmetic Eniac von Neumann architecture card unit record punched computation tabulators IBM 601 603 604 605 1401
+			</field>
+			<field id="f_publisher" value="IEEE"/>
+			<field id="f_month" value="Jan."/>
+			<field id="f_pages" value="12-May"/>
+		</record>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author" value="M.V. Wilkes"/>
+			<field id="f_title">
+Arithmetic on the EDSAC
+			</field>
+			<field id="f_publication">
+Annals of the History of Computing
+			</field>
+			<field id="f_volume" value="19"/>
+			<field id="f_issue" value="1"/>
+			<field id="f_year" value="1997"/>
+			<field id="f_keywords">
+word length fixed point arithmetic scaling overflow  Electronic Delay Storage Computer
+			</field>
+			<field id="f_publisher" value="IEEE"/>
+			<field id="f_month" value="Jan."/>
+			<field id="f_pages" value="13-15"/>
+		</record>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author">
+G.W. Reitwiesner
+			</field>
+			<field id="f_title">
+The First Operating System for the EDVAC
+			</field>
+			<field id="f_publication">
+Annals of the History of Computing
+			</field>
+			<field id="f_volume" value="19"/>
+			<field id="f_issue" value="1"/>
+			<field id="f_year" value="1997"/>
+			<field id="f_keywords">
+Electronic Discrete Variable Automatic Computer EDVAC word length architecture input output software subroutine relocation program tracing checkout radix decimal binary conversion
+			</field>
+			<field id="f_publisher" value="IEEE"/>
+			<field id="f_month" value="Jan."/>
+			<field id="f_pages" value="55-59"/>
+		</record>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author">
+G.D. Forney
+L. Brown
+M.V. Eyuboglu
+J.L. Moran
+			</field>
+			<field id="f_title">
+The V.34 High-Speed Modem Standard
+			</field>
+			<field id="f_publication">
+Communications Magazine
+			</field>
+			<field id="f_volume" value="34"/>
+			<field id="f_issue" value="12"/>
+			<field id="f_year" value="1996"/>
+			<field id="f_keywords">
+trellis coded modulation QAM quadrature amplitude modulation linear feedforward decision feedback equalization precoding shell mapping data communications digital siganl processing transmission
+			</field>
+			<field id="f_publisher" value="IEEE"/>
+			<field id="f_month" value="Dec."/>
+			<field id="f_pages" value="28-33"/>
+		</record>
+		<record>
+			<field id="f_doctype" value="journal-article"/>
+			<field id="f_author">
+R.V. Cox
+P. Kroon
+			</field>
+			<field id="f_title">
+Low Bit-Rate Speech Coders for Multimedia Communications
+			</field>
+			<field id="f_publication">
+Communications Magazine
+			</field>
+			<field id="f_volume" value="34"/>
+			<field id="f_issue" value="12"/>
+			<field id="f_year" value="1996"/>
+			<field id="f_keywords">
+variable bit rate speech coding codec compresssion interpolation silence detection comfor noise voice activity front end clipping linear predictive coding code excited G729 G.723
+			</field>
+			<field id="f_publisher" value="IEEE"/>
+			<field id="f_month" value="Dec."/>
+			<field id="f_pages" value="34-40"/>
+		</record>
+		<record>
+			<field id="f_doctype">
+proceedings-article
+			</field>
+			<field id="f_author">
+A. Agarwal
+R. Bianchini
+D. Chaiken
+K.L. Johnson
+D. Kranz
+J. Kubiatowicz
+B.-H. Lim
+K. MacKenzie
+D. Yeung
+			</field>
+			<field id="f_title">
+The MIT Alewife Machine: Architecture and Performance
+			</field>
+			<field id="f_publication">
+International Symposium on Computer Architecture
+			</field>
+			<field id="f_volume" value="23"/>
+			<field id="f_issue" value="2"/>
+			<field id="f_year" value="1995"/>
+			<field id="f_keywords">
+multiprocessors multicomputers message passing shared memory interprocessor communication cache consistency coherence limitLESS lockup free caches Sparcle synchronization
+			</field>
+			<field id="f_publisher">
+"ACM, IEEE"
+			</field>
+			<field id="f_month" value="May"/>
+			<field id="f_pages" value="13-Feb"/>
+		</record>
+		<record>
+			<field id="f_doctype">
+proceedings-article
+			</field>
+			<field id="f_author">
+M. Simone
+A. Essen
+A. Ike
+A. Krishnamurthy
+T. Maruyama
+N. Patkar
+M. Ramaswami
+M. Shebanow
+V. Thirumalaiswamy
+D. Tovey
+			</field>
+			<field id="f_title">
+Implementation Trade-offs in Using a Restricted Data Flow Architecture in a High Performance RISC Microprocessor
+			</field>
+			<field id="f_publication">
+International Symposium on Computer Architecture
+			</field>
+			<field id="f_volume" value="23"/>
+			<field id="f_issue" value="2"/>
+			<field id="f_year" value="1995"/>
+			<field id="f_keywords">
+Sparc V9 dataflow data driven computer architecture reservation stations restricted performance benchmarks register windows file size
+			</field>
+			<field id="f_publisher">
+"ACM, IEEE"
+			</field>
+			<field id="f_month" value="May"/>
+			<field id="f_pages" value="151-162"/>
+		</record>
+	</records>
+</libris>

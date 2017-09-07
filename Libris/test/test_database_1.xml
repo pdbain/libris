@@ -1,0 +1,41 @@
+<libris name="test" date="2005-01-08" moddate="2005-01-08" version="0.0">
+	<schema>
+		<fielddefs>
+			<fielddef id="f_doctype" name="Document type" datatype="string" summary="true"
+			indexable="false" printable="true" visible="true"  editable="true" />
+			<fielddef id="f_author" name="Author" datatype="string"
+			summary="true" indexable="true" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_title" name="Title" datatype="string"
+			summary="true" indexable="true" printable="true"
+			visible="true"  editable="true"/>
+			<fielddef id="f_publication" name="Publication" datatype="string"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="false"/>
+			<fielddef id="f_publisher" name="Publisher" datatype="string"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="false"/>
+			<fielddef id="f_year" name="Year" datatype="INTEGER"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_month" name="Month" datatype="INTEGER"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_pages" name="Pages" datatype="INTEGERS"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_volume" name="Volume" datatype="INTEGER"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_issue" name="Issue" datatype="INTEGER"
+			summary="true" indexable="false" printable="true"
+			visible="true"  editable="true" />
+			<fielddef id="f_keywords" name="Keywords" datatype="string"
+			summary="true" indexable="true" printable="true"
+			visible="true"  editable="true"/>
+		</fielddefs>
+		<indexdefs>
+			<indexdef indexname="ID" indexmethod="manual" />
+		</indexdefs>
+	</schema>
+</libris>
