@@ -42,6 +42,7 @@ public interface LibrisConstants {
 	public static final String PROPERTIES_FILENAME = "properties";
 	public static final String RECORDS_FILENAME = "records";
 	public static final String JOURNAL_FILENAME = "journal";
+	public static final String LOCK_FILENAME = "databaseLock";
 	public static final String NAMEDRECORDS_FILENAME_ROOT = "namedrecs_";
 	public static final String AFFILIATES_FILENAME_ROOT = "affiliates_";
 	public static final String AFFILIATES_FILENAME_HASHTABLE_ROOT = AFFILIATES_FILENAME_ROOT+"hashstable_";

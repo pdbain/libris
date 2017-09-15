@@ -3,6 +3,7 @@ package org.lasalledebain.libris.search;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.InputException;
 
+@Deprecated
 public class AffiliateFilter implements RecordFilter {
 
 	@Override

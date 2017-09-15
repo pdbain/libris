@@ -2,14 +2,13 @@ package org.lasalledebain.libris.hashfile;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 /**
  * HashEntry objects are immutable.
  *
  * @param <T> subtype
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public interface HashEntry<T extends HashEntry> extends Comparable<HashEntry> {
 
 	void writeData(DataOutput backingStore) throws IOException;

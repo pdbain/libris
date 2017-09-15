@@ -221,6 +221,10 @@ public class IndexManager implements LibrisConstants {
 		affList[groupNum].addChild(parent, child);
 	}
 
+	public void addAffiliate(int groupNum, int dest, int src) throws DatabaseException {
+		affList[groupNum].addAffiliate(dest, src);
+	}
+
 	public AffiliateList getAffiliateList(int groupNum) {
 		if (groupNum >= affList.length) {
 			throw new DatabaseError("cannot access group " + groupNum);

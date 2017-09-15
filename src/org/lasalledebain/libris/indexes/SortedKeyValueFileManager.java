@@ -349,9 +349,6 @@ public class SortedKeyValueFileManager <T extends KeyValueTuple> implements Iter
 			if (null == key) {
 				throw new InputException("Null key for bucket in "+managerName);
 			}
-			if (null == buck) {
-				throw new InputException("Null bucket key="+key+" for bucket in "+managerName);
-			}
 			cacheList.put(key, buck);
 		}
 

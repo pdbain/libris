@@ -5,6 +5,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
@@ -16,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -79,6 +81,44 @@ public class AffiliateEditor {
 		});
 		buttonBar.add(setParentButton);
 		final JButton newChildButton = new JButton("New child record");
+
+		final JButton addAffiliateButton = new JButton("Add affiliate");
+		addAffiliateButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				KeyIntegerTuple newAffiliate = (KeyIntegerTuple) recordFilter.getSelectedItem();
+				affInfo.add(newAffiliate);
+				affList.setListData(affInfo);
+				guiCtrl.setModified(true);
+				dialogueDispose();
+			}
+		});
+		addAffiliateButton.setEnabled(ctrl.isEditable());
+		buttonBar.add(addAffiliateButton);
+
+		final JButton removeParentButton = new JButton("Remove affiliate");
+		removeParentButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (Dialogue.yesNoDialog(null, "Remove selected affiliate?") == Dialogue.YES_OPTION) {
+					if (selectedAffiliate >= 0) {
+						if (0 ==selectedAffiliate) {
+							affInfo.set(selectedAffiliate, NameList.NULL_ID_TUPLE);
+						} else {
+							affInfo.remove(selectedAffiliate);
+						}
+						affList.setListData(affInfo);
+						guiCtrl.setModified(true);
+					}
+				}
+				dialogueDispose();
+			}
+		});
+		removeParentButton.setEnabled(ctrl.isEditable());
+		buttonBar.add(removeParentButton);
+
 		newChildButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {

@@ -29,6 +29,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
  */
 public class GroupMember extends GenericField implements LibrisXMLConstants, XmlImportable, XmlExportable {
 
+	private static final int NULL_ID = RecordId.getNullId();
 	private static final String memberTag = XML_MEMBER_TAG;
 	private static final String affiliationTag = XML_AFFILIATION_TAG;
 	GroupDef def;
@@ -38,7 +39,7 @@ public class GroupMember extends GenericField implements LibrisXMLConstants, Xml
 	static private final int[] dummyAffiliations = new int[0];
 
 	public int getParent() {
-		return (affiliations.length == 0) ? RecordId.getNullId(): affiliations[0];
+		return (affiliations.length == 0) ? NULL_ID: affiliations[0];
 	}
 
 	public String getGroupId() {
@@ -169,6 +170,7 @@ public class GroupMember extends GenericField implements LibrisXMLConstants, Xml
 		int tempArray[] = new int[affiliations.length + 1];
 		System.arraycopy(affiliations, 0, tempArray, 0, affiliations.length);
 		tempArray[tempArray.length - 1] = value;
+		Arrays.sort(tempArray, 1, tempArray.length);
 		affiliations = tempArray;
 	}
 
@@ -183,18 +185,15 @@ public class GroupMember extends GenericField implements LibrisXMLConstants, Xml
 	}
 
 	public void setParent(int parent) {
-		int loc;
-		for (loc = 0; loc < affiliations.length; ++loc) {
-			if (affiliations[loc] == parent) {
-				affiliations[loc] = affiliations[0];
-				affiliations[0] = parent;
-				return;
-			}
+		if ((affiliations.length > 0) && (NULL_ID == affiliations[0])) {
+			affiliations[0] = parent;
+		} else {
+			int[] tempAffiliations = new int[affiliations.length + 1];
+			tempAffiliations[0] = parent;
+			System.arraycopy(affiliations, 0, tempAffiliations, 1, affiliations.length);
+			Arrays.sort(tempAffiliations, 1, tempAffiliations.length);
+			affiliations = tempAffiliations;
 		}
-		int[] tempAffiliations = new int[affiliations.length + 1];
-		tempAffiliations[0] = parent;
-		System.arraycopy(affiliations, 0, tempAffiliations, 1, affiliations.length);
-		affiliations = tempAffiliations;
 	}
 
 	public static int[] getDummyAffiliations() {

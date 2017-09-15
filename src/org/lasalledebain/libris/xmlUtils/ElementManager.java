@@ -26,10 +26,6 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 	private LibrisException lastException;
 	private XmlShapes shapes;
 
-	public ElementManager(ElementReader rdr, String elementName, XmlShapes shapes) throws XmlException {
-		this(rdr, new QName(elementName), shapes);
-	}
-
 	public ElementManager(ElementReader rdr, QName elementName, XmlShapes shapes) throws XmlException {
 		this.tagQname = elementName;
 		this.xmlReader = rdr;

@@ -25,6 +25,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 public class RecordInstance extends Record implements  LibrisXMLConstants {
 	private int id;
 	private String name;
+	private static final int NULL_ID = RecordId.getNullId();
 
 	Field[] recordData;
 	GroupMember affiliations[];
@@ -412,7 +413,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	@Override
 	public String generateTitle(String[] fieldIds) {
 		StringBuffer buff = new StringBuffer("[");
-		String idString = (RecordId.getNullId() == id)? "<unknown>": RecordId.toString(id);
+		String idString = (NULL_ID == id)? "<unknown>": RecordId.toString(id);
 		buff.append(idString);
 		buff.append("]: ");
 		if (null != name) {
@@ -470,7 +471,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 						return false;						
 					}
 				} catch (InputException e) {
-					LibrisDatabase.librisLog(Level.WARNING, "Error getting affilaitions", e);
+					LibrisDatabase.log(Level.WARNING, "Error getting affilaitions", e);
 					return false;
 				}
 			}
@@ -599,6 +600,9 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 
 	@Override
 	public void addAffiliate(int groupNum, int affiliate) throws FieldDataException {
+		if (NULL_ID == getParent(groupNum)) {
+			setParent(groupNum, NULL_ID);
+		}
 		addGroupMember(groupNum, affiliate, false);
 	}
 
@@ -614,9 +618,9 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	@Override
 	public int getParent(int groupNum) {
 		if (groupNum < 0) {
-			return RecordId.getNullId();
+			return NULL_ID;
 		} else if ((null == affiliations) || (null == affiliations[groupNum])) {
-			return RecordId.getNullId();
+			return NULL_ID;
 		} else {
 			return affiliations[groupNum].getParent();
 		}

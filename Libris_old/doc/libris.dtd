@@ -14,7 +14,15 @@
 	
 <!ATTLIST libris  %databaseAttributes; >
 
-<!ELEMENT metadata (schema, layouts)>
+<!ELEMENT metadata (instance?, schema, layouts)>
+<!ELEMENT instance>
+<!ATTLIST instance 
+	selfdbid NMTOKEN  #REQUIRED
+	parentdbid NMTOKEN  #IMPLIED
+	startrecid NMTOKEN #REQUIRED
+>
+
+
 <!ELEMENT schema (groupdefs, fielddefs, indexdefs) >
 
 <!ELEMENT fielddefs (enumset*, fielddef*) >

@@ -3,6 +3,8 @@
  */
 package org.lasalledebain.libris.field;
 
+import java.net.URL;
+
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -13,6 +15,11 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 class ReadOnlyField implements Field {
+	@Override
+	public void addURLValue(URL value) throws FieldDataException {
+		throw new FieldDataException("field is read-only");
+	}
+
 	public ReadOnlyField(Field actualField) {
 		this.actualField = actualField;
 	}
@@ -30,13 +37,13 @@ class ReadOnlyField implements Field {
 
 	@Override
 	public void addValuePair(String value, String extraValue)
-	throws FieldDataException {
+			throws FieldDataException {
 		throw new FieldDataException("field is read-only");
 	}
 
 	@Override
 	public void addValuePair(Integer value, String extraValue)
-	throws FieldDataException {
+			throws FieldDataException {
 		throw new FieldDataException("field is read-only");
 	}
 
@@ -47,7 +54,7 @@ class ReadOnlyField implements Field {
 
 	@Override
 	public void changeValue(FieldValue fieldValue)
-	throws FieldDataException {
+			throws FieldDataException {
 		throw new FieldDataException("field is read-only");
 	}
 

@@ -41,11 +41,17 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 		affiliates = Arrays.copyOf(newAffiliates, newAffiliates.length);;
 	}
 	
-	public AffiliateListEntry(int key, int child) {
+	public AffiliateListEntry(int key, int affiliate, boolean addChild) {
 		super(key);
-		children = new int[1];
-		children[0] = child;
-		affiliates = emptyList;
+		if (addChild) {
+			children = new int[1];
+			children[0] = affiliate;
+			affiliates = emptyList;
+		} else {
+			affiliates = new int[1];
+			affiliates[0] = affiliate;
+			children = emptyList;
+		}
 	}
 	
 	public AffiliateListEntry(AffiliateListEntry original, int newAffiliate, boolean addChild) {
@@ -159,8 +165,8 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 			return new AffiliateListEntry(key, tempChildren, emptyList);
 		}
 
-		public AffiliateListEntry makeEntry(int parent, int child) {
-			return new AffiliateListEntry(parent, child);
+		public AffiliateListEntry makeEntry(int parent, int affiliate, boolean addChild) {
+			return new AffiliateListEntry(parent, affiliate, addChild);
 		}
 
 		public AffiliateListEntry makeEntry(AffiliateListEntry original, int newAffiliate, boolean addChild) {

@@ -5,13 +5,13 @@ import java.util.Iterator;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 
-public class ArrayRecordList extends RecordList {
+public class ArrayRecordIterator implements Iterable<Record> {
 
 	private final int recList[];
 	private final RecordList parentList;
 
-	public ArrayRecordList(RecordList parentList, int[] recList) {
-		this.parentList = parentList;
+	public ArrayRecordIterator(RecordList masterList, int[] recList) {
+		this.parentList = masterList;
 		this.recList = recList;
 	}
 
@@ -37,11 +37,4 @@ public class ArrayRecordList extends RecordList {
 			}
 		};
 	}
-
-	@Override
-	public Record getRecord(int id) throws InputException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

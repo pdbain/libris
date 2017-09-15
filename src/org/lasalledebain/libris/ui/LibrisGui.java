@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -47,7 +48,6 @@ import com.apple.eawt.QuitResponse;
 import com.apple.eawt.AppEvent.QuitEvent;
 
 public class LibrisGui extends LibrisWindowedUi {
-// TODO implement Link record
 	private static final String CONTENT_PANE_HEIGHT = "CONTENT_PANE_HEIGHT";
 	private static final String CONTENT_PANE_WIDTH = "CONTENT_PANE_WIDTH";
 	private static final String CONTENT_PANE_DIVIDER = "CONTENT_PANE_DIVIDER_LOCATION";
@@ -123,6 +123,10 @@ public class LibrisGui extends LibrisWindowedUi {
 	public void setTitle(String title) {
 		super.setTitle(title);
 		mainFrame.setTitle(title);
+	}
+	
+	public boolean chooseDatabase() {
+		return getMenu().openDatabaseDialogue();
 	}
 
 	public LibrisDatabase openDatabase() {
@@ -300,17 +304,13 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 	@Override
 	public void alert(String msg, Exception e) {
-		String errorString = msg;
+		StringBuilder buff = new StringBuilder(msg);
+		LibrisDatabase.log(Level.WARNING, e.getMessage(), e);
 		String emessage = "";
 		if (null != e) {
-			emessage = e.getMessage();
-			if (null != emessage) {
-				errorString += ": "+emessage;
-			} else {
-				StackTraceElement location = e.getStackTrace()[0];
-				errorString += " at "+location.toString();
-			}
+			emessage = LibrisUiGeneric.formatConciseStackTrace(e, buff);
 		}
+		String errorString = buff.toString();
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		e.printStackTrace(new PrintStream(bos));
 		try {
@@ -342,7 +342,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	public void databaseOpened (LibrisDatabase db) throws DatabaseException {
+	public void databaseOpened(LibrisDatabase db) throws DatabaseException {
 		super.databaseOpened(db);
 		menu.editMenuEnableModify(readOnly);
 		destroyWindow(true);
@@ -666,6 +666,19 @@ public class LibrisGui extends LibrisWindowedUi {
 	void enableNewChild() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public static void makeLabelledControl(JPanel parentPanel, Component theControl, String labelText, boolean vertical) {
+		JPanel controlPanel = new JPanel();
+		if (vertical) {
+			BoxLayout layout = new BoxLayout(controlPanel, BoxLayout.Y_AXIS);
+			controlPanel.setLayout(layout);
+		}
+		JLabel l = new JLabel(labelText);
+		l.setLabelFor(theControl);
+		controlPanel.add(l);
+		controlPanel.add(theControl);
+		parentPanel.add(controlPanel);
 	}
 
 }

@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.field;
 
+import java.net.URL;
 import java.util.HashMap;
 
 import javax.xml.stream.XMLStreamException;
@@ -21,6 +22,11 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public abstract class GenericField implements Field {
+
+	@Override
+	public void addURLValue(URL value) throws FieldDataException {
+		throw new FieldDataException("addURLValue(URL value) not defined for "+getFieldId());
+	}
 
 	@Override
 	public void addValuePair(Integer value, String extraValue)

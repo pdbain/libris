@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
+import javax.xml.namespace.QName;
+
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -44,8 +46,8 @@ public class Schema implements LibrisXMLConstants {
 	private IndexDefs myIndexDefs;
 
 	public void fromXml(ElementReader xmlReader) throws DatabaseException, InputException {
-		ElementManager schemaManager = new ElementManager(xmlReader, 
-				LibrisXMLConstants.XML_SCHEMA_TAG, new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
+		ElementManager schemaManager = new ElementManager(xmlReader, new QName(LibrisXMLConstants.XML_SCHEMA_TAG),
+				new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
 		fromXml(schemaManager);
 	}
 

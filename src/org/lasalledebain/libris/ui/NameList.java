@@ -15,6 +15,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.field.FieldIntValue;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
@@ -29,6 +30,15 @@ public class NameList extends GuiControl {
 	Vector <KeyIntegerTuple> affiliateInfo;
 	private final LibrisWindowedUi windowedUi;
 	final Record currentRecord;
+	public static final KeyIntegerTuple NULL_ID_TUPLE = makeNullTuple();
+
+	private static KeyIntegerTuple makeNullTuple() {
+		try {
+			return new KeyIntegerTuple("<none>", RecordId.getNullId());
+		} catch (InputException e) {
+			throw new InternalError("Unexpected exception", e);
+		}
+	}
 
 	public NameList(LibrisWindowedUi ui, LibrisDatabase db, Record rec, GroupDef gd) throws InputException {
 		grpDef = gd;
@@ -48,7 +58,7 @@ public class NameList extends GuiControl {
 		int affLen = affiliates.length;
 		affiliateInfo = new Vector<KeyIntegerTuple>(affLen);
 		if (0 == affLen) {
-			affiliateInfo.add(new KeyIntegerTuple("<none>", RecordId.getNullId()));
+			affiliateInfo.add(NULL_ID_TUPLE);
 		} else {
 			for (int i = 0; i < affLen; ++i) {
 				int recordNumber = affiliates[i];

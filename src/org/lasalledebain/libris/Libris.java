@@ -59,6 +59,8 @@ public class Libris {
 				LibrisGui ui = new LibrisGui(dbFile, auxDir, readOnly);
 				if (null != dbFile) {
 					ui.openDatabase();
+				} else {
+					ui.chooseDatabase();
 				}
 			} catch (LibrisException e) {
 				cmdlineError("Cannot open Libris: "+e.getMessage());

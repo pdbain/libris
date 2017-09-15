@@ -223,6 +223,32 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	public void repaint() {
 	}
 
+	public static String formatConciseStackTrace(Exception e, StringBuilder buff) {
+		String emessage;
+		emessage = e.getMessage();
+		if (null != emessage) {
+			buff.append(": "); buff.append(emessage);
+		} else {
+			buff.append(" at ");
+			String sep = "";
+			for (StackTraceElement t: e.getStackTrace()) {
+				buff.append(sep);
+				String className = t.getClassName();
+				int lastDot = className.lastIndexOf('.');
+				if (lastDot > 0) {
+					buff.append(className.substring(lastDot + 1, className.length()));
+				} else {
+					buff.append(className);
+				}
+				buff.append(".");
+				buff.append(t.getMethodName());
+				buff.append("() line ");
+				buff.append(t.getLineNumber());
+				sep = "\n";
+			}
+		}
+		return emessage;
+	}
 	public static void setLoggingLevel(Logger myLogger) {
 		String logLevelString = System.getProperty(LIBRIS_LOGGING_LEVEL);
 		if (null != logLevelString) {

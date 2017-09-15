@@ -56,7 +56,7 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 					modificationDate = timeInstance.parse(dbDateString);
 					break;
 				} catch (ParseException e) {
-					db.log(Level.WARNING, "DatabaseAttributes: Invalid date string: "+dbDateString+" for "+fmt);
+					LibrisDatabase.log(Level.WARNING, "DatabaseAttributes: Invalid date string: "+dbDateString+" for "+fmt);
 				}
 			}
 		}

@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.ui.LastFilterSettings;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -39,10 +40,16 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 	private Properties usageProperties;
 
 	private boolean lastRecOkay;
+	private LastFilterSettings lastFiltSettings;
+
+	public LastFilterSettings getLastFilterSettings() {
+		return lastFiltSettings;
+	}
 
 	public LibrisMetadata(LibrisDatabase database) {
 		this.database = database;
 		usageProperties = new Properties();
+		lastFiltSettings = new LastFilterSettings();
 	}
 	
 	public void readMetadata(ElementManager metadataMgr) throws InputException, DatabaseException {
