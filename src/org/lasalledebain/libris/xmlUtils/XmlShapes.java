@@ -2,6 +2,7 @@ package org.lasalledebain.libris.xmlUtils;
 
 import java.util.HashMap;
 
+import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
@@ -37,7 +38,7 @@ public class XmlShapes implements LibrisXMLConstants {
 						{XML_DATABASE_BRANCH_ATTR, XML_DATABASE_BRANCH_MAIN}});
 		makeShape(shapes, XML_ENUMCHOICE_TAG, emptyList, new String[] {XML_ENUMCHOICE_ID_ATTR},
 				new String[][]{{XML_ENUMCHOICE_VALUE_ATTR, ""}});
-		shapes.put(XML_ENUMSET_TAG, makeEnumsetXmlShape());
+		shapes.put(EnumFieldChoices.getXmlTag(), makeEnumsetXmlShape());
 		
 		shapes.put(GroupDefs.getXmlTag(), GroupDefs.getXmlShape());
 		shapes.put(GroupDef.getTag(), GroupDef.getShape());
@@ -68,7 +69,7 @@ public class XmlShapes implements LibrisXMLConstants {
 						{"return", "false"}, {"hspan", "1"}, {"vspan", "1"}, {"control", DEFAULT_GUI_CONTROL}});
 		makeShape(shapes,
 				XML_FIELDDEFS_TAG, 
-				new String[] {XML_ENUMSET_TAG, XML_FIELDDEF_TAG},
+				new String[] {EnumFieldChoices.getXmlTag(), XML_FIELDDEF_TAG},
 				emptyList,
 				emptyListList);
 		shapes.put(XML_INDEXDEFS_TAG, makeIndexDefsXmlShape());
@@ -77,7 +78,7 @@ public class XmlShapes implements LibrisXMLConstants {
 		shapes.put(XML_LAYOUTS_TAG, makeLayoutsXmlShape());
 		shapes.put(XML_LAYOUTUSAGE_TAG, makeLayoutUsageXmlShape());
 		shapes.put(XML_METADATA_TAG, makeMetadataXmlShape());
-		shapes.put(Record.getElementTag(), Record.getShape());
+		shapes.put(Record.getXmlTag(), Record.getShape());
 		shapes.put(GroupMember.getMemberTag(), GroupMember.getMemberShape());
 		shapes.put(GroupMember.getAffiliationTag(), GroupMember.getAffiliationShape());
 		shapes.put(XML_RECORDS_TAG, makeRecordsXmlShape());
@@ -173,7 +174,7 @@ public class XmlShapes implements LibrisXMLConstants {
 	}
 
 	private static ElementShape makeEnumsetXmlShape() {
-		ElementShape s = new ElementShape(XML_ENUMSET_TAG);
+		ElementShape s = new ElementShape(EnumFieldChoices.getXmlTag());
 		s.setRequiredAttributeNames(new String[] {XML_SET_ID_ATTR});
 		s.setSubElementNames(new String[] {XML_ENUMCHOICE_TAG});
 		return s;

@@ -57,8 +57,8 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	private UiField selectedField;
 	protected String uiTitle;
 	protected LibrisDatabase currentDatabase;
-	private File databaseFile;
-	private File auxDirectory;
+	protected File databaseFile;
+	protected File auxDirectory;
 
 	public UiField getSelectedField() {
 		return selectedField;

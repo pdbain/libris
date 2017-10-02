@@ -12,6 +12,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.ui.EmptyField;
@@ -230,6 +231,11 @@ public abstract class GenericField implements Field {
 	public String toString() {
 		return getFieldId()+": "+getValuesAsString();
 	}
+	@Override
+	public void fromXml(ElementManager mgr) throws LibrisException {
+		throw new InternalError("Use staic method "+getClass().getName()+".fromXml()");
+	}
+
 	public static Field fromXml(ElementManager fieldManager, Record rec) throws XmlException, DatabaseException, InputException {
 		HashMap<String, String> attrs = fieldManager.parseOpenTag();
 		String elementContents;
@@ -315,6 +321,15 @@ public abstract class GenericField implements Field {
 			}
 		}
 		return firstAttr;
+	}
+
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
+	}
+
+	public static String getXmlTag() {
+		return LibrisXMLConstants.XML_FIELD_TAG;
 	}
 
 	private FieldType getMyFieldType() {

@@ -13,7 +13,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class EnumFieldChoices implements XmlExportable {
+public class EnumFieldChoices implements XMLElement {
 	ArrayList<String> enumChoices = new ArrayList<String>();
 	ArrayList<String> choicevalues = new ArrayList<String>();
 	HashMap<String, Integer> choiceIds = new HashMap<String, Integer>();
@@ -151,7 +151,7 @@ public class EnumFieldChoices implements XmlExportable {
 
 	@Override
 	public void toXml(ElementWriter xmlWriter) throws XmlException {
-		xmlWriter.writeStartElement(XML_ENUMSET_TAG, getAttributes(), false);
+		xmlWriter.writeStartElement(getXmlTag(), getAttributes(), false);
 		for (int i = 0; i < numChoices; ++i) {
 			final String cId = enumChoices.get(i);
 			final String cValue = choicevalues.get(i);
@@ -162,5 +162,14 @@ public class EnumFieldChoices implements XmlExportable {
 			xmlWriter.writeStartElement(XML_ENUMCHOICE_TAG, choiceAttrs, true);
 		}
 		xmlWriter.writeEndElement();
+	}
+
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
+	}
+
+	public static String getXmlTag() {
+		return "enumset";
 	}
 }

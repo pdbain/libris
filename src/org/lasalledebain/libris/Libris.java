@@ -57,10 +57,11 @@ public class Libris {
 					}
 				}
 				LibrisGui ui = new LibrisGui(dbFile, auxDir, readOnly);
+				if (true)
 				if (null != dbFile) {
 					ui.openDatabase();
 				} else {
-					ui.chooseDatabase();
+					ui.sendChooseDatabase();
 				}
 			} catch (LibrisException e) {
 				cmdlineError("Cannot open Libris: "+e.getMessage());

@@ -8,11 +8,11 @@ import java.util.logging.Level;
 import javax.swing.JPanel;
 
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.XmlExportable;
-import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -22,7 +22,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class Layout implements XmlExportable, LibrisXMLConstants {
+public abstract class Layout implements XMLElement {
 	protected int height;
 	protected int width;
 	Schema mySchema = null;
@@ -32,13 +32,13 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 	private String id;
 	private String title = null;
 	final static ArrayList<UiField> emptyUiList = new ArrayList<>();
-	
+
 	public Layout(Schema schem) throws DatabaseException {
 		mySchema = schem;
 		bodyFieldList = new ArrayList<FieldPosition>();
 		layoutUsers = new Vector<String>(1);
 	}
-	
+
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -68,7 +68,7 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 	void readLayoutField(ElementManager fieldMgr, FieldPositionParameter fParams) throws InputException, DatabaseException {
 
 		HashMap<String, String> values = fieldMgr.parseOpenTag();
-		
+
 		fParams.setParams(values);
 		fParams.setFieldNum(mySchema.getFieldNum(fParams.getId()));
 		addBodyField(fParams);
@@ -94,8 +94,8 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 	}
 
 	abstract ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
-	throws DatabaseException, LibrisException;
-	
+			throws DatabaseException, LibrisException;
+
 	public void setIdAndTitle(String myTitle, String myId) throws DatabaseException {
 		if (null == myId) {
 			throw new DatabaseException("missing id attribute in layout element");
@@ -119,9 +119,9 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 			return mySchema.getFieldTemplate(id).getFieldTitle();
 		}
 	}
-	
+
 	public void getControlType(String id) {
-		
+
 	}
 
 	FieldPosition[] getFields() {
@@ -129,7 +129,7 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 		bodyFieldList.toArray(positions);
 		return positions;
 	}
-	
+
 	public abstract String getLayoutType();
 
 	public FieldType getFieldType(String id) {
@@ -140,9 +140,9 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 		return layoutUsers;
 	}
 
-	static Layout fromXml(Schema schem, ElementManager layoutMgr)
-	throws InputException, DatabaseException {
-		HashMap<String, String> values = layoutMgr.parseOpenTag();
+	static Layout layoutFactory(Schema schem, ElementManager mgr)
+			throws InputException, DatabaseException {
+		HashMap<String, String> values = mgr.parseOpenTag();
 		String layoutType = values.get(XML_LAYOUT_TYPE_ATTR);
 		Layout l;
 		switch (layoutType) {
@@ -161,33 +161,52 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 		default:
 			throw new InputException("layout type "+layoutType+" not supported");
 		}
-		l.setHeight(values.get("height"));
-		l.setWidth(values.get("width"));
-		FieldPositionParameter fParams = new FieldPositionParameter();
-		l.setIdAndTitle(values.get("title"), values.get("id"));
-		while (layoutMgr.hasNext()) {
-			ElementManager subElementMgr = layoutMgr.nextElement();
-			if (subElementMgr.getElementTag().equals(XML_LAYOUTFIELD_TAG)) {
-				l.readLayoutField(subElementMgr, fParams);
-			} else {
-				l.parseUsage(subElementMgr);
-			}
-			subElementMgr.parseClosingTag();
-		}
-		l.validate();
+		l.initialize(mgr, values);
 		return l;
 	}
 
+	@Override
+	public void fromXml(ElementManager mgr) throws LibrisException {
+		HashMap<String, String> values = mgr.parseOpenTag();
+		initialize(mgr, values);
+	}
+
+	protected void initialize(ElementManager layoutMgr, HashMap<String, String> values)
+			throws DatabaseException, XmlException, InputException {
+		setHeight(values.get("height"));
+		setWidth(values.get("width"));
+		FieldPositionParameter fParams = new FieldPositionParameter();
+		setIdAndTitle(values.get("title"), values.get("id"));
+		while (layoutMgr.hasNext()) {
+			ElementManager subElementMgr = layoutMgr.nextElement();
+			if (subElementMgr.getElementTag().equals(XML_LAYOUTFIELD_TAG)) {
+				readLayoutField(subElementMgr, fParams);
+			} else {
+				parseUsage(subElementMgr);
+			}
+			subElementMgr.parseClosingTag();
+		}
+		validate();
+	}
+
+	public String getXmlTag() {
+		return XML_LAYOUT_TAG;
+	}
+
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
+	}
 
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
-		output.writeStartElement(XML_LAYOUT_TAG, getAttributes(), false);
+		output.writeStartElement(getElementTag(), getAttributes(), false);
 		for (String user: layoutUsers) {
 			LibrisAttributes  attr = new LibrisAttributes();
 			attr.setAttribute(XML_LAYOUT_USEDBY_ATTR, user);
 			output.writeStartElement(XML_LAYOUTUSAGE_TAG, attr, true);
 		}
-		
+
 		for (FieldPosition f: bodyFieldList) {
 			LibrisAttributes attr = f.getAttributes();
 			output.writeStartElement(XML_LAYOUTFIELD_TAG, attr, true);
@@ -234,17 +253,17 @@ public abstract class Layout implements XmlExportable, LibrisXMLConstants {
 
 	protected Field getField(Record rec, int fieldNum)
 			throws LibrisException {
-				Field fld = null;
-				try {
-					fld = rec.getField(fieldNum);
-					if (null == fld) {
-						fld = rec.getDefaultField(fieldNum);
-					}
-				} catch (InputException e) {
-					throw new DatabaseException("Error in layout \""+getId()+"\"", e);			
-				}
-				return fld;
+		Field fld = null;
+		try {
+			fld = rec.getField(fieldNum);
+			if (null == fld) {
+				fld = rec.getDefaultField(fieldNum);
 			}
+		} catch (InputException e) {
+			throw new DatabaseException("Error in layout \""+getId()+"\"", e);			
+		}
+		return fld;
+	}
 
 	public int getFieldNum() {
 		return 0;

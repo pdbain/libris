@@ -51,7 +51,6 @@ public class LibrisGui extends LibrisWindowedUi {
 	private static final String CONTENT_PANE_HEIGHT = "CONTENT_PANE_HEIGHT";
 	private static final String CONTENT_PANE_WIDTH = "CONTENT_PANE_WIDTH";
 	private static final String CONTENT_PANE_DIVIDER = "CONTENT_PANE_DIVIDER_LOCATION";
-	private static final long serialVersionUID = -6063661235767540726L;
 	LibrisMenu menu;
 	private JMenuBar menuBar;
 	protected BrowserWindow resultsPanel;
@@ -71,6 +70,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	private void initializeGui() throws DatabaseException {
+		System.err.println("initializeGui "+Thread.currentThread().getName());  // TODO DEBUG
 		com.apple.eawt.Application.getApplication().setQuitHandler(new QuitHandler() {
 			@Override
 			public void handleQuitRequestWith(QuitEvent quitEvt, QuitResponse quitResp) {
@@ -679,6 +679,10 @@ public class LibrisGui extends LibrisWindowedUi {
 		controlPanel.add(l);
 		controlPanel.add(theControl);
 		parentPanel.add(controlPanel);
+	}
+
+	public void sendChooseDatabase() {
+		menu.sendChooseDatabase();
 	}
 
 }

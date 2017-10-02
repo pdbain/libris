@@ -3,23 +3,40 @@ package org.lasalledebain.libris.index;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XmlExportable;
+import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.ui.Layout;
+import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class IndexDef implements LibrisXMLConstants, XmlExportable {
+public class IndexDef implements XmlExportable {
 
 	@Override
 	public LibrisAttributes getAttributes() {
 		return LibrisAttributes.getLibrisEmptyAttributes();
 	}
 
+	public static String getXmltag() {
+		return XML_INDEXDEFS_TAG;
+	}
+	@Override
+	public String getElementTag() {
+		return getXmltag();
+	}
+
 	@Override
 	public void toXml(ElementWriter xmlWriter) throws LibrisException {
 		xmlWriter.writeStartElement(XML_INDEXDEFS_TAG);
 		xmlWriter.writeEndElement();
+	}
+	public void fromXml(ElementManager mgr) throws InputException, DatabaseException {
+		mgr.parseOpenTag();
+		mgr.parseClosingTag();
 	}
 	@Override
 	public boolean equals(Object comparand) {

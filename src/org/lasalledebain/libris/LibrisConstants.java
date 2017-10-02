@@ -36,6 +36,7 @@ public interface LibrisConstants {
 	public static final byte RECORD_HAS_NAME = 1 << 2;
 	
 	String DATABASE_NAME = "DATABASE";
+	int NULL_GROUP = -1;
 	public static final String SCHEMA_NAME = "SCHEMA";
 	public static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
 	public static final String POSITION_FILENAME = "positions";

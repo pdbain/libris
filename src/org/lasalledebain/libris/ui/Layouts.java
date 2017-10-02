@@ -23,11 +23,15 @@ public class Layouts implements LibrisXMLConstants, XmlExportable {
 	HashMap<String, Layout> layouts;
 	ArrayList<String> layoutIds;
 	HashMap <String,Layout> usage = new HashMap<String, Layout>();
-	private LibrisDatabase db;
+	private Schema schem;
 	
 	protected static HashMap<String, Dimension> defaultDimensionStrings = initializeDefaultDimensions();
 	public Layouts(LibrisDatabase db) {
-		this.db = db;
+		this(db.getSchema());
+	}
+
+	public Layouts(Schema mySchema) {
+		schem = mySchema;
 		layouts = new HashMap<String, Layout>();
 		layoutIds = new ArrayList<String>();
 	}
@@ -39,11 +43,11 @@ public class Layouts implements LibrisXMLConstants, XmlExportable {
 		return dims;
 	}
 
-	public void fromXml(Schema schem, ElementManager mgr) throws InputException, DatabaseException {
+	public void fromXml(ElementManager mgr) throws InputException, DatabaseException {
 		mgr.parseOpenTag();
 		while (mgr.hasNext()) {
 			ElementManager layoutMgr = mgr.nextElement();
-			Layout l = Layout.fromXml(schem, layoutMgr);
+			Layout l = Layout.layoutFactory(schem, layoutMgr);
 			String id = l.getId();
 			layouts.put(id, l);
 			layoutIds.add(id);
@@ -103,8 +107,7 @@ public class Layouts implements LibrisXMLConstants, XmlExportable {
 		for (String id: getLayoutIds()) {
 			getLayout(id).toXml(output);
 		}
-		output.writeEndElement();
-		
+		output.writeEndElement();	
 	}
 
 	@Override
@@ -119,15 +122,14 @@ public class Layouts implements LibrisXMLConstants, XmlExportable {
 			return otherLayouts.layouts.equals(layouts);
 		} catch (ClassCastException e) {
 			final String msg = "type mismatch in Layouts.equals()";
-			if (null != db) {
-				db.log(Level.WARNING, msg, e);
-			} else {
-				LibrisDatabase.librisLogger.log(Level.WARNING, msg, e);
-			}
+			LibrisDatabase.log(Level.WARNING, msg, e);
 			return false;
 		}
 	}
 
+	public static String getXmlTag() {
+		return XML_LAYOUTS_TAG;
+	}
 	public int getFieldNum() {
 		return 0;
 	}
@@ -138,5 +140,10 @@ public class Layouts implements LibrisXMLConstants, XmlExportable {
 
 	public String getTitle() {
 		return null;
+	}
+
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
 	}
 }

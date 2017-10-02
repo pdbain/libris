@@ -18,7 +18,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
+public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 
 	private LibrisDatabase database;
 	private Layouts myLayouts;
@@ -52,7 +52,7 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 		lastFiltSettings = new LastFilterSettings();
 	}
 	
-	public void readMetadata(ElementManager metadataMgr) throws InputException, DatabaseException {
+	public void fromXml(ElementManager metadataMgr) throws InputException, DatabaseException {
 		ElementManager schemaMgr;
 		
 		metadataMgr.parseOpenTag();
@@ -62,7 +62,7 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 		database.setSchema(schem);
 		myLayouts = new Layouts(database);
 		ElementManager layoutsMgr = metadataMgr.nextElement();
-		myLayouts.fromXml(schem, layoutsMgr);
+		myLayouts.fromXml(layoutsMgr);
 		metadataMgr.parseClosingTag();
 	}
 	public Layouts getLayouts() {
@@ -88,12 +88,10 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 		if (null != recCount) try {
 			savedRecords = Integer.parseInt(recCount);
 		} catch (NumberFormatException exc) {
-			database.log(Level.WARNING, "Error reading "+LibrisConstants.PROPERTY_RECORD_COUNT+" value = "+recCount, exc);
+			LibrisDatabase.log(Level.WARNING, "Error reading "+LibrisConstants.PROPERTY_RECORD_COUNT+" value = "+recCount, exc);
 			savedRecords = 0;
 		}
-		int branchNum = 0;
 		String branchString = usageProperties.getProperty(LibrisConstants.PROPERTY_DATABASE_BRANCH);
-		branchNum = DatabaseAttributes.parseBranchString(branchString);
 		if ((null != recordIdString) && !recordIdString.isEmpty()) {
 			try {
 				lastRecordId = RecordId.toId(recordIdString);
@@ -152,6 +150,16 @@ public class LibrisMetadata implements LibrisXMLConstants, XmlExportable {
 	public void adjustModifiedRecords(int numAdded) {
 		this.modifiedRecords += numAdded;
 	}
+
+public static String getXmlTag() {
+	return XML_METADATA_TAG;
+}
+
+
+	@Override
+public String getElementTag() {
+	return getElementTag();
+}
 
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {

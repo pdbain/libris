@@ -99,7 +99,7 @@ public class Schema implements LibrisXMLConstants {
 		while (fieldDefsManager.hasNext()) {
 			String nextId;
 			nextId = fieldDefsManager.getNextId();
-			if (nextId.equals(LibrisXMLConstants.XML_ENUMSET_TAG)) {
+			if (nextId.equals(EnumFieldChoices.getXmlTag())) {
 				ElementManager enumSetManager = fieldDefsManager.nextElement();
 				EnumFieldChoices c = EnumFieldChoices.fieldChoicesFactory(enumSetManager);
 				String cId = c.getId();
@@ -116,8 +116,8 @@ public class Schema implements LibrisXMLConstants {
 			nextId = fieldDefsManager.getNextId();
 			if (nextId.equals(LibrisXMLConstants.XML_FIELDDEF_TAG)) {
 				ElementManager fieldDefManager = fieldDefsManager.nextElement();
-				FieldTemplate f = new FieldTemplate();
-				f.fromXml(this, fieldDefManager);
+				FieldTemplate f = new FieldTemplate(this);
+				f.fromXml(fieldDefManager);
 				String fId = f.getFieldId();
 				if (fieldNumById.containsKey(fId)) {
 					throw new XmlException(fieldDefManager, "duplicate field "+fId);

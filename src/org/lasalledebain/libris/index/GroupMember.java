@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.RecordId;
+import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.XmlExportable;
 import org.lasalledebain.libris.XmlImportable;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -27,7 +28,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
  * and 0 or more affiliates, with whom it has no parent-child relationship.
  *
  */
-public class GroupMember extends GenericField implements LibrisXMLConstants, XmlImportable, XmlExportable {
+public class GroupMember extends GenericField implements XMLElement {
 
 	private static final int NULL_ID = RecordId.getNullId();
 	private static final String memberTag = XML_MEMBER_TAG;

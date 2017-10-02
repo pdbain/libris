@@ -7,6 +7,7 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XmlExportable;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -28,6 +29,20 @@ public class IndexDefs implements XmlExportable {
 		while (mgr.hasNext()) {
 			ElementManager indexMgr = mgr.nextElement();
 		}
+		mgr.parseClosingTag();
+	}
+
+	public static String getXmlTag() {
+		return XML_INDEXDEFS_TAG;
+	}
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
+	}
+
+	@Override
+	public void fromXml(ElementManager mgr) throws LibrisException {
+		mgr.parseOpenTag();
 		mgr.parseClosingTag();
 	}
 

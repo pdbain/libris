@@ -3,6 +3,7 @@ package org.lasalledebain.libris.ui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,6 +37,8 @@ import org.lasalledebain.libris.exception.LibrisException;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class LibrisMenu {
+	private static final String OPEN_DATABASE = "Open database...";
+
 	public class DuplicateRecordListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent arg0) {
@@ -50,10 +53,7 @@ public class LibrisMenu {
 
 	public class PasteListener implements ActionListener {
 
-		private boolean pasteToField;
-
 		public PasteListener(boolean pasteToField) {
-			this.pasteToField = pasteToField;
 		}
 
 		@Override
@@ -121,7 +121,7 @@ public class LibrisMenu {
 		JMenu fileMenu = new JMenu("File");
 		fileMenuModifyCommands = new HashSet<JMenuItem>();
 		fileMenuAccessCommands = new HashSet<JMenuItem>();
-		JMenuItem openDatabase = new JMenuItem("Open database...");
+		openDatabase = new JMenuItem(OPEN_DATABASE);
 		openDatabase.addActionListener(new OpenDatabaseListener());
 		openDatabase.setAccelerator(getAcceleratorKeystroke('O'));
 		fileMenu.add(openDatabase);
@@ -421,6 +421,7 @@ public class LibrisMenu {
 	}
 	
 	public boolean openDatabaseDialogue() {
+		// TODO keep a list of recent databases
 		boolean result = false;
 		JFileChooser chooser;
 		File dbLocation = null;
@@ -438,7 +439,6 @@ public class LibrisMenu {
 		JCheckBox reIndexCheckbox = new JCheckBox("Build indexes", false);
 		buttonPanel.add(reIndexCheckbox);
 		chooser.setAccessory(buttonPanel);
-		chooser.setSelectedFile(dbLocation);
 		FileNameExtensionFilter librisFileFilter = new FileNameExtensionFilter(
 				"Libris files",
 				LibrisConstants.FILENAME_XML_FILES_SUFFIX, "xml");
@@ -643,6 +643,7 @@ public class LibrisMenu {
 
 	private static final String DATABASE_FILE = "DATABASE_FILE";
 	private EditRecordListenerImpl editRecordListener;
+	private JMenuItem openDatabase;
 	public void enableFieldValueOperations(boolean selected) {
 		for (JMenuItem m: editMenuFieldValueCommands) {
 			m.setEnabled(selected);
@@ -651,6 +652,15 @@ public class LibrisMenu {
 
 	public void setRecordDuplicateRecordEnabled(boolean enabled) {
 		duplicateRecord.setEnabled(enabled);
+	}
+
+	public void sendChooseDatabase() {
+		for (ComponentListener a: openDatabase.getComponentListeners()) {
+			ActionEvent theEvent = new ActionEvent(a, ActionEvent.ACTION_PERFORMED, OPEN_DATABASE);
+			java.awt.Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(
+					theEvent);
+		
+		}
 	}
 
 }

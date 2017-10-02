@@ -11,10 +11,21 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
+import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 class ReadOnlyField implements Field {
+	@Override
+	public String getElementTag() {
+		throw new InternalError("Cannot call toXml on "+getClass().getName());
+	}
+
+	@Override
+	public void fromXml(ElementManager mgr) throws LibrisException {
+		throw new InternalError("Cannot call toXml on "+getClass().getName());
+	}
+
 	@Override
 	public void addURLValue(URL value) throws FieldDataException {
 		throw new FieldDataException("field is read-only");

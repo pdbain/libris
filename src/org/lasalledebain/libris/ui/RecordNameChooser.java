@@ -46,12 +46,10 @@ class RecordNameChooser extends DefaultComboBoxModel {
 				|| (lastIndex == 0) && Character.isJavaIdentifierStart(prefixChar)) {
 			currentPrefix.append(prefixChar);
 		}
-		// TODO expand the list if characters deleted, add more if the list shrinks
 		String prefix = currentPrefix.toString();
 		int currentSize = getSize();
 		int currentIndex = 0;
 		while (currentIndex < currentSize) {
-			// TODO 1 class cast exception during typing
 			KeyIntegerTuple element = (KeyIntegerTuple) getElementAt(currentIndex);
 			String e = element.getKey();
 			if (!e.startsWith(prefix)) {

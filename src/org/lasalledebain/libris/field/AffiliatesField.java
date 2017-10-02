@@ -239,18 +239,6 @@ public class AffiliatesField extends GenericField implements Field, Iterable<Fie
 	}
 
 	@Override
-	public LibrisAttributes getAttributes() throws XmlException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void toXml(ElementWriter output) throws LibrisException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public Iterator<FieldValue> iterator() {
 		return new Iterator<FieldValue>() {
 

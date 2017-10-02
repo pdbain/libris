@@ -10,7 +10,6 @@ public interface LibrisXMLConstants {
 	public static final String XML_FIELD_TAG = "field";
 	public static final String XML_FIELD_ID_ATTR = "id";
 	public static final String XML_SET_ID_ATTR = "id";
-	public static final String XML_ENUMSET_TAG = "enumset";
 	public static final String XML_ENUMCHOICE_ID_ATTR = "id";
 	public static final String XML_ENUMCHOICE_VALUE_ATTR = "value";
 	public static final String XML_ENUMCHOICE_TAG = "enumchoice";

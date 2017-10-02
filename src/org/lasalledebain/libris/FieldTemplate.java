@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.field.AffiliatesField;
 import org.lasalledebain.libris.field.BooleanField;
@@ -13,7 +14,6 @@ import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.field.IntegerField;
 import org.lasalledebain.libris.field.PairField;
 import org.lasalledebain.libris.field.StringField;
-import org.lasalledebain.libris.index.Group;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -25,7 +25,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
  * record instances.
  */
 
-public class FieldTemplate implements XmlExportable {
+public class FieldTemplate implements XMLElement {
 	
 	public int getInheritanceGroup() {
 		return inheritanceGroup;
@@ -44,20 +44,22 @@ public class FieldTemplate implements XmlExportable {
 	private boolean singleValue;
 	private boolean restricted;
 	private boolean required;
-	private int inheritanceGroup = Group.NULL_GROUP;
+	private int inheritanceGroup = LibrisConstants.NULL_GROUP;
+	protected Schema schem;
 	
-	public FieldTemplate () {
+	public FieldTemplate (Schema s) {
+		schem = s;
 		fieldAttributes = new LibrisAttributes();
 	}
 
-	public FieldTemplate(String id, String title, FieldType ft) {
-		this();
+	public FieldTemplate(Schema s, String id, String title, FieldType ft) {
+		this(s);
 		initialize(id, title, ft);
 		fieldAttributes.setAttribute(XML_FIELDDEF_ID_ATTR, id);
 	}
 
-	public FieldTemplate(FieldType ft) {
-		this();
+	public FieldTemplate(Schema s, FieldType ft) {
+		this(s);
 		ftype = ft;
 	}
 
@@ -69,7 +71,7 @@ public class FieldTemplate implements XmlExportable {
 		myGroup = null;
 	}
 	
-	public void fromXml(Schema s, ElementManager fieldDefManager) throws InputException {
+	public void fromXml(ElementManager fieldDefManager) throws InputException {
 			HashMap<String, String> attributes = fieldDefManager.parseOpenTag();
 			fieldAttributes = fieldDefManager.getElementAttributes();
 	
@@ -79,9 +81,9 @@ public class FieldTemplate implements XmlExportable {
 			valueSeparator = attributes.get(XML_VALUESEPARATOR_ATTR);
 			valueSeparator = attributes.get(XML_VALUESEPARATOR_ATTR);
 			String groupName = attributes.get(XML_FIELDDEF_INHERIT_ATTR);
-			inheritanceGroup = Group.NULL_GROUP;
+			inheritanceGroup = LibrisConstants.NULL_GROUP;
 			if (null != groupName) {
-				GroupDef grp = s.getGroupDef(groupName);
+				GroupDef grp = schem.getGroupDef(groupName);
 				if (null != grp) {
 					inheritanceGroup = grp.getGroupNum();
 				}
@@ -96,7 +98,7 @@ public class FieldTemplate implements XmlExportable {
 			initialize(id, title, ft);
 			if (ft.equals(FieldType.T_FIELD_ENUM)) {
 				String tempEnum;
-				EnumFieldChoices c = s.getEnumSet(tempEnum = attributes.get(LibrisXMLConstants.XML_FIELDDEF_ENUMSET_TAG));
+				EnumFieldChoices c = schem.getEnumSet(tempEnum = attributes.get(LibrisXMLConstants.XML_FIELDDEF_ENUMSET_TAG));
 				if (null == c) {
 					throw new XmlException(fieldDefManager, tempEnum+" is not a recognized enumset");
 				}
@@ -113,7 +115,7 @@ public class FieldTemplate implements XmlExportable {
 
 	@Override
 	public void toXml(ElementWriter xmlWriter) throws XmlException {
-		xmlWriter.writeStartElement(XML_FIELDDEF_TAG, getAttributes(), true);
+		xmlWriter.writeStartElement(getElementTag(), getAttributes(), true);
 	}
 
 	@Override
@@ -316,6 +318,15 @@ public class FieldTemplate implements XmlExportable {
 			return new AffiliatesField(template);
 		}
 	
+	}
+
+	public static String getXmlTag() {
+		return XML_FIELDDEF_TAG;
+	}
+	
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
 	}
 }
 

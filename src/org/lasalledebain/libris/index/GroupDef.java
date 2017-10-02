@@ -1,6 +1,8 @@
 package org.lasalledebain.libris.index;
 
 import org.lasalledebain.libris.FieldTemplate;
+import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.XmlExportable;
 import org.lasalledebain.libris.XmlImportable;
 import org.lasalledebain.libris.Field.FieldType;
@@ -12,7 +14,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
-public class GroupDef extends FieldTemplate implements XmlImportable, XmlExportable {
+public class GroupDef extends FieldTemplate implements XMLElement {
 
 	/*	<!ELEMENT groupdef EMPTY >
 
@@ -37,11 +39,12 @@ public class GroupDef extends FieldTemplate implements XmlImportable, XmlExporta
 	private GroupStructure structureType = GroupStructure.STRUCTURE_HIERARCHICAL;
 	private int groupNum;
 	
-	public GroupDef(String id, String title, int num) {
-		super(id, title, FieldType.T_FIELD_AFFILIATES);
+	public GroupDef(Schema s, String id, String title, int num) {
+		super(s, id, title, FieldType.T_FIELD_AFFILIATES);
 		groupNum = num;
 	}
-	public GroupDef(int num) {
+	public GroupDef(Schema s, int num) {
+		super(s);
 		ftype = FieldType.T_FIELD_AFFILIATES;
 		factory = fieldClasses.get(ftype);
 		groupNum = num;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
+import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.XmlExportable;
 import org.lasalledebain.libris.XmlImportable;
 import org.lasalledebain.libris.exception.InputException;
@@ -15,7 +16,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
-public class GroupDefs implements XmlExportable, XmlImportable, LibrisXMLConstants, Iterable<GroupDef> {
+public class GroupDefs implements XMLElement, Iterable<GroupDef> {
 
 	LinkedHashMap<String, GroupDef> groupMap;
 	ArrayList<String> groupIds;
@@ -52,7 +53,7 @@ public class GroupDefs implements XmlExportable, XmlImportable, LibrisXMLConstan
 		mgr.parseOpenTag();
 		int groupNum = 0;
 		while (mgr.hasNext()) {
-			GroupDef newGroup = new GroupDef(groupNum);
+			GroupDef newGroup = new GroupDef(null, groupNum);
 			ElementManager groupMgr = mgr.nextElement();
 			newGroup.fromXml(groupMgr);
 			String groupName = newGroup.getFieldId();
@@ -81,7 +82,7 @@ public class GroupDefs implements XmlExportable, XmlImportable, LibrisXMLConstan
 
 	@Override
 	public void toXml(ElementWriter output) throws XmlException {
-		output.writeStartElement(XML_GROUPDEFS_TAG);
+		output.writeStartElement(getXmlTag());
 		for (GroupDef g: groupMap.values()) {
 			g.toXml(output);
 		}
@@ -127,5 +128,10 @@ public class GroupDefs implements XmlExportable, XmlImportable, LibrisXMLConstan
 
 	public int getFieldNum() {
 		return 0;
+	}
+
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
 	}
 }

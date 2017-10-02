@@ -15,7 +15,7 @@
 <!ATTLIST libris  %databaseAttributes; >
 
 <!ELEMENT metadata (instance?, schema, layouts)>
-<!ELEMENT instance>
+<!ELEMENT instance EMPTY>
 <!ATTLIST instance 
 	selfdbid NMTOKEN  #REQUIRED
 	parentdbid NMTOKEN  #IMPLIED
@@ -85,7 +85,7 @@ Define the indexes in the database
 <!ATTLIST layout
 	id ID #REQUIRED
 	title CDATA #IMPLIED
-	type (table | list | form | text | XML) "table"
+	type (table | list | form | paragraph | XML) "table"
 		width NMTOKEN #IMPLIED
 	height NMTOKEN #IMPLIED
 >

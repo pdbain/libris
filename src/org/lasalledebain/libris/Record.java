@@ -12,9 +12,9 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
 
 
-public abstract class Record implements Comparable<Record>, XmlExportable, XmlImportable {
+public abstract class Record implements Comparable<Record>, XMLElement {
 	static final String elementTag = XML_RECORD_TAG;
-	public static String getElementTag() {
+	public static String getXmlTag() {
 		return elementTag;
 	}
 	public static ElementShape getShape() {

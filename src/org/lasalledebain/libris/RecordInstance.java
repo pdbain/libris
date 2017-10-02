@@ -13,7 +13,6 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
-import org.lasalledebain.libris.index.Group;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.indexes.RecordKeywords;
@@ -194,7 +193,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 			fld = template.getDefaultField(fieldNum);					
 		} else {
 			int parentGroup = template.getInheritanceGroup(fieldNum);
-			if (Group.NULL_GROUP == parentGroup) {
+			if (LibrisConstants.NULL_GROUP == parentGroup) {
 				fld = template.getDefaultField(fieldNum);
 			} else {
 				int parentRecordId = getParent(parentGroup);
@@ -669,5 +668,10 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 			ensureAffiliation(groupNum);
 		}
 		affiliations[groupNum] = newMember;
+	}
+
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
 	}
 }

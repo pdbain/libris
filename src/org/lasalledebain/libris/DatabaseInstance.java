@@ -4,14 +4,13 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
-import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
-public class DatabaseInstance implements XmlImportable, XmlExportable {
+public class DatabaseInstance extends LibrisElement {
 	private String selfDatabaseId;
 	private String parentDatabaseId;
-	private String startingRecordId;
+	private int startingRecordId;
 	
 	public static String getXmlTag() {
 		return XML_GROUPDEFS_TAG;
@@ -23,20 +22,29 @@ public class DatabaseInstance implements XmlImportable, XmlExportable {
 		LibrisAttributes attrs = mgr.getElementAttributes();
 		selfDatabaseId = attrs.get(XML_INSTANCE_SELFID_ATTR);
 		parentDatabaseId = attrs.get(XML_INSTANCE_PARENTID_ATTR);
-		startingRecordId = attrs.get(XML_INSTANCE_STARTRECID_ATTR);
+		if (null == parentDatabaseId) {
+			parentDatabaseId = "";
+		}
+		String startingRecordIdString = attrs.get(XML_INSTANCE_STARTRECID_ATTR);
+		if (null == startingRecordIdString) {
+			startingRecordId = LibrisConstants.NULL_RECORD_ID;
+		} else {
+			startingRecordId = Integer.parseInt(startingRecordIdString);
+		}
+
 		mgr.parseClosingTag();
 	}
 
-	@Override
-	public void toXml(ElementWriter output) throws LibrisException {
-		// TODO Auto-generated method stub
-		
-	}
+	// TODO recordInstance: make records < startingRecordId read-only
 
 	@Override
 	public LibrisAttributes getAttributes() throws XmlException {
-		// TODO Auto-generated method stub
-		return null;
+		LibrisAttributes attrs = new LibrisAttributes(
+				new String[][] {{XML_INSTANCE_SELFID_ATTR, selfDatabaseId},
+					{XML_INSTANCE_PARENTID_ATTR, parentDatabaseId},
+					{XML_INSTANCE_STARTRECID_ATTR, Integer.toString(startingRecordId)}}
+				);
+		return attrs;
 	}
 
 	static public ElementShape getXmlShape() {
@@ -54,8 +62,13 @@ public class DatabaseInstance implements XmlImportable, XmlExportable {
 		return parentDatabaseId;
 	}
 
-	public String getStartingRecordId() {
+	public int getStartingRecordId() {
 		return startingRecordId;
+	}
+
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
 	}
 
 }
