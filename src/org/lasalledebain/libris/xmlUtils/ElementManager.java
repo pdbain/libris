@@ -10,6 +10,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -164,8 +165,7 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 					atEndOfElement = true;
 					return false;
 				} else {
-					lastException = new DatabaseException("Illegal closing tag: "+e.getName());
-					return false;
+					throw new DatabaseError("Illegal closing tag: "+e.getName());
 				}
 			} else if (nextEvt.isStartElement()) {
 				StartElement startElem = nextEvt.asStartElement();
@@ -173,15 +173,13 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 					nextId = startElem.getName().toString().intern();
 					return true;
 				} else {
-					lastException = new DatabaseException("Illegal nested element tag: "+startElem.getName());
-					return false;
+					throw new DatabaseError("Illegal nested element tag: "+startElem.getName());
 				}
 			} else {
 				return true;
 			}
 		} catch (XMLStreamException e) {
-			lastException = new DatabaseException(this, e);
-			return false;
+			throw new DatabaseError("Error parsing XML", new DatabaseException(this, e));
 		}
 	}
 

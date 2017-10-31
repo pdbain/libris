@@ -51,9 +51,10 @@ public class DatabaseExporter {
 			switch (fmt) {
 			case EXPORT_XML:
 				FileOutputStream exportStream;
+				boolean addInstanceInfo = false;
 					try {
 						exportStream = new FileOutputStream(exportFile);
-						db.exportDatabaseXml(exportStream, includeSchema, includeRecords);
+						db.exportDatabaseXml(exportStream, includeSchema, includeRecords, addInstanceInfo);
 					} catch (FileNotFoundException e) {
 						db.alert("error exporting database to "+exportFile.getPath(), e);
 					}

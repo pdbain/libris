@@ -9,6 +9,7 @@ import java.io.RandomAccessFile;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 
@@ -229,7 +230,7 @@ public class RecordHeader implements Iterable<RecordHeader>{
 					}
 				}
 			} catch (DatabaseException e) {
-				LibrisDatabase.setLastException(e);
+				throw new DatabaseError("Error in record header", e);
 			}
 			cursor = result;
 			return result;
@@ -240,7 +241,7 @@ public class RecordHeader implements Iterable<RecordHeader>{
 			try {
 				root.remove(cursor);
 			} catch (Exception e) {
-				LibrisDatabase.setLastException(e);
+				throw new DatabaseError("Error in record header", e);
 			}
 		}
 	}

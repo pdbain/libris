@@ -41,10 +41,6 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 	}
 
 	@Override
-	public void setEditable(boolean edible) {
-	}
-
-	@Override
 	public void displayRecord(int recordId) throws LibrisException {
 		alert("displayRecord not implemented");
 	}
@@ -79,7 +75,7 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 		try {
 			String response = cmdlineInput.readLine();
 			do {
-				if (null == response) {
+				if (null == response) { // TODO fix CmdlineUi.confirmImpl
 					result = JOptionPane.CLOSED_OPTION;
 					break;
 				} else if (response.length() > 0) {
@@ -131,6 +127,10 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 	@Override
 	public void setRecordName(NamedRecordList namedRecs) throws InputException {
 		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
+	}
+
+	public boolean isReadOnly() {
+		return false;
 	}
 
 }

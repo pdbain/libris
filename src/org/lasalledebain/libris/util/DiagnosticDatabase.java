@@ -16,7 +16,7 @@ public class DiagnosticDatabase extends LibrisDatabase {
 		getFileMgr().createAuxFiles(true);
 		HashMap<String, String> attrs = new HashMap<String, String>();
 		attrs.put(XML_DATABASE_NAME_ATTR, "unknown");
-		attrs.put(XML_SCHEMA_NAME_ATTR, "unknown");
+		attrs.put(XML_DATABASE_SCHEMA_NAME_ATTR, "unknown");
 		attrs.put(XML_SCHEMA_VERSION_ATTR, "unknown");
 		metadata = new LibrisMetadata(this);
 		metadata.setLastRecordId(1);

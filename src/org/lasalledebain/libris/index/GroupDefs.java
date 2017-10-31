@@ -5,15 +5,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import org.lasalledebain.libris.XMLElement;
-import org.lasalledebain.libris.XmlExportable;
-import org.lasalledebain.libris.XmlImportable;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
 public class GroupDefs implements XMLElement, Iterable<GroupDef> {

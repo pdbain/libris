@@ -31,11 +31,12 @@ public class XmlShapes implements LibrisXMLConstants {
 		HashMap<String, ElementShape> shapes = new HashMap<String, ElementShape>();
 
 		makeShape(shapes, XML_LIBRIS_TAG, new String[] {XML_METADATA_TAG, XML_RECORDS_TAG }, 
-				new String[] { 
-				XML_SCHEMA_NAME_ATTR, XML_SCHEMA_VERSION_ATTR},
+				new String[] {XML_DATABASE_SCHEMA_NAME_ATTR, XML_SCHEMA_VERSION_ATTR},
 				new String[][] {{XML_DATABASE_NAME_ATTR, "unknown"}, {XML_DATABASE_DATE_ATTR, ""},
-						{XML_SCHEMA_LOCATION_ATTR, ""},
-						{XML_DATABASE_BRANCH_ATTR, XML_DATABASE_BRANCH_MAIN}});
+						{XML_DATABASE_SCHEMA_LOCATION_ATTR, ""}});
+		makeShape(shapes, XML_METADATA_TAG, new String[] {XML_INSTANCE_TAG, XML_SCHEMA_TAG, XML_LAYOUTS_TAG}, emptyList, emptyListList);
+		makeShape(shapes, XML_INSTANCE_TAG, emptyList, 
+				new String[] {XML_INSTANCE_STARTRECID_ATTR, XML_INSTANCE_FORKDATE_ATTR}, new String[][]{{XML_INSTANCE_JOINDATE_ATTR, ""}});
 		makeShape(shapes, XML_ENUMCHOICE_TAG, emptyList, new String[] {XML_ENUMCHOICE_ID_ATTR},
 				new String[][]{{XML_ENUMCHOICE_VALUE_ATTR, ""}});
 		shapes.put(EnumFieldChoices.getXmlTag(), makeEnumsetXmlShape());
@@ -77,9 +78,10 @@ public class XmlShapes implements LibrisXMLConstants {
 		shapes.put(XML_LAYOUT_TAG, makeLayoutXmlShape());
 		shapes.put(XML_LAYOUTS_TAG, makeLayoutsXmlShape());
 		shapes.put(XML_LAYOUTUSAGE_TAG, makeLayoutUsageXmlShape());
-		shapes.put(XML_METADATA_TAG, makeMetadataXmlShape());
 		shapes.put(Record.getXmlTag(), Record.getShape());
-		shapes.put(GroupMember.getMemberTag(), GroupMember.getMemberShape());
+		makeShape(shapes, GroupMember.getMemberTag(),
+				new String [] {GroupMember.XML_AFFILIATION_TAG}, new String [] {GroupMember.XML_MEMBER_GROUP_ATTR},
+				new String [][] {{GroupMember.XML_MEMBER_PARENT_ATTR, ""}}, false);
 		shapes.put(GroupMember.getAffiliationTag(), GroupMember.getAffiliationShape());
 		shapes.put(XML_RECORDS_TAG, makeRecordsXmlShape());
 		shapes.put(XML_SCHEMA_TAG, makeSchemaXmlShape());
@@ -151,12 +153,6 @@ public class XmlShapes implements LibrisXMLConstants {
 			s.setOptionalAttributeNames(optionalAttributeNamesAndValues);
 		}
 		s.setHasContent(hasContent);
-		return s;
-	}
-
-	private static ElementShape makeMetadataXmlShape() {
-	 ElementShape s = new ElementShape(XML_METADATA_TAG);
-		s.setSubElementNames(new String[] {XML_SCHEMA_TAG, XML_LAYOUTS_TAG});
 		return s;
 	}
 

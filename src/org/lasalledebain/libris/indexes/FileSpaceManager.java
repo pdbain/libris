@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
@@ -135,12 +136,13 @@ public class FileSpaceManager implements Iterable<RecordHeader> {
 				if (null == cursor) {
 					result = new RecordHeader(dataFile, root.getNext());
 				} else {
-					if (0 != cursor.getNext()) {
-						result = new RecordHeader(dataFile, cursor.getNext());
+					long cursorNext = cursor.getNext();
+					if (0 != cursorNext) {
+						result = new RecordHeader(dataFile, cursorNext);
 					}
 				}
 			} catch (DatabaseException e) {
-				LibrisDatabase.setLastException(e);
+				throw new DatabaseError("Error in record file", e);
 			}
 			cursor = result;
 			return result;
@@ -149,10 +151,12 @@ public class FileSpaceManager implements Iterable<RecordHeader> {
 		@Override
 		public void remove() {
 			try {
+				long cursorPrev = cursor.getPrev();
 				root.remove(cursor);
 				freeList.add(cursor);
+				cursor = new RecordHeader(dataFile, cursorPrev);
 			} catch (Exception e) {
-				LibrisDatabase.setLastException(e);
+				throw new DatabaseError("Error in record file", e);
 			}
 		}
 	}

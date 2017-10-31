@@ -4,10 +4,16 @@
 package org.lasalledebain.libris.xmlUtils;
 
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 
+import org.lasalledebain.libris.LibrisConstants;
+import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 public class LibrisAttributes implements Iterable<String[]> {
@@ -17,6 +23,7 @@ public class LibrisAttributes implements Iterable<String[]> {
 
 	public LibrisAttributes() {
 		attributeList = new TreeMap<String, String>();
+		timeInstance = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
 		next = null;
 	}
 	
@@ -87,6 +94,25 @@ public class LibrisAttributes implements Iterable<String[]> {
 		return LibrisEmptyAttributes.getLibrisEmptyAttributes();
 	}
 	
+	public static Date parseDate(String dbDateString) {
+		DateFormat dfmt = null;
+		if (null != dbDateString) {
+			for (String fmt: new String[] {LibrisConstants.YMD_TIME_TZ, LibrisConstants.YMD_TIME, LibrisConstants.YMD}) {
+				try {
+					dfmt = new SimpleDateFormat(fmt);
+					dfmt.setLenient(true);
+					Date modDate = dfmt.parse(dbDateString);
+					if (null != modDate) {
+						return modDate;
+					}
+				} catch (ParseException e) {
+					LibrisDatabase.log(Level.WARNING, "DatabaseAttributes: Invalid date string: "+dbDateString+" for "+fmt);
+				}
+			}
+		}
+		return null;
+	}
+
 	private class AttributeIterator implements Iterator<String[]> {
 		Iterator<String> iter;
 		public AttributeIterator() {

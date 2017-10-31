@@ -94,5 +94,8 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public boolean hasAffiliations(int groupNum) {
 		return false;
 	}
+	public abstract String generateTitle();
+	
+	// TODO abbreviate title
 	
 }

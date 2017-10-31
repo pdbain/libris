@@ -1,11 +1,9 @@
 package org.lasalledebain.libris.index;
 
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
-import org.lasalledebain.libris.XmlExportable;
-import org.lasalledebain.libris.XmlImportable;
-import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;

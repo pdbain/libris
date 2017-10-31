@@ -7,8 +7,6 @@ import java.util.HashMap;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.XMLElement;
-import org.lasalledebain.libris.XmlExportable;
-import org.lasalledebain.libris.XmlImportable;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -19,7 +17,6 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
 /**
@@ -58,12 +55,6 @@ public class GroupMember extends GenericField implements XMLElement {
 		this.def = template;
 	}
 	
-	static public ElementShape getMemberShape() {
-		return XmlShapes.makeShape(memberTag,
-		new String [] {XML_AFFILIATION_TAG}, new String [] {XML_MEMBER_GROUP_ATTR},
-		new String [][] {{XML_MEMBER_PARENT_ATTR, ""}}, false);
-	}
-
 	static public ElementShape getAffiliationShape() {
 		return XmlShapes.makeShape(affiliationTag,
 		new String [] {}, new String [] {XML_AFFILIATE_ATTR},

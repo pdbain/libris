@@ -59,7 +59,14 @@ public class LibrisFileManager implements LibrisConstants {
 			throw new UserErrorException("database file "+dbFile+" dos not exist");
 		}
 		if (null == auxDir) {
-			auxDirectory =databaseFile.getParentFile();
+			File databaseDir = databaseFile.getParentFile();
+			String directoryName = databaseFile.getName();
+			int suffixPosition = directoryName.lastIndexOf(".xml");
+			if (suffixPosition > 0) {
+				directoryName = directoryName.substring(0, suffixPosition);
+			}
+
+			auxDirectory = new File(databaseDir, AUX_DIRECTORY_NAME+'_'+directoryName);
 		}
 		lockFile = new File(auxDirectory, LOCK_FILENAME);
 		open(databaseFile, auxDirectory);
@@ -71,6 +78,7 @@ public class LibrisFileManager implements LibrisConstants {
 		setDatabaseFile(new File(databaseFileName));
 	}
 	
+	// FIXME put database lock in aux dir
 	public synchronized boolean  lockDatabase() {
 		try {
 			lockFile.createNewFile();
@@ -93,7 +101,9 @@ public class LibrisFileManager implements LibrisConstants {
 		if (null != dbLock) {
 			try {
 				dbLock.release();
-				(new RandomAccessFile(lockFile, "rw")).setLength(0);
+				RandomAccessFile lckFile = new RandomAccessFile(lockFile, "rw");
+				lckFile.setLength(0);
+				lckFile.close();
 			} catch (IOException e) {
 				LibrisDatabase.librisLogger.log(Level.SEVERE, "Error unlocking file", e);
 			}
@@ -177,13 +187,6 @@ public class LibrisFileManager implements LibrisConstants {
 		if (null == databaseFile) {
 			throw new DatabaseException("Database file not set");
 		}
-		String directoryName = databaseFile.getName();
-		int suffixPosition = directoryName.lastIndexOf(".xml");
-		if (suffixPosition > 0) {
-			directoryName = directoryName.substring(0, suffixPosition);
-		}
-
-		auxDirectory = new File(databaseDir, AUX_DIRECTORY_NAME+'_'+directoryName);
 		journalAccessMgr = new FileAccessManager(new File(auxDirectory, JOURNAL_FILENAME));
 		activeManagers.put(JOURNAL_FILENAME, journalAccessMgr);
 		

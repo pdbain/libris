@@ -8,7 +8,7 @@ import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.XmlExportable;
+import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -16,9 +16,8 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisEmptyAttributes;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class Layouts implements LibrisXMLConstants, XmlExportable {
+public class Layouts implements XMLElement {
 	public static final String DEFAULT_LAYOUT_VALUE = "default";
 	HashMap<String, Layout> layouts;
 	ArrayList<String> layoutIds;

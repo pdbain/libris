@@ -32,10 +32,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	public void setTitle(String title) {
 		uiTitle = title;
 	}
-	@Override
-	public void indicateModified(boolean isModified) {
-		return;
-	}
 
 	@Override
 	public void arrangeValues() {
@@ -53,7 +49,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	protected static Preferences librisPrefs;
 	protected static Object prefsSync = new Object();
 	protected Logger uiLogger;
-	boolean readOnly;
 	private UiField selectedField;
 	protected String uiTitle;
 	protected LibrisDatabase currentDatabase;
@@ -74,7 +69,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	public LibrisUiGeneric() {
 		uiLogger = Logger.getLogger(LibrisUi.class.getName());
 		LibrisUiGeneric.setLoggingLevel(uiLogger);
-		readOnly = false;
 		fieldSelected(false);
 		setSelectedField(null);
 	}
@@ -99,7 +93,8 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 			alert("Cannot open "+databaseFile.getAbsolutePath()+" because "+currentDatabase.getDatabaseFile().getAbsolutePath()+" is open");
 		}
 		try {
-			currentDatabase = new LibrisDatabase(databaseFile, auxDirectory, this, readOnly);
+			// TODO add option to open read-write
+			currentDatabase = new LibrisDatabase(databaseFile, auxDirectory, this, false);
 			if (!currentDatabase.isIndexed()) {
 				alert("database "+databaseFile.getAbsolutePath()+" is not indexed.  Please re-index.");
 				return null;
@@ -157,22 +152,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	}
 
 	@Override
-	public boolean isReadOnly() {
-		return readOnly;
-	}
-
-	@Override
-	public void setReadOnly(boolean readOnly) {
-		this.readOnly = readOnly;
-	}
-
-	@Override
-	public void setEditable(boolean editable) throws LibrisException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void databaseOpened(LibrisDatabase db) throws DatabaseException {
 		currentDatabase = db;
 		String title = NO_DATABASE_OPENED;
@@ -223,6 +202,11 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	public void repaint() {
 	}
 
+	public abstract boolean isReadOnly();
+	
+	protected boolean isDatabaseModified() {
+		return (null != currentDatabase) && currentDatabase.isModified();
+	}
 	public static String formatConciseStackTrace(Exception e, StringBuilder buff) {
 		String emessage;
 		emessage = e.getMessage();

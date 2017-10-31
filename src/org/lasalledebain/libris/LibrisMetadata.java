@@ -3,14 +3,16 @@ package org.lasalledebain.libris;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.ui.LastFilterSettings;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -26,6 +28,7 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	private int savedRecords;
 	private int modifiedRecords;
 	private boolean schemaInline;
+	DatabaseInstance instanceInfo;
 	public boolean isSchemaInline() {
 		return schemaInline;
 	}
@@ -41,6 +44,7 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 
 	private boolean lastRecOkay;
 	private LastFilterSettings lastFiltSettings;
+	private static SimpleDateFormat dateFormatter = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
 
 	public LastFilterSettings getLastFilterSettings() {
 		return lastFiltSettings;
@@ -51,11 +55,19 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		usageProperties = new Properties();
 		lastFiltSettings = new LastFilterSettings();
 	}
-	
+
 	public void fromXml(ElementManager metadataMgr) throws InputException, DatabaseException {
 		ElementManager schemaMgr;
-		
+
 		metadataMgr.parseOpenTag();
+		String nextElement = metadataMgr.getNextId();
+		if (XML_INSTANCE_TAG.equals(nextElement)) {
+			ElementManager instanceMgr = metadataMgr.nextElement();
+			instanceInfo = new DatabaseInstance();
+			instanceInfo.fromXml(instanceMgr);
+		} else {
+			instanceInfo = null;
+		}
 		schemaMgr = metadataMgr.nextElement();
 		Schema schem = new Schema();
 		schem.fromXml(schemaMgr);
@@ -70,12 +82,11 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	}
 
 	public void saveProperties(FileOutputStream propertiesFile) throws IOException {
-			usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_SAVED, getCurrentDateString());
-			String lastId = RecordId.toString(lastRecordId);
-			usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_RECORD_ID, lastId);
-			usageProperties.setProperty(LibrisConstants.PROPERTY_RECORD_COUNT, (0 == savedRecords)? "0": Integer.toString(savedRecords));
-			usageProperties.setProperty(LibrisConstants.PROPERTY_DATABASE_BRANCH, database.getBranchString());
-			usageProperties.store(propertiesFile, "");
+		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_SAVED, getCurrentDateString());
+		String lastId = RecordId.toString(lastRecordId);
+		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_RECORD_ID, lastId);
+		usageProperties.setProperty(LibrisConstants.PROPERTY_RECORD_COUNT, (0 == savedRecords)? "0": Integer.toString(savedRecords));
+		usageProperties.store(propertiesFile, "");
 	}
 
 	LibrisException readProperties(LibrisDatabase librisDatabase, FileInputStream ipFile) throws LibrisException, IOException {
@@ -91,7 +102,6 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 			LibrisDatabase.log(Level.WARNING, "Error reading "+LibrisConstants.PROPERTY_RECORD_COUNT+" value = "+recCount, exc);
 			savedRecords = 0;
 		}
-		String branchString = usageProperties.getProperty(LibrisConstants.PROPERTY_DATABASE_BRANCH);
 		if ((null != recordIdString) && !recordIdString.isEmpty()) {
 			try {
 				lastRecordId = RecordId.toId(recordIdString);
@@ -106,18 +116,34 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	}
 
 	public static String getCurrentDateString() {
-		return (DateFormat.getDateTimeInstance()).format(new Date());
+		return formatDate(getCurrentDate());
+	}
+
+	public static Date getCurrentDate() {
+		return new Date();
+	}
+
+	public static String formatDate(Date theDate) {
+		return dateFormatter.format(theDate);
 	}
 
 	public synchronized int getLastRecordId() {
 		return lastRecordId;
 	}
-	
+	public synchronized int getRecordIdBase() {
+		int result =  (null == instanceInfo) ? 0 : instanceInfo.getRecordIdBase();
+		return result;
+	}
+
 	public synchronized void setLastRecordId(final int recId) {
 		if ((RecordId.isNull(lastRecordId)) || ((recId > lastRecordId))) {
 			lastRecordId = recId;
 		}
 		lastRecOkay = true;
+	}
+
+	public DatabaseInstance getInstanceInfo() {
+		return instanceInfo;
 	}
 
 	public synchronized int newRecordId() {
@@ -151,19 +177,29 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		this.modifiedRecords += numAdded;
 	}
 
-public static String getXmlTag() {
-	return XML_METADATA_TAG;
-}
+	public static String getXmlTag() {
+		return XML_METADATA_TAG;
+	}
 
 
 	@Override
-public String getElementTag() {
-	return getElementTag();
-}
+	public String getElementTag() {
+		return getElementTag();
+	}
 
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
+		toXml(output, false);
+	}
+	public void toXml(ElementWriter output, boolean addInstanceInfo) throws LibrisException {
 		output.writeStartElement(XML_METADATA_TAG, getAttributes(), false);
+		if (addInstanceInfo) {
+			if (null != instanceInfo) {
+				throw new UserErrorException("Cannot fork froma a database fork");
+			}
+			DatabaseInstance i = new DatabaseInstance(this);
+			i.toXml(output);
+		}
 		database.getSchema().toXml(output);
 		database.getLayouts().toXml(output);
 		output.writeEndElement();
@@ -186,15 +222,5 @@ public String getElementTag() {
 
 	public int getFieldNum() {
 		return 0;
-	}
-
-	public String getId() {
-		return null;
-	}
-
-	public String getTitle() {
-		return null;
-	}
-	
-	
+	}	
 }

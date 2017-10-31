@@ -56,12 +56,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return metadata;
 	}
 	private static final String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
-	private static Exception lastException;
+	@Deprecated
 	public LibrisException openException;
 	public  LibrisException rebuildException;
-	public static Exception getLastException() {
-		return lastException;
-	}
 	private LibrisFileManager fileMgr;
 	private IndexManager indexMgr;
 	private GroupManager groupMgr;
@@ -74,7 +71,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	DatabaseUsageMode usageMode = DatabaseUsageMode.USAGE_BATCH;
 	private boolean isModified = false;
 	private ModifiedRecordList modifiedRecords;
-	private int branch;
 	private LibrisJournalFileManager journalFile;
 	private Records databaseRecords;
 	public static Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());;
@@ -228,18 +224,17 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			try {
 				databaseDate.parse(dateString);
 			} catch (ParseException e) {
-				//TODO throw new SchemaException("illegal date format: "+dateString, e);
+			// TODO	throw new InputException("illegal date format: "+dateString, e);
 			}
 		}
-		branch = DatabaseAttributes.parseBranchString(dbElementAttrs.get(XML_DATABASE_BRANCH_ATTR));
 		
 		String nextElement = mgr.getNextId();
 		ElementManager metadataMgr;
 		if (XML_METADATA_TAG.equals(nextElement)) {
 			metadataMgr = mgr.nextElement();
 		} else {
-			schemaLocation = dbElementAttrs.get(XML_SCHEMA_LOCATION_ATTR);
-			metadataMgr = makeMetadataMgr(dbElementAttrs.get(XML_SCHEMA_NAME_ATTR), schemaLocation);
+			schemaLocation = dbElementAttrs.get(XML_DATABASE_SCHEMA_LOCATION_ATTR);
+			metadataMgr = makeMetadataMgr(dbElementAttrs.get(XML_DATABASE_SCHEMA_NAME_ATTR), schemaLocation);
 			metadata.setSchemaInline(null == schemaLocation);
 		}
 		if (null == metadataMgr) {
@@ -269,7 +264,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 
 	@Override
 	public void toXml(ElementWriter outWriter) throws LibrisException {
-		toXml(outWriter, true, true);
+		toXml(outWriter, true, true, false);
 	}
 	
 	public String getElementTag() {
@@ -279,10 +274,10 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return XML_LIBRIS_TAG;
 	}
 	private void toXml(ElementWriter outWriter, boolean includeMetadata,
-			boolean includeRecords) throws XmlException, LibrisException {
+			boolean includeRecords, boolean addInstanceInfo) throws XmlException, LibrisException {
 		outWriter.writeStartElement(XML_LIBRIS_TAG, getAttributes(), false);
 		if (includeMetadata) {
-			metadata.toXml(outWriter);
+			metadata.toXml(outWriter, addInstanceInfo);
 		}
 		if (includeRecords) {
 			LibrisAttributes recordsAttrs = new LibrisAttributes();
@@ -400,7 +395,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 
 	public void setModified(boolean isModified) {
 		this.isModified = isModified;
-		ui.indicateModified(isModified);
 	}
 	/**
 	 * @param sourceFileMgr
@@ -503,10 +497,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 
 	public DatabaseAttributes getAttributes() {
 		return xmlAttributes;
-	}
-
-	public String getBranchString() {
-		return Integer.toString(branch);
 	}
 
 	public Layouts getLayouts() {
@@ -614,6 +604,11 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			rec.setRecordId(id);
 			metadata.adjustModifiedRecords(1);
 		} else {
+			if (isRecordReadOnly(id)) {
+				librisLogger.log(Level.FINE, "LibrisDatabase.put "+rec.getRecordId() + "failed because read-only"); //$NON-NLS-1$
+				ui.alert(DATABASE_OR_RECORD_ARE_READ_ONLY);
+				return 0;
+			}
 			metadata.setLastRecordId(id);
 		}
 		librisLogger.log(Level.FINE, "LibrisDatabase.put "+rec.getRecordId()); //$NON-NLS-1$
@@ -708,14 +703,22 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public LibrisUi getUi() {
 		return ui;
 	}
-	public static void setLastException(Exception e) {
-		lastException = e;
-	}
 
 	public boolean isReadOnly() {
-		return ui.isReadOnly();
+		return readOnly;
+	}
+	
+	public boolean isRecordReadOnly(int recordId) {
+		boolean result;
+		if (readOnly) {
+			result = true;
+		} else {
+			result = (recordId <= metadata.getRecordIdBase());
+		}
+		return result;
 	}
 
+// FIXME clear modified marker when saving
 	public static void log(Level severity, String msg, Throwable e) {
 		librisLogger.log(severity, msg, e);
 	}
@@ -736,14 +739,15 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return recs;
 	}
 	
-	public void exportDatabaseXml(OutputStream destination, boolean includeSchema, boolean includeRecords) throws LibrisException {
+	public void exportDatabaseXml(OutputStream destination, boolean includeSchema, boolean includeRecords, boolean addInstanceInfo) throws LibrisException {
 		ElementWriter outWriter;
+		
 		try {
 			outWriter = ElementWriter.eventWriterFactory(destination);
 		} catch (XMLStreamException e) {
 			throw new OutputException(Messages.getString("LibrisDatabase.exception_export_xml"), e); //$NON-NLS-1$
 		}
-		toXml(outWriter, includeSchema, includeRecords); 
+		toXml(outWriter, includeSchema, includeRecords, addInstanceInfo); 
 	}
 
 	public IndexManager getIndexes() {

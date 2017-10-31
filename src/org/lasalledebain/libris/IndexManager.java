@@ -2,7 +2,6 @@ package org.lasalledebain.libris;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -212,7 +211,7 @@ public class IndexManager implements LibrisConstants {
 
 	public LibrisRecordsFileManager getRecordsFileMgr() throws LibrisException {
 		if (null == recordsFile) {
-			recordsFile = new LibrisRecordsFileManager(db, db.getUi().isReadOnly(), db.getSchema(), fileMgr);
+			recordsFile = new LibrisRecordsFileManager(db, db.isReadOnly(), db.getSchema(), fileMgr);
 		}
 		return recordsFile;
 	}

@@ -22,8 +22,6 @@ public interface LibrisUi {
 	public void exit();
 
 	public void setTitle(String title);
-	public void indicateModified(boolean isModified);
-	public void setEditable(boolean editable) throws LibrisException;
 
 	public abstract void displayRecord(int recordId) throws LibrisException;
 
@@ -54,10 +52,6 @@ public interface LibrisUi {
 	void recordsAccessible(boolean accessible);
 
 	public boolean isDatabaseSelected();
-	
-	public boolean isReadOnly();
-
-	public void setReadOnly(boolean readOnly);
 
 	public Logger getuiLogger();
 

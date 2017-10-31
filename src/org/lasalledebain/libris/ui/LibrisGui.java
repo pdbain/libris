@@ -60,7 +60,6 @@ public class LibrisGui extends LibrisWindowedUi {
 	private JPanel layoutEditPane;
 	private Clipboard systemClipboard;
 	private boolean databaseSelected = false;
-	boolean readOnly = false;
 	private Component mainframeContents;
 	public LibrisGui(File databaseFile, File auxDirectory, boolean readOnly) throws LibrisException {
 		super(databaseFile, auxDirectory, readOnly);
@@ -86,6 +85,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		System.setProperty("Title", "Libris");
 		menu = new LibrisMenu(this);
 		menuBar = menu.createMenus();
+		boolean readOnly = isReadOnly();
 		recordsAccessible(databaseSelected && !readOnly);
 		databaseModifiable(databaseSelected && !readOnly);
 		createPanes(!databaseSelected);
@@ -111,20 +111,15 @@ public class LibrisGui extends LibrisWindowedUi {
 		setTitle(databaseName);
 	}
 
-	@Override
-	public void indicateModified(boolean isModified) {
-		String title = uiTitle;
-		if (isModified && !title.endsWith("*")) {
-			title = title+"*";
-		}
-		setTitle(title);
-	}
-
 	public void setTitle(String title) {
 		super.setTitle(title);
-		mainFrame.setTitle(title);
+		if (isDatabaseModified()) {
+			mainFrame.setTitle(title+"*");
+		} else {
+			mainFrame.setTitle(title);
+		}
 	}
-	
+
 	public boolean chooseDatabase() {
 		return getMenu().openDatabaseDialogue();
 	}
@@ -172,6 +167,12 @@ public class LibrisGui extends LibrisWindowedUi {
 			createDummyWindow();
 		}
 		mainFrame.pack();
+	}
+
+	@Override
+	public Dimension getDisplayPanelSize() {
+		Dimension s = displayPanel.getSize();
+		return s;
 	}
 
 	private void createDummyWindow() {
@@ -270,7 +271,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		RecordWindow rw = null;
 		try {
 			record = currentDatabase.newRecord();
-			record.setEditable(true);
+			record.setEditable(!currentDatabase.isReadOnly());
 		} catch (LibrisException e1) {
 			fatalError(e1);
 		}
@@ -344,6 +345,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	@Override
 	public void databaseOpened(LibrisDatabase db) throws DatabaseException {
 		super.databaseOpened(db);
+		boolean readOnly = db.isReadOnly();
 		menu.editMenuEnableModify(readOnly);
 		destroyWindow(true);
 		createPanes(false);
@@ -376,21 +378,29 @@ public class LibrisGui extends LibrisWindowedUi {
 		return editable;
 	}
 	
-	public void setEditable(boolean editable) throws LibrisException {
+	/**
+	 * Sets the editability of the current record window.  The request may not be obeyed if the database or the record are read-only.
+	 * @param editable new state of record window
+	 * @return new state of record window
+	 * @throws LibrisException
+	 */
+	public boolean setRecordWindowEditable(boolean editable) throws LibrisException {
 		RecordWindow rw = getCurrentRecordWindow();
+		if (editable) {
+			if (currentDatabase.isReadOnly()
+					|| currentDatabase.isRecordReadOnly(rw.getRecordId())) 
+				return false;
+		}
 		boolean wasEditable = rw.isEditable();
 		rw.setEditable(!wasEditable);
 		rw.refresh();
 		repaint();
 		rw.setModified(false);
+		return true;
 	}
 
 	public boolean isReadOnly() {
-		return readOnly;
-	}
-
-	public void setReadOnly(boolean readOnly) {
-		this.readOnly = readOnly;
+		return (null == currentDatabase) || currentDatabase.isReadOnly();
 	}
 
 	@Override
@@ -570,7 +580,10 @@ public class LibrisGui extends LibrisWindowedUi {
 		menu.setRecordDuplicateRecordEnabled(enabled);
 	}
 
-	public void duplicateRecord() {
+	public boolean duplicateRecord() {
+		if (currentDatabase.isReadOnly()) {
+			return false;
+		}
 		int rid = resultsPanel.getSelectedRecordId();
 		Record newRecord = null;
 		try {
@@ -584,7 +597,9 @@ public class LibrisGui extends LibrisWindowedUi {
 			displayPanel.addRecord(newRecord, true);
 		} catch (Exception e) {
 			alert("error creating new record", e);
+			return false;
 		}
+		return true;
 	}
 
 	public void enterRecord() {

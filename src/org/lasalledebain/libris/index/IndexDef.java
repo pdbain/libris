@@ -3,18 +3,15 @@ package org.lasalledebain.libris.index;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.XmlExportable;
+import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.ui.Layout;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class IndexDef implements XmlExportable {
+public class IndexDef implements XMLElement {
 
 	@Override
 	public LibrisAttributes getAttributes() {

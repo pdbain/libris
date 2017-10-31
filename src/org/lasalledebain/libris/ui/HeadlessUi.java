@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.ui;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -128,6 +129,11 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public Record newChildRecord(Record currentRecord, int groupNum) {
+		return null;
+	}
+
+	@Override
+	public Dimension getDisplayPanelSize() {
 		return null;
 	}
 }

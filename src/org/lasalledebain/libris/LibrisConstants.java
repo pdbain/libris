@@ -11,15 +11,13 @@ public interface LibrisConstants {
 	public static final String BOOLEAN_TRUE_STRING = "true";
 	public static final String PROPERTY_LAST_RECORD_ID = "libris.database.lastrecordid";
 	public static final String PROPERTY_RECORD_COUNT = "libris.database.recordcount";
-	public static final String PROPERTY_DATABASE_BRANCH = "libris.database.databasebranch";
-	public static final String PROPERTY_DATABASE_LAST_CHILD = "libris.database.databaselastchild";
 	public static final String PROPERTY_LAST_OPENED = "libris.database.lastopened";
 	public static final String PROPERTY_LAST_SAVED = "libris.database.lastsaved";
 	public static final String FILENAME_JOURNAL_SUFFIX = "lbrj";
 	public static final String FILENAME_NATIVE_RECORDS_SUFFIX = "lbrn";
 	public static final String FILENAME_XML_FILES_SUFFIX = "libr";
-	public static int NULL_RECORD_ID = 0;
-	public static int DATABASE_ROOT_BRANCH_ID = 0;
+	public static final int NULL_RECORD_ID = 0;
+	public static final int MAX_RECORD_ID = Integer.MAX_VALUE;
 	public static String LIBRIS_LOGGING_LEVEL = "libris.logging.level";
 
 	/**
@@ -37,6 +35,11 @@ public interface LibrisConstants {
 	
 	String DATABASE_NAME = "DATABASE";
 	int NULL_GROUP = -1;
+	public String YMD_TIME_TZ = LibrisConstants.YMD_TIME+" z";
+	String HH_MM_SS = "HH:mm:ss";
+	String YMD = "yyyy-MM-dd";
+	String YMD_TIME = YMD+" "+HH_MM_SS;
+	String DATABASE_OR_RECORD_ARE_READ_ONLY = "Database or record are read-only";
 	public static final String SCHEMA_NAME = "SCHEMA";
 	public static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
 	public static final String POSITION_FILENAME = "positions";

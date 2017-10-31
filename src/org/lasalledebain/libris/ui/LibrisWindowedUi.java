@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.ui;
 
+import java.awt.Dimension;
 import java.io.File;
 
 import javax.swing.JFrame;
@@ -43,4 +44,5 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 
 	void enableNewChild() {}
 	public abstract Record newChildRecord(Record currentRecord, int groupNum);
+	public abstract Dimension getDisplayPanelSize();
 }

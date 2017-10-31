@@ -65,20 +65,26 @@ public abstract class GenericField implements Field {
 	private static HashMap<String, FieldType> fieldTypeMap = GenericField.initializeTypeMap();
 	@Override
 	public String getValuesAsString() {
-		if (null == values) {
-			return "";
-		} else {
+		FieldValue fieldValues = values;
+		String result = valuesToString(fieldValues);
+		return result;
+	}
+
+	public static String valuesToString(FieldValue fieldValues) {
+		String result = "";
+		if (null != fieldValues) {
 			StringBuffer buff = new StringBuffer();
 			String separator = null;
-			for (FieldValue v: values) {
+			for (FieldValue v: fieldValues) {
 				if (null != separator) {
 					buff.append(separator);
 				}
 				separator = ", ";
 				buff.append(v.getValueAsString());
 			}
-			return buff.toString();
+			result = buff.toString();
 		}
+		return result;
 	}
 	public FieldValue removeValue() {
 		FieldValue deletedValue = values;

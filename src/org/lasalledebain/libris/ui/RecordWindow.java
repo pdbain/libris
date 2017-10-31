@@ -112,7 +112,10 @@ public class RecordWindow extends JPanel {
 		setVisible(false);
 	}
 
-	public void setEditable(boolean isEditable) {
+	public boolean setEditable(boolean isEditable) {
+		if (isEditable && ui.isReadOnly()) {
+			return false;
+		}
 		modTracker.setModifiable(isEditable);
 		record.setEditable(isEditable);
 		for (UiField f: guiFields) {
@@ -121,6 +124,7 @@ public class RecordWindow extends JPanel {
 		if (!isEditable) {
 			modTracker.unselect();
 		}
+		return true;
 	}
 
 	public String getTitle() {
