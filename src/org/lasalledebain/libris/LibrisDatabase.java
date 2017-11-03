@@ -264,7 +264,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 
 	@Override
 	public void toXml(ElementWriter outWriter) throws LibrisException {
-		toXml(outWriter, true, true, false);
+		toXml(outWriter, true, getRecordReader(), false);
 	}
 	
 	public String getElementTag() {
@@ -274,16 +274,16 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return XML_LIBRIS_TAG;
 	}
 	private void toXml(ElementWriter outWriter, boolean includeMetadata,
-			boolean includeRecords, boolean addInstanceInfo) throws XmlException, LibrisException {
+			RecordsReader recordSource, boolean addInstanceInfo) throws XmlException, LibrisException {
 		outWriter.writeStartElement(XML_LIBRIS_TAG, getAttributes(), false);
 		if (includeMetadata) {
 			metadata.toXml(outWriter, addInstanceInfo);
 		}
-		if (includeRecords) {
+		if (null != recordSource) {
 			LibrisAttributes recordsAttrs = new LibrisAttributes();
 			recordsAttrs.setAttribute(XML_RECORDS_LASTID_ATTR, RecordId.toString(metadata.getLastRecordId()));
 			outWriter.writeStartElement(XML_RECORDS_TAG, recordsAttrs, false);
-			for (Record r: getRecordReader()) {
+			for (Record r: recordSource) {
 				r.toXml(outWriter);
 			}
 			outWriter.writeEndElement(); /* records */
@@ -291,7 +291,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		outWriter.writeEndElement(); /* database */	
 		outWriter.flush();
 	}
-
 
 	private void openRecords() throws LibrisException, DatabaseException {
 
@@ -747,7 +746,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		} catch (XMLStreamException e) {
 			throw new OutputException(Messages.getString("LibrisDatabase.exception_export_xml"), e); //$NON-NLS-1$
 		}
-		toXml(outWriter, includeSchema, includeRecords, addInstanceInfo); 
+		toXml(outWriter, includeSchema, getRecordReader(), addInstanceInfo); 
 	}
 
 	public IndexManager getIndexes() {
