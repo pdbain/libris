@@ -3,6 +3,7 @@ package org.lasalledebain.libris.index;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.RecordId;
@@ -32,12 +33,12 @@ public class GroupMember extends GenericField implements XMLElement {
 	private static final String affiliationTag = XML_AFFILIATION_TAG;
 	GroupDef def;
 	
-	int affiliations[];
+	int affiliates[];
 	private GroupDefs defs;
-	static private final int[] dummyAffiliations = new int[0];
+	static private final int[] dummyAffiliates = new int[0];
 
 	public int getParent() {
-		return (affiliations.length == 0) ? NULL_ID: affiliations[0];
+		return (affiliates.length == 0) ? NULL_ID: affiliates[0];
 	}
 
 	public String getGroupId() {
@@ -50,7 +51,7 @@ public class GroupMember extends GenericField implements XMLElement {
 
 	public GroupMember(GroupDefs defs, GroupDef template) {
 		super(template);
-		affiliations = dummyAffiliations;
+		affiliates = dummyAffiliates;
 		this.defs = defs;
 		this.def = template;
 	}
@@ -89,7 +90,7 @@ public class GroupMember extends GenericField implements XMLElement {
 		}
 		if (null != tempAffiliations) {
 			int[] result = listToArray(tempAffiliations);
-			affiliations = result;
+			affiliates = result;
 		}
 	}
 
@@ -105,11 +106,11 @@ public class GroupMember extends GenericField implements XMLElement {
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
 		LibrisAttributes attrs = getAttributes();
-		boolean empty = affiliations.length == 0;
+		boolean empty = affiliates.length == 0;
 		output.writeStartElement(XML_MEMBER_TAG, attrs, empty);
 		if (!empty) {
 			boolean first = true;
-			for (int affId: affiliations) {
+			for (int affId: affiliates) {
 				if (first) {
 					first = false;
 					continue;
@@ -132,7 +133,7 @@ public class GroupMember extends GenericField implements XMLElement {
 
 	@Override
 	public int getNumberOfValues() {
-		return (null == affiliations) ? 0 : affiliations.length;
+		return (null == affiliates) ? 0 : affiliates.length;
 	}
 
 	public static String getAffiliationTag() {
@@ -144,7 +145,7 @@ public class GroupMember extends GenericField implements XMLElement {
 	}
 
 	public int[] getAffiliations() {
-		return affiliations;
+		return affiliates;
 	}
 
 	@Override
@@ -159,11 +160,11 @@ public class GroupMember extends GenericField implements XMLElement {
 
 	@Override
 	public void addIntegerValue(int value) throws FieldDataException {
-		int tempArray[] = new int[affiliations.length + 1];
-		System.arraycopy(affiliations, 0, tempArray, 0, affiliations.length);
+		int tempArray[] = new int[affiliates.length + 1];
+		System.arraycopy(affiliates, 0, tempArray, 0, affiliates.length);
 		tempArray[tempArray.length - 1] = value;
 		Arrays.sort(tempArray, 1, tempArray.length);
-		affiliations = tempArray;
+		affiliates = tempArray;
 	}
 
 	@Override
@@ -177,19 +178,31 @@ public class GroupMember extends GenericField implements XMLElement {
 	}
 
 	public void setParent(int parent) {
-		if ((affiliations.length > 0) && (NULL_ID == affiliations[0])) {
-			affiliations[0] = parent;
+		if ((affiliates.length > 0) && (NULL_ID == affiliates[0])) {
+			affiliates[0] = parent;
 		} else {
-			int[] tempAffiliations = new int[affiliations.length + 1];
+			int[] tempAffiliations = new int[affiliates.length + 1];
 			tempAffiliations[0] = parent;
-			System.arraycopy(affiliations, 0, tempAffiliations, 1, affiliations.length);
+			System.arraycopy(affiliates, 0, tempAffiliations, 1, affiliates.length);
 			Arrays.sort(tempAffiliations, 1, tempAffiliations.length);
-			affiliations = tempAffiliations;
+			affiliates = tempAffiliations;
+		}
+	}
+	
+	/**
+	 * Sets the affiliations to the values of the argument.
+	 * @param newAffiliates List of record IDs.  May be null or empty.
+	 */
+	public void setAffiliates(int newAffiliates[]) {
+		if (Objects.isNull(newAffiliates) || (newAffiliates.length == 0)) {
+			affiliates = dummyAffiliates;
+		} else {
+			affiliates = Arrays.copyOf(newAffiliates, newAffiliates.length);
 		}
 	}
 
-	public static int[] getDummyAffiliations() {
-		return dummyAffiliations;
+	public static int[] getDummyAffiliates() {
+		return dummyAffiliates;
 	}
 
 	public GroupDef getDef() {
@@ -211,6 +224,6 @@ public class GroupMember extends GenericField implements XMLElement {
 		for (FieldValue fv: valueList) {
 			tempAffiliations.add(fv.getValueAsInt());
 		}
-		affiliations = listToArray(tempAffiliations);
+		affiliates = listToArray(tempAffiliations);
 	}
 }

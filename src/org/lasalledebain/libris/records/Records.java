@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.ModifiedRecordList;
@@ -23,11 +24,11 @@ public class Records implements Iterable<Record>{
 		this.db = db;
 	}
 
-	public RecordsReader getNativeRecordsReader() {
+	public Iterable<Record> getNativeRecordsReader() {
 		return recMgr;
 	}
 
-	public void importRecords(RecordsReader.DatabaseFormat format, File[] importFiles) throws DatabaseException {
+	public void importRecords(LibrisConstants.DatabaseFormat format, File[] importFiles) throws DatabaseException {
 		throw new DatabaseException("not implemented");
 	}
 

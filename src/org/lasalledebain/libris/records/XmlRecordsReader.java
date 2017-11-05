@@ -2,11 +2,15 @@ package org.lasalledebain.libris.records;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import javax.xml.stream.FactoryConfigurationError;
 
+import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
@@ -21,12 +25,13 @@ import org.lasalledebain.libris.indexes.RecordPositions;
 import org.lasalledebain.libris.ui.Messages;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
+import static org.lasalledebain.libris.exception.DatabaseError.assertTrue; 
 
 /**
  * Read records from an XML file.
  *
  */
-public class XmlRecordsReader implements RecordsReader, Iterator<Record>,LibrisXMLConstants {
+public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,LibrisXMLConstants {
 	ElementManager recsMgr;
 	private LibrisDatabase database;
 
@@ -70,7 +75,7 @@ public class XmlRecordsReader implements RecordsReader, Iterator<Record>,LibrisX
 				inputRecord.fromXml(recMgr);
 			}
 		} catch (LibrisException e) {
-			database.log(Level.SEVERE, Messages.getString("XmlRecordsReader.0"), e); //$NON-NLS-1$
+			LibrisDatabase.log(Level.SEVERE, Messages.getString("XmlRecordsReader.0"), e); //$NON-NLS-1$
 			LibrisException.saveException(e);
 			return null;
 		}
@@ -124,7 +129,7 @@ public class XmlRecordsReader implements RecordsReader, Iterator<Record>,LibrisX
 				}
 				importer.putRecord(r);
 				++numAdded;
-				database.log(Level.FINE, "importXmlRecords put record "+RecordId.toString(r.getRecordId())); //$NON-NLS-1$
+				LibrisDatabase.log(Level.FINE, "importXmlRecords put record "+RecordId.toString(r.getRecordId())); //$NON-NLS-1$
 				int recId = r.getRecordId();
 				lastId = Math.max(lastId, recId);
 			}
@@ -140,11 +145,61 @@ public class XmlRecordsReader implements RecordsReader, Iterator<Record>,LibrisX
 
 		} catch (FactoryConfigurationError e) {
 			String msg = Messages.getString("XmlRecordsReader.4"); //$NON-NLS-1$
-			database.log(Level.SEVERE, msg, e); //$NON-NLS-1$
+			LibrisDatabase.log(Level.SEVERE, msg, e); //$NON-NLS-1$
 			throw new DatabaseException(msg); //$NON-NLS-1$
 		} catch (IOException e) {
 			throw new DatabaseException(Messages.getString("XmlRecordsReader.6"), e); //$NON-NLS-1$
 
 			}
+	}
+	
+	public static void importIncrementFile(LibrisDatabase database, Reader source, String filePath) throws LibrisException {
+		LibrisMetadata metadata = database.getMetadata();
+		int lastMasterId = metadata.getLastRecordId();
+		try {
+			ElementManager librisMgr = database.makeLibrisElementManager(source, XML_LIBRIS_TAG, filePath);
+			librisMgr.parseOpenTag();
+			ElementManager instanceMgr = librisMgr.nextElement();
+			DatabaseInstance instanceInfo = new DatabaseInstance();
+			instanceInfo.fromXml(instanceMgr);
+			int idOffset = lastMasterId - instanceInfo.getRecordIdBase();
+			assertTrue("Increment starting record ID invalid", idOffset >= 0);
+			ElementManager recordsMgr = librisMgr.nextElement();
+			XmlRecordsReader recordsRdr = new XmlRecordsReader(database, recordsMgr);
+			int numGroups = database.getSchema().getNumGroups();
+			for (Record r: recordsRdr) {
+				if (null == r) {
+					LibrisException e = LibrisException.getLastException();
+					throw e;
+				}
+				if (idOffset > 0) {
+					int oldId = r.getRecordId();
+					r.setRecordId(oldId + idOffset);
+					for (int groupNum = 0; groupNum < numGroups; ++groupNum) {
+						int[] affiliates = r.getAffiliates(groupNum);
+						if (!Objects.isNull(affiliates)) {
+							final int affiliatesLength = affiliates.length;
+							int newAffiliates[] = Arrays.copyOf(affiliates, affiliatesLength);
+							for (int i = 0; i < affiliatesLength; ++i) {
+								if (newAffiliates[i] > lastMasterId) {
+									newAffiliates[i] += idOffset;
+								}
+							}
+							r.setAffiliates(groupNum, newAffiliates);
+						}
+					}
+				}
+				database.put(r);
+				LibrisDatabase.log(Level.FINE, "importXmlRecords put record "+RecordId.toString(r.getRecordId())); //$NON-NLS-1$
+			}
+			librisMgr.closeFile();
+		} catch (XmlException e) {
+			throw new DatabaseException(Messages.getString("XmlRecordsReader.1"), e); //$NON-NLS-1$
+
+		} catch (FactoryConfigurationError e) {
+			String msg = Messages.getString("XmlRecordsReader.4"); //$NON-NLS-1$
+			LibrisDatabase.log(Level.SEVERE, msg, e); //$NON-NLS-1$
+			throw new DatabaseException(msg); //$NON-NLS-1$
+		}
 	}
 }

@@ -9,10 +9,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.ui.LastFilterSettings;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -29,6 +27,10 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	private int modifiedRecords;
 	private boolean schemaInline;
 	DatabaseInstance instanceInfo;
+	public void setInstanceInfo(DatabaseInstance instanceInfo) {
+		this.instanceInfo = instanceInfo;
+	}
+
 	public boolean isSchemaInline() {
 		return schemaInline;
 	}
@@ -60,14 +62,6 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		ElementManager schemaMgr;
 
 		metadataMgr.parseOpenTag();
-		String nextElement = metadataMgr.getNextId();
-		if (XML_INSTANCE_TAG.equals(nextElement)) {
-			ElementManager instanceMgr = metadataMgr.nextElement();
-			instanceInfo = new DatabaseInstance();
-			instanceInfo.fromXml(instanceMgr);
-		} else {
-			instanceInfo = null;
-		}
 		schemaMgr = metadataMgr.nextElement();
 		Schema schem = new Schema();
 		schem.fromXml(schemaMgr);
@@ -193,13 +187,6 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	}
 	public void toXml(ElementWriter output, boolean addInstanceInfo) throws LibrisException {
 		output.writeStartElement(XML_METADATA_TAG, getAttributes(), false);
-		if (addInstanceInfo) {
-			if (null != instanceInfo) {
-				throw new UserErrorException("Cannot fork froma a database fork");
-			}
-			DatabaseInstance i = new DatabaseInstance(this);
-			i.toXml(output);
-		}
 		database.getSchema().toXml(output);
 		database.getLayouts().toXml(output);
 		output.writeEndElement();

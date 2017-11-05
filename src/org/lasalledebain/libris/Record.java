@@ -79,6 +79,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	 * @throws InputException
 	 */
 	public abstract int[] getAffiliates(int groupNum) throws InputException;
+	public abstract void setAffiliates(int groupNum, int[] affiliates) throws InputException;
 	public abstract GroupMember[] getMembers();
 	public abstract GroupMember getMember(int groupNum);
 	public abstract void setMember(int groupNum, GroupMember newMember);

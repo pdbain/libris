@@ -452,9 +452,15 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		if ((null != affiliations) && (null != affiliations[groupNum])) {
 			result = affiliations[groupNum].getAffiliations();
 		} else {
-			result = GroupMember.getDummyAffiliations();
+			result = GroupMember.getDummyAffiliates();
 		}
 		return result;
+	}
+
+	@Override
+	public void setAffiliates(int groupNum, int[] newAffiliates) throws InputException {
+		ensureAffiliation(groupNum);
+		affiliations[groupNum].setAffiliates(newAffiliates);
 	}
 
 	@Override

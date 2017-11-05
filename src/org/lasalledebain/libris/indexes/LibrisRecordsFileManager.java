@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UTFDataFormatException;
@@ -12,6 +11,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -21,7 +21,6 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordInstance;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
@@ -30,9 +29,8 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.OutputException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
-import org.lasalledebain.libris.records.RecordsReader;
 
-public class LibrisRecordsFileManager implements RecordsReader, Iterable<Record>, LibrisConstants {
+public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstants {
 
 	private static final long MINIMUM_RECORDS_FILE_LENGTH = 2*RecordHeader.getHeaderLength(); /* head & tail, record and free */
 // TODO test oversize records

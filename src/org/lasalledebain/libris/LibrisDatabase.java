@@ -35,7 +35,6 @@ import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
-import org.lasalledebain.libris.records.RecordsReader;
 import org.lasalledebain.libris.records.XmlRecordsReader;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -56,8 +55,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return metadata;
 	}
 	private static final String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
-	@Deprecated
-	public LibrisException openException;
 	public  LibrisException rebuildException;
 	private LibrisFileManager fileMgr;
 	private IndexManager indexMgr;
@@ -214,9 +211,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	}
 
 	@Override
-	public void fromXml(ElementManager mgr) throws LibrisException {
+	public void fromXml(ElementManager librisMgr) throws LibrisException {
 		String schemaLocation;
-		HashMap<String, String> dbElementAttrs = mgr.parseOpenTag();
+		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
 		String dateString = dbElementAttrs.get(XML_DATABASE_DATE_ATTR);
 		if ((null == dateString) || dateString.isEmpty()) {
 			databaseDate.setCalendar(Calendar.getInstance());
@@ -228,10 +225,17 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			}
 		}
 		
-		String nextElement = mgr.getNextId();
+		String nextElement = librisMgr.getNextId();
+		DatabaseInstance instanceInfo = null;
+		if (XML_INSTANCE_TAG.equals(nextElement)) {
+			ElementManager instanceMgr = librisMgr.nextElement();
+			instanceInfo  = new DatabaseInstance();
+			instanceInfo.fromXml(instanceMgr);
+			nextElement = librisMgr.getNextId();
+		}
 		ElementManager metadataMgr;
 		if (XML_METADATA_TAG.equals(nextElement)) {
-			metadataMgr = mgr.nextElement();
+			metadataMgr = librisMgr.nextElement();
 		} else {
 			schemaLocation = dbElementAttrs.get(XML_DATABASE_SCHEMA_LOCATION_ATTR);
 			metadataMgr = makeMetadataMgr(dbElementAttrs.get(XML_DATABASE_SCHEMA_NAME_ATTR), schemaLocation);
@@ -243,6 +247,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		this.xmlAttributes = new DatabaseAttributes(this, dbElementAttrs);
 		this.metadata = new LibrisMetadata(this);
 		metadata.fromXml(metadataMgr);
+		if (null != instanceInfo) {
+			metadata.setInstanceInfo(instanceInfo);
+		}
 	}
 
 	void buildIndexes() throws LibrisException {
@@ -274,10 +281,17 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return XML_LIBRIS_TAG;
 	}
 	private void toXml(ElementWriter outWriter, boolean includeMetadata,
-			RecordsReader recordSource, boolean addInstanceInfo) throws XmlException, LibrisException {
+			Iterable<Record> recordSource, boolean includeInstanceInfo) throws XmlException, LibrisException {
 		outWriter.writeStartElement(XML_LIBRIS_TAG, getAttributes(), false);
+		if (includeInstanceInfo) {
+			DatabaseInstance instanceInfo = metadata.getInstanceInfo();
+			if (null != instanceInfo) {
+				throw new UserErrorException("Cannot fork froma a database fork");
+			}
+			new DatabaseInstance(metadata).toXml(outWriter);
+		}
 		if (includeMetadata) {
-			metadata.toXml(outWriter, addInstanceInfo);
+			metadata.toXml(outWriter, includeInstanceInfo);
 		}
 		if (null != recordSource) {
 			LibrisAttributes recordsAttrs = new LibrisAttributes();
@@ -290,6 +304,14 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		}
 		outWriter.writeEndElement(); /* database */	
 		outWriter.flush();
+	}
+
+	/**
+	 * Read records from a database forked instance and merge them to the current database.
+	 * @param instanceReader reader for the XML of the exported records
+	 */
+	public void instanceJoinImport(Reader instanceReader) {
+
 	}
 
 	private void openRecords() throws LibrisException, DatabaseException {
@@ -518,7 +540,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return xmlFactory;
 	}
 
-	public RecordsReader getRecordReader() throws LibrisException {
+	public Iterable<Record> getRecordReader() throws LibrisException {
 		return getRecordsFileMgr();
 	}
 	/**

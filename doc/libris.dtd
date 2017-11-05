@@ -4,7 +4,7 @@
 <!ENTITY % usagetype "(newrecord|formdisplay|summarydisplay|formentry|tabledisplay)">
 <!ENTITY % groupstructure "(flat|hierarchical)">
 
-<!ELEMENT libris (metadata?, records?)>
+<!ELEMENT libris (instance?, metadata?, records?)>
 <!ENTITY % databaseAttributes	"
 	schemaname NMTOKEN #REQUIRED
 	schemaversion NMTOKEN #REQUIRED
@@ -14,7 +14,7 @@
 	
 <!ATTLIST libris  %databaseAttributes; >
 
-<!ELEMENT metadata (instance?, schema, layouts)>
+<!ELEMENT metadata (schema, layouts)>
 <!ELEMENT instance EMPTY>
 <!ATTLIST instance 
 	startrecid NMTOKEN #REQUIRED

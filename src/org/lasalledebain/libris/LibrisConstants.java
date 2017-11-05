@@ -16,6 +16,7 @@ public interface LibrisConstants {
 	public static final String FILENAME_JOURNAL_SUFFIX = "lbrj";
 	public static final String FILENAME_NATIVE_RECORDS_SUFFIX = "lbrn";
 	public static final String FILENAME_XML_FILES_SUFFIX = "libr";
+	public static final String FILENAME_INSTANCE_INCREMENT_FILES_SUFFIX = "libi";
 	public static final int NULL_RECORD_ID = 0;
 	public static final int MAX_RECORD_ID = Integer.MAX_VALUE;
 	public static String LIBRIS_LOGGING_LEVEL = "libris.logging.level";
@@ -27,6 +28,8 @@ public interface LibrisConstants {
 	public enum DatabaseUsageMode {
 		USAGE_BATCH, USAGE_CMDLINE, USAGE_GUI
 	}
+
+	enum DatabaseFormat {DBFMT_XML, DBFMT_CSV, DBFMT_NATIVE}
 
 	public static final short NULL_FIELD_NUM = -1;
 	public static final short ENUM_VALUE_OUT_OF_RANGE = -1;
