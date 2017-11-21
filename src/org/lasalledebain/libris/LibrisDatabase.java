@@ -770,6 +770,14 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		}
 		toXml(outWriter, includeSchema, getRecordReader(), addInstanceInfo); 
 	}
+	
+	public boolean exportIncrement(OutputStream destination) {
+		if (isModified()) {
+			return false;
+		}
+		DatabaseInstance instanceInfo = metadata.getInstanceInfo();
+		return true;
+	}
 
 	public IndexManager getIndexes() {
 		return indexMgr;

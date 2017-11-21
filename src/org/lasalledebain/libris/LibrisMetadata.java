@@ -26,9 +26,10 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	private int savedRecords;
 	private int modifiedRecords;
 	private boolean schemaInline;
-	DatabaseInstance instanceInfo;
+	private DatabaseInstance instanceInfo;
 	public void setInstanceInfo(DatabaseInstance instanceInfo) {
 		this.instanceInfo = instanceInfo;
+		lastRecordId = Math.max(lastRecordId, instanceInfo.getRecordIdBase());
 	}
 
 	public boolean isSchemaInline() {

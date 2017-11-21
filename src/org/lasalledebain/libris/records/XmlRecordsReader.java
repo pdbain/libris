@@ -103,15 +103,21 @@ public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,Libr
 		LibrisMetadata metadata = database.getMetadata();
 		try {
 			int numAdded = 0;
-			ElementManager librisXmlMgr = database.makeLibrisElementManager(source);
-			librisXmlMgr.parseOpenTag();
-			String nextElement = librisXmlMgr.getNextId();
+			ElementManager librisMgr = database.makeLibrisElementManager(source);
+			librisMgr.parseOpenTag();
+			String nextElement = librisMgr.getNextId();
+			if (XML_INSTANCE_TAG.equals(nextElement)) {
+				ElementManager instanceMgr = librisMgr.nextElement();
+				instanceMgr.flushElement();
+				nextElement = librisMgr.getNextId();
+			}
 			ElementManager metadataMgr;
 			if (XML_METADATA_TAG.equals(nextElement)) {
-				metadataMgr = librisXmlMgr.nextElement();
+				metadataMgr = librisMgr.nextElement();
 				metadataMgr.flushElement();
+				nextElement = librisMgr.getNextId();	
 			}
-			ElementManager recordsMgr = librisXmlMgr.nextElement();
+			ElementManager recordsMgr = librisMgr.nextElement();
 			XmlRecordsReader recordsRdr = new XmlRecordsReader(database, recordsMgr);
 			int lastId = 0;
 			metadata.setSavedRecords(0);
@@ -137,7 +143,7 @@ public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,Libr
 			importer.finish(nonEmpty);
 			recordsFileMgr.releaseOpStream();
 			recPosns.close();
-			librisXmlMgr.closeFile();
+			librisMgr.closeFile();
 			database.closeDatabaseSource();
 			metadata.setLastRecordId(lastId);
 		} catch (XmlException e) {

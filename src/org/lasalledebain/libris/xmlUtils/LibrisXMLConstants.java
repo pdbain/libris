@@ -53,6 +53,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_INDEXES_TAG = "indexes";
 	public static final String XML_RECORDS_LASTID_ATTR = "lastid";
 	public static final String XML_INDEXDEFS_TAG = "indexdefs";
+	public static final String XML_INDEXDEF_TAG = "indexdef";
 	public static final String XML_LAYOUTFIELD_TAG = "layoutfield";
 	public static final String XML_INSTANCE_TAG = "instance";
 	

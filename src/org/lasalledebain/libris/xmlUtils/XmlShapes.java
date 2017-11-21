@@ -30,11 +30,11 @@ public class XmlShapes implements LibrisXMLConstants {
 	private static HashMap<String, ElementShape> initializeXmlShapes() {
 		HashMap<String, ElementShape> shapes = new HashMap<String, ElementShape>();
 
-		makeShape(shapes, XML_LIBRIS_TAG, new String[] {XML_METADATA_TAG, XML_RECORDS_TAG }, 
+		makeShape(shapes, XML_LIBRIS_TAG, new String[] {XML_INSTANCE_TAG, XML_METADATA_TAG, XML_RECORDS_TAG }, 
 				new String[] {XML_DATABASE_SCHEMA_NAME_ATTR, XML_SCHEMA_VERSION_ATTR},
 				new String[][] {{XML_DATABASE_NAME_ATTR, "unknown"}, {XML_DATABASE_DATE_ATTR, ""},
 						{XML_DATABASE_SCHEMA_LOCATION_ATTR, ""}});
-		makeShape(shapes, XML_METADATA_TAG, new String[] {XML_INSTANCE_TAG, XML_SCHEMA_TAG, XML_LAYOUTS_TAG}, emptyList, emptyListList);
+		makeShape(shapes, XML_METADATA_TAG, new String[] {XML_SCHEMA_TAG, XML_LAYOUTS_TAG}, emptyList, emptyListList);
 		makeShape(shapes, XML_INSTANCE_TAG, emptyList, 
 				new String[] {XML_INSTANCE_STARTRECID_ATTR, XML_INSTANCE_FORKDATE_ATTR}, new String[][]{{XML_INSTANCE_JOINDATE_ATTR, ""}});
 		makeShape(shapes, XML_ENUMCHOICE_TAG, emptyList, new String[] {XML_ENUMCHOICE_ID_ATTR},
@@ -73,7 +73,11 @@ public class XmlShapes implements LibrisXMLConstants {
 				new String[] {EnumFieldChoices.getXmlTag(), XML_FIELDDEF_TAG},
 				emptyList,
 				emptyListList);
-		shapes.put(XML_INDEXDEFS_TAG, makeIndexDefsXmlShape());
+		makeShape(shapes,
+				XML_INDEXDEFS_TAG, 
+				new String[] {EnumFieldChoices.getXmlTag(), XML_INDEXDEF_TAG},
+				emptyList,
+				emptyListList);
 		shapes.put(XML_INDEXES_TAG, makeIndexesXmlShape());
 		shapes.put(XML_LAYOUT_TAG, makeLayoutXmlShape());
 		shapes.put(XML_LAYOUTS_TAG, makeLayoutsXmlShape());
@@ -173,13 +177,6 @@ public class XmlShapes implements LibrisXMLConstants {
 		ElementShape s = new ElementShape(EnumFieldChoices.getXmlTag());
 		s.setRequiredAttributeNames(new String[] {XML_SET_ID_ATTR});
 		s.setSubElementNames(new String[] {XML_ENUMCHOICE_TAG});
-		return s;
-	}
-
-	@Deprecated
-	private static ElementShape makeIndexDefsXmlShape() {
-		ElementShape s = new ElementShape(XML_INDEXDEFS_TAG);
-		s.setSubElementNames(new String[] {XML_INDEXDEFS_TAG});
 		return s;
 	}
 
