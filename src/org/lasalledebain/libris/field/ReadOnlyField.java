@@ -4,6 +4,7 @@
 package org.lasalledebain.libris.field;
 
 import java.net.URL;
+import java.util.Objects;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
@@ -33,6 +34,11 @@ class ReadOnlyField implements Field {
 
 	public ReadOnlyField(Field actualField) {
 		this.actualField = actualField;
+	}
+
+	@Override
+	public boolean isText() {
+		return (Objects.isNull(actualField))? false: actualField.isText();
 	}
 
 	Field actualField;

@@ -2,8 +2,12 @@ package org.lasalledebain.libris;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
@@ -412,32 +416,57 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	@Override
 	public String generateTitle(String[] fieldIds) {
 		StringBuffer buff = new StringBuffer("[");
+		int wordLimit = 8;
+		final int MAX_WORD_LENGTH = 8;
+		final char ELLIPSIS_CHAR = '\u2026';
+		final String ELLIPSIS_STRING = "\u2026";
 		String idString = (NULL_ID == id)? "<unknown>": RecordId.toString(id);
 		buff.append(idString);
 		buff.append("]: ");
 		if (null != name) {
 			buff.append(name);
 		} else {
-			boolean firstField = true;
+			String[][] fieldWordsList = new String[fieldIds.length][];
+			ArrayList<String> fieldStrings = new ArrayList<>(fieldIds.length);
+			int fieldCount = 0;
 			for (String fieldId: fieldIds) {
 				Field fld;
 				try {
 					fld = getField(fieldId);
 				} catch (InputException e) {
+					throw new InternalError(e);
+				}
+				if ((null == fld) || !fld.isText()) {
 					continue;
 				}
-				if (null == fld) {
-					continue;
+				String[] fieldWords = fld.getValuesAsString().split("\\s+");
+				fieldWordsList[fieldCount++] = fieldWords;
+			}
+			int f = 0;
+			boolean lastEllipsis = false;
+			while (fieldCount > 0) {
+				String fieldWords[] = fieldWordsList[f];
+				ArrayList<String> fieldBuff = new ArrayList<>(fieldWords.length);
+				int wordsPerField = Math.min(wordLimit/fieldCount, fieldWords.length);
+				for (int i = 0; i < wordsPerField; ++i) {
+					String titleWord = fieldWords[i];
+					if (lastEllipsis = (titleWord.length() > MAX_WORD_LENGTH)) {
+						titleWord = titleWord.substring(0, MAX_WORD_LENGTH - 1)+ELLIPSIS_CHAR;
+					}
+					fieldBuff.add(titleWord);
 				}
-				String value = fld.getValuesAsString();
-				if (!firstField) {
-					buff.append("; ");
+				fieldStrings.add(String.join(" ", fieldBuff));
+				if ((1 == fieldCount) && !lastEllipsis && (wordsPerField < fieldWords.length)) {
+					fieldStrings.add(ELLIPSIS_STRING);
 				}
-				firstField = false;
-				buff.append(value);
+				wordLimit -= wordsPerField;
+				fieldCount--;
+				f++;
 			}
 			if (0 == buff.length()) {
 				buff.append("Untitled");
+			} else {
+				buff.append(String.join("; ", fieldStrings));
 			}
 		}
 		return buff.toString();
