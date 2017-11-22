@@ -36,6 +36,11 @@ public abstract class GenericField implements Field {
 	}
 
 	@Override
+	public boolean isText() {
+		return false;
+	}
+
+	@Override
 	public boolean isEmpty() {
 		if (null != values) {
 			for (FieldValue v: values) {

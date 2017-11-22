@@ -20,6 +20,7 @@ public interface Field extends XMLElement {
 	public boolean isTrue()   throws FieldDataException;
 	public String getFieldId();
 	public FieldType getType();
+	public boolean isText();
 	public int getNumberOfValues();
 	public Iterable<FieldValue> getFieldValues();
 	public String getValuesAsString();
