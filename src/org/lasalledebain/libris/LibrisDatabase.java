@@ -14,6 +14,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -286,7 +288,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		if (includeInstanceInfo) {
 			DatabaseInstance instanceInfo = metadata.getInstanceInfo();
 			if (null != instanceInfo) {
-				throw new UserErrorException("Cannot fork froma a database fork");
+				throw new UserErrorException("Cannot fork from a database fork");
 			}
 			new DatabaseInstance(metadata).toXml(outWriter);
 		}
@@ -771,11 +773,23 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		toXml(outWriter, includeSchema, getRecordReader(), addInstanceInfo); 
 	}
 	
-	public boolean exportIncrement(OutputStream destination) {
+	public boolean exportIncrement(OutputStream destination) throws OutputException  {
 		if (isModified()) {
+			ui.alert("Cannot export an increment from a database which has unsaved changes");
 			return false;
 		}
 		DatabaseInstance instanceInfo = metadata.getInstanceInfo();
+		if (Objects.isNull(instanceInfo)) {
+			ui.alert("Cannot export an increment from a database which is not a fork");
+			return false;
+		}
+		Iterable<Record> rangeIter = new RangeRecordIterable(this, instanceInfo.getRecordIdBase(), getLastRecordId());
+		try {
+			ElementWriter outWriter = ElementWriter.eventWriterFactory(destination);
+		toXml(outWriter, false, rangeIter, true); 
+		} catch (XMLStreamException | LibrisException e) {
+			throw new OutputException(Messages.getString("LibrisDatabase.exception_export_xml"), e); //$NON-NLS-1$
+		}
 		return true;
 	}
 

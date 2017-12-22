@@ -7,45 +7,49 @@ import java.util.Vector;
 
 import org.lasalledebain.libris.exception.InputException;
 
-class RangeRecordIterator implements Iterator<Record> {
-	Vector <Record> recordList;
+class RangeRecordIterable implements Iterable<Record> {
 	private LibrisDatabase database;
-	private int limit;
-	private int cursor;
-	private Record nextRecord;
-	public RangeRecordIterator(LibrisDatabase db, int startId, int endId) {
+	int limit;
+	int base;
+	public RangeRecordIterable(LibrisDatabase db, int startId, int endId) {
 		database = db;
-		cursor = startId;
+		base = startId;
 		limit = endId;
-		nextRecord = null;
 	}
-	@Override
-	public boolean hasNext() {
-		while (Objects.isNull(nextRecord) && (cursor <= limit)) {
-			try {
-				nextRecord = database.getRecord(cursor);
-			} catch (InputException e) {
-				throw new NoSuchElementException();
-			}
-			cursor += 1;
-		}
-		return !Objects.isNull(nextRecord);
-	}
-	@Override
-	public Record next() {
-		Record result;
-		if (!Objects.isNull(nextRecord)) {
-			result = nextRecord;
+	class RangeRecordIterator implements Iterator<Record> {
+		private int cursor;
+		private Record nextRecord;
+		public RangeRecordIterator() {
+			cursor = base;
 			nextRecord = null;
-		} else {
+		}
+		@Override
+		public boolean hasNext() {
+			while (Objects.isNull(nextRecord) && (cursor <= limit)) {
+				try {
+					nextRecord = database.getRecord(cursor);
+				} catch (InputException e) {
+					throw new NoSuchElementException();
+				}
+				cursor += 1;
+			}
+			return !Objects.isNull(nextRecord);
+		}
+		@Override
+		public Record next() {
+			Record result;
 			if (!hasNext()) {
 				throw new NoSuchElementException();
-			} else {
-				result = nextRecord;
-				nextRecord = null;
-			}
+			}		
+			result = nextRecord;
+			nextRecord = null;
+			return result;
 		}
-		return result;
 	}
 
+	@Override
+	public Iterator<Record> iterator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
