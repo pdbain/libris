@@ -210,5 +210,10 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 
 	public int getFieldNum() {
 		return 0;
+	}
+
+	public int getBloomFilterLevelsLevels() {
+		// TODO Auto-generated method stub
+		return 0;
 	}	
 }

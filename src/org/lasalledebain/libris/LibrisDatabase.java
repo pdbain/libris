@@ -56,7 +56,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public LibrisMetadata getMetadata() {
 		return metadata;
 	}
-	private static final String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
 	public  LibrisException rebuildException;
 	private LibrisFileManager fileMgr;
 	private IndexManager indexMgr;
@@ -472,7 +471,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 						}
 						fileMgr.setSchemaAccessMgr(schemaFile);
 					} catch (DatabaseException e) {
-						throw new InputException(COULD_NOT_OPEN_SCHEMA_FILE+schemaFile.getPath(), e);
+						throw new InputException(LibrisConstants.COULD_NOT_OPEN_SCHEMA_FILE+schemaFile.getPath(), e);
 					}
 				} else {
 					URL metadataUrl = new URL(schemaLocation);
@@ -492,11 +491,11 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			metadataMgr = librisMgr.nextElement();
 			return metadataMgr;
 		} catch (FileNotFoundException e) {
-			throw new InputException(COULD_NOT_OPEN_SCHEMA_FILE+schemaLocation, e);
+			throw new InputException(LibrisConstants.COULD_NOT_OPEN_SCHEMA_FILE+schemaLocation, e);
 		} catch (MalformedURLException e) {
-			throw new InputException(COULD_NOT_OPEN_SCHEMA_FILE+schemaLocation, e);
+			throw new InputException(LibrisConstants.COULD_NOT_OPEN_SCHEMA_FILE+schemaLocation, e);
 		} catch (DatabaseException e) {
-			throw new InputException(COULD_NOT_OPEN_SCHEMA_FILE+schemaLocation, e);
+			throw new InputException(LibrisConstants.COULD_NOT_OPEN_SCHEMA_FILE+schemaLocation, e);
 		}
 	}
 

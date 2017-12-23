@@ -43,6 +43,8 @@ public interface LibrisConstants {
 	String YMD = "yyyy-MM-dd";
 	String YMD_TIME = YMD+" "+HH_MM_SS;
 	String DATABASE_OR_RECORD_ARE_READ_ONLY = "Database or record are read-only";
+	String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
+	int MINIMUM_TERM_LENGTH = 2;
 	public static final String SCHEMA_NAME = "SCHEMA";
 	public static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
 	public static final String POSITION_FILENAME = "positions";
@@ -54,8 +56,10 @@ public interface LibrisConstants {
 	public static final String AFFILIATES_FILENAME_ROOT = "affiliates_";
 	public static final String AFFILIATES_FILENAME_HASHTABLE_ROOT = AFFILIATES_FILENAME_ROOT+"hashstable_";
 	public static final String AFFILIATES_FILENAME_OVERFLOW_ROOT = AFFILIATES_FILENAME_ROOT+"overflow_";
+	public static final String KEYWORDS_FILTER_FILENAME_ROOT = "keywords_filter_";
 	static final String TEMP_ROOT = "_TEMP_";
 	static final String TEMP_CHILD_FILE = TEMP_ROOT+"child_";
 	static final String TEMP_AFFILIATE_FILE = TEMP_ROOT+"affiliate_";
 	public static final String CSV_FILE = "CSV_FILE";
+	public static final int MAX_BLOOM_FILTER_LEVELS = 6;
 }
