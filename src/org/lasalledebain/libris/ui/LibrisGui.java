@@ -68,7 +68,6 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	private void initializeGui() throws DatabaseException {
-		System.err.println("initializeGui "+Thread.currentThread().getName());  // TODO DEBUG
 		com.apple.eawt.Application.getApplication().setQuitHandler(new QuitHandler() {
 			@Override
 			public void handleQuitRequestWith(QuitEvent quitEvt, QuitResponse quitResp) {
