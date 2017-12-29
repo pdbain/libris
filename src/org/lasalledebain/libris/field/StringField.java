@@ -6,6 +6,10 @@ import org.lasalledebain.libris.exception.FieldDataException;
 
 public class StringField extends GenericField implements Field {
 	
+	@Override
+	public boolean isText() {
+		return true;
+	}
 
 	public StringField(FieldTemplate template) {
 		super(template);
