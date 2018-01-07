@@ -79,13 +79,13 @@ public class LibrisFileManager implements LibrisConstants {
 	}
 	
 	// FIXME put database lock in aux dir
-	public synchronized boolean  lockDatabase() {
+	public synchronized boolean  reserveDatabase() {
 		try {
 			lockFile.createNewFile();
 			dbLockFile = new FileOutputStream(lockFile);
 			dbLock = dbLockFile.getChannel().tryLock();
 			if (null != dbLock) {
-				String dateString = "Locked "+DateFormat.getDateInstance().format(new Date());
+				String dateString = "Reserved "+DateFormat.getDateInstance().format(new Date());
 				dbLockFile.write(dateString.getBytes());
 				return true;
 			} else {

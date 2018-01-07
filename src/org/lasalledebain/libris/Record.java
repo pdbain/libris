@@ -37,6 +37,14 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract void setEditable(boolean newValue);
 	public abstract boolean isEditable();
 	public abstract void setRecordId(int recId);
+	/**
+	 * Add idAdjustment to the recordId.  Also add idAdjustment to all references to other records
+	 * greater than baseId.
+	 * @param baseId ID of the last record at the time of the fork
+	 * @param idAdjustment amount to adjust the IDs.
+	 * @throws InputException if an error occurs during the change
+	 */
+	public abstract void offsetIds(int baseId, int idAdjustment) throws InputException;
 	public abstract Record duplicate() throws DatabaseException, FieldDataException;
 	
 	/* field management */
@@ -65,7 +73,6 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	/* format conversion */
 	public abstract String toString();
 	public abstract String generateTitle(String[] titleFieldIds);
-	public abstract long getFilePosition();
 	public abstract long getDataLength();
 	public abstract void fromXml(ElementManager recMgr) throws LibrisException;
 	

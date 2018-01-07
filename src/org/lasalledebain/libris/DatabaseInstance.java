@@ -14,18 +14,22 @@ public class DatabaseInstance extends LibrisElement {
 	private int recordIdBase;
 	private Date forkDate;
 	private Date joinDate;
+	public DatabaseInstance() {
+		super();
+	}
+
 	public DatabaseInstance(LibrisMetadata metaData) {
 		recordIdBase = metaData.getLastRecordId();
 		forkDate = LibrisMetadata.getCurrentDate();
 		joinDate = null;
 	}
 
+	/**
+	 * Get the ID of the last record in the root database at the time of the fork.
+	 * @return record ID
+	 */
 	public int getRecordIdBase() {
 		return recordIdBase;
-	}
-
-	public DatabaseInstance() {
-		super();
 	}
 
 	public Date getForkDate() {
@@ -37,17 +41,13 @@ public class DatabaseInstance extends LibrisElement {
 	}
 
 	
-	public static String getXmlTag() {
-		return XML_INSTANCE_TAG;
-	}
-	
 	@Override
 	public void fromXml(ElementManager mgr) throws InputException {
 		mgr.parseOpenTag();
 		LibrisAttributes attrs = mgr.getElementAttributes();
 		forkDate = LibrisAttributes.parseDate(attrs.get(XML_INSTANCE_FORKDATE_ATTR));
 		joinDate = LibrisAttributes.parseDate(attrs.get(XML_INSTANCE_JOINDATE_ATTR));
-		String startingRecordIdString = attrs.get(XML_INSTANCE_STARTRECID_ATTR);
+		String startingRecordIdString = attrs.get(XML_INSTANCE_BASERECID_ATTR);
 		if (null == startingRecordIdString) {
 			recordIdBase = LibrisConstants.NULL_RECORD_ID;
 		} else {
@@ -63,7 +63,7 @@ public class DatabaseInstance extends LibrisElement {
 	public LibrisAttributes getAttributes() throws XmlException {
 		LibrisAttributes attrs = new LibrisAttributes(
 				new String[][] {
-					{XML_INSTANCE_STARTRECID_ATTR, Integer.toString(recordIdBase)},
+					{XML_INSTANCE_BASERECID_ATTR, Integer.toString(recordIdBase)},
 					{XML_INSTANCE_FORKDATE_ATTR, LibrisMetadata.formatDate(forkDate)}
 					});
 		if (null != joinDate) {
@@ -72,10 +72,22 @@ public class DatabaseInstance extends LibrisElement {
 		return attrs;
 	}
 
+	public Date getJoinDate() {
+		return joinDate;
+	}
+
+	public void doJoin() {
+		joinDate = LibrisMetadata.getCurrentDate();
+	}
+
+	public static String getXmlTag() {
+		return XML_INSTANCE_TAG;
+	}
+
 	static public ElementShape getXmlShape() {
 		return XmlShapes.makeShape(getXmlTag(),
 				new String [] {}, new String [] 
-						{XML_INSTANCE_STARTRECID_ATTR, XML_INSTANCE_FORKDATE_ATTR}, 
+						{XML_INSTANCE_BASERECID_ATTR, XML_INSTANCE_FORKDATE_ATTR}, 
 						new String [][] {{XML_INSTANCE_JOINDATE_ATTR, ""}}, false);
 	}
 
@@ -83,9 +95,4 @@ public class DatabaseInstance extends LibrisElement {
 	public String getElementTag() {
 		return getXmlTag();
 	}
-
-	public Date getJoinDate() {
-		return joinDate;
-	}
-
 }

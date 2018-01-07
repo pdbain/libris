@@ -36,7 +36,7 @@ public class XmlShapes implements LibrisXMLConstants {
 						{XML_DATABASE_SCHEMA_LOCATION_ATTR, ""}});
 		makeShape(shapes, XML_METADATA_TAG, new String[] {XML_SCHEMA_TAG, XML_LAYOUTS_TAG}, emptyList, emptyListList);
 		makeShape(shapes, XML_INSTANCE_TAG, emptyList, 
-				new String[] {XML_INSTANCE_STARTRECID_ATTR, XML_INSTANCE_FORKDATE_ATTR}, new String[][]{{XML_INSTANCE_JOINDATE_ATTR, ""}});
+				new String[] {XML_INSTANCE_BASERECID_ATTR, XML_INSTANCE_FORKDATE_ATTR}, new String[][]{{XML_INSTANCE_JOINDATE_ATTR, ""}});
 		makeShape(shapes, XML_ENUMCHOICE_TAG, emptyList, new String[] {XML_ENUMCHOICE_ID_ATTR},
 				new String[][]{{XML_ENUMCHOICE_VALUE_ATTR, ""}});
 		shapes.put(EnumFieldChoices.getXmlTag(), makeEnumsetXmlShape());

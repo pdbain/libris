@@ -3,7 +3,6 @@ package org.lasalledebain.libris;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Vector;
 
 import org.lasalledebain.libris.exception.InputException;
 
@@ -13,7 +12,7 @@ class RangeRecordIterable implements Iterable<Record> {
 	int base;
 	public RangeRecordIterable(LibrisDatabase db, int startId, int endId) {
 		database = db;
-		base = startId;
+		base = startId + 1;
 		limit = endId;
 	}
 	class RangeRecordIterator implements Iterator<Record> {
@@ -49,7 +48,6 @@ class RangeRecordIterable implements Iterable<Record> {
 
 	@Override
 	public Iterator<Record> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		return new RangeRecordIterator();
 	}
 }
