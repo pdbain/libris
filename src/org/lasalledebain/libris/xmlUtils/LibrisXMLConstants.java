@@ -33,6 +33,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_AFFILIATE_ATTR = "affiliate";
 	
 	public static final String XML_DATABASE_DATE_ATTR = "date";
+	public static final String XML_DATABASE_LOCKED_ATTR = "locked";
 	public static final String XML_DATABASE_NAME_ATTR = "databasename";
 	public static final String XML_DATABASE_SCHEMA_NAME_ATTR = "schemaname";
 	public static final String XML_DATABASE_SCHEMA_LOCATION_ATTR = "schemalocation";
@@ -98,7 +99,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_LAYOUT_USER_NEWRECORD = "newrecord";
 	public static final String XML_SCHEMA_VERSION_ATTR = "schemaversion";
 
-	public static final String XML_INSTANCE_STARTRECID_ATTR = "startrecid";
+	public static final String XML_INSTANCE_BASERECID_ATTR = "baserecid";
 	public static final String XML_INSTANCE_FORKDATE_ATTR = "forkdate";
 	public static final String XML_INSTANCE_JOINDATE_ATTR = "joindate";
 

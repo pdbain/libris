@@ -2,12 +2,8 @@ package org.lasalledebain.libris;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
@@ -34,7 +30,6 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	GroupMember affiliations[];
 	boolean editable = false;
 	private RecordTemplate template;
-	private long filePosition = -1;
 	private long dataLength = -1;
 	private LibrisAttributes attributes;
 	
@@ -563,12 +558,6 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		return otherRec;
 	}
 
-	public long getFilePosition() {
-		return filePosition;
-	}
-	public void setFilePosition(long filePosition) {
-		this.filePosition = filePosition;
-	}
 	public long getDataLength() {
 		return dataLength;
 	}
@@ -689,6 +678,24 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	@Override
 	public void setRecordId(int recId) {
 		id = recId;
+	}
+
+	@Override
+	public void offsetIds(int baseId, int idAdjustment) throws InputException {
+		id += idAdjustment;
+		if (null != affiliations) {
+			int numGroups = template.getNumGroups();
+			for (int groupNum = 0; groupNum < numGroups; ++ groupNum) {
+				if (hasAffiliations(groupNum)) {
+					int[] affiliates = getAffiliates(groupNum);
+					for (int a = 0; a < affiliates.length; ++a) {
+						if (affiliates[a] > baseId) {
+							affiliates[a] += idAdjustment;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Override
