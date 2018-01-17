@@ -352,7 +352,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		}
 		int baseId = instanceInfo.getRecordIdBase();
 		int lastRecordId = getLastRecordId();
-		if (!assertTrue(ui, "increment base record ID < root database last ID", baseId >= lastRecordId)) {
+		if (!assertTrue(ui, "increment base record ID > root database last ID", baseId <= lastRecordId)) {
 			return false;
 		}
 		int idAdjustment = lastRecordId - baseId;
@@ -455,6 +455,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 				return false;
 			}
 			try {
+				if (getLastRecordId() != otherDb.getLastRecordId()) {
+					return false;
+				}
 				for (Record r: getDatabaseRecords()) {
 					int rid = r.getRecordId();
 					Record otherRecord = otherDb.getRecord(rid);
@@ -675,6 +678,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	/**
 	 * Save a record in the list of modified records
 	 * @param rec Record to enter
+	 * @return ID of the new record
 	 * @throws LibrisException 
 	 */
 	public int put(Record rec) throws LibrisException {
@@ -685,9 +689,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			metadata.adjustModifiedRecords(1);
 		} else {
 			if (isRecordReadOnly(id)) {
-				librisLogger.log(Level.FINE, "LibrisDatabase.put "+rec.getRecordId() + "failed because read-only"); //$NON-NLS-1$
-				ui.alert(DATABASE_OR_RECORD_ARE_READ_ONLY);
-				return 0;
+				throw new DatabaseException("Record "+id+" is read-only");
 			}
 			metadata.setLastRecordId(id);
 		}

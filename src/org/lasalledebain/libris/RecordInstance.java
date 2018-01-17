@@ -346,8 +346,23 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	@Override
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
+		buff.append("Record ID: ");
 		buff.append(RecordId.toString(getRecordId())); 
 		buff.append('\n');
+		for (int groupNum = 0; groupNum < template.getNumGroups(); ++groupNum) {
+			if (hasAffiliations(groupNum)) {
+				GroupMember member = affiliations[groupNum];
+				buff.append(member.getTitle());
+				buff.append(": ");
+				String separator = "";
+				for ( int affiliate: member.getAffiliations()) {
+					buff.append(separator);
+					buff.append(String.valueOf(affiliate));
+					separator = ", ";
+				}
+				buff.append('\n');
+			}
+		}
 		for (Field f:recordData) {
 			if (null == f) {
 				continue;

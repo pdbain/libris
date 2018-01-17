@@ -10,7 +10,8 @@
 	schemaversion NMTOKEN #REQUIRED
 	schemalocation NMTOKEN #IMPLIED
 	databasename NMTOKEN #IMPLIED
-	date CDATA #IMPLIED" >
+	date CDATA #IMPLIED
+	locked %boolean #IMPLIED" >
 	
 <!ATTLIST libris  %databaseAttributes; >
 
@@ -131,6 +132,7 @@ Represents a document or a index item
 	group CDATA #REQUIRED
 	parent ID #REQUIRED
 >
+<!ELEMENT affiliation EMPTY >
 <!ATTLIST affiliation 
 	affiliate ID #REQUIRED
 >
