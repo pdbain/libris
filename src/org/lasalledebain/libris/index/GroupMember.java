@@ -116,8 +116,8 @@ public class GroupMember extends GenericField implements XMLElement {
 					continue;
 				}
 				LibrisAttributes affAttrs = new LibrisAttributes();
-				affAttrs.setAttribute(XML_MEMBER_PARENT_ATTR, Integer.toString(affId));
-				output.writeStartElement(XML_AFFILIATION_TAG, affAttrs, false);
+				affAttrs.setAttribute(XML_AFFILIATE_ATTR, Integer.toString(affId));
+				output.writeStartElement(XML_AFFILIATION_TAG, affAttrs, true);
 			}
 			output.writeEndElement();
 		}

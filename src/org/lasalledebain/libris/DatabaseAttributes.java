@@ -21,7 +21,7 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	
 	@Override
 	public void setAttribute(String key, String value) {
-		db.alert("setAttribute unimplemented for "+getClass().getName());
+		super.setAttribute(key, value);
 	}
 	
 	public DatabaseAttributes(LibrisDatabase db, Map<String, String> attrs) throws DatabaseException {
