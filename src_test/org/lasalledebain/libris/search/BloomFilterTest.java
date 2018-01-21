@@ -93,7 +93,7 @@ public class BloomFilterTest extends TestCase {
 						assertTrue("missing match", found);
 					} else {
 						if (found) {
-							Set<String> orig = recordTermSets.get(recId -1);
+							Set<String> orig = recordTermSets.get(recId - 1);
 							for (String str: s) {
 								if (!orig.contains(str)) {
 									assertFalse("false match recId="+recId+" set="+setId, found);
@@ -286,10 +286,7 @@ public class BloomFilterTest extends TestCase {
 			for (int recId = 1; recId <= numRecords; ++recId) {
 				Set<String> partWords = makeNumericWord(recId);
 				for (int level = 0; level < numLevels; ++level) {
-					if (!bfs[level].isLoaded(recId)) {
-						bfs[level].store();
-						bfs[level].initialize(recId);
-					}
+					bfs[level].switchTo(recId);
 					bfs[level].addTerms(partWords);
 				}
 			}

@@ -27,6 +27,20 @@ public class BloomFilterSectionEditor extends BloomFilterSection {
 		}
 		setBaseId(recId);
 	}
+	
+	/**
+	 * Ensure the section corresponds to recId.
+	 * Null operation if recId's section is loaded.
+	 * Saves current section if not.
+	 * @param recId record ID 
+	 * @throws IOException in case of error
+	 */
+	public void switchTo(int recId) throws IOException {
+		if (!isLoaded(recId)) {
+			store();
+			initialize(recId);
+		}
+	}
 
 	/**
 	 * Save the signature to the signature file.

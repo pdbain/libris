@@ -3,6 +3,7 @@ package org.lasalledebain.libris;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -14,8 +15,11 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.AffiliateList;
+import org.lasalledebain.libris.indexes.BloomFilterSection;
+import org.lasalledebain.libris.indexes.BloomFilterSectionEditor;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
+import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.indexes.SortedKeyIntegerBucket;
 import org.lasalledebain.libris.indexes.SortedKeyValueBucketFactory;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
@@ -72,6 +76,11 @@ public class IndexManager implements LibrisConstants {
 		DataOutputStream affiliateOpStreams[] = new DataOutputStream[numGroups];
 		int numChildren[] = new int[numGroups];
 		int numAffiliates[] = new int[numGroups];
+		LibrisMetadata metadata = db.getMetadata();
+		int sigLevels = BloomFilterSection.calculateSignatureLevels(metadata.getLastRecordId());
+		metadata.setSignatureLevels(sigLevels);
+		FileAccessManager signatureFileManagers[] = new FileAccessManager[sigLevels];
+		BloomFilterSectionEditor signatureEditors[] = new BloomFilterSectionEditor[sigLevels];
 		try {
 			for (int g = 0; g < numGroups; ++g) {
 				childTempFiles[g] = fileMgr.getAuxiliaryFileMgr(TEMP_CHILD_FILE + g);
@@ -82,6 +91,13 @@ public class IndexManager implements LibrisConstants {
 				childTempFiles[g].setDeleteOnExit();
 				affiliateTempFiles[g].setDeleteOnExit();
 			}
+			for (int sigLevel = 0; sigLevel < sigLevels; ++sigLevel) {
+				final FileAccessManager sigFileMgr = db.getFileMgr().getAuxiliaryFileMgr(SIGNATURE_FILENAME_ROOT+sigLevel);
+				signatureFileManagers[sigLevel] = sigFileMgr;
+				RandomAccessFile raf = sigFileMgr.getReadWriteRandomAccessFile();
+				signatureEditors[sigLevel] = new BloomFilterSectionEditor(raf, sigLevel);
+			}
+			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
 			for (Record r : recs) {
 				String name = r.getName();
 				int id = r.getRecordId();
@@ -105,9 +121,17 @@ public class IndexManager implements LibrisConstants {
 					}
 
 				}
+				final int rId = r.getRecordId();
+				r.getKeywords(db.getSchema().getIndexFields(), keywordList);
+				for (BloomFilterSectionEditor b:signatureEditors) {
+					b.switchTo(rId);
+					b.addTerms(keywordList.getKeywords());
+				}
 			}
-			DataInputStream childIpStreams[] = new DataInputStream[numGroups];
-			DataInputStream affiliateIpStreams[] = new DataInputStream[numGroups];
+			for (int i = 0; i < sigLevels; ++i) {
+				signatureEditors[i].store();
+				signatureFileManagers[i].close();
+			}
 			for (int g = 0; g < numGroups; ++g) {
 				childTempFiles[g].close();
 				affiliateTempFiles[g].close();
