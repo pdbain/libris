@@ -22,6 +22,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_RECORD_NAME_ATTR = "name";
 	public static final String XML_MEMBER_GROUP_ATTR = "group";
 	public static final String XML_MEMBER_PARENT_ATTR = "parent";
+	public static final String XML_INDEXDEF_ID_ATTR = "id";
 	public static final String XML_LIBRIS_TAG = "libris";
 	public static final String XML_METADATA_TAG = "metadata";
 	public static final String XML_SCHEMA_TAG = "schema";

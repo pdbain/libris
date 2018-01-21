@@ -1,9 +1,12 @@
 package org.lasalledebain.libris.index;
 
+import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -12,6 +15,13 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 public class IndexDef implements XMLElement {
+
+	private Schema databaseSchema;
+	private short fieldNum;
+
+	public IndexDef(Schema schem) {
+		databaseSchema = schem;
+	}
 
 	@Override
 	public LibrisAttributes getAttributes() {
@@ -28,12 +38,13 @@ public class IndexDef implements XMLElement {
 
 	@Override
 	public void toXml(ElementWriter xmlWriter) throws LibrisException {
-		xmlWriter.writeStartElement(XML_INDEXDEFS_TAG);
-		xmlWriter.writeEndElement();
+		xmlWriter.writeStartElement(XML_INDEXDEFS_TAG, getAttributes(), true);	
 	}
-	public void fromXml(ElementManager mgr) throws InputException, DatabaseException {
-		mgr.parseOpenTag();
-		mgr.parseClosingTag();
+	public void fromXml(ElementManager mgr) throws InputException  {
+		HashMap<String, String> attrs = mgr.parseOpenTag();
+		String fieldIdString = attrs.get(XML_INDEXDEF_ID_ATTR);
+		Assertion.assertNotNullInputException("indexDef."+XML_INDEXDEF_ID_ATTR, fieldIdString);
+		fieldNum = databaseSchema.getFieldNum(fieldIdString);
 	}
 	@Override
 	public boolean equals(Object comparand) {
@@ -46,16 +57,8 @@ public class IndexDef implements XMLElement {
 		}
 	}
 
-	public String getTitle() {
-		return null;
-	}
-
-	public String getId() {
-		return null;
-	}
-
 	public int getFieldNum() {
-		return 0;
+		return fieldNum;
 	}
 
 }

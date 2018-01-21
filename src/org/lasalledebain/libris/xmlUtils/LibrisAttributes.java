@@ -14,6 +14,7 @@ import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 public class LibrisAttributes implements Iterable<String[]> {
@@ -97,17 +98,13 @@ public class LibrisAttributes implements Iterable<String[]> {
 	public static Date parseDate(String dbDateString) {
 		DateFormat dfmt = null;
 		if (null != dbDateString) {
-			for (String fmt: new String[] {LibrisConstants.YMD_TIME_TZ, LibrisConstants.YMD_TIME, LibrisConstants.YMD}) {
-				try {
-					dfmt = new SimpleDateFormat(fmt);
-					dfmt.setLenient(true);
-					Date modDate = dfmt.parse(dbDateString);
-					if (null != modDate) {
-						return modDate;
-					}
-				} catch (ParseException e) {
-					LibrisDatabase.log(Level.WARNING, "DatabaseAttributes: Invalid date string: "+dbDateString+" for "+fmt);
+			try {
+				Date modDate = LibrisMetadata.parseDateString(dbDateString);
+				if (null != modDate) {
+					return modDate;
 				}
+			} catch (ParseException e) {
+				LibrisDatabase.log(Level.WARNING, "DatabaseAttributes: Invalid date string: "+dbDateString);
 			}
 		}
 		return null;

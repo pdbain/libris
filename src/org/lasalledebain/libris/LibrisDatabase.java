@@ -13,6 +13,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -68,7 +69,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	LibrisXmlFactory xmlFactory;
 	Schema schem;
 	private RecordTemplate mainRecordTemplate;
-	private DateFormat databaseDate = DateFormat.getDateInstance();
 	protected LibrisMetadata metadata;
 	private LibrisUi ui = null;
 	DatabaseUsageMode usageMode = DatabaseUsageMode.USAGE_BATCH;
@@ -79,8 +79,8 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public static Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());
 	private DatabaseAttributes xmlAttributes;
 	private boolean readOnly;
-	private boolean locked;
 	boolean opened;
+	private Date databaseDate;
 	public static final String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
 
 	public LibrisDatabase(File databaseFile, File auxDir, LibrisUi ui, boolean readOnly) throws LibrisException  {	
@@ -89,7 +89,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		loadSchema();
 		indexMgr = new IndexManager(this, metadata, fileMgr);
 		this.ui = ui;
-		locked = false;
 		this.readOnly = readOnly;
 		if (!readOnly) {
 			modifiedRecords = new ModifiedRecordList();			
@@ -228,12 +227,12 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
 		String dateString = dbElementAttrs.get(XML_DATABASE_DATE_ATTR);
 		if ((null == dateString) || dateString.isEmpty()) {
-			databaseDate.setCalendar(Calendar.getInstance());
+			databaseDate = new Date();
 		} else {
 			try {
-				databaseDate.parse(dateString);
+				databaseDate = LibrisMetadata.parseDateString(dateString);
 			} catch (ParseException e) {
-				// TODO	throw new InputException("illegal date format: "+dateString, e);
+				throw new InputException("illegal date format: "+dateString, e);
 			}
 		}
 
@@ -253,9 +252,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			metadataMgr = makeMetadataMgr(dbElementAttrs.get(XML_DATABASE_SCHEMA_NAME_ATTR), schemaLocation);
 			metadata.setSchemaInline(null == schemaLocation);
 		}
-		if (null == metadataMgr) {
-			throw new UserErrorException("could not open schema file"); //$NON-NLS-1$
-		}
+		Assertion.assertNotNullInputException("could not open schema file", metadataMgr);
 		this.xmlAttributes = new DatabaseAttributes(this, dbElementAttrs);
 		if (xmlAttributes.isLocked()) {
 			readOnly = true;
@@ -874,10 +871,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public boolean isFork() {
 		DatabaseInstance instanceInfo = metadata.getInstanceInfo();
 		return (null != instanceInfo);
-	}
-
-	public IndexManager getIndexes() {
-		return indexMgr;
 	}
 
 	public GroupManager getGroupMgr() {

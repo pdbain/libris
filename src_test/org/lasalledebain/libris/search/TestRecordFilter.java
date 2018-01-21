@@ -48,6 +48,10 @@ public class TestRecordFilter extends TestCase {
 		assertFalse("too few records found", expectedIds.hasNext());
 	}
 	
+	public void testKeywordAndBloomFilter() {
+		fail("not implememted");
+	}
+	
 	@After
 	public void tearDown() throws Exception {
 		db.close(true);

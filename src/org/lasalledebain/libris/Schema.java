@@ -10,9 +10,11 @@ import javax.xml.namespace.QName;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
+import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexDefs;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementReader;
@@ -68,13 +70,13 @@ public class Schema implements LibrisXMLConstants {
 		parseFieldDefs(fieldDefsManager);
 
 		ElementManager indexDefsManager = schemaManager.nextElement(XML_INDEXDEFS_TAG);
-		myIndexDefs = new IndexDefs(database);
+		myIndexDefs = new IndexDefs(this);
 		myIndexDefs.fromXml(this, indexDefsManager);
 
 		schemaManager.parseClosingTag();
 	}
 
-	public void toXml(ElementWriter xmlWriter) throws XmlException {
+	public void toXml(ElementWriter xmlWriter) throws LibrisException {
 		xmlWriter.writeStartElement(XML_SCHEMA_TAG);
 		myGroupDefs.toXml(xmlWriter);
 		xmlWriter.writeStartElement(XML_FIELDDEFS_TAG);
@@ -164,6 +166,10 @@ public class Schema implements LibrisXMLConstants {
 			fieldIds.toArray(fieldIdArray);
 		}
 		return fieldIdArray;
+	}
+	
+	public IndexDef[] getIndexFields() {
+		return myIndexDefs.getIndexList();
 	}
 
 	public String[] getFieldTitles() {
