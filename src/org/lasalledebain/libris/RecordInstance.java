@@ -16,6 +16,7 @@ import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.index.IndexDef;
+import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -266,8 +267,8 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	}
 	
 	@Override
-	public void getKeywords(IndexDef[] indexFields, RecordKeywords keywordList) throws InputException {
-		for (IndexDef f: indexFields) {
+	public void getKeywords(IndexField[] indexFields, RecordKeywords keywordList) throws InputException {
+		for (IndexField f: indexFields) {
 			Field fld = getField(f.getFieldNum());
 			if (null != fld) {
 				String values = fld.getValuesAsString();

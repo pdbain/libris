@@ -2,6 +2,7 @@ package org.lasalledebain.libris;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
@@ -16,6 +17,7 @@ import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexDefs;
+import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementReader;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -24,6 +26,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
 public class Schema implements LibrisXMLConstants {
+	protected static final IndexField[] emptyIndexFieldList = new IndexField[0];
 	public Schema() {
 		enumSets = new TreeMap<String, EnumFieldChoices>();
 		fieldList = new ArrayList<FieldTemplate>();
@@ -55,7 +58,7 @@ public class Schema implements LibrisXMLConstants {
 
 	public void fromXml(ElementManager schemaManager) throws DatabaseException, InputException
 	{
-		schemaManager.parseOpenTag();
+		schemaManager.parseOpenTag(getXmlTag());
 		if (!schemaManager.hasNext()) {
 			throw new XmlException(schemaManager, "<schema> cannot be empty");
 		}
@@ -71,7 +74,7 @@ public class Schema implements LibrisXMLConstants {
 
 		ElementManager indexDefsManager = schemaManager.nextElement(XML_INDEXDEFS_TAG);
 		myIndexDefs = new IndexDefs(this);
-		myIndexDefs.fromXml(this, indexDefsManager);
+		myIndexDefs.fromXml(indexDefsManager);
 
 		schemaManager.parseClosingTag();
 	}
@@ -168,8 +171,9 @@ public class Schema implements LibrisXMLConstants {
 		return fieldIdArray;
 	}
 	
-	public IndexDef[] getIndexFields() {
-		return myIndexDefs.getIndexList();
+	public IndexField[] getIndexFields(String indexId) {
+		final IndexDef index = myIndexDefs.getIndex(indexId);
+		return Objects.isNull(index)? emptyIndexFieldList: index.getFieldList();
 	}
 
 	public String[] getFieldTitles() {
@@ -249,19 +253,11 @@ public class Schema implements LibrisXMLConstants {
 		}
 	}
 
-	public boolean hasGroups() {
-		return myGroupDefs.getNumGroups() != 0;
+	public static String getXmlTag() {
+		return XML_SCHEMA_TAG;
 	}
 
-	public int getFieldNum() {
-		return 0;
-	}
-
-	public String getId() {
-		return null;
-	}
-
-	public String getTitle() {
-		return null;
+	public String getElementTag() {
+		return getXmlTag();
 	}
 }

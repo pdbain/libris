@@ -212,8 +212,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			}
 			librisMgr.closeFile();
 			databaseFileMgr.releaseIpStream(fileIpStream);
-		} catch (FactoryConfigurationError e) {	
-			throw new DatabaseException("Error reading schema"); //$NON-NLS-1$
 		} catch (XmlException e) {	
 			throw new DatabaseException("Error reading schema", e); //$NON-NLS-1$
 		} catch (IOException e) {	

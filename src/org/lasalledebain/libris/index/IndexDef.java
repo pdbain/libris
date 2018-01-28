@@ -1,11 +1,13 @@
 package org.lasalledebain.libris.index;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
+import org.lasalledebain.libris.FieldTemplate.IndexEntryFieldFactory;
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -17,7 +19,8 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 public class IndexDef implements XMLElement {
 
 	private Schema databaseSchema;
-	private short fieldNum;
+	private String indexId;
+	private IndexField[] fieldList;
 
 	public IndexDef(Schema schem) {
 		databaseSchema = schem;
@@ -25,27 +28,44 @@ public class IndexDef implements XMLElement {
 
 	@Override
 	public LibrisAttributes getAttributes() {
-		return LibrisAttributes.getLibrisEmptyAttributes();
+		return new LibrisAttributes(new String[][]{{XML_INDEXDEF_ID_ATTR}, {indexId}});
 	}
 
-	public static String getXmltag() {
-		return XML_INDEXDEFS_TAG;
+	public static String getXmlTag() {
+		return XML_INDEXDEF_TAG;
 	}
 	@Override
 	public String getElementTag() {
-		return getXmltag();
+		return getXmlTag();
 	}
 
 	@Override
 	public void toXml(ElementWriter xmlWriter) throws LibrisException {
-		xmlWriter.writeStartElement(XML_INDEXDEFS_TAG, getAttributes(), true);	
+		xmlWriter.writeStartElement(XML_INDEXDEFS_TAG, getAttributes(), false);	
+		for (IndexField f: fieldList) {
+			f.toXml(xmlWriter);
+		}
+		xmlWriter.writeEndElement();
 	}
 	public void fromXml(ElementManager mgr) throws InputException  {
-		HashMap<String, String> attrs = mgr.parseOpenTag();
-		String fieldIdString = attrs.get(XML_INDEXDEF_ID_ATTR);
-		Assertion.assertNotNullInputException("indexDef."+XML_INDEXDEF_ID_ATTR, fieldIdString);
-		fieldNum = databaseSchema.getFieldNum(fieldIdString);
+		HashMap<String, String> attrs = mgr.parseOpenTag(getElementTag());
+		indexId = attrs.get(XML_INDEXDEF_ID_ATTR);
+		ArrayList<IndexField> fieldArray = new ArrayList<>();
+		while (mgr.hasNext()) {
+			ElementManager fieldMgr = mgr.nextElement();
+			IndexField fld = new IndexField(databaseSchema);
+			fld.fromXml(fieldMgr);
+			fieldArray.add(fld);
+		}
+		fieldList = fieldArray.toArray(new IndexField[fieldArray.size()]);
 	}
+	/**
+	 * @return the fieldList
+	 */
+	public IndexField[] getFieldList() {
+		return fieldList;
+	}
+
 	@Override
 	public boolean equals(Object comparand) {
 		try {
@@ -57,8 +77,7 @@ public class IndexDef implements XMLElement {
 		}
 	}
 
-	public int getFieldNum() {
-		return fieldNum;
+	public String getId() {
+		return indexId;
 	}
-
 }

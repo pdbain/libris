@@ -10,6 +10,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_FIELD_TAG = "field";
 	public static final String XML_FIELD_ID_ATTR = "id";
 	public static final String XML_SET_ID_ATTR = "id";
+	public static final String XML_ENUMSET_TAG = "enumset";
 	public static final String XML_ENUMCHOICE_ID_ATTR = "id";
 	public static final String XML_ENUMCHOICE_VALUE_ATTR = "value";
 	public static final String XML_ENUMCHOICE_TAG = "enumchoice";
@@ -23,6 +24,8 @@ public interface LibrisXMLConstants {
 	public static final String XML_MEMBER_GROUP_ATTR = "group";
 	public static final String XML_MEMBER_PARENT_ATTR = "parent";
 	public static final String XML_INDEXDEF_ID_ATTR = "id";
+	public static final String XML_INDEXFIELD_ID_ATTR = "id";
+	public static final String XML_INDEXFIELD_STOPLIST_ATTR = "false";
 	public static final String XML_LIBRIS_TAG = "libris";
 	public static final String XML_METADATA_TAG = "metadata";
 	public static final String XML_SCHEMA_TAG = "schema";
@@ -56,8 +59,11 @@ public interface LibrisXMLConstants {
 	public static final String XML_RECORDS_LASTID_ATTR = "lastid";
 	public static final String XML_INDEXDEFS_TAG = "indexdefs";
 	public static final String XML_INDEXDEF_TAG = "indexdef";
+	public static final String XML_INDEXFIELD_TAG = "indexfield";
 	public static final String XML_LAYOUTFIELD_TAG = "layoutfield";
 	public static final String XML_INSTANCE_TAG = "instance";
+	
+	public static final String XML_INDEX_NAME_KEYWORDS = "INDEX_RECORD_KEYWORDS";
 	
 	public static final String XML_LIBRISIMPORT_TAG = "librisimport";
 	public static final String XML_LIBRISIMPORT_FIELD_TAG = "field";

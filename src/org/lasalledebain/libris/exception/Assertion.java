@@ -21,6 +21,12 @@ public class Assertion {
 		return result;
 	}
 
+	public static void assertTrueInputException(String message, boolean test) throws InputException {
+		if (!test) {
+			throw new InputException("Error: "+message);
+		}
+	}
+
 	public static void assertEqualsInputException(String message, Object expected, Object actual) throws InputException {
 		boolean result = actual.equals(expected);
 		if (!result) {
