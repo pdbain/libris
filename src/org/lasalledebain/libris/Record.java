@@ -8,6 +8,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.index.IndexDef;
+import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
@@ -70,7 +71,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract FieldType getFieldType(String fid);
 	public abstract boolean valuesEqual(Record comparand);
 	public abstract void getKeywords(int[] fieldList, RecordKeywords keywordList) throws InputException;
-	public abstract void getKeywords(IndexDef[] indexFields, RecordKeywords keywordList) throws InputException;
+	public abstract void getKeywords(IndexField[] indexFields, RecordKeywords keywordList) throws InputException;
 	
 	/* format conversion */
 	public abstract String toString();

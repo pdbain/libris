@@ -24,6 +24,7 @@ import org.lasalledebain.libris.indexes.SortedKeyIntegerBucket;
 import org.lasalledebain.libris.indexes.SortedKeyValueBucketFactory;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.Records;
+import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class IndexManager implements LibrisConstants {
 
@@ -122,7 +123,7 @@ public class IndexManager implements LibrisConstants {
 
 				}
 				final int rId = r.getRecordId();
-				r.getKeywords(db.getSchema().getIndexFields(), keywordList);
+				r.getKeywords(db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS), keywordList);
 				for (BloomFilterSectionEditor b:signatureEditors) {
 					b.switchTo(rId);
 					b.addTerms(keywordList.getKeywords());

@@ -1,6 +1,8 @@
 package org.lasalledebain.libris.index;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
@@ -15,26 +17,22 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 public class IndexDefs implements XMLElement {
 	private Schema databaseSchema;
-	IndexDef[] indexList;
+	LinkedHashMap<String, IndexDef> indexList;
 	
 	public IndexDefs(Schema schem) {
 		databaseSchema = schem;
+		indexList = new LinkedHashMap<>();
 	}
 
 	public void fromXml(Schema schem, ElementManager mgr) throws InputException {
-		mgr.parseOpenTag();
-		ArrayList<IndexDef> indexListArray = new ArrayList<IndexDef>();
+		mgr.parseOpenTag(getXmlTag());
 		while (mgr.hasNext()) {
-			final ElementManager nextElement = mgr.nextElement();
-			ElementManager indexMgr = nextElement;
-			Assertion.assertEqualsInputException("Wrong opening tag for indexDef", 
-					XML_INDEXDEF_TAG, nextElement.getElementTag());
+			ElementManager indexMgr = mgr.nextElement();
 			IndexDef def = new IndexDef(databaseSchema);
 			def.fromXml(indexMgr);
-			indexListArray.add(def);
+			indexList.put(def.getId(), def);
 		}
 		mgr.parseClosingTag();
-		indexList = indexListArray.toArray(new IndexDef[indexListArray.size()]);
 	}
 
 	public static String getXmlTag() {
@@ -46,9 +44,8 @@ public class IndexDefs implements XMLElement {
 	}
 
 	@Override
-	public void fromXml(ElementManager mgr) throws LibrisException {
-		mgr.parseOpenTag();
-		mgr.parseClosingTag();
+	public void fromXml(ElementManager mgr) throws InputException  {
+		fromXml(databaseSchema, mgr);
 	}
 
 	@Override
@@ -59,7 +56,7 @@ public class IndexDefs implements XMLElement {
 	@Override
 	public void toXml(ElementWriter xmlWriter) throws LibrisException {
 		xmlWriter.writeStartElement(XML_INDEXDEFS_TAG, getAttributes(), false);
-		for (IndexDef id: indexList) {
+		for (IndexDef id: indexList.values()) {
 			id.toXml(xmlWriter);
 		}
 		xmlWriter.writeEndElement();
@@ -68,12 +65,12 @@ public class IndexDefs implements XMLElement {
 	public boolean equals(Object comparand) {
 		try {
 			IndexDefs otherIndexDefs = (IndexDefs) comparand;
-			IndexDef[] otherIndexList = otherIndexDefs.indexList;
-			if (otherIndexList.length != indexList.length) {
+			 LinkedHashMap<String, IndexDef> otherIndexList = otherIndexDefs.indexList;
+			if (otherIndexList.size() != indexList.size()) {
 				return false;
 			}
-			for (int i = 0; i < indexList.length; ++i) {
-				if (!indexList[i].equals(otherIndexList[i])) {
+			for (String id: indexList.keySet()) {
+				if (!indexList.get(id).equals(otherIndexList.get(id))) {
 					return false;
 				}
 			}
@@ -85,8 +82,8 @@ public class IndexDefs implements XMLElement {
 		}
 	}
 
-	public IndexDef[] getIndexList() {
-		return indexList;
+	public IndexDef getIndex(String id) {
+		return indexList.get(id);
 	}
 
 }
