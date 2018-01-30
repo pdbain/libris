@@ -12,5 +12,4 @@ public interface XMLElement extends LibrisXMLConstants {
 	public abstract void fromXml(ElementManager mgr) throws LibrisException;
 	public abstract void toXml(ElementWriter output) throws LibrisException;
 	public abstract LibrisAttributes getAttributes() throws XmlException;
-
 }

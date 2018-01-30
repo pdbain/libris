@@ -9,6 +9,10 @@
 			<fielddef id="ID_hardcopy" datatype="boolean" />
 		</fielddefs>
 		<indexdefs>
+		<indexdef id="INDEX_RECORD_KEYWORDS">
+			<indexfield id="ID_auth"/>
+			<indexfield id="ID_keywords"/>
+		</indexdef>
 		</indexdefs>
 	</schema>
 	<layouts/>

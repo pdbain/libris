@@ -74,12 +74,15 @@ Define the indexes in the database
 
 <!ELEMENT indexdef (indexfield*) >
 
+<!ATTLIST indexdef
+	id IDREF #REQUIRED
+	>
+	
 <!ELEMENT indexfield EMPTY>
 
 <!ATTLIST indexfield
 	id IDREF #REQUIRED
 	stoplist %boolean; "false"
-	method NMTOKEN "manual"
 	>
 
 <!ELEMENT layouts (layout*) >

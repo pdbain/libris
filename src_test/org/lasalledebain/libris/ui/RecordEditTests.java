@@ -404,7 +404,7 @@ public class RecordEditTests extends TestCase {
 			gui.exit();
 		} catch (Throwable e) {
 			e.printStackTrace();
-			fail("unexpected exception");
+			fail("unexpected exception ");
 		}
 	}
 
@@ -442,7 +442,7 @@ public class RecordEditTests extends TestCase {
 			gui.exit();
 		} catch (Throwable e) {
 			e.printStackTrace();
-			fail("unexpected exception");
+			fail("unexpected exception "+e.getClass()+e.getMessage());
 		}
 	
 		

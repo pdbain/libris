@@ -189,7 +189,7 @@ public abstract class Layout implements XMLElement {
 		validate();
 	}
 
-	public String getXmlTag() {
+	public static String getXmlTag() {
 		return XML_LAYOUT_TAG;
 	}
 
