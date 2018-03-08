@@ -363,12 +363,12 @@ public class DatabaseTests extends TestCase {
 			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
 			copyDbXml.deleteOnExit();
 			dbInstance.deleteOnExit();
-			FileOutputStream instanceStream = new FileOutputStream(dbInstance);
-			testLogger.log(Level.INFO,getName()+": copy database to "+dbInstance);
+			FileOutputStream instanceStream = new FileOutputStream(dbIncrement);
+			testLogger.log(Level.INFO,getName()+": copy database to "+dbIncrement);
 			rootDb.exportFork(instanceStream);
 			instanceStream.close();
 			int lastId = rootDb.getLastRecordId();
-			forkDb = Libris.buildAndOpenDatabase(dbInstance);
+			forkDb = Libris.buildAndOpenDatabase(dbIncrement);
 			assertNotNull("Error rebuilding database copy", forkDb);
 			assertTrue("database copy does not match original", forkDb.equals(rootDb));
 			
@@ -397,19 +397,72 @@ public class DatabaseTests extends TestCase {
 		}
 	}
 
-	private void checkDbRecords(LibrisDatabase testDb, ArrayList<Record> expectedRecords) {
-		Iterator<Record> expectedRecordIterator = expectedRecords.iterator();
-		for (Record actualRecord: testDb.getRecords()) {
-			assertTrue("too many records", expectedRecordIterator.hasNext());
-			Record e = expectedRecordIterator.next();
-			assertEquals("wrong record", e, actualRecord);
-		}
-		assertFalse("too few records", expectedRecordIterator.hasNext());
-	}
-	
 	@Test
 	public void testMultipleForks() {
-		fail("not implemented");
+		try {
+			ArrayList<Record> expectedRecords = new ArrayList<>();
+			ArrayList<File> forkFiles = new ArrayList<>();
+			ArrayList<File> incrementFiles = new ArrayList<>();
+			int newRecordNumber;
+			File workdir = Utilities.getTempTestDirectory();
+			File dbInstance = new File(workdir, "database_instance.xml");
+				dbInstance.deleteOnExit();
+			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile());
+			for (Record rec: rootDb.getRecords()) {
+				expectedRecords.add(rec);
+			}
+			newRecordNumber = rootDb.getLastRecordId() + 1;
+			for (int forkNum = 0; forkNum < 3; ++forkNum) {
+				File forkFile = new File (workdir, "database_copy_"+forkNum+".xml");
+				testLogger.log(Level.INFO,getName()+": copy database to "+forkFile);
+				forkFiles.add(forkFile);
+				forkFile.deleteOnExit();
+				FileOutputStream forkStream = new FileOutputStream(forkFile);
+				testLogger.log(Level.INFO,getName()+": copy database to "+forkFile);
+				rootDb.exportFork(forkStream);
+				forkStream.close();
+				Record newRootRec = rootDb.newRecord();
+				String fieldData = "Record"+newRecordNumber;
+				newRootRec.addFieldValue("ID_title", fieldData);
+				testLogger.log(Level.INFO,"add new record with "+fieldData+" to root database");
+				rootDb.put(newRootRec);
+				newRecordNumber++;
+				rootDb.save();
+				expectedRecords.add(newRootRec);
+			}
+			int incrementNumber = 0;
+			for (File forkFile: forkFiles) {
+				forkDb = Libris.buildAndOpenDatabase(forkFile);
+				Record recCopy;
+				{
+					Record newForkRec = rootDb.newRecord();
+					String fieldData = "Record"+newRecordNumber;
+					newForkRec.addFieldValue("ID_title", fieldData);
+					int newId = forkDb.put(newForkRec);
+					recCopy = newForkRec.duplicate();
+					testLogger.log(Level.INFO,"add new record " + newId + " with "+fieldData+" to fork "+incrementNumber);
+				}
+				forkDb.save();
+				recCopy.setRecordId(newRecordNumber);
+				expectedRecords.add(recCopy);
+				++newRecordNumber;
+				File dbIncrement = new File(workdir, "database_increment_"+incrementNumber+".xml");
+				dbIncrement.deleteOnExit();
+				forkDb.exportIncrement(new FileOutputStream(dbIncrement));
+				incrementFiles.add(dbIncrement);
+				++incrementNumber;			
+			}
+			
+			for (File incFile: incrementFiles) {
+				rootDb.importIncrement(incFile);	
+				rootDb.save();
+			}
+			
+			checkDbRecords(rootDb, expectedRecords);
+		} catch (IOException | LibrisException e) {
+			e.printStackTrace();
+			fail("unexpected exception");
+		}
 	}
 
 	@Test
@@ -567,6 +620,16 @@ public class DatabaseTests extends TestCase {
 			forkDb = null;
 		}
 		Utilities.deleteWorkingDirectory();
+	}
+
+	private void checkDbRecords(LibrisDatabase testDb, ArrayList<Record> expectedRecords) {
+		Iterator<Record> expectedRecordIterator = expectedRecords.iterator();
+		for (Record actualRecord: testDb.getRecords()) {
+			assertTrue("too many records", expectedRecordIterator.hasNext());
+			Record e = expectedRecordIterator.next();
+			assertEquals("wrong record", e, actualRecord);
+		}
+		assertFalse("too few records", expectedRecordIterator.hasNext());
 	}
 
 	private LibrisDatabase buildTestDatabase(File testDatabaseFileCopy) throws IOException {			
