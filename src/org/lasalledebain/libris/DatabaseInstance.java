@@ -64,10 +64,10 @@ public class DatabaseInstance extends LibrisElement {
 		LibrisAttributes attrs = new LibrisAttributes(
 				new String[][] {
 					{XML_INSTANCE_BASERECID_ATTR, Integer.toString(recordIdBase)},
-					{XML_INSTANCE_FORKDATE_ATTR, LibrisMetadata.formatDate(forkDate)}
+					{XML_INSTANCE_FORKDATE_ATTR, LibrisMetadata.formatDateAndTime(forkDate)}
 					});
 		if (null != joinDate) {
-			attrs.setAttribute(XML_INSTANCE_JOINDATE_ATTR, LibrisMetadata.formatDate(joinDate));
+			attrs.setAttribute(XML_INSTANCE_JOINDATE_ATTR, LibrisMetadata.formatDateAndTime(joinDate));
 		}
 		return attrs;
 	}

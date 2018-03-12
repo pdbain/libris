@@ -41,8 +41,9 @@ public interface LibrisConstants {
 	int NULL_GROUP = -1;
 	public String YMD_TIME_TZ = LibrisConstants.YMD_TIME+" z";
 	String HH_MM_SS = "HH:mm:ss";
-	String YMD = "yyyy-MM-dd";
-	String YMD_TIME = YMD+" "+HH_MM_SS;
+	String YMD_DASHSEP = "yyyy-MM-dd";
+	String YMD = "yyyyMMdd";
+	String YMD_TIME = YMD_DASHSEP+" "+HH_MM_SS;
 	String DATABASE_OR_RECORD_ARE_READ_ONLY = "Database or record are read-only";
 	String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
 	int MINIMUM_TERM_LENGTH = 2;
