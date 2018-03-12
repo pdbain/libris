@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.prefs.BackingStoreException;
@@ -15,6 +16,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -67,8 +69,9 @@ public class LibrisMenu {
 	private LibrisGui guiMain;
 	private JMenu fileMenu;
 	private JMenu editMenu;
-	private JMenu searchMenu;
+	private DatabaseMenu dbMenu;
 	private JMenu recordMenu;
+	private JMenu searchMenu;
 	private JMenu organizeMenu;
 	private NewRecordListener newRecordHandler;
 	private ViewRecordListener viewRecordHandler;
@@ -77,12 +80,12 @@ public class LibrisMenu {
 	private JCheckBoxMenuItem editRecord;
 	private HashSet <JMenuItem> recordMenuEditCommands;
 	private HashSet <JMenuItem> fileMenuModifyCommands;
-	private HashSet <JMenuItem> fileMenuAccessCommands;
 	private final ArrayList<JMenuItem> editMenuFieldValueCommands;
 	private final ArrayList<JMenuItem> editMenuRecordCommands;
 	private JMenuItem duplicateRecord;
 	private JMenuItem childRecord;
 	private JMenuItem searchRecords;
+	private HashSet<JMenuItem> databaseAccessCommands;
 
 	public LibrisMenu(LibrisGui gui) {
 		this();
@@ -102,6 +105,8 @@ public class LibrisMenu {
 		menu.add(fileMenu);
 		editMenu = createEditMenu();
 		menu.add(editMenu);
+		dbMenu = new DatabaseMenu(guiMain);
+		menu.add(dbMenu);
 		recordMenu = createRecordMenu();
 		menu.add(recordMenu);
 		searchMenu = createSearchMenu();
@@ -118,13 +123,13 @@ public class LibrisMenu {
 	 * @return 
 	 */
 	private JMenu createFileMenu() {
-		JMenu fileMenu = new JMenu("File");
+		JMenu menu = new JMenu("File");
 		fileMenuModifyCommands = new HashSet<JMenuItem>();
-		fileMenuAccessCommands = new HashSet<JMenuItem>();
+		databaseAccessCommands = new HashSet<JMenuItem>();
 		openDatabase = new JMenuItem(OPEN_DATABASE);
 		openDatabase.addActionListener(new OpenDatabaseListener());
 		openDatabase.setAccelerator(getAcceleratorKeystroke('O'));
-		fileMenu.add(openDatabase);
+		menu.add(openDatabase);
 		
 		JMenuItem saveDatabase = new JMenuItem("Save");
 		saveDatabase.setAccelerator(getAcceleratorKeystroke('S'));
@@ -132,80 +137,53 @@ public class LibrisMenu {
 		JMenuItem saveDatabaseAs = new JMenuItem("Save as ...");
 		saveDatabaseAs.setAccelerator(getAcceleratorKeystroke('S', java.awt.event.InputEvent.CTRL_DOWN_MASK));
 		saveDatabaseAs.addActionListener(new SaveListener(true));
-		fileMenu.add(saveDatabase);
+		menu.add(saveDatabase);
 		fileMenuModifyCommands.add(saveDatabase);
-		fileMenu.add(saveDatabaseAs);
+		menu.add(saveDatabaseAs);
 		fileMenuModifyCommands.add(saveDatabaseAs);
-		
-		JMenuItem importData = new JMenuItem("Import...");
-		importData.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					DelimitedTextImporter.guiImportFile(database);
-				} catch (DatabaseException exc) {
-					guiMain.alert("Problem importing data", exc);
-				}
-			}
-		});
-		fileMenu.add(importData);
-		fileMenuAccessCommands.add(importData);
-		
-		JMenuItem exportData = new JMenuItem("Export...");
-		exportData.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					guiMain.exportData(database);
-				} catch (LibrisException exc) {
-					guiMain.alert("Problem exporting data", exc);
-				}
-			}
-		});
-		fileMenu.add(exportData);
-		fileMenuAccessCommands.add(exportData);
 		
 		JMenuItem print = new JMenuItem("Print...");
 		print.setAccelerator(getAcceleratorKeystroke('P'));
-		fileMenu.add(print);
-		fileMenuAccessCommands.add(print);
+		menu.add(print);
+		databaseAccessCommands.add(print);
 		
 		JMenuItem closeWindow = new JMenuItem("Close window");
 		closeWindow.addActionListener(new CloseWindowListener(false));
 		closeWindow.setAccelerator(getAcceleratorKeystroke('W'));
-		fileMenu.add(closeWindow);
-		fileMenuAccessCommands.add(closeWindow);
+		menu.add(closeWindow);
+		databaseAccessCommands.add(closeWindow);
 		
 		JMenuItem closeAllWindows = new JMenuItem("Close all windows");
 		closeAllWindows.addActionListener(new CloseWindowListener(true));
 		closeAllWindows.setAccelerator(getAcceleratorKeystroke('W', java.awt.event.InputEvent.SHIFT_DOWN_MASK));
-		fileMenu.add(closeAllWindows);
-		fileMenuAccessCommands.add(closeAllWindows);
+		menu.add(closeAllWindows);
+		databaseAccessCommands.add(closeAllWindows);
 		
 		JMenuItem closeDatabase = new JMenuItem("Close database");
 		closeDatabase.addActionListener(new CloseDatabaseListener());
 		closeDatabase.setAccelerator(getAcceleratorKeystroke('W', java.awt.event.InputEvent.CTRL_DOWN_MASK));
-		fileMenu.add(closeDatabase);
-		fileMenuAccessCommands.add(closeDatabase);
+		menu.add(closeDatabase);
+		databaseAccessCommands.add(closeDatabase);
 
 		JMenuItem quit = new JMenuItem("Quit");
 		quit.addActionListener(new QuitListener());
 		quit.setAccelerator(getAcceleratorKeystroke('Q'));
-		fileMenu.add(quit);
+		menu.add(quit);
 		for (JMenuItem m: fileMenuModifyCommands) {
-			fileMenuAccessCommands.add(m);
+			databaseAccessCommands.add(m);
 		}
-		return fileMenu;
+		return menu;
 	}
 	
 	/**
 	 * Enable or disable File menu choices related to open files.
 	 * @param accessible if database is opened
 	 */
-	public void fileMenuDatabaseAccessible(boolean accessible) {
-		for (JMenuItem m: fileMenuAccessCommands) {
+	public void databaseAccessible(boolean accessible) {
+		for (JMenuItem m: databaseAccessCommands) {
 			m.setEnabled(accessible);
 		}
+		dbMenu.databaseAccessible(database, accessible);
 	}
 
 	public void fileMenuEnableModify(boolean enable) {
@@ -388,6 +366,13 @@ public class LibrisMenu {
 
 	void setSearchMenuEnabled(boolean enabled) {
 		for (Component i: searchMenu.getMenuComponents()) {
+			i.setEnabled(enabled);
+		}
+		searchMenu.setEnabled(enabled);
+	}
+	
+	void setDatabaseMenuEnabled(boolean enabled) {
+		for (Component i: dbMenu.getMenuComponents()) {
 			i.setEnabled(enabled);
 		}
 		searchMenu.setEnabled(enabled);

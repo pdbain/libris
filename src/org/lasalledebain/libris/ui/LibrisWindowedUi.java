@@ -13,18 +13,11 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	protected JFrame mainFrame;
 	private GroupDef selectedGroupDef;
 
-	protected void initializeUi() {
-		mainFrame = new JFrame();
-	}
-	public JFrame getMainFrame() {
-		return mainFrame;
-	}
 	public LibrisWindowedUi() {
 		super();
 		initializeUi();
 		selectedGroupDef = null;
 	}
-	
 	public LibrisWindowedUi(File dbFile) throws LibrisException {
 		this(dbFile, null, false);
 	}
@@ -33,7 +26,13 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		super(databaseFile, auxDirectory, readOnly);
 		initializeUi();
 	}
-
+	protected void initializeUi() {
+		mainFrame = new JFrame();
+	}
+	
+	public JFrame getMainFrame() {
+		return mainFrame;
+	}
 	public void setSelectedGroup(GroupDef grpDef) {
 		selectedGroupDef = grpDef;
 		enableNewChild();

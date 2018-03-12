@@ -13,4 +13,17 @@ public class StringUtils {
 	public static byte[] toCanonicalBytes(String s) {
 		return s.toLowerCase().getBytes(standardCharset);
 	}
+	
+	public static String stripSuffix(String fileName) {
+		int suffixStart = fileName.lastIndexOf('.');
+		if (suffixStart < 0) {
+			return fileName;
+		} else {
+			return fileName.substring(0, suffixStart);
+		}
+	}
+	
+	public static String changeFileExtension(String original, String newExtension) {
+		return stripSuffix(original)+"."+newExtension;
+	}
 }
