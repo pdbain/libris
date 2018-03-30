@@ -7,11 +7,13 @@
 			<fielddef id="ID_auth" title="author"/>
 			<fielddef id="ID_keywords" datatype="string" />
 			<fielddef id="ID_hardcopy" datatype="boolean" />
+			<fielddef id="ID_text" datatype="string" />
 		</fielddefs>
 		<indexdefs>
 		<indexdef id="INDEX_RECORD_KEYWORDS">
 			<indexfield id="ID_auth"/>
 			<indexfield id="ID_keywords"/>
+			<indexfield id="ID_text"/>
 		</indexdef>
 		</indexdefs>
 	</schema>
@@ -22,6 +24,11 @@
 			<field id="ID_auth" value="testauthor" />
 			<field id="ID_keywords" value="k1 k2 k3" />
 			<field id="ID_hardcopy" value="true" />
+			<field id="ID_text" value="Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+			sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+			Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+			Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+			Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." />
 		</record>
 		<record id="2">
 			<field id="ID_auth" value="testauthor" />

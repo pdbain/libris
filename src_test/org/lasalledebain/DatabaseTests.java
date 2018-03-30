@@ -7,7 +7,6 @@ import static org.lasalledebain.Utilities.testLogger;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,7 +17,6 @@ import org.junit.Test;
 import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Libris;
-import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.Record;

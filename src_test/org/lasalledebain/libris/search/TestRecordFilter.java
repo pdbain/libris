@@ -51,7 +51,7 @@ public class TestRecordFilter extends TestCase {
 	
 	public void testGetIndexFields() {
 		IndexField[] indexFieldList = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
-		int expectedFieldNums[] = new int[] {0,1};
+		int expectedFieldNums[] = new int[] {0,1,3};
 		Iterator actualFields = Arrays.asList(indexFieldList).iterator();
 		for (int fld: expectedFieldNums) {
 			assertTrue ("missing field "+fld, actualFields.hasNext());
