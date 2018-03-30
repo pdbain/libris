@@ -39,6 +39,7 @@ import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.records.XmlRecordsReader;
+import org.lasalledebain.libris.search.KeywordFilter;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.ui.LibrisUiGeneric;
@@ -760,6 +761,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return new DatabaseRecordList(this);	
 	}
 
+	public RecordList getKeywordFilteredRecordList(KeywordFilter filter) {
+		return null;
+	}
 	public int getModifiedRecordCount() {
 		return metadata.getModifiedRecords();
 	}
