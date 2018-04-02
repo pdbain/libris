@@ -22,8 +22,6 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.Template;
-
 public abstract class GenericField implements Field {
 
 	@Override
@@ -272,7 +270,7 @@ public abstract class GenericField implements Field {
 			} else if ((null != valueAttr) && !valueAttr.isEmpty()) {
 				f = rec.addFieldValue(fieldId, valueAttr);
 			} else {
-				throw new InputException("value and extraValue empty: "+rec.getRecordId()+"."+fieldId);
+				throw new InputException("value and extraValue empty: "+rec.getRecordId());
 			}
 		}
 		fieldManager.parseClosingTag();
