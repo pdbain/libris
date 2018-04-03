@@ -13,9 +13,11 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
+import org.lasalledebain.libris.xmlUtils.ElementShape;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisEmptyAttributes;
+import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
 public class Layouts implements XMLElement {
 	public static final String DEFAULT_LAYOUT_VALUE = "default";
@@ -129,6 +131,17 @@ public class Layouts implements XMLElement {
 	public static String getXmlTag() {
 		return XML_LAYOUTS_TAG;
 	}
+	static public ElementShape getShape() {
+		return XmlShapes.makeShape(getTag(), 
+				new String [] {XML_LAYOUT_TAG},
+				XmlShapes.emptyRequiredAttributesList,
+				XmlShapes.emptyOptionalAttributesList,
+				false);
+	}
+	private static String getTag() {
+		return getXmlTag();
+	}
+
 	public int getFieldNum() {
 		return 0;
 	}

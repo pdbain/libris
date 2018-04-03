@@ -19,7 +19,7 @@ public class EnumField extends GuiControl {
 	JPanel control;
 	private EnumFieldChoices legalValues;
 	private ArrayList<String> extraValues;
-	JComboBox valueSelector;
+	JComboBox<String> valueSelector;
 	private int height;
 	private int width;
 	private int numLegalValues;
@@ -75,7 +75,7 @@ public class EnumField extends GuiControl {
 		for (int i = 0; i < numLegalValues; ++i) {
 			comboValues[i] = comboValues[i].intern();
 		}
-		valueSelector = new JComboBox(comboValues);
+		valueSelector = new JComboBox<String>(comboValues);
 		valueSelector.setSelectedIndex(-1);
 		if ((height > 0) && (width > 0)) {
 			valueSelector.setSize(width, height);

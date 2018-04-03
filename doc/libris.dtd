@@ -37,7 +37,7 @@
 <!ATTLIST fielddef
 	id ID #REQUIRED 
 	title CDATA #IMPLIED
-	datatype (string|boolean|integer|valuepair|INDEXENTRY|enum) "string"
+	datatype (string|boolean|integer|valuepair|INDEXENTRY|enum|location) "string"
 	enumset IDREF #IMPLIED
 	default CDATA #IMPLIED
 	valueseparator CDATA #IMPLIED
