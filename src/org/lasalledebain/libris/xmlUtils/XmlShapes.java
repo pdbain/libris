@@ -12,6 +12,7 @@ import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexDefs;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.ui.Layout;
+import org.lasalledebain.libris.ui.Layouts;
 
 
 public class XmlShapes implements LibrisXMLConstants {
@@ -100,7 +101,7 @@ public class XmlShapes implements LibrisXMLConstants {
 				new String[] {LibrisXMLConstants.XML_LAYOUT_ID_ATTR},
 				new String[][] {{"title", ""}, {"type","table"}, {"height", "300"}, {"width", "400"}});		
 		
-		shapes.put(XML_LAYOUTS_TAG, makeLayoutsXmlShape());
+		shapes.put(Layouts.getXmlTag(), Layouts.getShape());
 		shapes.put(XML_LAYOUTUSAGE_TAG, makeLayoutUsageXmlShape());
 		shapes.put(Record.getXmlTag(), Record.getShape());
 		makeShape(shapes, GroupMember.getMemberTag(),
@@ -199,13 +200,6 @@ public class XmlShapes implements LibrisXMLConstants {
 		s.setSubElementNames(new String[] {XML_ENUMCHOICE_TAG});
 		return s;
 	}
-
-	@Deprecated
-	private static ElementShape makeLayoutsXmlShape() {
-		 ElementShape s = new ElementShape(XML_LAYOUTS_TAG);
-			s.setSubElementNames(new String[] {XML_LAYOUT_TAG});
-			return s;
-		}
 
 	@Deprecated
 private static ElementShape makeLayoutUsageXmlShape() {
