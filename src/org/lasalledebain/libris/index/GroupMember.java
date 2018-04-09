@@ -105,10 +105,10 @@ public class GroupMember extends GenericField implements XMLElement {
 
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
-		LibrisAttributes attrs = getAttributes();
 		boolean empty = affiliates.length == 0;
-		output.writeStartElement(XML_MEMBER_TAG, attrs, empty);
 		if (!empty) {
+			LibrisAttributes attrs = getAttributes();
+			output.writeStartElement(XML_MEMBER_TAG, attrs, empty);
 			boolean first = true;
 			for (int affId: affiliates) {
 				if (first) {
@@ -126,7 +126,10 @@ public class GroupMember extends GenericField implements XMLElement {
 	@Override
 	public LibrisAttributes getAttributes() throws XmlException {
 		LibrisAttributes attrs = new LibrisAttributes();
-		attrs.setAttribute(XML_MEMBER_PARENT_ATTR, Integer.toString(getParent()));
+		int parent = getParent();
+		if (NULL_ID != parent) {
+			attrs.setAttribute(XML_MEMBER_PARENT_ATTR, Integer.toString(parent));
+		}
 		attrs.setAttribute(XML_MEMBER_GROUP_ATTR, def.getFieldId());		
 		return attrs;
 	}
