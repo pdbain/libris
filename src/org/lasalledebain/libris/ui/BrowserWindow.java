@@ -42,7 +42,7 @@ public class BrowserWindow extends JPanel {
 	private static final int VISIBLE_LIMIT = 64;
 
 	private LibrisDatabase database;
-	private JList chooser;
+	private JList<?> chooser;
 	private final LibrisGui gui;
 	private JPanel filterView;
 	private JButton moreButton;
