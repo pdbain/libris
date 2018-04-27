@@ -3,7 +3,6 @@ package org.lasalledebain.libris.ui;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
@@ -11,6 +10,8 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+
+import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
 
 public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	private String schemaPath;
@@ -23,14 +24,6 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	public HeadlessUi(File dbFile) throws LibrisException {
 		super(dbFile);
-	}
-
-	public Logger getuiLogger() {
-		return uiLogger;
-	}
-
-	public void setuiLogger(Logger uiLogger) {
-		this.uiLogger = uiLogger;
 	}
 
 	// TODO write headless UI
@@ -46,12 +39,12 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void alert(String msg, Exception e) {
-		uiLogger.log(Level.WARNING, msg, e);
+		librisLogger.log(Level.WARNING, msg, e);
 	}
 
 	@Override
 	public void alert(String msg) {
-		uiLogger.log(Level.WARNING, msg);
+		librisLogger.log(Level.WARNING, msg);
 	}
 
 	@Override
@@ -66,7 +59,7 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void displayRecord(int recordId) throws LibrisException {
-		uiLogger.log(Level.FINE, RecordId.toString(recordId));
+		librisLogger.log(Level.FINE, RecordId.toString(recordId));
 	}
 
 	@Override
@@ -105,7 +98,7 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void put(Record newRecord) throws DatabaseException {
-		uiLogger.log(Level.FINE, newRecord.toString());
+		librisLogger.log(Level.FINE, newRecord.toString());
 	}
 
 	public void repaint() {

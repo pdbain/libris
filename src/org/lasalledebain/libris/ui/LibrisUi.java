@@ -53,8 +53,6 @@ public interface LibrisUi {
 
 	public boolean isDatabaseSelected();
 
-	public Logger getuiLogger();
-
 	public abstract void put(Record newRecord) throws DatabaseException;
 
 	public void addRecord(Record newRecord) throws DatabaseException;

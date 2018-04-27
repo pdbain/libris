@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ENTITY % boolean "(true|false)">
-<!ENTITY % controltype "(radiobutton|checkbox|textbox|textfield|rangefield|enumfield|names)">
+<!ENTITY % controltype "(radiobutton|checkbox|textbox|textfield|rangefield|enumfield|names|locationfield)">
 <!ENTITY % usagetype "(newrecord|formdisplay|summarydisplay|formentry|tabledisplay)">
 <!ENTITY % groupstructure "(flat|hierarchical)">
 

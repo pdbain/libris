@@ -15,20 +15,7 @@ public class RecordTextField extends GuiControl {
 	JTextField control;
 	public RecordTextField(int height, int width) {
 		control = new JTextField();
-		control.getDocument().addDocumentListener(new DocumentListener() {
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				setModified(true);
-			}
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				setModified(true);
-			}
-			@Override
-			public void changedUpdate(DocumentEvent e) {
-				setModified(true);
-			}
-		});
+		control.getDocument().addDocumentListener(getModificationListener());
 	}
 
 	public RecordTextField(String contents) {

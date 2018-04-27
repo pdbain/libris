@@ -320,6 +320,7 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 						}
 						break;
 					case T_FIELD_PAIR:
+					case T_FIELD_LOCATION:
 						try {
 							String mainValue = fv.getMainValueAsString();
 							valuesStream.writeUTF(mainValue);

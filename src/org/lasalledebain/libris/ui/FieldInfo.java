@@ -48,6 +48,7 @@ public class FieldInfo implements LibrisXMLConstants, GuiConstants{
 		temp.put(FieldType.T_FIELD_PAIR, GuiConstants.GUI_PAIRFIELD);
 		temp.put(FieldType.T_FIELD_STRING, GuiConstants.GUI_TEXTFIELD);
 		temp.put(FieldType.T_FIELD_TEXT, GuiConstants.GUI_TEXTBOX);
+		temp.put(FieldType.T_FIELD_LOCATION, GuiConstants.GUI_LOCATIONFIELD);
 		temp.put(FieldType.T_FIELD_AFFILIATES, GuiConstants.GUI_NAMES_BROWSER);
 		return temp;
 	}

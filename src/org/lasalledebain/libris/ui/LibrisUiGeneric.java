@@ -48,7 +48,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	 */
 	protected static Preferences librisPrefs;
 	protected static Object prefsSync = new Object();
-	protected Logger uiLogger;
 	private UiField selectedField;
 	protected String uiTitle;
 	protected LibrisDatabase currentDatabase;
@@ -67,8 +66,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	}
 
 	public LibrisUiGeneric() {
-		uiLogger = Logger.getLogger(LibrisUi.class.getName());
-		LibrisUiGeneric.setLoggingLevel(uiLogger);
 		fieldSelected(false);
 		setSelectedField(null);
 	}
@@ -162,10 +159,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		setTitle(title);
 	}
 
-	public Logger getuiLogger() {
-		return uiLogger;
-	}
-
 	public static Preferences getLibrisPrefs() {
 		synchronized (prefsSync) {
 			if (null == librisPrefs) {
@@ -174,10 +167,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 		}
 		return librisPrefs;
-	}
-
-	public Logger getUiLogger() {
-		return uiLogger;
 	}
 
 	@Override

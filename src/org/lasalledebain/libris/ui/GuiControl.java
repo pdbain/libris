@@ -5,6 +5,9 @@ import java.awt.Frame;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
 
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -31,8 +34,9 @@ public abstract class GuiControl {
 
 	boolean singleValue;
 	boolean restricted;
-	boolean empty = true;
+	protected boolean empty = true;
 	protected Frame parentFrame = null;
+	protected DocumentListener modListener;
 
 	public boolean isEmpty() {
 		return empty;
@@ -95,10 +99,32 @@ public abstract class GuiControl {
 	}
 
 	public void addFocusListener(FocusListener focusTracker) {
-		getFocusComponent().addFocusListener(focusTracker);
+		Component focusComponent = getFocusComponent();
+		focusComponent.addFocusListener(focusTracker);
 	}
 	
 	public int getNumValues() {
 		return 1;
+	}
+
+	protected DocumentListener getModificationListener() {
+		if (null == modListener) {
+			modListener = new DocumentListener() {
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					setModified(true);
+				}
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					setModified(true);
+				}
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					setModified(true);
+				}
+			};
+		}
+		return modListener;
+	
 	}
 }

@@ -19,19 +19,30 @@ public abstract class GuiControlFactory {
 		try {
 			String cName = GuiConstants.GUI_TEXTBOX;
 			map.put(cName, new TextboxConstructor());
-			
+
 			cName = GuiConstants.GUI_TEXTFIELD;
 			map.put(cName, new TextfieldConstructor());
-			
+
 			cName = GuiConstants.GUI_PAIRFIELD;
 			map.put(cName, new RangefieldConstructor());
-			
+
 			cName = GuiConstants.GUI_CHECKBOX;
 			map.put(cName, new CheckboxConstructor());
-			
+
 			cName = GuiConstants.GUI_ENUMFIELD;
-			map.put(cName, new EnumfieldConstructor());
-			
+			map.put(cName, new ControlConstructor() {
+				public GuiControl makeControl(String title, int height, int width) {	
+					return new EnumField(height, width);
+				}		
+			});
+
+			cName = GuiConstants.GUI_LOCATIONFIELD;
+			map.put(cName, new ControlConstructor() {
+				public GuiControl makeControl(String title, int height, int width) {	
+					return new LocationField(height, width);
+				}
+			});
+
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		}
@@ -124,9 +135,4 @@ public abstract class GuiControlFactory {
 		}
 	}
 
-	static class EnumfieldConstructor extends ControlConstructor {
-		public GuiControl makeControl(String title, int height, int width) {	
-			return new EnumField(height, width);
-		}		
-	}
 	}
