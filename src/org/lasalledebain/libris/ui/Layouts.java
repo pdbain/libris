@@ -41,6 +41,7 @@ public class Layouts implements XMLElement {
 		HashMap<String, Dimension> dims = new HashMap<String, Dimension>();
 		dims.put(GuiConstants.GUI_TEXTBOX, new Dimension(25,1));
 		dims.put(GuiConstants.GUI_PAIRFIELD, new Dimension(3,1));
+		dims.put(GuiConstants.GUI_LOCATIONFIELD, new Dimension(3,1));
 		return dims;
 	}
 

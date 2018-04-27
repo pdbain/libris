@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.field;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.lasalledebain.libris.Field;
@@ -20,7 +21,11 @@ public class LocationField extends GenericField implements Field {
 	 */
 	@Override
 	public void addValuePair(String value, String extraValue) throws FieldDataException {
-		// TODO Auto-generated method stub
+		try {
+			new URL(value);
+		} catch (MalformedURLException e) {
+			throw new  FieldDataException("Invalid data "+value+" ("+extraValue+") for "+template.getFieldTitle(), e);
+		}
 		super.addValuePair(value, extraValue);
 	}
 

@@ -11,13 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -42,6 +37,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
 
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitHandler;
@@ -211,7 +207,7 @@ public class LibrisGui extends LibrisWindowedUi {
 				try {
 					prefs.flush();
 				} catch (BackingStoreException e) {
-					uiLogger.log(Level.WARNING, "exception in destroyWindow", e);
+					librisLogger.log(Level.WARNING, "exception in destroyWindow", e);
 				}
 			}
 			for (Component c: mainWindow.getComponents()) {
@@ -304,34 +300,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 	@Override
 	public void alert(String msg, Exception e) {
-		StringBuilder buff = new StringBuilder(msg);
-		LibrisDatabase.log(Level.WARNING, e.getMessage(), e);
-		String emessage = "";
-		buff.append(e.getClass().getSimpleName());
-		
-		String excMsg = e.getMessage();
-		if (Objects.nonNull(excMsg)) {
-			buff.append(": ");
-			buff.append(excMsg);
-			buff.append("\n");
-		}
-		if (null != e) {
-			emessage = LibrisUiGeneric.formatConciseStackTrace(e, buff);
-		}
-		String errorString = buff.toString();
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		e.printStackTrace(new PrintStream(bos));
-		try {
-			uiLogger.log(Level.WARNING, bos.toString(Charset.defaultCharset().name()));
-		} catch (UnsupportedEncodingException e1) {
-			e1.printStackTrace();
-		}
-		Throwable c = e;
-		errorString += e.getClass().getSimpleName() + "\n";
-		while (null != ( c = c.getCause())) {
-			errorString += '\n'+c.getMessage();
-		}
-		LibrisDatabase.librisLogger.log(Level.FINE, emessage, e);
+		String errorString = formatAlertString(msg, e);
 		alert(errorString);
 	}
 
