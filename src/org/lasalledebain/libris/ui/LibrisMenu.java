@@ -330,7 +330,7 @@ public class LibrisMenu {
 		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord};
 		return recMenu;
 	}
-	
+
 	void recordWindowOpened(boolean recordEditable) {
 		if (isEditable()) {
 			for (JMenuItem i: recordWindowItems) {
@@ -339,7 +339,7 @@ public class LibrisMenu {
 			editRecord.setState(recordEditable);
 		}
 	}
-	
+
 	void recordWindowClosed() {
 		for (JMenuItem i: recordWindowItems) {
 			i.setEnabled(false);
