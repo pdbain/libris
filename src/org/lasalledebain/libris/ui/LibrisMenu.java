@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.prefs.BackingStoreException;
@@ -16,7 +15,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -27,7 +25,6 @@ import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -75,10 +72,8 @@ public class LibrisMenu {
 	private JMenu organizeMenu;
 	private NewRecordListener newRecordHandler;
 	private ViewRecordListener viewRecordHandler;
-	private JMenuItem viewRecord;
-	private JMenuItem enterRecord;
+	private JMenuItem enterRecord, viewRecord;
 	private JCheckBoxMenuItem editRecord;
-	private HashSet <JMenuItem> recordMenuEditCommands;
 	private HashSet <JMenuItem> fileMenuModifyCommands;
 	private final ArrayList<JMenuItem> editMenuFieldValueCommands;
 	private final ArrayList<JMenuItem> editMenuRecordCommands;
@@ -98,6 +93,10 @@ public class LibrisMenu {
 		editMenuRecordCommands = new ArrayList<JMenuItem>(2);
 	}
 	
+	private boolean isEditable() {
+		return (null != database)  && !database.isReadOnly();
+	}
+
 	protected JMenuBar createMenus() {
 		JMenuBar menu = new JMenuBar();
 		
@@ -282,7 +281,6 @@ public class LibrisMenu {
 	}
 
 	private JMenu createRecordMenu() {
-		recordMenuEditCommands = new HashSet<JMenuItem>();
 		/* edit menu */
 		JMenu recMenu = new JMenu("Record");
 		JMenuItem newRecord = new JMenuItem("New record");
@@ -290,10 +288,10 @@ public class LibrisMenu {
 		newRecordHandler = new NewRecordListener();
 		newRecord.addActionListener(newRecordHandler);
 		recMenu.add(newRecord);
-		recordMenuEditCommands.add(newRecord);
 		
 		viewRecord = new JMenuItem("View record");
 		viewRecordHandler = new ViewRecordListener();
+		viewRecord.addActionListener(viewRecordHandler);
 		recMenu.add(viewRecord);
 		viewRecord.setEnabled(false);
 		
@@ -309,16 +307,15 @@ public class LibrisMenu {
 		enterRecord.setAccelerator(getAcceleratorKeystroke('E'));
 		enterRecord.addActionListener(new EnterRecordListener());
 		recMenu.add(enterRecord);
+		enterRecord.setEnabled(false);
 		
 		duplicateRecord = new JMenuItem("Duplicate record");
 		recMenu.add(duplicateRecord);
-		recordMenuEditCommands.add(duplicateRecord);
 		duplicateRecord.setEnabled(false);
 		duplicateRecord.addActionListener(new DuplicateRecordListener());
 		
 		childRecord = new JMenuItem("New child record");
 		recMenu.add(childRecord);
-		recordMenuEditCommands.add(childRecord);
 		childRecord.setEnabled(false);
 		childRecord.addActionListener(new ActionListener() {
 			@Override
@@ -330,25 +327,26 @@ public class LibrisMenu {
 				}
 			}
 		});
-		
-		recMenu.add("Link record");
+		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord};
 		return recMenu;
 	}
 	
-	void setRecordEditEnabled(boolean enabled) {
-		for (Component i: recordMenuEditCommands) {
-			i.setEnabled(enabled);
+	void recordWindowOpened(boolean recordEditable) {
+		if (isEditable()) {
+			for (JMenuItem i: recordWindowItems) {
+				i.setEnabled(true);
+			}
+			editRecord.setState(recordEditable);
 		}
-		recordMenu.setEnabled(enabled);
-		setRecordDuplicateRecordEnabled(false);
-		setRecordEnterRecordEnabled(false);
-		setEditRecordState();
 	}
-
-	public void setEditRecordState() {
-		editRecordListener.setEditingState();
+	
+	void recordWindowClosed() {
+		for (JMenuItem i: recordWindowItems) {
+			i.setEnabled(false);
+		}
+		editRecord.setState(false);
 	}
-
+	
 	private JMenu createSearchMenu() {
 		JMenu srchMenu = new JMenu("Search");
 		srchMenu.add("Find in record...");
@@ -576,20 +574,12 @@ public class LibrisMenu {
 			boolean wasEditable = guiMain.isEditable();
 			try {
 				boolean result = guiMain.setRecordWindowEditable(!wasEditable);
-				editRecord.setState(result);
+				editRecord.setState(!result);
 				if (wasEditable && !result)
 					guiMain.alert(LibrisConstants.DATABASE_OR_RECORD_ARE_READ_ONLY);
 			} catch (LibrisException e) {
 				guiMain.alert("Problem toggling editable", e);
 			}
-		}
-		
-		public void setEditingState() {
-			boolean isEditable = false;
-			if (null != guiMain) {
-				isEditable = guiMain.isEditable();
-			}
-			editRecord.setState(isEditable);
 		}
 	}
 	
@@ -628,9 +618,9 @@ public class LibrisMenu {
 		return newRecordHandler;
 	}
 
-	private static final String DATABASE_FILE = "DATABASE_FILE";
 	private EditRecordListenerImpl editRecordListener;
 	private JMenuItem openDatabase;
+	private JMenuItem recordWindowItems[];
 	public void enableFieldValueOperations(boolean selected) {
 		for (JMenuItem m: editMenuFieldValueCommands) {
 			m.setEnabled(selected);
@@ -649,6 +639,5 @@ public class LibrisMenu {
 		
 		}
 	}
-
 }
 

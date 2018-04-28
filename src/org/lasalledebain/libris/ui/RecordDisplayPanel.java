@@ -66,7 +66,7 @@ public class RecordDisplayPanel extends JPanel {
 		rw.setModified(false);
 		rw.setEditable(editable);
 		addRecordWindow(rw);
-		menu.setRecordEditEnabled(editable);
+		menu.recordWindowOpened(editable);
 		return rw;
 	}
 // FIXME summary view not shown
@@ -243,8 +243,16 @@ public class RecordDisplayPanel extends JPanel {
 				openRecordPanes.remove(selectedRecordIndex);
 				currentRecordWindow.close();
 				currentRecord.setEditable(false);
-				menu.setEditRecordState();
 			}
+			adjustMenusForWindowClose();
+		}
+	}
+
+	private void adjustMenusForWindowClose() {
+		menu.recordWindowClosed();
+		RecordWindow w = getCurrentRecordWindow();
+		if (null != w) {
+			menu.recordWindowOpened(w.isEditable());
 		}
 	}		
 
@@ -286,7 +294,7 @@ public class RecordDisplayPanel extends JPanel {
 			int currentRecordIndex = openRecordPanes.getSelectedIndex();
 			removeRecord(currentRecordIndex);
 		}
-		menu.setEditRecordState();
+		adjustMenusForWindowClose();
 	}
 
 	private void removeRecord(int index) {
