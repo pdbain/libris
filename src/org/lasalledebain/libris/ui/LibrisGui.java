@@ -292,7 +292,6 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	public void displayRecord(int recId) throws LibrisException {
 		displayPanel.displayRecord(recId);
-		menu.setRecordEditEnabled(true);
 	}
 
 	FilterDialogue createSearchDialogue() {
@@ -475,7 +474,6 @@ public class LibrisGui extends LibrisWindowedUi {
 		menu.setDatabase(currentDatabase);
 		menu.databaseAccessible(enable);
 		menu.editMenuEnableModify(enable);
-		menu.setRecordEditEnabled(enable);
 		menu.setSearchMenuEnabled(enable);
 		if (!accessible && (null != resultsPanel)) {
 			resultsPanel.clearSelection();
@@ -524,6 +522,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	public void repaint() {
+		resultsPanel.repaint();
 		displayPanel.repaint();
 	}
 
