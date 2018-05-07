@@ -91,7 +91,7 @@ public class GuiManualTests extends TestCase {
 		JPanel recordPanel = new JPanel(panelLayout);
 
 		c.gridx = 0; c.gridy = 0;
-		GuiControl f1 = new TextBox(10, 25);
+		GuiControl f1 = new TextBox(10, 25, true);
 
 		JPanel p = new JPanel();
 		p.setLayout(new FlowLayout());
@@ -119,7 +119,7 @@ public class GuiManualTests extends TestCase {
 		JPanel recordPanel = new JPanel(panelLayout);
 
 		c.gridx = 0; c.gridy = 0;
-		GuiControl f1 = new EnumField(10, 25);
+		GuiControl f1 = new EnumField(10, 25, true);
 		String[] enumValues = new String[] {"one", "two", "three"};
 		EnumFieldChoices choices = new EnumFieldChoices();
 		try {

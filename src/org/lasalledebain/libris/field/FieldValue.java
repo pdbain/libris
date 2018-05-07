@@ -11,6 +11,11 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 	public FieldValueIterator iterator() {
 		return new RecordFieldValueIterator(this);
 	}
+	private static final EmptyFieldValue emptyFieldValueSingleton = new EmptyFieldValue();
+
+	public static EmptyFieldValue getEmptyfieldvaluesingleton() {
+		return emptyFieldValueSingleton;
+	}
 
 	public class RecordFieldValueIterator implements FieldValueIterator, Iterable<FieldValue> {
 
@@ -52,9 +57,9 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 		}
 		return count;
 	}
-	
+
 	public abstract String getValueAsString();
-	
+
 	public LibrisAttributes getValueAsAttributes() throws FieldDataException {
 		LibrisAttributes values = new LibrisAttributes();
 		String mainValueAsKey = getMainValueAsKey();
@@ -94,7 +99,7 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 	public boolean isEmpty() {
 		return false;
 	}
-	
+
 	public int getValueAsInt() {
 		return 0;
 	}
@@ -102,7 +107,7 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 		if (getNumberOfValues() != comparand.getNumberOfValues()) {
 			return false;
 		}
-		
+
 		Iterator<FieldValue> compIterator = comparand.iterator();
 		for (FieldValue v: this) {
 			FieldValue cNext = compIterator.next();

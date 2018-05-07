@@ -40,12 +40,14 @@ public class NameList extends GuiControl {
 		}
 	}
 
-	public NameList(LibrisWindowedUi ui, LibrisDatabase db, Record rec, GroupDef gd) throws InputException {
+	public NameList(LibrisWindowedUi ui, LibrisDatabase db, Record rec, GroupDef gd, boolean editable) throws InputException {
+		super(0, 0, editable);
 		grpDef = gd;
 		windowedUi = ui;
 		dBase = db;
 		currentRecord = rec;
 		isEditable = true;
+		affiliateInfo = new Vector<KeyIntegerTuple>(0);
 		setValues(rec, gd);
 	}
 
@@ -56,7 +58,7 @@ public class NameList extends GuiControl {
 
 	private void setFieldValues(int[] affiliates) throws InputException {
 		int affLen = affiliates.length;
-		affiliateInfo = new Vector<KeyIntegerTuple>(affLen);
+		affiliateInfo.setSize(affLen);
 		if (0 == affLen) {
 			affiliateInfo.add(NULL_ID_TUPLE);
 		} else {
@@ -65,8 +67,13 @@ public class NameList extends GuiControl {
 				affiliateInfo.add(new KeyIntegerTuple(dBase.getRecordName(recordNumber), recordNumber));
 			}
 		}
+		displayControls();
+	}
+
+	@Override
+	protected void displayControls() {
 		control = new JList(affiliateInfo);
-		if (affLen > 0) {
+		if (affiliateInfo.size() > 0) {
 			control.setSelectedIndex(0);
 			// TODO add menu item to edit affiliate list
 		}
@@ -111,11 +118,6 @@ public class NameList extends GuiControl {
 		isEditable = edtble;
 	}
 
-	@Override
-	public boolean isEditable() {
-		return isEditable;
-	}
-	
 	@Override
 	public int getNumValues() {
 		return affiliateInfo.size();
@@ -204,6 +206,16 @@ public class NameList extends GuiControl {
 			return;
 		}
 
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return affiliateInfo.size() > 0;
+	}
+
+	@Override
+	public void setEmpty(boolean empty) {
+		affiliateInfo.setSize(0);
 	}
 
 }

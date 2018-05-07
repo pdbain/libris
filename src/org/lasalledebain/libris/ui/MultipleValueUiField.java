@@ -5,6 +5,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import javax.swing.BorderFactory;
@@ -22,7 +24,6 @@ import org.lasalledebain.libris.field.FieldValueIterator;
  */
 public class MultipleValueUiField extends UiField  implements Iterable<FieldValue> {
 	private ArrayList<GuiControl> controlList;
-	private Iterator<GuiControl> controlListIterator;
 	private FieldPosition fldInfo;
 	public MultipleValueUiField(FieldPosition fInfo, boolean labelField, Field fld, int numValues, ModificationTracker modTrk) {
 		super(fld,modTrk);
@@ -80,20 +81,33 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 	}
 
 	private class UiFieldValueIterator implements FieldValueIterator {
+		private Iterator<GuiControl> controlListIterator;
+		private GuiControl nextControl;
 		private UiFieldValueIterator(Iterator<GuiControl> cListI) {
 			controlListIterator = cListI;
+			nextControl = null;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return controlListIterator.hasNext();
+			if (Objects.isNull(nextControl) && controlListIterator.hasNext()) {
+				GuiControl temp = controlListIterator.next();
+				if (!temp.isEmpty()) {
+					nextControl = temp;
+				}
+			}
+			return Objects.nonNull(nextControl);
 		}
 
 		@Override
 		public FieldValue next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
 			try {
-				GuiControl nextControl = controlListIterator.next();
-				return nextControl.getFieldValue();
+				final FieldValue fieldValue = nextControl.getFieldValue();
+				nextControl = null;
+				return fieldValue;
 			} catch (FieldDataException e) {
 				LibrisDatabase.librisLogger.log(Level.SEVERE, e.getMessage());
 				return null;
@@ -144,7 +158,7 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 	@Override
 	public int getNumValues() {
 		int result = 0;
-		if ((controlList.size() > 0) && !controlList.get(0).empty) {
+		if ((controlList.size() > 0) && !controlList.get(0).isEmpty()) {
 				result = controlList.size();
 		}
 		return result;

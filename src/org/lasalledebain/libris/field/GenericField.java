@@ -212,7 +212,7 @@ public abstract class GenericField implements Field {
 		tMap.put("valuepair", FieldType.T_FIELD_PAIR);
 		tMap.put("indexentry", FieldType.T_FIELD_INDEXENTRY);
 		tMap.put("enum", FieldType.T_FIELD_ENUM);
-		tMap.put("location", FieldType.T_FIELD_LOCATION);
+		tMap.put("location", FieldType.T_FIELD_PAIR);
 
 		return tMap;
 	}

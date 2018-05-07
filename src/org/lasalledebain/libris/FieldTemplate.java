@@ -12,7 +12,6 @@ import org.lasalledebain.libris.field.BooleanField;
 import org.lasalledebain.libris.field.EnumField;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.field.IntegerField;
-import org.lasalledebain.libris.field.LocationField;
 import org.lasalledebain.libris.field.PairField;
 import org.lasalledebain.libris.field.StringField;
 import org.lasalledebain.libris.index.GroupDef;
@@ -263,12 +262,6 @@ public class FieldTemplate implements XMLElement {
 		}
 				);
 		temp.put(Field.FieldType.T_FIELD_AFFILIATES, new AffiliatesFieldFactory());
-		temp.put(Field.FieldType.T_FIELD_LOCATION, new FieldFactory() {
-			@Override
-			public GenericField newField(FieldTemplate masterCopy) {
-				return new LocationField(masterCopy);
-			}		
-		});
 		return temp;
 	}
 

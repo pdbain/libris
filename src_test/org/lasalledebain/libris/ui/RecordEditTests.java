@@ -461,7 +461,7 @@ public class RecordEditTests extends TestCase {
 			pause();
 			MultipleValueUiField titleField = (MultipleValueUiField) recWindow.getField(ID_TITL);
 			assertNotNull("Could not find "+ID_TITL, titleField);
-			assertEquals("wrong initial number of field values", titleField.getNumValues(), 1);
+			assertEquals("wrong initial number of field values", 1, titleField.getNumValues());
 			String oldFieldValues = titleField.getRecordField().getValuesAsString();
 			titleField.doSelect();
 			gui.newFieldValue();
