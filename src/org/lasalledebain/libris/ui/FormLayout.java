@@ -68,8 +68,7 @@ public class FormLayout extends Layout {
 
 				Box groupBox = Box.createHorizontalBox();
 				groupBox.setBorder(affiliateBorder);
-				GuiControl uiField = new NameList(ui, db, rec, def);
-				uiField.setEditable(modifiable);
+				GuiControl uiField = new NameList(ui, db, rec, def, modifiable);
 				Component comp = uiField.getGuiComponent();
 				GroupMember gm = rec.getMember(groupNum);
 				if (null == gm) {

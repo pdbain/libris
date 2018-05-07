@@ -71,6 +71,7 @@
 			<field id="ID_publisher" value="NS_e1" />
 			<field id="ID_keywords" value="k1 k2 k3" />
 			<field id="ID_hardcopy" value="true" />
+			<field id="ID_location" value="https://httpbin.org/html" extravalue="Random text"/>
 		</record>
 		<record id="2">
 			<field id="ID_auth" value="Rec2Fld1Val1" />
@@ -78,6 +79,7 @@
 			<field id="ID_pages" value="365" />
 			<field id="ID_keywords" value="Ulysses Odysseus Trojan war" />
 			<field id="ID_hardcopy" value="true" />
+			<field id="ID_location" value="https://httpbin.org/html"/>
 		</record>
 		<record id="3">
 			<field id="ID_auth" value="Rec3Fld1Val1" />

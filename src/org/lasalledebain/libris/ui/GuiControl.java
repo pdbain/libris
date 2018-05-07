@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.ui;
 
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
@@ -14,8 +15,18 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
 public abstract class GuiControl {
+	protected static final String EMPTY_TEXT_VALUE = "";
 	private FieldInfo fldInfo;
 	private ModificationTracker modMon;
+	protected boolean editable;
+	protected int height;
+	protected int width;
+	public GuiControl(int height, int width, boolean editable) {
+		this.editable = editable;
+		this.height = height;
+		this.width = width;
+	}
+
 	public boolean isSingleValue() {
 		return singleValue;
 	}
@@ -34,13 +45,10 @@ public abstract class GuiControl {
 
 	boolean singleValue;
 	boolean restricted;
-	protected boolean empty = true;
 	protected Frame parentFrame = null;
 	protected DocumentListener modListener;
 
-	public boolean isEmpty() {
-		return empty;
-	}
+	public abstract boolean isEmpty();
 
 	public abstract void setFieldValue(String controlValue) throws FieldDataException;
 
@@ -74,9 +82,15 @@ public abstract class GuiControl {
 		this.fldInfo = fieldInfo;
 	}
 
-	public abstract void setEditable(boolean editable);
-	public abstract boolean isEditable();
-	
+	public boolean isEditable() {
+		return editable;
+	}
+
+	public void setEditable(boolean newEditableValue) {
+		this.editable = newEditableValue;
+	}
+	protected abstract void displayControls();
+
 	protected void setModified(boolean modified) {
 		modMon.setModified(modified);
 	}
@@ -86,9 +100,7 @@ public abstract class GuiControl {
 		// TODO track modifications in subclasses
 	}
 
-	public void setEmpty(boolean empty) {
-		this.empty = empty;
-	}
+	public abstract void setEmpty(boolean empty);
 
 	public void requestFocusInWindow() {
 		getFocusComponent().requestFocusInWindow();

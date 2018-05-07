@@ -10,29 +10,26 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldBooleanValue;
 import org.lasalledebain.libris.field.FieldValue;
 
-public class CheckBox extends GuiControl {
+public class CheckBoxControl extends GuiControl {
 
 	boolean selected;
-	public class CheckboxListener implements ItemListener {
-
-		@Override
-		public void itemStateChanged(ItemEvent arg0) {
-			if (!editable) {
-				control.setState(!control.getState());
-			} else {
-				setModified(true);
-			}
-		}
-
-	}
-
 	Checkbox control;
 	private boolean editable;
-	public CheckBox(String title, int height, int width) {
-		control = new Checkbox(title);
-		control.addItemListener(new CheckboxListener());
-	}
+	private String title;
+	private boolean empty;
 
+	public boolean isEmpty() {
+		return empty;
+	}
+	public void setEmpty(boolean empty) {
+		this.empty = empty;
+	}
+	public CheckBoxControl(String title, int height, int width, boolean editable) {
+		super(height, width, editable);
+		this.title = title;
+		empty = true;
+		displayControls();
+	}
 	@Override
 	public void setFieldValue(String controlValue) {
 		control.setState(Boolean.parseBoolean(controlValue));
@@ -57,15 +54,20 @@ public class CheckBox extends GuiControl {
 	}
 
 	@Override
-	public void setEditable(boolean edtable) {
-		editable = edtable;
+	protected void displayControls() {
+		control = new Checkbox(title);
+		control.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				if (!editable) {
+					control.setState(!control.getState());
+				} else {
+					setModified(true);
+				}
+			}
+
+		}
+				);
 		control.setEnabled(editable);
 	}
-
-	@Override
-	public boolean isEditable() {
-		return editable;
-	}
-
-
 }

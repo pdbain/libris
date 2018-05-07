@@ -20,17 +20,20 @@ public class EnumField extends GuiControl {
 	private EnumFieldChoices legalValues;
 	private ArrayList<String> extraValues;
 	JComboBox<String> valueSelector;
-	private int height;
-	private int width;
 	private int numLegalValues;
 	private JPanel filler;
+	private boolean empty;
 	
-	public EnumField(int height, int width) {
+	public EnumField(int height, int width, boolean editable) {
+		super(height, width, editable);
+		displayControls();
+		this.editable = editable;
+	}
+
+	protected void displayControls() {
 		control = new JPanel();
 		filler = new JPanel();
 		control.setSize(width, height);
-		this.height = height;
-		this.width = width;
 		Dimension ctrlDim = new Dimension(Math.max(100, width), Math.max(20,height));
 		filler.setPreferredSize(ctrlDim);
 		filler.setMinimumSize(ctrlDim);
@@ -40,9 +43,9 @@ public class EnumField extends GuiControl {
 	}
 	
 	@Override
-	public void setEmpty(boolean empty) {
-		super.setEmpty(empty);
-		setContent(empty);
+	public void setEmpty(boolean newEmpty) {
+		empty = newEmpty;
+		setContent(newEmpty);
 	}
 
 	private void setContent(boolean useFiller) {
@@ -81,6 +84,7 @@ public class EnumField extends GuiControl {
 			valueSelector.setSize(width, height);
 		}
 		valueSelector.addItemListener(new ItemListener() {
+
 
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
@@ -140,6 +144,7 @@ public class EnumField extends GuiControl {
 	}
 	@Override
 	public void setEditable(boolean editable) {
+		super.setEditable(editable);
 		valueSelector.setEnabled(editable);
 		if (isEmpty()) {
 			setContent(!editable);
@@ -153,7 +158,7 @@ public class EnumField extends GuiControl {
 	}
 
 	@Override
-	public boolean isEditable() {
-		return valueSelector.isEditable();
+	public boolean isEmpty() {
+		return empty;
 	}
 }
