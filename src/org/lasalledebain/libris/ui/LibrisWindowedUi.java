@@ -21,43 +21,10 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import static javax.swing.JOptionPane.showMessageDialog;
 
-public abstract class LibrisWindowedUi extends LibrisUiGeneric {
-	@Override
-	public void close(boolean allWindows, boolean closeGui) {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void exit() {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public int confirm(String msg) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	@Override
-	public int confirmWithCancel(String msg) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	@Override
-	public void put(Record newRecord) throws DatabaseException {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void setRecordName(NamedRecordList namedRecs) throws InputException {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public String SelectSchemaFile(String schemaName) throws DatabaseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+public abstract class LibrisWindowedUi extends LibrisUiGeneric {	
+	protected JFrame mainFrame;
+	private GroupDef selectedGroupDef;
+
 	public static void alert(Component parentComponent, String msg, Exception e) {
 		showMessageDialog(parentComponent, formatAlertString(msg, e));
 	}
@@ -93,14 +60,6 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		LibrisDatabase.librisLogger.log(Level.FINE, emessage, e);
 		return errorString;
 	}
-	
-	@Override
-	public boolean isReadOnly() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-	protected JFrame mainFrame;
-	private GroupDef selectedGroupDef;
 
 	public LibrisWindowedUi() {
 		super();

@@ -445,7 +445,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	@Override
 	public String SelectSchemaFile(String schemaName) throws DatabaseException {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub SelectSchemaFile(String schemaName)
 		return null;
 	}
 
@@ -639,25 +639,6 @@ public class LibrisGui extends LibrisWindowedUi {
 			alert("Error creating record");
 		}
 		return newRec;
-	}
-
-	@Deprecated
-	class RecordNameDialogue implements ActionListener {
-		final LibrisDatabase dBase;
-		public RecordNameDialogue(LibrisDatabase db) {
-			dBase = db;
-		}
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			dBase.getUi().getSelectedField();
-		}
-		
-	}
-
-	@Override
-	void enableNewChild() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public static void makeLabelledControl(JPanel parentPanel, Component theControl, String labelText, boolean vertical) {
