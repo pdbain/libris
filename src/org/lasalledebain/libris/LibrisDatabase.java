@@ -401,7 +401,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 				FileOutputStream opFile = propsMgr.getOpStream();
 				metadata.saveProperties(opFile);
 			} catch (IOException e) {
-				getUi().alert("Exception saving properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
+				alert("Exception saving properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
 			} finally {
 				try {
 					propsMgr.releaseOpStream();
@@ -914,18 +914,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public String getRecordName(int recordNum) throws InputException {
 		Record rec = getRecord(recordNum);
 		return (null == rec) ? null: rec.getName();
-	}
-
-	public String getTitle() {
-		return null;
-	}
-
-	public String getId() {
-		return null;
-	}
-
-	public int getFieldNum() {
-		return 0;
 	}
 }
 

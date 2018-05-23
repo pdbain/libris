@@ -50,15 +50,6 @@ public class FieldLocationValue extends FieldValue {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.lasalledebain.libris.field.FieldValue#getExtraValueAsKey()
-	 */
-	@Override
-	public String getExtraValueAsKey() {
-		// TODO Auto-generated method stub
-		return super.getExtraValueAsKey();
-	}
-
-	/* (non-Javadoc)
 	 * @see org.lasalledebain.libris.field.FieldValue#getNumberOfValues()
 	 */
 	@Override
