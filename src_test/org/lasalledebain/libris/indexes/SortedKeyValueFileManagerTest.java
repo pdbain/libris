@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.indexes;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,8 +9,6 @@ import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import junit.framework.TestCase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,13 +16,15 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.exception.InputException;
 
+import junit.framework.TestCase;
+
 public class SortedKeyValueFileManagerTest extends TestCase {
 	private File workDir;
 	private SortedKeyValueBucketFactory<KeyIntegerTuple> bucketFactory;
 	private SortedKeyValueFileManager<KeyIntegerTuple> mgr;
 	private ArrayList<FileAccessManager> fileList;
 	static String multiLevelTestNames[] = {"testRandomOrderManyBuckets", "testMultipleLevels"};
-	static HashSet<String> multiLevelTests = new HashSet(Arrays.asList(multiLevelTestNames));
+	static HashSet<String> multiLevelTests = new HashSet<String>(Arrays.asList(multiLevelTestNames));
 	
 	@Before
 	public void setUp() {

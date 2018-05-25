@@ -21,11 +21,12 @@ import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementReader;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
-public class Schema implements LibrisXMLConstants {
+public class Schema implements LibrisXMLConstants, XMLElement {
 	protected static final IndexField[] emptyIndexFieldList = new IndexField[0];
 	public Schema() {
 		enumSets = new TreeMap<String, EnumFieldChoices>();
@@ -46,9 +47,9 @@ public class Schema implements LibrisXMLConstants {
 	ArrayList<String> fieldTitles;
 	String fieldIdArray[];
 	String fieldTitleArray[];
-	private LibrisDatabase database;
 	private GroupDefs myGroupDefs;
 	private IndexDefs myIndexDefs;
+	private LibrisAttributes xmlAttributes;
 
 	public void fromXml(ElementReader xmlReader) throws DatabaseException, InputException {
 		ElementManager schemaManager = new ElementManager(xmlReader, new QName(LibrisXMLConstants.XML_SCHEMA_TAG),
@@ -58,7 +59,8 @@ public class Schema implements LibrisXMLConstants {
 
 	public void fromXml(ElementManager schemaManager) throws DatabaseException, InputException
 	{
-		schemaManager.parseOpenTag(getXmlTag());
+		HashMap<String, String> attrs = schemaManager.parseOpenTag(getXmlTag());
+		xmlAttributes = new LibrisAttributes(attrs);
 		if (!schemaManager.hasNext()) {
 			throw new XmlException(schemaManager, "<schema> cannot be empty");
 		}
@@ -96,6 +98,10 @@ public class Schema implements LibrisXMLConstants {
 		xmlWriter.writeEndElement(); /* fielddefs */
 		myIndexDefs.toXml(xmlWriter);
 		xmlWriter.writeEndElement(); /* schema */
+	}
+
+	public LibrisAttributes getAttributes() {
+		return xmlAttributes;
 	}
 
 	private void parseFieldDefs(ElementManager fieldDefsManager)
@@ -248,7 +254,7 @@ public class Schema implements LibrisXMLConstants {
 				return fieldList.equals(otherSchema.fieldList);
 			}
 		} catch (ClassCastException e) {
-			database.log(Level.WARNING, "Incompatible comparand in "+getClass().getName()+".equals()", e);
+			LibrisDatabase.log(Level.WARNING, "Incompatible comparand in "+getClass().getName()+".equals()", e);
 			return false;
 		}
 	}

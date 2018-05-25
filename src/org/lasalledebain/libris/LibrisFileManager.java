@@ -1,7 +1,6 @@
 package org.lasalledebain.libris;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -69,7 +68,7 @@ public class LibrisFileManager implements LibrisConstants {
 			auxDirectory = new File(databaseDir, AUX_DIRECTORY_NAME+'_'+directoryName);
 		}
 		lockFile = new File(auxDirectory, LOCK_FILENAME);
-		open(databaseFile, auxDirectory);
+		open(auxDirectory);
 		mgrLock  = new ReentrantLock();
 		locked = false;
 	}
@@ -164,7 +163,7 @@ public class LibrisFileManager implements LibrisConstants {
 		return (databaseFile == null)? "<no database file given>": databaseFile.getParent();
 	}
 
-	public void open(File databaseFile, File auxDir) {
+	public void open(File auxDir) {
 		try {
 			setAuxiliaryFiles(auxDir);
 		} catch (DatabaseException e) {
@@ -184,7 +183,7 @@ public class LibrisFileManager implements LibrisConstants {
 	 */
 	public synchronized void setAuxiliaryFiles(File databaseDir) throws DatabaseException {
 		checkLock();
-		if (null == databaseFile) {
+		if (!fileSet()) {
 			throw new DatabaseException("Database file not set");
 		}
 		journalAccessMgr = new FileAccessManager(new File(auxDirectory, JOURNAL_FILENAME));

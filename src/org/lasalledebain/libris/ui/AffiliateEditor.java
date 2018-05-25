@@ -5,7 +5,6 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
@@ -17,11 +16,8 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
-import org.lasalledebain.libris.exception.FieldDataException;
-import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
@@ -36,7 +32,6 @@ public class AffiliateEditor {
 	private final GuiControl guiCtrl;
 	public AffiliateEditor(Record currentRecord, final GuiControl ctrl, LibrisWindowedUi ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
 			Vector<KeyIntegerTuple> affiliateInfo, JList affiliateList, GroupDef grpDef) {
-		final Record rec = currentRecord;
 		guiCtrl = ctrl;
 		affInfo = affiliateInfo;
 		affList = affiliateList;

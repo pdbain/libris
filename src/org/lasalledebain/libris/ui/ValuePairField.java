@@ -1,13 +1,9 @@
 package org.lasalledebain.libris.ui;
 
 import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.event.FocusListener;
 import java.util.Objects;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldSingleStringValue;

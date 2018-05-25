@@ -6,7 +6,6 @@ import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;

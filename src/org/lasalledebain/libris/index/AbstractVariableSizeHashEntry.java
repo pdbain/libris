@@ -6,7 +6,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import org.lasalledebain.libris.hashfile.HashBucket;
-import org.lasalledebain.libris.hashfile.HashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 
 public abstract class AbstractVariableSizeHashEntry extends AbstractHashEntry implements VariableSizeHashEntry {

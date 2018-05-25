@@ -15,7 +15,6 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
-import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;

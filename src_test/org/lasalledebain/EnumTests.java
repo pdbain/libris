@@ -2,13 +2,12 @@ package org.lasalledebain;
 
 import java.io.ByteArrayInputStream;
 
-import junit.framework.TestCase;
-
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
+
+import junit.framework.TestCase;
 
 
 public class EnumTests extends TestCase {

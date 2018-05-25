@@ -5,7 +5,6 @@ import java.util.HashMap;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.field.AffiliatesField;
 import org.lasalledebain.libris.field.BooleanField;

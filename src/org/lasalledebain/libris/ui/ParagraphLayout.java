@@ -4,14 +4,11 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.logging.Level;
 
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
