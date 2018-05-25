@@ -2,12 +2,8 @@ package org.lasalledebain.libris;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
@@ -19,6 +15,8 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
+import org.lasalledebain.libris.index.IndexDef;
+import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -34,7 +32,6 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	GroupMember affiliations[];
 	boolean editable = false;
 	private RecordTemplate template;
-	private long filePosition = -1;
 	private long dataLength = -1;
 	private LibrisAttributes attributes;
 	
@@ -268,6 +265,19 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 			}
 		}
 	}
+	
+	@Override
+	public void getKeywords(IndexField[] indexFields, RecordKeywords keywordList) throws InputException {
+		for (IndexField f: indexFields) {
+			Field fld = getField(f.getFieldNum());
+			if (null != fld) {
+				String values = fld.getValuesAsString();
+				if ((null != values) && !values.isEmpty()) {
+					keywordList.addKeywords(Arrays.asList(values.split("\\W+")));
+				}
+			}
+		}
+	}
 	private class FieldIterator implements Iterator<Field>, Iterable<Field> {
 	
 		int fieldIndex;
@@ -351,8 +361,23 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	@Override
 	public String toString() {
 		StringBuffer buff = new StringBuffer();
+		buff.append("Record ID: ");
 		buff.append(RecordId.toString(getRecordId())); 
 		buff.append('\n');
+		for (int groupNum = 0; groupNum < template.getNumGroups(); ++groupNum) {
+			if (hasAffiliations(groupNum)) {
+				GroupMember member = affiliations[groupNum];
+				buff.append(member.getTitle());
+				buff.append(": ");
+				String separator = "";
+				for ( int affiliate: member.getAffiliations()) {
+					buff.append(separator);
+					buff.append(String.valueOf(affiliate));
+					separator = ", ";
+				}
+				buff.append('\n');
+			}
+		}
 		for (Field f:recordData) {
 			if (null == f) {
 				continue;
@@ -563,12 +588,6 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		return otherRec;
 	}
 
-	public long getFilePosition() {
-		return filePosition;
-	}
-	public void setFilePosition(long filePosition) {
-		this.filePosition = filePosition;
-	}
 	public long getDataLength() {
 		return dataLength;
 	}
@@ -689,6 +708,24 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	@Override
 	public void setRecordId(int recId) {
 		id = recId;
+	}
+
+	@Override
+	public void offsetIds(int baseId, int idAdjustment) throws InputException {
+		id += idAdjustment;
+		if (null != affiliations) {
+			int numGroups = template.getNumGroups();
+			for (int groupNum = 0; groupNum < numGroups; ++ groupNum) {
+				if (hasAffiliations(groupNum)) {
+					int[] affiliates = getAffiliates(groupNum);
+					for (int a = 0; a < affiliates.length; ++a) {
+						if (affiliates[a] > baseId) {
+							affiliates[a] += idAdjustment;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	@Override

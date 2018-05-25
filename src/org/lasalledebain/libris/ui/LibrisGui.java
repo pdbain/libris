@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -295,7 +296,6 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	public void displayRecord(int recId) throws LibrisException {
 		displayPanel.displayRecord(recId);
-		menu.setRecordEditEnabled(true);
 	}
 
 	FilterDialogue createSearchDialogue() {
@@ -306,6 +306,14 @@ public class LibrisGui extends LibrisWindowedUi {
 		StringBuilder buff = new StringBuilder(msg);
 		LibrisDatabase.log(Level.WARNING, e.getMessage(), e);
 		String emessage = "";
+		buff.append(e.getClass().getSimpleName());
+		
+		String excMsg = e.getMessage();
+		if (Objects.nonNull(excMsg)) {
+			buff.append(": ");
+			buff.append(excMsg);
+			buff.append("\n");
+		}
 		if (null != e) {
 			emessage = LibrisUiGeneric.formatConciseStackTrace(e, buff);
 		}
@@ -318,6 +326,7 @@ public class LibrisGui extends LibrisWindowedUi {
 			e1.printStackTrace();
 		}
 		Throwable c = e;
+		errorString += e.getClass().getSimpleName() + "\n";
 		while (null != ( c = c.getCause())) {
 			errorString += '\n'+c.getMessage();
 		}
@@ -493,9 +502,9 @@ public class LibrisGui extends LibrisWindowedUi {
 	@Override
 	public void recordsAccessible(boolean accessible) {
 		boolean enable = accessible && (null != currentDatabase);
-		menu.fileMenuDatabaseAccessible(accessible);
+		menu.setDatabase(currentDatabase);
+		menu.databaseAccessible(enable);
 		menu.editMenuEnableModify(enable);
-		menu.setRecordEditEnabled(enable);
 		menu.setSearchMenuEnabled(enable);
 		if (!accessible && (null != resultsPanel)) {
 			resultsPanel.clearSelection();
@@ -510,7 +519,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	public void exportData(LibrisDatabase db) throws LibrisException {
 		try {
-			DatabaseExporter.guiExportFile(db);
+			DatabaseExporter.guiExportFile(this, db);
 		} catch (InputException e) {
 			db.alert("Error exporting database", e);
 		}
@@ -544,6 +553,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	public void repaint() {
+		resultsPanel.repaint();
 		displayPanel.repaint();
 	}
 

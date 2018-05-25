@@ -1,33 +1,36 @@
 package org.lasalledebain.libris.index;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 public class IndexDefs implements XMLElement {
-
-
-	private LibrisDatabase database;
-	private ArrayList<IndexDef> indexList;
+	private Schema databaseSchema;
+	LinkedHashMap<String, IndexDef> indexList;
 	
-	public IndexDefs(LibrisDatabase db) {
-		this.database = db;
-		indexList = new ArrayList<IndexDef>();
+	public IndexDefs(Schema schem) {
+		databaseSchema = schem;
+		indexList = new LinkedHashMap<>();
 	}
 
 	public void fromXml(Schema schem, ElementManager mgr) throws InputException {
-		mgr.parseOpenTag();
+		mgr.parseOpenTag(getXmlTag());
 		while (mgr.hasNext()) {
 			ElementManager indexMgr = mgr.nextElement();
+			IndexDef def = new IndexDef(databaseSchema);
+			def.fromXml(indexMgr);
+			indexList.put(def.getId(), def);
 		}
 		mgr.parseClosingTag();
 	}
@@ -41,9 +44,8 @@ public class IndexDefs implements XMLElement {
 	}
 
 	@Override
-	public void fromXml(ElementManager mgr) throws LibrisException {
-		mgr.parseOpenTag();
-		mgr.parseClosingTag();
+	public void fromXml(ElementManager mgr) throws InputException  {
+		fromXml(databaseSchema, mgr);
 	}
 
 	@Override
@@ -52,20 +54,36 @@ public class IndexDefs implements XMLElement {
 	}
 
 	@Override
-	public void toXml(ElementWriter xmlWriter) throws XmlException {
+	public void toXml(ElementWriter xmlWriter) throws LibrisException {
 		xmlWriter.writeStartElement(XML_INDEXDEFS_TAG, getAttributes(), false);
+		for (IndexDef id: indexList.values()) {
+			id.toXml(xmlWriter);
+		}
 		xmlWriter.writeEndElement();
 	}
 	@Override
 	public boolean equals(Object comparand) {
 		try {
 			IndexDefs otherIndexDefs = (IndexDefs) comparand;
-			return indexList.equals(otherIndexDefs.indexList);
+			 LinkedHashMap<String, IndexDef> otherIndexList = otherIndexDefs.indexList;
+			if (otherIndexList.size() != indexList.size()) {
+				return false;
+			}
+			for (String id: indexList.keySet()) {
+				if (!indexList.get(id).equals(otherIndexList.get(id))) {
+					return false;
+				}
+			}
+			return true;
 		} catch (ClassCastException e) {
 			LibrisDatabase.librisLogger.log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
 			return false;
 		
 		}
+	}
+
+	public IndexDef getIndex(String id) {
+		return indexList.get(id);
 	}
 
 }

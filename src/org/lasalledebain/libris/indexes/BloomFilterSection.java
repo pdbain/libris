@@ -129,4 +129,15 @@ public abstract class BloomFilterSection {
 			}
 		}		
 	}
+
+	public static int calculateSignatureLevels(int numRecords) {
+		int levels = 1;
+		int numSigs = levels * BRANCH_FACTOR;
+		int numTopLevelSignatures = numRecords / BRANCH_FACTOR;
+		while (numSigs < numTopLevelSignatures) {
+			++levels;
+			numSigs *= BRANCH_FACTOR;
+		}
+		return levels;
+	}
 }

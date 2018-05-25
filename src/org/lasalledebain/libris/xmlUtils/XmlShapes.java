@@ -3,10 +3,15 @@ package org.lasalledebain.libris.xmlUtils;
 import java.util.HashMap;
 
 import org.lasalledebain.libris.EnumFieldChoices;
+import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
+import org.lasalledebain.libris.index.IndexDef;
+import org.lasalledebain.libris.index.IndexDefs;
+import org.lasalledebain.libris.index.IndexField;
+import org.lasalledebain.libris.ui.Layout;
 
 
 public class XmlShapes implements LibrisXMLConstants {
@@ -34,17 +39,18 @@ public class XmlShapes implements LibrisXMLConstants {
 				new String[] {XML_DATABASE_SCHEMA_NAME_ATTR, XML_SCHEMA_VERSION_ATTR},
 				new String[][] {{XML_DATABASE_NAME_ATTR, "unknown"}, {XML_DATABASE_DATE_ATTR, ""},
 						{XML_DATABASE_SCHEMA_LOCATION_ATTR, ""}});
-		makeShape(shapes, XML_METADATA_TAG, new String[] {XML_SCHEMA_TAG, XML_LAYOUTS_TAG}, emptyList, emptyListList);
-		makeShape(shapes, XML_INSTANCE_TAG, emptyList, 
-				new String[] {XML_INSTANCE_STARTRECID_ATTR, XML_INSTANCE_FORKDATE_ATTR}, new String[][]{{XML_INSTANCE_JOINDATE_ATTR, ""}});
+		makeShape(shapes, XML_METADATA_TAG, 
+				new String[] {XML_SCHEMA_TAG, XML_LAYOUTS_TAG}, emptyList, emptyListList);
+		makeShape(shapes, XML_INSTANCE_TAG, 
+				emptyList, 
+				new String[] {XML_INSTANCE_BASERECID_ATTR, XML_INSTANCE_FORKDATE_ATTR}, new String[][]{{XML_INSTANCE_JOINDATE_ATTR, ""}});
 		makeShape(shapes, XML_ENUMCHOICE_TAG, emptyList, new String[] {XML_ENUMCHOICE_ID_ATTR},
 				new String[][]{{XML_ENUMCHOICE_VALUE_ATTR, ""}});
-		shapes.put(EnumFieldChoices.getXmlTag(), makeEnumsetXmlShape());
+		shapes.put(XML_ENUMSET_TAG, makeEnumsetXmlShape());
 		
 		shapes.put(GroupDefs.getXmlTag(), GroupDefs.getXmlShape());
 		shapes.put(GroupDef.getTag(), GroupDef.getShape());
-		makeShape(shapes, 
-				XML_FIELDDEF_TAG, 
+		makeShape(shapes, XML_FIELDDEF_TAG, 
 				emptyList, 
 				new String[] {XML_FIELDDEF_ID_ATTR},
 				new String[][] {
@@ -55,31 +61,45 @@ public class XmlShapes implements LibrisXMLConstants {
 				{XML_FIELDDEF_EDITABLE_ATTR, "true"}, {XML_VALUESEPARATOR_ATTR, ""}, {XML_INHERIT_ATTR, ""}
 		});
 		
-		makeShape(shapes, 
-				XML_FIELD_TAG, 
+		makeShape(shapes, XML_FIELD_TAG, 
 				emptyList, 
 				new String[] {XML_RECORD_ID_ATTR},
 		new String[][] {{XML_ENUMCHOICE_VALUE_ATTR, ""}, {XML_EXTRA_VALUE_ATTR, ""}}, 
 		true);
 
-		makeShape(shapes, 
-				XML_LAYOUTFIELD_TAG,
+		makeShape(shapes, XML_LAYOUTFIELD_TAG,
 				emptyList, 
 				new String[] {"id"},
 				new String[][] {{"title", ""}, {"row", ""}, {"column",""}, {"height", ""}, {"width", ""}, 
 						{"return", "false"}, {"hspan", "1"}, {"vspan", "1"}, {"control", DEFAULT_GUI_CONTROL}});
-		makeShape(shapes,
-				XML_FIELDDEFS_TAG, 
-				new String[] {EnumFieldChoices.getXmlTag(), XML_FIELDDEF_TAG},
+		makeShape(shapes, XML_FIELDDEFS_TAG, 
+				new String[] {XML_FIELDDEF_ENUMSET_TAG, FieldTemplate.getXmlTag()},
 				emptyList,
 				emptyListList);
 		makeShape(shapes,
-				XML_INDEXDEFS_TAG, 
-				new String[] {EnumFieldChoices.getXmlTag(), XML_INDEXDEF_TAG},
+				IndexDefs.getXmlTag(), 
+				new String[] {IndexDef.getXmlTag()},
 				emptyList,
 				emptyListList);
-		shapes.put(XML_INDEXES_TAG, makeIndexesXmlShape());
-		shapes.put(XML_LAYOUT_TAG, makeLayoutXmlShape());
+
+		makeShape(shapes,
+				IndexDef.getXmlTag(), 
+				new String[] {IndexField.getXmlTag()},
+				new String[] {XML_INDEXDEF_ID_ATTR},
+				emptyListList);		
+		
+		makeShape(shapes,
+				IndexField.getXmlTag(), 
+				emptyList, 
+				new String[] {XML_INDEXFIELD_ID_ATTR},
+				new String[][] {{XML_INDEXFIELD_STOPLIST_ATTR, "false"}});		
+		
+		makeShape(shapes,
+				Layout.getXmlTag(), 
+				new String[] {XML_LAYOUTFIELD_TAG, XML_LAYOUTUSAGE_TAG},
+				new String[] {LibrisXMLConstants.XML_LAYOUT_ID_ATTR},
+				new String[][] {{"title", ""}, {"type","table"}, {"height", "300"}, {"width", "400"}});		
+		
 		shapes.put(XML_LAYOUTS_TAG, makeLayoutsXmlShape());
 		shapes.put(XML_LAYOUTUSAGE_TAG, makeLayoutUsageXmlShape());
 		shapes.put(Record.getXmlTag(), Record.getShape());
@@ -177,22 +197,6 @@ public class XmlShapes implements LibrisXMLConstants {
 		ElementShape s = new ElementShape(EnumFieldChoices.getXmlTag());
 		s.setRequiredAttributeNames(new String[] {XML_SET_ID_ATTR});
 		s.setSubElementNames(new String[] {XML_ENUMCHOICE_TAG});
-		return s;
-	}
-
-	@Deprecated
-	private static ElementShape makeIndexesXmlShape() {
-		ElementShape s = new ElementShape(XML_INDEXES_TAG);
-		s.setSubElementNames(emptyList);
-		return s;
-	}
-
-	@Deprecated
-	private static ElementShape makeLayoutXmlShape() {
-		 ElementShape s = new ElementShape(XML_LAYOUT_TAG);
-		s.setSubElementNames(new String[] {XML_LAYOUTFIELD_TAG, XML_LAYOUTUSAGE_TAG});
-		s.setRequiredAttributeNames(new String[] {LibrisXMLConstants.XML_LAYOUT_ID_ATTR});
-		s.setOptionalAttributeNames(new String[][] {{"title", ""}, {"type","table"}, {"height", "300"}, {"width", "400"}});
 		return s;
 	}
 

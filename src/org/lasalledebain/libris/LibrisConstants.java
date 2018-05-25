@@ -13,6 +13,7 @@ public interface LibrisConstants {
 	public static final String PROPERTY_RECORD_COUNT = "libris.database.recordcount";
 	public static final String PROPERTY_LAST_OPENED = "libris.database.lastopened";
 	public static final String PROPERTY_LAST_SAVED = "libris.database.lastsaved";
+	public static final String PROPERTY_SIGNATURE_LEVELS = "libris.database.signaturelevels";
 	public static final String FILENAME_JOURNAL_SUFFIX = "lbrj";
 	public static final String FILENAME_NATIVE_RECORDS_SUFFIX = "lbrn";
 	public static final String FILENAME_XML_FILES_SUFFIX = "libr";
@@ -40,8 +41,9 @@ public interface LibrisConstants {
 	int NULL_GROUP = -1;
 	public String YMD_TIME_TZ = LibrisConstants.YMD_TIME+" z";
 	String HH_MM_SS = "HH:mm:ss";
-	String YMD = "yyyy-MM-dd";
-	String YMD_TIME = YMD+" "+HH_MM_SS;
+	String YMD_DASHSEP = "yyyy-MM-dd";
+	String YMD = "yyyyMMdd";
+	String YMD_TIME = YMD_DASHSEP+" "+HH_MM_SS;
 	String DATABASE_OR_RECORD_ARE_READ_ONLY = "Database or record are read-only";
 	String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
 	int MINIMUM_TERM_LENGTH = 2;
@@ -53,6 +55,7 @@ public interface LibrisConstants {
 	public static final String JOURNAL_FILENAME = "journal";
 	public static final String LOCK_FILENAME = "databaseLock";
 	public static final String NAMEDRECORDS_FILENAME_ROOT = "namedrecs_";
+	public static final String SIGNATURE_FILENAME_ROOT = "signature_";
 	public static final String AFFILIATES_FILENAME_ROOT = "affiliates_";
 	public static final String AFFILIATES_FILENAME_HASHTABLE_ROOT = AFFILIATES_FILENAME_ROOT+"hashstable_";
 	public static final String AFFILIATES_FILENAME_OVERFLOW_ROOT = AFFILIATES_FILENAME_ROOT+"overflow_";

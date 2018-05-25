@@ -12,37 +12,31 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	private Date modificationDate;
 	private LibrisDatabase db;
 	private String databaseName;
-	@Deprecated
-	public static int  parseBranchString(String branchString) throws DatabaseException {
-		int branchId = 0;
-		if (null != branchString) {
-			try {
-				branchId = Integer.parseInt(branchString);
-			} catch (NumberFormatException e) {
-				throw new DatabaseException("error parsing branch ID "+branchString, e);
-			}
-		}
-		return branchId;
-	}
+	private boolean locked;
+	private String schemaName;
+
 	public LibrisDatabase getDatabase() {
 		return db;
 	}
+	
 	@Override
 	public void setAttribute(String key, String value) {
-		db.alert("setAttribute unimplemented for "+getClass().getName());
+		super.setAttribute(key, value);
 	}
 	
 	public DatabaseAttributes(LibrisDatabase db, Map<String, String> attrs) throws DatabaseException {
 		super(attrs);
 		this.db = db;
 		String schemaversion = attrs.get(XML_SCHEMA_VERSION_ATTR);
-		String schemaname = attrs.get(XML_DATABASE_SCHEMA_NAME_ATTR);
+		schemaName = attrs.get(XML_DATABASE_SCHEMA_NAME_ATTR);
 		databaseName = attrs.get(XML_DATABASE_NAME_ATTR);
-		if ( schemaversion.isEmpty() || schemaname.isEmpty()) {
+		if ( schemaversion.isEmpty() || schemaName.isEmpty()) {
 			throw new DatabaseException("Missing required attributes in the "+XML_LIBRIS_TAG+" element");
 		}
 		String dbDateString = attrs.get(XML_DATABASE_DATE_ATTR);
 		modificationDate = parseDate(dbDateString);
+		String lockedString = attrs.get(XML_DATABASE_LOCKED_ATTR);
+		locked = Boolean.parseBoolean(lockedString);
 	}
 	public String getDatabaseName() {
 		return databaseName;
@@ -58,14 +52,15 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 		}
 		return super.iterator();
 	}
-	public int getFieldNum() {
-		return 0;
+	public boolean isLocked() {
+		return locked;
 	}
-	public String getId() {
-		return null;
-	}
-	public String getTitle() {
-		return null;
+	public void setLocked(boolean locked) {
+		this.locked = locked;
+		setAttribute(XML_DATABASE_LOCKED_ATTR, Boolean.toString(locked));
 	}
 
+	public String getSchemaName() {
+		return schemaName;
+	}
 }

@@ -10,6 +10,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -52,6 +53,11 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 			return srcFile;
 		}
 	}
+	public HashMap<String, String> parseOpenTag(String expectedTag) throws InputException {
+		Assertion.assertEqualsInputException("Wrong tag", expectedTag, tagQname.toString());
+		return parseOpenTag();
+	}
+
 	public HashMap<String, String> parseOpenTag() throws InputException {
 		XMLEvent nextEvt = null;
 		try {

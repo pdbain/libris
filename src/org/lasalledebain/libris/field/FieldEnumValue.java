@@ -93,6 +93,10 @@ public class FieldEnumValue extends FieldValue implements LibrisConstants {
 	}
 
 	@Override
+	public boolean isEmpty() {
+		return (EnumFieldChoices.INVALID_CHOICE == choice) &&((null == extraValue) || extraValue.isEmpty());
+	}
+	@Override
 	public FieldValue duplicate() {
 		FieldEnumValue v = new FieldEnumValue(enumChoices, choice, extraValue);
 		return v;

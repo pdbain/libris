@@ -1,8 +1,6 @@
 package org.lasalledebain.libris.ui;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,14 +8,9 @@ import java.io.FileOutputStream;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.InputException;
@@ -28,7 +21,8 @@ public class DatabaseExporter {
 	private static final String DATABASE_EXPORT_FORMAT = "DATABASE_EXPORT_FORMAT";
 	enum ExportFormat {
 		EXPORT_XML, EXPORT_CSV, EXPORT_TEXT
-	};
+	}
+	private static LibrisWindowedUi gui;
 	LibrisDatabase db;
 	private JFrame exportFrame;
 	private Preferences librisPrefs;
@@ -37,7 +31,8 @@ public class DatabaseExporter {
 	private boolean includeSchema;
 	private boolean includeRecords;
 
-	public static void guiExportFile(LibrisDatabase db) throws LibrisException  {
+	public static void guiExportFile(LibrisWindowedUi ui, LibrisDatabase db) throws LibrisException  {
+		gui = ui;
 		DatabaseExporter exporter = new DatabaseExporter(db);
 		if (exporter.chooseExportFile()) {
 			exporter.doExport();
@@ -86,72 +81,23 @@ public class DatabaseExporter {
 		}
 		JPanel importPanel = new JPanel(new GridLayout(1,0));
 		exportFrame.setContentPane(importPanel);
-		JRadioButton xmlButton = new JRadioButton("XML");
-		JRadioButton csvButton = new JRadioButton("CSV");
-		JRadioButton textButton = new JRadioButton("Formatted Text");
-		if (lastExportFormat.equals(ExportFormat.EXPORT_XML.toString())) {
-			xmlButton.setSelected(true);
-		} else if 	(lastExportFormat.equals(ExportFormat.EXPORT_CSV.toString())) {
-			csvButton.setSelected(false);
-		} else if 	(lastExportFormat.equals(ExportFormat.EXPORT_TEXT.toString())) {
-			textButton.setSelected(false);
-		}
-		
-		ButtonGroup formatButton = new ButtonGroup();
-		formatButton.add(xmlButton);
-		formatButton.add(csvButton);
-		formatButton.add(textButton);
-		GridBagLayout buttonLayout = new GridBagLayout();
-		GridBagConstraints buttonConstraints = new GridBagConstraints();
-		buttonConstraints.gridwidth = GridBagConstraints.REMAINDER;
-		buttonConstraints.anchor = GridBagConstraints.WEST;
-		final JPanel sepPanel = new JPanel(buttonLayout);
-		sepPanel.setLayout(new BoxLayout(sepPanel, BoxLayout.Y_AXIS));
-		JLabel sepLabel = new JLabel("Select output format");
-		buttonLayout.setConstraints(sepLabel, buttonConstraints);
-		sepPanel.add(sepLabel);
-	
-		buttonLayout.setConstraints(xmlButton, buttonConstraints);
-		sepPanel.add(xmlButton);
-		
-		buttonLayout.setConstraints(csvButton, buttonConstraints);
-		sepPanel.add(csvButton);
-		
-		buttonLayout.setConstraints(textButton, buttonConstraints);
-		sepPanel.add(textButton);
-				
-		JCheckBox includeSchemaControl = new JCheckBox("Include schema");
-		JCheckBox includeRecordsControl = new JCheckBox("Include records");
-		sepPanel.add(includeSchemaControl);
-		sepPanel.add(includeRecordsControl);
-		includeSchemaControl.setSelected(true);
-		includeRecordsControl.setSelected(true);
-		JFileChooser exportFileChooser = new JFileChooser(lastExportFile);
+		LibrisFileChooser exportFileChooser = new LibrisFileChooser(gui, "Export to...");
+		final DatabaseExporterAccessoryPanel sepPanel = 
+				new DatabaseExporterAccessoryPanel(exportFileChooser, lastExportFormat);
 		if ((null != lastExportFile) && lastExportFile.isFile()) {
 			exportFileChooser.setSelectedFile(lastExportFile);
 		}
 		exportFileChooser.setApproveButtonText("Export");
-		exportFileChooser.setDialogTitle("Export to...");
 		exportFileChooser.setAccessory(sepPanel);
 
-		int response = exportFileChooser.showSaveDialog(sepPanel);
-		exportFile = null;
-		if (JFileChooser.CANCEL_OPTION != response) {
+		exportFile = exportFileChooser.chooseOutputFile(lastExportFileName);
+		if (null != exportFile) {
 			Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
-			if (xmlButton.isSelected()) {
-				fmt = ExportFormat.EXPORT_XML;
-			} else if (csvButton.isSelected()) {
-				fmt = ExportFormat.EXPORT_CSV;
-			} else if (textButton.isSelected()) {
-				fmt = ExportFormat.EXPORT_TEXT;
-			} else {
-				throw new InputException("No format specified");
-			}
+			fmt = sepPanel.getFormat();
 			librisPrefs.put(DATABASE_EXPORT_FORMAT, fmt.toString());
-			exportFile = exportFileChooser.getSelectedFile();
 			librisPrefs.put(DATABASE_EXPORT_FILE, exportFile.getAbsolutePath());
-			includeSchema = includeSchemaControl.isSelected();
-			includeRecords = includeRecordsControl.isSelected();
+			includeSchema = sepPanel.isIncludeSchema();
+			includeRecords = sepPanel.isIncludeRecords();
 			try {
 				librisPrefs.sync();
 			} catch (BackingStoreException e) {

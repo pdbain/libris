@@ -3,8 +3,10 @@ package org.lasalledebain.libris;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -47,7 +49,9 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 
 	private boolean lastRecOkay;
 	private LastFilterSettings lastFiltSettings;
-	private static SimpleDateFormat dateFormatter = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
+	private int signatureLevels;
+	private static SimpleDateFormat dateAndTimeFormatter = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
+	private static SimpleDateFormat compactDateFormatter = new SimpleDateFormat(LibrisConstants.YMD);
 
 	public LastFilterSettings getLastFilterSettings() {
 		return lastFiltSettings;
@@ -57,6 +61,7 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		this.database = database;
 		usageProperties = new Properties();
 		lastFiltSettings = new LastFilterSettings();
+		signatureLevels = 0;
 	}
 
 	public void fromXml(ElementManager metadataMgr) throws InputException, DatabaseException {
@@ -77,10 +82,11 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	}
 
 	public void saveProperties(FileOutputStream propertiesFile) throws IOException {
-		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_SAVED, getCurrentDateString());
+		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_SAVED, getCurrentDateAndTimeString());
 		String lastId = RecordId.toString(lastRecordId);
 		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_RECORD_ID, lastId);
 		usageProperties.setProperty(LibrisConstants.PROPERTY_RECORD_COUNT, (0 == savedRecords)? "0": Integer.toString(savedRecords));
+		usageProperties.setProperty(LibrisConstants.PROPERTY_SIGNATURE_LEVELS, String.valueOf(signatureLevels));
 		usageProperties.store(propertiesFile, "");
 	}
 
@@ -88,7 +94,7 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		Properties props = new Properties();
 		props.load(ipFile);
 		usageProperties = props;
-		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_OPENED, LibrisMetadata.getCurrentDateString());
+		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_OPENED, LibrisMetadata.getCurrentDateAndTimeString());
 		String recordIdString = usageProperties.getProperty(LibrisConstants.PROPERTY_LAST_RECORD_ID);
 		String recCount = usageProperties.getProperty(LibrisConstants.PROPERTY_RECORD_COUNT);
 		if (null != recCount) try {
@@ -107,19 +113,37 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		} else {
 			lastRecordId = RecordId.getNullId();
 		}
+		String sigLevelsString = usageProperties.getProperty(LibrisConstants.PROPERTY_SIGNATURE_LEVELS);
+		if (!Objects.isNull(sigLevelsString)) {
+			signatureLevels = Integer.parseInt(sigLevelsString);
+		} else {
+			signatureLevels = 1;
+		}
 		return null;
 	}
 
-	public static String getCurrentDateString() {
-		return formatDate(getCurrentDate());
+	public static Date parseDateString(String dateString) throws ParseException {
+		return dateAndTimeFormatter.parse(dateString);
+	}
+
+	public static String getCurrentDateAndTimeString() {
+		return formatDateAndTime(getCurrentDate());
+	}
+
+	public static String getCompactDateString() {
+		return formatCompactDate(getCurrentDate());
 	}
 
 	public static Date getCurrentDate() {
 		return new Date();
 	}
 
-	public static String formatDate(Date theDate) {
-		return dateFormatter.format(theDate);
+	public static String formatDateAndTime(Date theDate) {
+		return dateAndTimeFormatter.format(theDate);
+	}
+
+	public static String formatCompactDate(Date theDate) {
+		return compactDateFormatter.format(theDate);
 	}
 
 	public synchronized int getLastRecordId() {
@@ -212,8 +236,11 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		return 0;
 	}
 
-	public int getBloomFilterLevelsLevels() {
-		// TODO Auto-generated method stub
-		return 0;
+	public void setSignatureLevels(int sigLevels) {
+		signatureLevels = sigLevels;
+	}
+
+	public int getSignatureLevels() {
+		return signatureLevels;
 	}	
 }

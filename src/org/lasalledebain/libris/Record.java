@@ -7,6 +7,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupMember;
+import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
@@ -37,6 +38,14 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract void setEditable(boolean newValue);
 	public abstract boolean isEditable();
 	public abstract void setRecordId(int recId);
+	/**
+	 * Add idAdjustment to the recordId.  Also add idAdjustment to all references to other records
+	 * greater than baseId.
+	 * @param baseId ID of the last record at the time of the fork
+	 * @param idAdjustment amount to adjust the IDs.
+	 * @throws InputException if an error occurs during the change
+	 */
+	public abstract void offsetIds(int baseId, int idAdjustment) throws InputException;
 	public abstract Record duplicate() throws DatabaseException, FieldDataException;
 	
 	/* field management */
@@ -61,11 +70,11 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract FieldType getFieldType(String fid);
 	public abstract boolean valuesEqual(Record comparand);
 	public abstract void getKeywords(int[] fieldList, RecordKeywords keywordList) throws InputException;
+	public abstract void getKeywords(IndexField[] indexFields, RecordKeywords keywordList) throws InputException;
 	
 	/* format conversion */
 	public abstract String toString();
 	public abstract String generateTitle(String[] titleFieldIds);
-	public abstract long getFilePosition();
 	public abstract long getDataLength();
 	public abstract void fromXml(ElementManager recMgr) throws LibrisException;
 	
