@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.Objects;
 
 import org.lasalledebain.libris.LibrisConstants;
-import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.util.Murmur3;
 import org.lasalledebain.libris.util.StringUtils;
 

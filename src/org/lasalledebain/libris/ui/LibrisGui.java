@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -7,8 +9,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -37,7 +37,6 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
 
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitHandler;
@@ -445,7 +444,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	@Override
 	public String SelectSchemaFile(String schemaName) throws DatabaseException {
-		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub SelectSchemaFile(String schemaName)
 		return null;
 	}
 
@@ -639,25 +638,6 @@ public class LibrisGui extends LibrisWindowedUi {
 			alert("Error creating record");
 		}
 		return newRec;
-	}
-
-	@Deprecated
-	class RecordNameDialogue implements ActionListener {
-		final LibrisDatabase dBase;
-		public RecordNameDialogue(LibrisDatabase db) {
-			dBase = db;
-		}
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			dBase.getUi().getSelectedField();
-		}
-		
-	}
-
-	@Override
-	void enableNewChild() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public static void makeLabelledControl(JPanel parentPanel, Component theControl, String labelText, boolean vertical) {

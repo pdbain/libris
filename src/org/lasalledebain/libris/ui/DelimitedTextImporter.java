@@ -45,10 +45,6 @@ import org.lasalledebain.libris.records.RecordImporter;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
 public class DelimitedTextImporter {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -711158397627820062L;
 	private static final String DELIMITED_FILE = "IMPORT_DELIMITED_TEXT_FILE";
 	private static final String UNKNOWN_FIELD_NAME = "<unknown>";
 	private static final String IGNORE_FIELD_ID = "<ignore>";

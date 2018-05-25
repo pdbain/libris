@@ -1,5 +1,9 @@
 package org.lasalledebain.libris;
 
+import static org.lasalledebain.libris.exception.Assertion.assertEquals;
+import static org.lasalledebain.libris.exception.Assertion.assertNotNull;
+import static org.lasalledebain.libris.exception.Assertion.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,9 +14,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -20,7 +22,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JOptionPane;
-import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.exception.Assertion;
@@ -52,14 +53,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
-import static org.lasalledebain.libris.exception.Assertion.assertEquals;
-import static org.lasalledebain.libris.exception.Assertion.assertNotNull;
-import static org.lasalledebain.libris.exception.Assertion.assertTrue;
-
 public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLElement {
-	// TODO read records in order
-	// TODO write "get info": num records, location, aux dir, fork data, file sizes
-	// TODO lock increment after export
 	public LibrisMetadata getMetadata() {
 		return metadata;
 	}
@@ -82,6 +76,13 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private boolean readOnly;
 	boolean opened;
 	private Date databaseDate;
+	public Date getDatabaseDate() {
+		return databaseDate;
+	}
+
+	public void setDatabaseDate(Date databaseDate) {
+		this.databaseDate = databaseDate;
+	}
 	public static final String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
 
 	public LibrisDatabase(File databaseFile, File auxDir, LibrisUi ui, boolean readOnly) throws LibrisException  {	
@@ -252,7 +253,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			metadata.setSchemaInline(null == schemaLocation);
 		}
 		Assertion.assertNotNullInputException("could not open schema file", metadataMgr);
-		this.xmlAttributes = new DatabaseAttributes(this, dbElementAttrs);
+		xmlAttributes = new DatabaseAttributes(this, dbElementAttrs);
 		if (xmlAttributes.isLocked()) {
 			readOnly = true;
 		}
@@ -401,7 +402,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 				FileOutputStream opFile = propsMgr.getOpStream();
 				metadata.saveProperties(opFile);
 			} catch (IOException e) {
-				getUi().alert("Exception saving properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
+				alert("Exception saving properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
 			} finally {
 				try {
 					propsMgr.releaseOpStream();
@@ -914,18 +915,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public String getRecordName(int recordNum) throws InputException {
 		Record rec = getRecord(recordNum);
 		return (null == rec) ? null: rec.getName();
-	}
-
-	public String getTitle() {
-		return null;
-	}
-
-	public String getId() {
-		return null;
-	}
-
-	public int getFieldNum() {
-		return 0;
 	}
 }
 

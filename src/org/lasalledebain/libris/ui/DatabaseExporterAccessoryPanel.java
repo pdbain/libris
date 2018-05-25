@@ -2,8 +2,6 @@ package org.lasalledebain.libris.ui;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.LayoutManager;
-import java.awt.SecondaryLoop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -20,6 +18,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.ui.DatabaseExporter.ExportFormat;
 import org.lasalledebain.libris.util.StringUtils;
 
+@SuppressWarnings("serial")
 public class DatabaseExporterAccessoryPanel extends JPanel {
 	private ButtonGroup formatButton;
 	private JRadioButton librButton;

@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.ui;
 
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.event.FocusListener;
 import java.util.Arrays;

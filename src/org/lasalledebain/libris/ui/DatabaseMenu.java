@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.HashSet;
 import java.util.Objects;
 
 import javax.swing.JMenu;
@@ -19,6 +18,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.OutputException;
 import org.lasalledebain.libris.util.StringUtils;
 
+@SuppressWarnings("serial")
 public class DatabaseMenu extends JMenu {
 	private LibrisDatabase database;
 	private LibrisGui guiMain;

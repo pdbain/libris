@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.lasalledebain.libris.hashfile.FixedSizeEntryFactory;
-import org.lasalledebain.libris.hashfile.HashEntry;
 
 public class RecordPositionEntryFactory implements FixedSizeEntryFactory<RecordPositionEntry>{
 
