@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.ui;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.NamedRecordList;

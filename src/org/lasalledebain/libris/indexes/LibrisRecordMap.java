@@ -1,6 +1,5 @@
 package org.lasalledebain.libris.indexes;
 
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.RecordDataException;
 

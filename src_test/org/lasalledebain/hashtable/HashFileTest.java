@@ -1,5 +1,8 @@
 package org.lasalledebain.hashtable;
 
+import static org.lasalledebain.Utilities.checkForDuplicates;
+import static org.lasalledebain.Utilities.compareIntLists;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -9,7 +12,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.junit.Test;
 import org.lasalledebain.Utilities;
@@ -27,9 +29,6 @@ import org.lasalledebain.libris.indexes.FileSpaceManager;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-
-import static org.lasalledebain.Utilities.compareIntLists;
-import static org.lasalledebain.Utilities.checkForDuplicates;
 
 public class HashFileTest extends TestCase {
 

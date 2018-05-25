@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.ui;
 
+import static javax.swing.JOptionPane.showMessageDialog;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.io.ByteArrayOutputStream;
@@ -13,13 +15,9 @@ import java.util.logging.Level;
 import javax.swing.JFrame;
 
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
-import static javax.swing.JOptionPane.showMessageDialog;
 
 public abstract class LibrisWindowedUi extends LibrisUiGeneric {	
 	protected JFrame mainFrame;

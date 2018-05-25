@@ -12,26 +12,24 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 
-import junit.framework.TestCase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.lasalledebain.MockSchema;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.FileAccessManager;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.util.DiagnosticDatabase;
+
+import junit.framework.TestCase;
 
 /**
  * Test the native records file alone

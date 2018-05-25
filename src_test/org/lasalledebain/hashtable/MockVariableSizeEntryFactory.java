@@ -1,7 +1,6 @@
 package org.lasalledebain.hashtable;
 
 import java.io.DataInput;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.lasalledebain.libris.hashfile.HashEntry;

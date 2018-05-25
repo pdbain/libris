@@ -12,11 +12,7 @@ import org.lasalledebain.libris.RecordIdNameMapper;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.InternalError;
-import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.index.GroupDef;
-import org.lasalledebain.libris.xmlUtils.ElementWriter;
-import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 public class AffiliatesField extends GenericField implements Field, Iterable<FieldValue>{
 	private int affiliates[];
