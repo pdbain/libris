@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementReader;
@@ -70,8 +71,7 @@ public class GuiTests extends TestCase {
 			InputStreamReader xmlInput = new InputStreamReader(new FileInputStream(inputFile));
 			LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 			ElementReader xmlReader = xmlFactory.makeReader(xmlInput, inputFile.getPath());
-			mySchema = new Schema();
-			mySchema.fromXml(xmlReader);
+			mySchema = new XmlSchema(xmlReader);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("unexpected exception: "+e);

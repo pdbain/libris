@@ -20,9 +20,8 @@ import java.util.logging.Logger;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
-import junit.framework.TestCase;
-
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -30,7 +29,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -46,6 +45,8 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
+
+import junit.framework.TestCase;
 
 public class Utilities extends TestCase {
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
@@ -110,14 +111,13 @@ public class Utilities extends TestCase {
 		return testDirectory;
 	}
 	
-	public static Schema loadSchema(File schemaFile) throws InputException, DatabaseException  {
+	public static Schema loadSchema(File schemaFile) throws LibrisException  {
 		FileReader rdr;
 		try {
 			rdr = new FileReader(schemaFile);
 			LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 			ElementReader xmlReader = xmlFactory.makeReader(rdr, schemaFile.getPath());
-			Schema s = new Schema();
-			s.fromXml(xmlReader);
+			Schema s = new XmlSchema(xmlReader);
 			return s;
 		} catch (FileNotFoundException e) {
 			throw new InputException("Cannot open "+schemaFile.getPath(), e);
