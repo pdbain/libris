@@ -27,10 +27,6 @@ public class Layouts implements XMLElement {
 	private Schema schem;
 	
 	protected static HashMap<String, Dimension> defaultDimensionStrings = initializeDefaultDimensions();
-	public Layouts(LibrisDatabase db) {
-		this(db.getSchema());
-	}
-
 	public Layouts(Schema mySchema) {
 		schem = mySchema;
 		layouts = new HashMap<String, Layout>();
