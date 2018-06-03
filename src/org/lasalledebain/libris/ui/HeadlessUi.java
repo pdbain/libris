@@ -129,4 +129,9 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	public Dimension getDisplayPanelSize() {
 		return null;
 	}
+
+	@Override
+	protected void destroyWindow(boolean b) {
+		
+	}
 }

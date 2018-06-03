@@ -62,7 +62,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private IndexManager indexMgr;
 	private GroupManager groupMgr;
 	LibrisXmlFactory xmlFactory;
-	Schema schem;
+	private Schema mySchema;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisMetadata metadata;
 	private LibrisUi ui = null;
@@ -76,19 +76,22 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private boolean readOnly;
 	boolean opened;
 	private Date databaseDate;
-	public Date getDatabaseDate() {
-		return databaseDate;
-	}
-
-	public void setDatabaseDate(Date databaseDate) {
-		this.databaseDate = databaseDate;
-	}
 	public static final String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
 
 	public LibrisDatabase(File databaseFile, File auxDir, LibrisUi ui, boolean readOnly) throws LibrisException  {	
+		initialize(databaseFile, auxDir, ui, readOnly);
+		loadSchema();
+	}
+
+	public LibrisDatabase(Schema schem, File databaseFile, File auxDir, LibrisUi ui, boolean readOnly) throws LibrisException  {	
+		initialize(databaseFile, auxDir, ui, readOnly);
+		mySchema = schem;
+	}
+
+	protected void initialize(File databaseFile, File auxDir, LibrisUi ui, boolean readOnly)
+			throws UserErrorException, DatabaseException {
 		opened = false;
 		fileMgr = new LibrisFileManager(databaseFile, auxDir);
-		loadSchema();
 		indexMgr = new IndexManager(this, metadata, fileMgr);
 		this.ui = ui;
 		this.readOnly = readOnly;
@@ -108,7 +111,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			return false;
 		}
 		groupMgr = new GroupManager(this);
-		mainRecordTemplate = RecordTemplate.templateFactory(schem, new DatabaseRecordList(this));
+		mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 		if (!isIndexed()) {
 			return false;
 		} else {
@@ -244,20 +247,21 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			instanceInfo.fromXml(instanceMgr);
 			nextElement = librisMgr.getNextId();
 		}
+		xmlAttributes = new DatabaseAttributes(this, dbElementAttrs);
+		if (xmlAttributes.isLocked()) {
+			readOnly = true;
+		}
+		final XmlMetadata myMetadata = new XmlMetadata(this);
+		this.metadata = myMetadata;
 		ElementManager metadataMgr;
 		if (XML_METADATA_TAG.equals(nextElement)) {
 			metadataMgr = librisMgr.nextElement();
 		} else {
 			schemaLocation = dbElementAttrs.get(XML_DATABASE_SCHEMA_LOCATION_ATTR);
 			metadataMgr = makeMetadataMgr(dbElementAttrs.get(XML_DATABASE_SCHEMA_NAME_ATTR), schemaLocation);
-			metadata.setSchemaInline(null == schemaLocation);
+			myMetadata.setSchemaInline(null == schemaLocation);
 		}
 		Assertion.assertNotNullInputException("could not open schema file", metadataMgr);
-		xmlAttributes = new DatabaseAttributes(this, dbElementAttrs);
-		if (xmlAttributes.isLocked()) {
-			readOnly = true;
-		}
-		this.metadata = new LibrisMetadata(this);
 		metadata.fromXml(metadataMgr);
 		if (null != instanceInfo) {
 			metadata.setInstanceInfo(instanceInfo);
@@ -270,7 +274,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		}
 		fileMgr.createAuxFiles(true);
 		loadSchema();
-		mainRecordTemplate = RecordTemplate.templateFactory(schem, new DatabaseRecordList(this));
+		mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 		final File databaseFile = fileMgr.getDatabaseFile();
 		metadata.setSavedRecords(0);
 		XmlRecordsReader.importXmlRecords(this, databaseFile);
@@ -376,7 +380,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		synchronized (propsMgr) {
 			try {
 				FileInputStream ipFile = propsMgr.getIpStream();
-				LibrisException exc = metadata.readProperties(this, ipFile);
+				LibrisException exc = metadata.readProperties(ipFile);
 				if (null != exc) {
 					propsMgr.delete();
 					throw new DatabaseException("Exception reading properties file"+propsMgr.getPath(), exc); //$NON-NLS-1$
@@ -417,7 +421,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private void destroy() {
 		databaseRecords = null;
 		metadata = null;
-		schem = null;
+		mySchema = null;
 		if (null != indexMgr) {
 			try {
 				indexMgr.close();
@@ -447,7 +451,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 				log(Level.FINE, "metadata do not match"); //$NON-NLS-1$
 				return false;
 			}
-			if (!schem.equals(otherDb.schem)) {
+			if (!mySchema.equals(otherDb.mySchema)) {
 				log(Level.FINE, "schema do not match"); //$NON-NLS-1$
 				return false;
 			}
@@ -558,7 +562,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	}
 
 	public void setSchema(Schema schem) {
-		this.schem = schem;
+		this.mySchema = schem;
 	}
 	public File getDatabaseFile() {
 		return fileMgr.getDatabaseFile();
@@ -614,7 +618,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return databaseRecords;
 	}
 	public Schema getSchema() {
-		return schem;
+		return mySchema;
 	}
 
 	public void viewRecord(int recordId) {
@@ -704,7 +708,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 				nri.addElement(new KeyIntegerTuple(recordName, id));
 			}
 		}
-		for (int g = 0; g < schem.getNumGroups(); ++g) {
+		for (int g = 0; g < mySchema.getNumGroups(); ++g) {
 			int[] affiliations = rec.getAffiliates(g);
 			if (affiliations.length != 0) {
 				if (affiliations[0] != RecordId.getNullId()) {
@@ -915,6 +919,14 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public String getRecordName(int recordNum) throws InputException {
 		Record rec = getRecord(recordNum);
 		return (null == rec) ? null: rec.getName();
+	}
+
+	public Date getDatabaseDate() {
+		return databaseDate;
+	}
+
+	public void setDatabaseDate(Date databaseDate) {
+		this.databaseDate = databaseDate;
 	}
 }
 

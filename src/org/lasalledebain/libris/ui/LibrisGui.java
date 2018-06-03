@@ -9,7 +9,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +16,6 @@ import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -26,7 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 
-import org.lasalledebain.libris.DatabaseAttributes;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.NamedRecordList;
@@ -54,7 +51,6 @@ public class LibrisGui extends LibrisWindowedUi {
 	private JSplitPane mainWindow;
 	private JPanel layoutEditPane;
 	private Clipboard systemClipboard;
-	private boolean databaseSelected = false;
 	private Component mainframeContents;
 	public LibrisGui(File databaseFile, File auxDirectory, boolean readOnly) throws LibrisException {
 		super(databaseFile, auxDirectory, readOnly);
@@ -63,7 +59,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		initializeGui();
 	}
 
-	private void initializeGui() throws DatabaseException {
+	protected void initializeGui() throws DatabaseException {
 		com.apple.eawt.Application.getApplication().setQuitHandler(new QuitHandler() {
 			@Override
 			public void handleQuitRequestWith(QuitEvent quitEvt, QuitResponse quitResp) {
@@ -84,34 +80,8 @@ public class LibrisGui extends LibrisWindowedUi {
 		databaseModifiable(databaseSelected && !readOnly);
 		createPanes(!databaseSelected);
 		mainFrame.setJMenuBar(menuBar);
-		mainFrame.addWindowListener(new closeListener());
+		mainFrame.addWindowListener(new WindowCloseListener());
 		mainFrame.setVisible(true);
-	}
-
-	@Override
-	public void exit() {
-		destroyWindow(false);
-	}
-
-	public void updateUITitle(LibrisDatabase db, boolean isModified) {
-		String databaseName = "no database open";
-		if (null != db) {
-			DatabaseAttributes databaseAttributes = db.getAttributes();
-			databaseName = databaseAttributes.getDatabaseName();
-			if (isModified) {
-				databaseName = databaseName+"*";
-			}
-		}
-		setTitle(databaseName);
-	}
-
-	public void setTitle(String title) {
-		super.setTitle(title);
-		if (isDatabaseModified()) {
-			mainFrame.setTitle(title+"*");
-		} else {
-			mainFrame.setTitle(title);
-		}
 	}
 
 	public boolean chooseDatabase() {
@@ -193,7 +163,8 @@ public class LibrisGui extends LibrisWindowedUi {
 		}
 	}
 	
-	private void destroyWindow(boolean retain) {
+	@Override
+	 protected void destroyWindow(boolean retain) {
 		if (null != mainWindow) {
 			if (!isReadOnly()) {
 				Preferences prefs = getLibrisPrefs();
@@ -296,12 +267,6 @@ public class LibrisGui extends LibrisWindowedUi {
 	FilterDialogue createSearchDialogue() {
 		return new FilterDialogue(currentDatabase, getMainFrame(), resultsPanel);
 	}
-	@Override
-	public void alert(String msg, Exception e) {
-		String errorString = formatAlertString(msg, e);
-		alert(errorString);
-	}
-
 	public void fatalError(Exception e) {
 		String msg = "Fatal error: ";
 		fatalError(e, msg);
@@ -383,63 +348,12 @@ public class LibrisGui extends LibrisWindowedUi {
 		JOptionPane.showMessageDialog(mainFrame, msg);
 	}
 
-	class closeListener implements WindowListener {
-
-		
-		@Override
-		public void windowActivated(WindowEvent e) {
-			return;
-		}
-
-		@Override
-		public void windowClosed(WindowEvent e) {
-			return;
-			}
-
-		@Override
-		public void windowClosing(WindowEvent e) {
-			if (null != currentDatabase) {
-				currentDatabase.quit();
-			}
-		}
-
-		@Override
-		public void windowDeactivated(WindowEvent e) {
-			return;
-			}
-
-		@Override
-		public void windowDeiconified(WindowEvent e) {
-			return;
-			}
-
-		@Override
-		public void windowIconified(WindowEvent e) {
-			return;
-			}
-
-		@Override
-		public void windowOpened(WindowEvent e) {
-			return;
-			}
-		
-	}
-
 	public void displaySelectedRecord() {
 		resultsPanel.displaySelectedRecord();
 	}
 
 	public void setViewViewSelectedRecordEnabled(boolean enabled) {
 		menu.setViewViewSelectedRecordEnabled(enabled);
-	}
-
-	@Override
-	public int confirm(String message) {
-		return Dialogue.yesNoDialog(mainFrame, message);
-	}
-
-	public int confirmWithCancel(String msg) {
-		return Dialogue.yesNoCancelDialog(mainFrame, msg);
 	}
 
 	@Override
@@ -638,19 +552,6 @@ public class LibrisGui extends LibrisWindowedUi {
 			alert("Error creating record");
 		}
 		return newRec;
-	}
-
-	public static void makeLabelledControl(JPanel parentPanel, Component theControl, String labelText, boolean vertical) {
-		JPanel controlPanel = new JPanel();
-		if (vertical) {
-			BoxLayout layout = new BoxLayout(controlPanel, BoxLayout.Y_AXIS);
-			controlPanel.setLayout(layout);
-		}
-		JLabel l = new JLabel(labelText);
-		l.setLabelFor(theControl);
-		controlPanel.add(l);
-		controlPanel.add(theControl);
-		parentPanel.add(controlPanel);
 	}
 
 	public void sendChooseDatabase() {
