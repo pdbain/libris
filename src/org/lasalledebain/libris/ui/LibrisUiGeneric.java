@@ -17,32 +17,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	
-	@Override
-	public Record newRecord() {
-		return null;
-	}
-	@Override
-	public LibrisDatabase getDatabase() {
-		return currentDatabase;
-	}
-
-
 	private static final String NO_DATABASE_OPENED = "No database opened";
-
-	public void setTitle(String title) {
-		uiTitle = title;
-	}
-
-	@Override
-	public void arrangeValues() {
-		throw new InternalError("LibrisUiGeneric.arrangeValues unimplemented");
-	}
-
-	@Override
-	public void addRecord(Record newRecord) throws DatabaseException {
-		throw new InternalError("LibrisUiGeneric.addRecord unimplemented");
-	}
-
 	/**
 	 * 
 	 */
@@ -56,6 +31,29 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 	public UiField getSelectedField() {
 		return selectedField;
+	}
+	@Override
+	public Record newRecord() {
+		return null;
+	}
+	@Override
+	public LibrisDatabase getDatabase() {
+		return currentDatabase;
+	}
+
+
+	public void setTitle(String title) {
+		uiTitle = title;
+	}
+
+	@Override
+	public void arrangeValues() {
+		throw new InternalError("LibrisUiGeneric.arrangeValues unimplemented");
+	}
+
+	@Override
+	public void addRecord(Record newRecord) throws DatabaseException {
+		throw new InternalError("LibrisUiGeneric.addRecord unimplemented");
 	}
 
 	public LibrisUiGeneric(File dbFile, File auxDir,

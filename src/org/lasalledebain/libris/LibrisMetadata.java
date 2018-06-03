@@ -20,28 +20,14 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
+public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 
-	private LibrisDatabase database;
-	private Layouts myLayouts;
+	protected LibrisDatabase database;
+	protected Layouts uiLayouts;
 	private int lastRecordId;
 	private int savedRecords;
 	private int modifiedRecords;
-	private boolean schemaInline;
 	private DatabaseInstance instanceInfo;
-	public void setInstanceInfo(DatabaseInstance instanceInfo) {
-		this.instanceInfo = instanceInfo;
-		lastRecordId = Math.max(lastRecordId, instanceInfo.getRecordIdBase());
-	}
-
-	public boolean isSchemaInline() {
-		return schemaInline;
-	}
-
-	public void setSchemaInline(boolean schemaInline) {
-		this.schemaInline = schemaInline;
-	}
-
 	/**
 	 * Dynamic attributes of the database
 	 */
@@ -53,10 +39,6 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	private static SimpleDateFormat dateAndTimeFormatter = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
 	private static SimpleDateFormat compactDateFormatter = new SimpleDateFormat(LibrisConstants.YMD);
 
-	public LastFilterSettings getLastFilterSettings() {
-		return lastFiltSettings;
-	}
-
 	public LibrisMetadata(LibrisDatabase database) {
 		this.database = database;
 		usageProperties = new Properties();
@@ -64,21 +46,18 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		signatureLevels = 0;
 	}
 
-	public void fromXml(ElementManager metadataMgr) throws InputException, DatabaseException {
-		ElementManager schemaMgr;
-
-		metadataMgr.parseOpenTag();
-		schemaMgr = metadataMgr.nextElement();
-		Schema schem = new Schema();
-		schem.fromXml(schemaMgr);
-		database.setSchema(schem);
-		myLayouts = new Layouts(database);
-		ElementManager layoutsMgr = metadataMgr.nextElement();
-		myLayouts.fromXml(layoutsMgr);
-		metadataMgr.parseClosingTag();
+	public LibrisMetadata(LibrisDatabase database, Layouts myLayouts) {
+		this.database = database;
+		usageProperties = new Properties();
+		lastFiltSettings = new LastFilterSettings();
+		signatureLevels = 0;
+		if (Objects.isNull(myLayouts)) {
+			uiLayouts = new Layouts(database.getSchema());
+		}
 	}
+
 	public Layouts getLayouts() {
-		return myLayouts;
+		return uiLayouts;
 	}
 
 	public void saveProperties(FileOutputStream propertiesFile) throws IOException {
@@ -90,7 +69,7 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		usageProperties.store(propertiesFile, "");
 	}
 
-	LibrisException readProperties(LibrisDatabase librisDatabase, FileInputStream ipFile) throws LibrisException, IOException {
+	LibrisException readProperties(FileInputStream ipFile) throws LibrisException, IOException {
 		Properties props = new Properties();
 		props.load(ipFile);
 		usageProperties = props;
@@ -154,6 +133,11 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		return result;
 	}
 
+	public void setInstanceInfo(DatabaseInstance instanceInfo) {
+		this.instanceInfo = instanceInfo;
+		lastRecordId = Math.max(lastRecordId, instanceInfo.getRecordIdBase());
+	}
+
 	public synchronized void setLastRecordId(final int recId) {
 		if ((RecordId.isNull(lastRecordId)) || ((recId > lastRecordId))) {
 			lastRecordId = recId;
@@ -171,6 +155,10 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	}
 	public boolean isMetadataOkay() {
 		return lastRecOkay;
+	}
+
+	public LastFilterSettings getLastFilterSettings() {
+		return lastFiltSettings;
 	}
 
 	public int getSavedRecords() {
@@ -224,11 +212,11 @@ public class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 
 	@Override
 	public boolean equals(Object comparand) {
-		if (!comparand.getClass().isAssignableFrom(LibrisMetadata.class)) {
+		if (!LibrisMetadata.class.isAssignableFrom(comparand.getClass())) {
 			return false;
 		} else {
 			LibrisMetadata otherMetadat = (LibrisMetadata) comparand;
-			return myLayouts.equals(otherMetadat.myLayouts);
+			return uiLayouts.equals(otherMetadat.uiLayouts);
 		}
 	}
 

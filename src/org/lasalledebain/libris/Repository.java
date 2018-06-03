@@ -2,19 +2,11 @@ package org.lasalledebain.libris;
 
 import java.io.File;
 
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.UserErrorException;
-import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
-import org.lasalledebain.libris.ui.LibrisUi;
 
-public class Libris {
+public class Repository extends Libris {
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		boolean readOnly = false;
 		boolean isGui = true;
@@ -69,37 +61,6 @@ public class Libris {
 			}
 		}
 
-	}
-
-	static void cmdlineError(String msg) {
-		System.err.println(msg);
-		System.exit(1);
-	}
-
-	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
-		HeadlessUi ui = new HeadlessUi(databaseFile);
-		buildIndexes(databaseFile, ui);
-		
-		LibrisDatabase result = new LibrisDatabase(databaseFile, null, ui, false);
-		result.open();
-		return result;
-	}
-
-	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi ui) throws LibrisException {
-		if (null == ui) {
-			ui = new HeadlessUi(databaseFile);
-		}
-		LibrisDatabase result = new LibrisDatabase(databaseFile, null, ui, false);
-		result.open();
-		return result;
-	}
-
-	public static void buildIndexes(File databaseFile, LibrisUi ui)
-			throws UserErrorException, DatabaseException, InputException,
-			LibrisException {
-		LibrisDatabase indexDb = new LibrisDatabase(databaseFile, null, ui, false);
-		indexDb.buildIndexes();
-		indexDb.close();
 	}
 
 }

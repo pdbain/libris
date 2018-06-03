@@ -21,6 +21,11 @@ public class IndexDefs implements XMLElement {
 		indexList = new LinkedHashMap<>();
 	}
 
+	public IndexDefs(Schema schem, ElementManager mgr) throws InputException {
+		this(schem);
+		fromXml(mgr);
+	}
+
 	public void fromXml(Schema schem, ElementManager mgr) throws InputException {
 		mgr.parseOpenTag(getXmlTag());
 		while (mgr.hasNext()) {
