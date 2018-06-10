@@ -56,7 +56,7 @@ public abstract class AbstractLibrisMenu {
 		}
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			guiMain.close(closeAllWindows, false);
+			guiMain.closeWindow(closeAllWindows);
 		}
 
 	}
@@ -65,7 +65,7 @@ public abstract class AbstractLibrisMenu {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (null != database) {
-				database.close();
+				guiMain.closeDatabase(false);
 			}
 		}		
 	}
@@ -73,7 +73,7 @@ public abstract class AbstractLibrisMenu {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (null != database) {
-				database.quit();
+				guiMain.quit(false);
 				// TODO check if there are new, modified records
 			}
 		}	

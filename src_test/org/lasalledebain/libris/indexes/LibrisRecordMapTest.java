@@ -24,7 +24,7 @@ public class LibrisRecordMapTest extends TestCase {
 			final LibrisUi myUi = db.getUi();
 			
 			MockLibrisRecordMap recPositions = new MockLibrisRecordMap();
-			db.close();
+			assertTrue("Could not close database", db.closeDatabase(false));
 			db = myUi.openDatabase();
 			Records recs = db.getDatabaseRecords();	
 			int numRecs = 0;

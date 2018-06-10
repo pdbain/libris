@@ -227,7 +227,7 @@ public class InheritanceTest extends TestCase {
 			addChildren(numRecs, lastId, expectedChildren);
 			File builtDatabaseFile = db.getDatabaseFile();
 			db.save();
-			db.close();
+			db.closeDatabase(false);
 			db = Libris.openDatabase(builtDatabaseFile, null);
 			lastId = db.getLastRecordId();
 			assertEquals("database has wrong number of records",numRecs, lastId);
@@ -259,7 +259,7 @@ public class InheritanceTest extends TestCase {
 			}
 			File builtDatabaseFile = db.getDatabaseFile();
 			db.save();
-			db.close();
+			db.closeDatabase(false);
 			db = Libris.openDatabase(builtDatabaseFile, null);
 			lastId = db.getLastRecordId();
 			assertEquals("database has wrong number of records",numRecs, lastId);

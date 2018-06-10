@@ -375,7 +375,7 @@ public class Utilities extends TestCase {
 		try {
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			LibrisUi ui = db.getUi();
-			db.close();
+			ui.closeDatabase(false);
 			db = ui.openDatabase();
 		} catch (LibrisException e) {
 			e.printStackTrace();

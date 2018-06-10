@@ -21,24 +21,8 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 		}
 	}
 
-	@Override
-	public void exit() {
-		// TODO write cmdlineUi.exit()
-		
-	}
-
 	BufferedReader cmdlineInput;
 	private boolean doIndexing;
-	@Override
-	public void databaseClosed() {
-		super.databaseClosed();
-		return;
-	}
-
-	@Override
-	public void close(boolean allWindows, boolean closeGui) {
-		return;
-	}
 
 	@Override
 	public void displayRecord(int recordId) throws LibrisException {
@@ -131,6 +115,21 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 
 	public boolean isReadOnly() {
 		return false;
+	}
+
+	@Override
+	public boolean closeDatabase(boolean force) {
+		if (!currentDatabase.closeDatabase(force)) {
+			alert("Database not closed"); // TODO 4 improve cmdLineUi close database checking
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	@Override
+	public boolean quit(boolean force) {
+		return closeDatabase(force);
 	}
 
 }

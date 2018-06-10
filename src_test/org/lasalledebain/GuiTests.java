@@ -41,7 +41,7 @@ public class GuiTests extends TestCase {
 			for (int i=1; i <= 3; ++i) {
 				db.viewRecord(i);
 			}
-			db.close(true);
+			db.getUi().quit(true);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Unexpected exception: "+e.getMessage());
