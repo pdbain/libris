@@ -428,6 +428,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 				if (reIndexCheckbox.isSelected()) {
 					try {
 						Libris.buildIndexes(sf, guiMain);
+						// TODO 1 check that database is not already open
 					} catch (Exception e) {
 						guiMain.alert("Error building indexes", e);
 						return false;
@@ -528,12 +529,9 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	
 	class RebuildIndexListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			if (null != database) {
-				File dbFile = database.getDatabaseFile();
-
-				if (!database.close()) {
-					guiMain.alert("Please save database before rebuildiing");
-				}
+			if (guiMain.isDatabaseOpen()) {
+				guiMain.alert("Please save database before rebuildiing");
+			} else {
 				try {
 					guiMain.rebuildDatabase();
 				} catch (LibrisException e) {

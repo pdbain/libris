@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisGui;
+import org.lasalledebain.libris.ui.LibrisUiGeneric;
 
 public class Repository extends Libris {
 
@@ -31,7 +32,7 @@ public class Repository extends Libris {
 				if (null == databaseFile) {
 					databaseFilePath = arg;
 				} else {
-					cmdlineError("only one database name can be specified");
+					LibrisUiGeneric.cmdlineError("only one database name can be specified");
 				}
 			}
 			++i;
@@ -42,7 +43,7 @@ public class Repository extends Libris {
 				File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
 				File auxDir = null;
 				if ((null != dbFile) && (!dbFile.isFile())) {
-					cmdlineError(databaseFilePath+" is not a file");
+					LibrisUiGeneric.cmdlineError(databaseFilePath+" is not a file");
 				} else {
 					if (null != auxDirpath) {
 						auxDir = new File(auxDirpath);
@@ -56,7 +57,7 @@ public class Repository extends Libris {
 					ui.sendChooseDatabase();
 				}
 			} catch (LibrisException e) {
-				cmdlineError("Cannot open Libris: "+e.getMessage());
+				LibrisUiGeneric.cmdlineError("Cannot open Libris: "+e.getMessage());
 
 			}
 		}

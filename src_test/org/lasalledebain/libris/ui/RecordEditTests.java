@@ -48,7 +48,7 @@ public class RecordEditTests extends TestCase {
 			pause("opened record");
 			info("selected "+rid);
 			gui.setRecordWindowEditable(true);
-			gui.close(false, false);
+			gui.closeDatabase(false);
 			pause("re-open record");
 			gui.displaySelectedRecord();
 			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
@@ -65,8 +65,7 @@ public class RecordEditTests extends TestCase {
 			assertEquals("main value wrong", "1", originalMainValue);
 			assertEquals("Extra value wrong", "2", originalExtraValue);
 			pause("Close database");
-			gui.close(true, true);
-			gui.exit();
+			assertTrue("Could not quit", gui.quit(false));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -147,7 +146,7 @@ public class RecordEditTests extends TestCase {
 				fld.addValuePair(-1, "foobar");
 				db.put(rec);
 				db.save();
-				db.close();
+				assertTrue("Could not close database", db.closeDatabase(false));
 			}
 
 			{
@@ -184,8 +183,7 @@ public class RecordEditTests extends TestCase {
 			FieldValue fldVal = rec.getFieldValue("ID_hardcopy");
 			assertTrue("ID_hardcopy default wrong", fldVal.isTrue());
 			pause("Close database");
-			gui.close(true, true);
-			gui.exit();
+			assertTrue("Could not close database", gui.quit(false));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -217,8 +215,7 @@ public class RecordEditTests extends TestCase {
 				editable = !editable;
 			}
 			pause("Close database");
-			gui.close(true, true);
-			gui.exit();
+			assertTrue("Could not close database", gui.quit(false));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception: "+e.getMessage());
@@ -250,8 +247,7 @@ public class RecordEditTests extends TestCase {
 			assertEquals("Wrong number of values for read-only"+ID_PUB, 0, numValues);
 			val = pubUiField.getRecordField().getValuesAsString();
 			pause("Close database");
-			gui.close(true, true);
-			gui.exit();
+			assertTrue("Could not close database", gui.quit(false));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -301,8 +297,7 @@ public class RecordEditTests extends TestCase {
 			rid = resultsWindow.getSelectedRecordId();
 			assertEquals("Wrong record opened", currentRec.getRecordId(), rid);
 			pause("Close database");
-			gui.close(true, true);
-			gui.exit();
+			assertTrue("Could not close database", gui.quit(true));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -343,9 +338,7 @@ public class RecordEditTests extends TestCase {
 			dispPanel = gui.getDisplayPanel();
 			recWindow = dispPanel.getCurrentRecordWindow();			
 			pause("Close database");
-			db.close();
-			gui.exit();
-
+			assertTrue("Could not close database", gui.quit(false));
 
 			TestGUI newGui = openGuiAndDatabase(testName, dbFile);
 			LibrisDatabase newDb = newGui.getDatabase();
@@ -400,8 +393,7 @@ public class RecordEditTests extends TestCase {
 			String newAuthFieldValues = currentRec.getField(ID_AUTH).getValuesAsString();
 			assertEquals("auth field value deletion failed", "Rec4Fld1Val2", newAuthFieldValues);
 			pause("Close database");
-			gui.close(true, true);
-			gui.exit();
+			assertTrue("Could not close database", gui.quit(true));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception ");
@@ -438,8 +430,7 @@ public class RecordEditTests extends TestCase {
 			assertEquals("Empty enum", oldValues, actualValues);
 			assertEquals("Empty enum", numPubValues, testField.getNumberOfValues());
 			pause("Close database");
-			gui.close(true, true);
-			gui.exit();
+			assertTrue("Could not close database", gui.quit(true));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception "+e.getClass()+e.getMessage());
@@ -479,8 +470,7 @@ public class RecordEditTests extends TestCase {
 			String actualValues = testField.getValuesAsString();
 			assertEquals(ID_PUB+" field mismatch", oldFieldValues+", "+TITLE_NEW_VALUE, actualValues);
 			pause("Close database");
-			gui.close(true, true);
-			gui.exit();
+			assertTrue("Could not close database", gui.quit(true));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -516,8 +506,7 @@ public class RecordEditTests extends TestCase {
 			String actualValues = testField.getValuesAsString();
 			assertEquals(ID_PUB+" field mismatch", oldFieldValues+", "+PUB_NEW_VALUE, actualValues);
 			pause("Close database");
-			gui.close(true, true);
-			gui.exit();
+			assertTrue("Could not close database", gui.quit(true));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -558,13 +547,13 @@ public class RecordEditTests extends TestCase {
 			DatabaseException {
 		LibrisDatabase db = Utilities.buildTestDatabase(databaseFileName);
 		File dbFile = db.getDatabaseFile();
-		db.close();
+		assertTrue("Could not close database", db.closeDatabase(false));
 	
 		TestGUI gui = openGuiAndDatabase(testName, dbFile);
 		return gui;
 	}
 
-	private TestGUI openGuiAndDatabase(String testName, File dbFile) {
+	private TestGUI openGuiAndDatabase(String testName, File dbFile) throws DatabaseException {
 		@SuppressWarnings("unused")
 		LibrisDatabase db;
 		TestGUI gui = null;

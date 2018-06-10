@@ -9,7 +9,6 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -63,8 +62,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		com.apple.eawt.Application.getApplication().setQuitHandler(new QuitHandler() {
 			@Override
 			public void handleQuitRequestWith(QuitEvent quitEvt, QuitResponse quitResp) {
-				if((null == currentDatabase) || currentDatabase.close()) {
-					close(true, true);
+				if ((null == currentDatabase) || currentDatabase.closeDatabase(false)) {
 					quitResp.performQuit();
 				} else {
 					quitResp.cancelQuit();
@@ -88,10 +86,21 @@ public class LibrisGui extends LibrisWindowedUi {
 		return getMenu().openDatabaseDialogue();
 	}
 
-	public LibrisDatabase openDatabase() {
+	public LibrisDatabase openDatabase() throws DatabaseException {
 		super.openDatabase();
 		menu.setDatabase(currentDatabase);
 		getMainFrame().toFront();
+		boolean readOnly = currentDatabase.isReadOnly();
+		menu.editMenuEnableModify(readOnly);
+		destroyWindow(true);
+		createPanes(false);
+		updateUITitle(currentDatabase, false);
+
+		displayPanel.addLayouts(currentDatabase.getLayouts());
+		RecordList list = currentDatabase.getRecords();
+		resultsPanel.initialize(list);
+		recordsAccessible(!readOnly);
+		databaseModifiable(!readOnly);
 		return currentDatabase;
 	}
 
@@ -273,37 +282,10 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	public void close(boolean allWindows, boolean closeGui) {
+	public void closeWindow(boolean allWindows) {
 		if (null != displayPanel) {
 			displayPanel.close(allWindows);
 		}
-		if (closeGui) {
-			destroyWindow(true);
-		}
-	}
-
-	@Override
-	public void databaseOpened(LibrisDatabase db) throws DatabaseException {
-		super.databaseOpened(db);
-		boolean readOnly = db.isReadOnly();
-		menu.editMenuEnableModify(readOnly);
-		destroyWindow(true);
-		createPanes(false);
-		updateUITitle(db, false);
-
-		displayPanel.addLayouts(db.getLayouts());
-		RecordList list = db.getRecords();
-		resultsPanel.initialize(list);
-		recordsAccessible(!readOnly);
-		databaseModifiable(!readOnly);
-	}
-
-	@Override
-	public void databaseClosed () {
-		super.databaseClosed();
-		destroyWindow(true);
-		recordsAccessible(false);
-		databaseModifiable(false);
 	}
 
 	public boolean isEditable() {

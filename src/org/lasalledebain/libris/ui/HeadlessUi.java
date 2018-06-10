@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
+
 import java.awt.Dimension;
 import java.io.File;
 import java.util.logging.Level;
@@ -10,8 +12,6 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-
-import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
 
 public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	private String schemaPath;
@@ -105,33 +105,39 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	}
 
 	@Override
-	public void exit() {
-		// TODO write headlessUI.exit()
-		
-	}
-	@Override
 	public void setRecordName(NamedRecordList namedRecs) throws InputException {
 		// TODO write setRecordName
 		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
 	}
 
 	@Override
-	public void close(boolean allWindows, boolean closeGui) {
-		return;
+	public boolean quit(boolean force) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void closeWindow(boolean allWindows) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void destroyWindow(boolean b) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public Record newChildRecord(Record currentRecord, int groupNum) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Dimension getDisplayPanelSize() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	protected void destroyWindow(boolean b) {
-		
-	}
 }

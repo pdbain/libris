@@ -136,9 +136,9 @@ public class DatabaseTests extends TestCase {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
 			rootDb = buildTestDatabase(testDatabaseFileCopy);
 			LibrisUi testUi = rootDb.getUi();
-			rootDb.close();
+			rootDb.closeDatabase(false);
 			rootDb = testUi.openDatabase();
-			rootDb.close();
+			rootDb.closeDatabase(false);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -149,7 +149,7 @@ public class DatabaseTests extends TestCase {
 	public void testOpenIndexAndImmediatelyCloseDatabase() {
 		try {
 			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile());
-			rootDb.close();
+			rootDb.closeDatabase(false);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -164,10 +164,11 @@ public class DatabaseTests extends TestCase {
 			LibrisMetadata meta = rootDb.getMetadata();
 			int numRecs = meta.getSavedRecords();
 			assertEquals("Wrong number of records initial build", 4, numRecs);
-			rootDb.close();
+			rootDb.closeDatabase(false);
 			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			LibrisUi ui = rootDb.getUi();
-			rootDb.close();
+			rootDb.closeDatabase(false);
+;
 
 			forkDb = ui.openDatabase();
 			assertEquals("Wrong number of records after rebuild", 4, forkDb.getMetadata().getSavedRecords());
@@ -196,14 +197,15 @@ public class DatabaseTests extends TestCase {
 				expected = f.getValuesAsString();
 				rootDb.put(rec);
 				rootDb.save();
-				rootDb.close();
+				rootDb.closeDatabase(false);
+;
 			}
 			forkDb = testUi.openDatabase();
 			Record rec = forkDb.getRecord(1);
 			Field f = rec.getField(ID_publisher);
 			String actual = f.getValuesAsString();
 			assertEquals("Out of range enum wrong", expected, actual);
-			forkDb.close();
+			forkDb.closeDatabase(false);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -246,8 +248,8 @@ public class DatabaseTests extends TestCase {
 			LibrisDatabase dbCopy = Libris.buildAndOpenDatabase(copyDbXml);
 			assertNotNull("Error rebuilding database copy", dbCopy);
 			assertTrue("database copy does not match original", dbCopy.equals(db));
-			db.close();
-			dbCopy.close();
+			db.closeDatabase(false);
+			dbCopy.closeDatabase(false);
 			Utilities.deleteRecursively(testDatabaseFileCopy);
 			Utilities.deleteRecursively(copyDbXml);
 		} catch (Throwable e) {
@@ -297,7 +299,8 @@ public class DatabaseTests extends TestCase {
 			assertNotNull("Error rebuilding database copy", forkDb);
 			assertTrue("database copy does not match original", forkDb.equals(rootDb));
 			
-			rootDb.close();
+			rootDb.closeDatabase(false);
+;
 			DatabaseInstance inst = forkDb.getMetadata().getInstanceInfo();
 			assertNotNull("Database instance information missing", inst);
 			assertEquals("Wrong base ID", lastId, inst.getRecordIdBase());
@@ -336,8 +339,9 @@ public class DatabaseTests extends TestCase {
 				}
 			}
 		
-			rootDb.close();
-			forkDb.close();
+			rootDb.closeDatabase(false);
+;
+			forkDb.closeDatabase(false);
 			dbInstance.delete();
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -386,8 +390,9 @@ public class DatabaseTests extends TestCase {
 			forkDb.exportIncrement(new FileOutputStream(dbIncrement));
 			rootDb.importIncrement(dbIncrement);
 			checkDbRecords(rootDb, expectedRecords);
-			rootDb.close();
-			forkDb.close();
+			rootDb.closeDatabase(false);
+;
+			forkDb.closeDatabase(false);
 			dbInstance.delete();
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -521,8 +526,9 @@ public class DatabaseTests extends TestCase {
 				assertEquals("new root record wrong", newForkRec2, rec);
 			}
 			
-			rootDb.close();
-			forkDb.close();
+			rootDb.closeDatabase(false);
+;
+			forkDb.closeDatabase(false);
 			dbInstance.delete();
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -593,8 +599,9 @@ public class DatabaseTests extends TestCase {
 			
 			rootExpectedRecords.addAll(rootExpectedRecords.size(), incrementExpectedRecords);
 			checkDbRecords(rootDb, rootExpectedRecords);
-			rootDb.close();
-			forkDb.close();
+			rootDb.closeDatabase(false);
+;
+			forkDb.closeDatabase(false);
 			dbInstance.delete();
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -610,11 +617,11 @@ public class DatabaseTests extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		if (null != rootDb) {
-			rootDb.close(true);
+			rootDb.closeDatabase(true);
 			rootDb = null;
 		}
 		if (null != forkDb) {
-			forkDb.close(true);
+			forkDb.closeDatabase(true);
 			forkDb = null;
 		}
 		Utilities.deleteWorkingDirectory();

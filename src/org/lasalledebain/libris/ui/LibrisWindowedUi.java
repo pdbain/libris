@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.lasalledebain.libris.DatabaseAttributes;
@@ -29,6 +30,30 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	protected JFrame mainFrame;
 	private GroupDef selectedGroupDef;
 	protected boolean databaseSelected = false;
+
+	public abstract void closeWindow(boolean allWindows);
+	@Override
+	public boolean closeDatabase(boolean force) {
+		boolean result = false;
+		if (Objects.nonNull(currentDatabase)) {
+			if (!force && currentDatabase.isModified()) {
+				int choice = confirmWithCancel(Messages.getString("LibrisDatabase.save_database_before_close")); //$NON-NLS-1$
+				switch (choice) {
+				case JOptionPane.YES_OPTION:
+					currentDatabase.save();
+					result =  currentDatabase.closeDatabase(true);
+				case JOptionPane.NO_OPTION:
+					result =  currentDatabase.closeDatabase(true);
+				case JOptionPane.CANCEL_OPTION:
+				default:
+					/* do nothing */
+				}
+			} else {
+				return currentDatabase.closeDatabase(force);
+			}
+		}
+		return result;
+	}
 
 	public static void alert(Component parentComponent, String msg, Exception e) {
 		showMessageDialog(parentComponent, formatAlertString(msg, e));
@@ -97,8 +122,9 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	}
 	
 	@Override
-	public void exit() {
+	public boolean quit(boolean force) {
 		destroyWindow(false);
+		return closeDatabase(force);
 	}
 
 	protected abstract void destroyWindow(boolean b);
@@ -158,7 +184,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		@Override
 		public void windowClosing(WindowEvent e) {
 			if (null != currentDatabase) {
-				currentDatabase.quit();
+				quit(false);
 			}
 		}
 	}

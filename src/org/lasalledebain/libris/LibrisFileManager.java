@@ -49,6 +49,7 @@ public class LibrisFileManager implements LibrisConstants {
 	private File lockFile;
 	private FileOutputStream dbLockFile;
 	private FileLock dbLock;
+	private boolean databaseReserved;
 
 	public LibrisFileManager(File dbFile, File auxDir) throws UserErrorException {
 		activeManagers = new HashMap<String, FileAccessManager>();
@@ -86,6 +87,7 @@ public class LibrisFileManager implements LibrisConstants {
 			if (null != dbLock) {
 				String dateString = "Reserved "+DateFormat.getDateInstance().format(new Date());
 				dbLockFile.write(dateString.getBytes());
+				databaseReserved = true;
 				return true;
 			} else {
 				dbLockFile.close();
@@ -95,14 +97,19 @@ public class LibrisFileManager implements LibrisConstants {
 		}
 		return false;
 	}
+	
+	public boolean isDatabaseReserved() {
+		return databaseReserved;
+	}
 
-	public synchronized void unlockDatabase() {
+	public synchronized void freeDatabase() {
 		if (null != dbLock) {
 			try {
 				dbLock.release();
 				RandomAccessFile lckFile = new RandomAccessFile(lockFile, "rw");
 				lckFile.setLength(0);
 				lckFile.close();
+				databaseReserved = false;
 			} catch (IOException e) {
 				LibrisDatabase.librisLogger.log(Level.SEVERE, "Error unlocking file", e);
 			}
