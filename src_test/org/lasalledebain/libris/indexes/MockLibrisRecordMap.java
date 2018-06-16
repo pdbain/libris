@@ -31,13 +31,11 @@ public class MockLibrisRecordMap extends LibrisRecordMap {
 	}
 	@Override
 	public void close() throws DatabaseException {
-		// TODO Auto-generated method stub
-		
-	}
+		return;
+		}
 	@Override
 	public void flush() throws DatabaseException {
-		// TODO Auto-generated method stub
-		
+		return;
 	}
 
 }

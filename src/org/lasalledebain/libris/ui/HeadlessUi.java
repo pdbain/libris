@@ -112,31 +112,29 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public boolean quit(boolean force) {
-		// TODO Auto-generated method stub
+		// TODO Implement quit
 		return false;
 	}
 
 	@Override
 	public void closeWindow(boolean allWindows) {
-		// TODO Auto-generated method stub
-		
+		return;
 	}
 
 	@Override
 	protected void destroyWindow(boolean b) {
-		// TODO Auto-generated method stub
-		
-	}
+		return;
+		}
 
 	@Override
 	public Record newChildRecord(Record currentRecord, int groupNum) {
-		// TODO Auto-generated method stub
+		// TODO Implement newChildRecord
 		return null;
 	}
 
 	@Override
 	public Dimension getDisplayPanelSize() {
-		// TODO Auto-generated method stub
+		// TODO Implement getDisplayPanelSize
 		return null;
 	}
 

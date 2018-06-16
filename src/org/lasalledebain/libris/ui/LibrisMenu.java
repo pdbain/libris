@@ -428,7 +428,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 				if (reIndexCheckbox.isSelected()) {
 					try {
 						Libris.buildIndexes(sf, guiMain);
-						// TODO 1 check that database is not already open
 					} catch (Exception e) {
 						guiMain.alert("Error building indexes", e);
 						return false;
@@ -463,7 +462,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	}
 
 	private class SaveListener implements ActionListener {
-	// TODO 1 set database unmodified when saving
 		boolean saveToOtherFile;
 		SaveListener(boolean saveAs) {
 			saveToOtherFile = saveAs;
@@ -475,6 +473,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 					database.getUi().alert("save as not implemented");
 				} else {
 					database.save();
+					guiMain.updateUITitle(false);
 				}
 			}
 		}

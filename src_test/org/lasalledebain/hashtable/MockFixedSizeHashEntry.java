@@ -77,30 +77,6 @@ class MockFixedSizeHashEntry extends AbstractFixedSizeHashEntry {
 		backingStore.write(data);
 	}
 
-/* TODO delete
-	public void readData(DataInput backingStore) throws IOException {
-		key = backingStore.readInt();
-		try {
-			backingStore.readFully(data);
-		} catch (EOFException e) {
-			fail("unexpected end of file");
-		}
-	}
-
-	public void readData(ByteBuffer buff, int length) {
-		if (null == data) {
-			data = new byte[length];
-		}
-		buff.get(data, 0, length);
-	}
-
-	public void readData(DataInput ip, int length) throws IOException {
-		if (null == data) {
-			data = new byte[length];
-		}
-		ip.readFully(data);
-	}
-*/
 	@Override
 	public boolean equals(Object comparand) {
 		if (comparand.getClass() != this.getClass()) {

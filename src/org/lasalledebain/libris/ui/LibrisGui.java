@@ -94,7 +94,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		menu.editMenuEnableModify(readOnly);
 		destroyWindow(true);
 		createPanes(false);
-		updateUITitle(currentDatabase, false);
+		updateUITitle(false);
 
 		displayPanel.addLayouts(currentDatabase.getLayouts());
 		RecordList list = currentDatabase.getRecords();
@@ -485,7 +485,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	@Override
 	public void setAuxiliaryDirectory(File auxDir) {
-		// TODO Auto-generated method stub
+		// TODO implement or remove setAuxiliaryDirectory
 		
 	}
 

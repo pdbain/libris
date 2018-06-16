@@ -18,7 +18,6 @@ public interface LibrisUi {
 	public void rebuildDatabase() throws LibrisException;
 	public boolean isDatabaseSelected();
 	public boolean isDatabaseOpen();
-	// TODO 1 check that database is not already opened and is not reserved.
 	public LibrisDatabase getDatabase();
 	void setDatabaseFile(File dbFile);
 	void setAuxiliaryDirectory(File auxDir);

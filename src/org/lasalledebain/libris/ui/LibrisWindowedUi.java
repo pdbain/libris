@@ -168,10 +168,10 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		return Dialogue.yesNoCancelDialog(mainFrame, msg);
 	}
 
-	public void updateUITitle(LibrisDatabase db, boolean isModified) {
+	public void updateUITitle(boolean isModified) {
 		String databaseName = "no database open";
-		if (null != db) {
-			DatabaseAttributes databaseAttributes = db.getAttributes();
+		if (null != currentDatabase) {
+			DatabaseAttributes databaseAttributes = currentDatabase.getAttributes();
 			databaseName = databaseAttributes.getDatabaseName();
 			if (isModified) {
 				databaseName = databaseName+"*";

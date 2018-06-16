@@ -275,6 +275,7 @@ public class RecordDisplayPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			recordModified();
+			mainGui.updateUITitle(true);
 		}
 	}
 	
