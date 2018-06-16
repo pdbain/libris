@@ -172,7 +172,7 @@ public class GroupMember extends GenericField implements XMLElement {
 
 	@Override
 	public Field duplicate() throws FieldDataException {
-		// TODO Auto-generated method stub
+		// TODO implement GroupMember.duplicate
 		return null;
 	}
 

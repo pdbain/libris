@@ -38,7 +38,6 @@ PDFTextStripper stripper;
 			System.out.println(outputBuff);
 			doc.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

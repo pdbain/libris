@@ -59,7 +59,7 @@ public class FieldLocationValue extends FieldValue {
 
 	@Override
 	public FieldValue duplicate() {
-		// TODO Auto-generated method stub
+		// TODO write duplicate()
 		return null;
 	}
 

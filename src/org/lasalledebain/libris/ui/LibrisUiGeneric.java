@@ -129,18 +129,18 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 	@Override
 	public void displayRecord(int recordId) throws LibrisException {
-		// TODO Auto-generated method stub
+		// TODO implement or remove displayRecord
 
 	}
 	@Override
 	public void pasteToField() {
-		// TODO Auto-generated method stub
+		// TODO implement or remove pasteToField
 
 	}
 
 	@Override
 	public String promptAndReadReply(String prompt) throws DatabaseException {
-		// TODO Auto-generated method stub
+		// TODO implement or remove promptAndReadReply
 		return null;
 	}
 

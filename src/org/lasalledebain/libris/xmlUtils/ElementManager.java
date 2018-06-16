@@ -344,8 +344,7 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 
 	@Override
 	public void remove() {
-		// TODO Auto-generated method stub
-		
+		/* empty */
 	}
 
 	public ElementManager nextElement() throws XmlException {

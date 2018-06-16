@@ -775,7 +775,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return result;
 	}
 
-	// FIXME clear modified marker when saving
 	public static void log(Level severity, String msg, Throwable e) {
 		librisLogger.log(severity, msg, e);
 	}
