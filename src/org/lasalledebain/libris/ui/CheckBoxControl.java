@@ -14,7 +14,6 @@ public class CheckBoxControl extends GuiControl {
 
 	boolean selected;
 	Checkbox control;
-	private boolean editable;
 	private String title;
 	private boolean empty;
 
@@ -69,5 +68,9 @@ public class CheckBoxControl extends GuiControl {
 		}
 				);
 		control.setEnabled(editable);
+	}
+	@Override
+	protected void copyValuesFromControls() {
+		return;
 	}
 }

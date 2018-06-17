@@ -50,12 +50,6 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 		return ctrl;
 	}
 
-	public void setEditable(boolean isEditable) {
-		for (GuiControl c: controlList) {
-			c.setEditable(isEditable);
-		}
-	}
-
 	@Override
 	public void enterFieldValues() throws FieldDataException {
 		recordField.setValues(this);
@@ -92,6 +86,7 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 		public boolean hasNext() {
 			if (Objects.isNull(nextControl) && controlListIterator.hasNext()) {
 				GuiControl temp = controlListIterator.next();
+				temp.copyValuesFromControls();
 				if (!temp.isEmpty()) {
 					nextControl = temp;
 				}

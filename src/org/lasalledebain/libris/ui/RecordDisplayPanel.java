@@ -62,9 +62,8 @@ public class RecordDisplayPanel extends JPanel {
 	}
 
 	RecordWindow addRecord(Record record, boolean editable) throws LibrisException {
-		RecordWindow rw = new RecordWindow(mainGui, recLayout, record, true, modListener);
+		RecordWindow rw = new RecordWindow(mainGui, recLayout, record, editable, modListener);
 		rw.setModified(false);
-		rw.setEditable(editable);
 		addRecordWindow(rw);
 		menu.recordWindowOpened(editable);
 		return rw;

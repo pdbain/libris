@@ -23,10 +23,9 @@ import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 
 public class NameList extends GuiControl {
 
-	private  JList control;
+	private  JList<KeyIntegerTuple> control;
 	private final GroupDef grpDef;
 	private final LibrisDatabase dBase;
-	private boolean isEditable;
 	Vector <KeyIntegerTuple> affiliateInfo;
 	private final LibrisWindowedUi windowedUi;
 	final Record currentRecord;
@@ -46,7 +45,6 @@ public class NameList extends GuiControl {
 		windowedUi = ui;
 		dBase = db;
 		currentRecord = rec;
-		isEditable = true;
 		affiliateInfo = new Vector<KeyIntegerTuple>(0);
 		setValues(rec, gd);
 	}
@@ -72,7 +70,7 @@ public class NameList extends GuiControl {
 
 	@Override
 	protected void displayControls() {
-		control = new JList(affiliateInfo);
+		control = new JList<KeyIntegerTuple>(affiliateInfo);
 		if (affiliateInfo.size() > 0) {
 			control.setSelectedIndex(0);
 			// TODO add menu item to edit affiliate list
@@ -112,10 +110,6 @@ public class NameList extends GuiControl {
 		} catch (InputException e) {
 			throw new FieldDataException("Error reading record ID: ", e);
 			}
-	}
-	@Override
-	public void setEditable(boolean edtble) {
-		isEditable = edtble;
 	}
 
 	@Override
@@ -158,8 +152,7 @@ public class NameList extends GuiControl {
 					@Override
 					public void remove() {
 						return;
-					}
-					
+					}					
 				};
 			}
 			
@@ -218,4 +211,8 @@ public class NameList extends GuiControl {
 		affiliateInfo.setSize(0);
 	}
 
+	@Override
+	protected void copyValuesFromControls() {
+		return;
+	}
 }
