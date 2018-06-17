@@ -17,7 +17,7 @@ public abstract class GuiControl {
 	protected static final String EMPTY_TEXT_VALUE = "";
 	private FieldInfo fldInfo;
 	private ModificationTracker modMon;
-	protected boolean editable;
+	protected final boolean editable;
 	protected int height;
 	protected int width;
 	public GuiControl(int height, int width, boolean editable) {
@@ -57,6 +57,8 @@ public abstract class GuiControl {
 
 	public abstract void setFieldValue(FieldValue newValue) throws FieldDataException;
 
+	protected abstract void copyValuesFromControls();
+
 	/**
 	 * Gets the value(s) from the GUI control into the recordField
 	 * @return linked list of FieldValues
@@ -85,9 +87,6 @@ public abstract class GuiControl {
 		return editable;
 	}
 
-	public void setEditable(boolean newEditableValue) {
-		this.editable = newEditableValue;
-	}
 	protected abstract void displayControls();
 
 	protected void setModified(boolean modified) {

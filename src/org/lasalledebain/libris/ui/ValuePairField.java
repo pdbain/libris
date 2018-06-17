@@ -23,7 +23,7 @@ public abstract class ValuePairField extends GuiControl {
 		mainValue = EMPTY_TEXT_VALUE;
 		extraValue = EMPTY_TEXT_VALUE;
 		displayControls();
-}
+	}
 
 	@Override
 	public boolean isEmpty() {
@@ -39,13 +39,15 @@ public abstract class ValuePairField extends GuiControl {
 	public void setFieldValue(String controlValue) throws FieldDataException {
 		setFieldValue(controlValue, null, false);
 	}
+	
+	// TODO eliminate setFieldValue
 	public void setFieldValue(FieldValue val) throws FieldDataException {
 		String firstValue = val.getMainValueAsString();
 		String secondValue = val.getExtraValueAsString();
 		boolean twoValues = Objects.nonNull(secondValue) && !secondValue.isEmpty();
 		setFieldValue(firstValue, secondValue, twoValues);
 	}
-	
+
 	public void setFieldValue(String firstValue, String secondValue, boolean twoValues) {
 		mainValue = firstValue;
 		extraValue = twoValues? secondValue: EMPTY_TEXT_VALUE;
@@ -53,16 +55,8 @@ public abstract class ValuePairField extends GuiControl {
 	}
 
 	@Override
-	public void setEditable(boolean editable) {
-		if (isEditable()) {
-			copyValuesFromControls();
-		}
-		super.setEditable(editable);
-	}
-
-	@Override
 	public void setEmpty(boolean empty) {
-mainValue = extraValue = EMPTY_TEXT_VALUE;
+		mainValue = extraValue = EMPTY_TEXT_VALUE;
 	}
 	protected abstract void copyValuesFromControls();
 
@@ -71,7 +65,7 @@ mainValue = extraValue = EMPTY_TEXT_VALUE;
 		if (editable) {
 			copyValuesFromControls();
 		}
-	
+
 		FieldValue result;
 		if (!isEmpty()) {
 			if (extraValue.isEmpty()) {

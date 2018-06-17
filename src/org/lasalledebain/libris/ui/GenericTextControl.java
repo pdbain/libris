@@ -39,12 +39,6 @@ public abstract class GenericTextControl extends GuiControl {
 	}
 
 	@Override
-	public void setEditable(boolean newEditableValue) {
-		copyValuesFromControls();
-		editable = newEditableValue;
-		displayControls();
-	}
-	@Override
 	public FieldValue getFieldValue() throws FieldDataException {
 		copyValuesFromControls();
 		return new FieldSingleStringValue(mainValue);
@@ -59,13 +53,13 @@ public abstract class GenericTextControl extends GuiControl {
 		return control;
 	}
 
-	protected void copyValuesFromControls() {
+	 protected void copyValuesFromControls() {
 		if (isEditable()) {
 			mainValue = control.getText();
 		}
 	}
 
-	protected void copyValuesToControls() {
+	 void copyValuesToControls() {
 		if (isEditable()) {
 			control.setText(mainValue);
 		}

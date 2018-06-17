@@ -26,8 +26,11 @@ public class EnumField extends GuiControl {
 	
 	public EnumField(int height, int width, boolean editable) {
 		super(height, width, editable);
+		valueSelector.setEnabled(editable);
+		if (isEmpty()) {
+			setContent(!editable);
+		}
 		displayControls();
-		this.editable = editable;
 	}
 
 	protected void displayControls() {
@@ -142,14 +145,6 @@ public class EnumField extends GuiControl {
 		}
 		return extraValues;
 	}
-	@Override
-	public void setEditable(boolean editable) {
-		super.setEditable(editable);
-		valueSelector.setEnabled(editable);
-		if (isEmpty()) {
-			setContent(!editable);
-		}
-	}
 
 	@Override
 	public void setRestricted(boolean restricted) {
@@ -160,5 +155,10 @@ public class EnumField extends GuiControl {
 	@Override
 	public boolean isEmpty() {
 		return empty;
+	}
+
+	@Override
+	protected void copyValuesFromControls() {
+		return;
 	}
 }

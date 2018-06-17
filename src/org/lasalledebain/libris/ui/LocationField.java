@@ -83,12 +83,6 @@ public class LocationField extends ValuePairField {
 		}
 	}
 
-	@Override
-	public void setEditable(boolean editable) {
-		this.editable = editable;
-		showEditableFields();
-	}
-
 	@SuppressWarnings("serial")
 	class URLField extends JLabel {
 		URL href;
@@ -109,7 +103,8 @@ public class LocationField extends ValuePairField {
 	}
 
 	@Override
-	protected void copyValuesFromControls() {
+	protected
+	void copyValuesFromControls() {
 		if (isEditable()) {
 			mainValue = urlBox.getText();
 			extraValue = linkTextBox.getText();
