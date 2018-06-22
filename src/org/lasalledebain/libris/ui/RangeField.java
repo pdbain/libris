@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.event.FocusListener;
 
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class RangeField extends ValuePairField {
@@ -16,30 +17,15 @@ public class RangeField extends ValuePairField {
 		FlowLayout layout = new FlowLayout();
 		control.setLayout(layout);
 		layout.setHgap(0);
+		if (editable) {
+			copyValuesToControls();
+		}
 	}
 
 	@Override
-	protected void displayControls() {
-		control.removeAll();
-		mainControl = new JTextField(mainValue);
-		control.add(mainControl);
-		if (editable) {
-			mainControl.setEditable(true);
-			control.add(dashLabel);
-			extraControl = new JTextField(extraValue);
-			extraControl.setEditable(true);
-			mainControl.getDocument().addDocumentListener(getModificationListener());
-			extraControl.getDocument().addDocumentListener(getModificationListener());
-			control.add(extraControl);
-		} else {
-			mainControl.setEditable(false);
-			if (!extraValue.isEmpty()) {
-				control.add(dashLabel);
-				extraControl = new JTextField(extraValue);
-				extraControl.setEditable(false);
-				control.add(extraControl);
-			}
-		}
+	protected JPanel displayControls() {
+		JPanel tempPanel = new JPanel();
+		return tempPanel;
 	}
 
 	@Override
@@ -62,5 +48,35 @@ public class RangeField extends ValuePairField {
 	protected void copyValuesFromControls() {
 		mainValue = mainControl.getText();
 		extraValue = extraControl.getText();
+	}
+
+	@Override
+	protected void copyValuesToControls() {
+		if (editable) {
+			showEditableFields();
+		} else {
+			if (!extraValue.isEmpty()) {
+				mainControl = new JTextField(mainValue, width);
+				control.add(dashLabel);
+				extraControl = new JTextField(extraValue, width);
+				extraControl.setEditable(false);
+				control.add(extraControl);
+			} else {
+				mainControl = new JTextField(mainValue, 2*width);
+			}
+			mainControl.setEditable(false);
+		}
+	}
+
+	protected void showEditableFields() {
+		mainControl = new JTextField(mainValue, width);
+		control.add(mainControl);
+		mainControl.setEditable(true);
+		control.add(dashLabel);
+		extraControl = new JTextField(extraValue, width);
+		extraControl.setEditable(true);
+		mainControl.getDocument().addDocumentListener(getModificationListener());
+		extraControl.getDocument().addDocumentListener(getModificationListener());
+		control.add(extraControl);
 	}
 }

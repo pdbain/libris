@@ -56,6 +56,7 @@ public class FieldPositionParameter {
 		} else {
 			width = Integer.parseInt(widthString);			
 		}
+
 		if ((null != dims) && ((height < 1) || (width < 1))) {
 			throw new DatabaseException("field dimensions must be positive");
 		}

@@ -191,12 +191,11 @@ public class RecordListTests extends TestCase {
 			testDb.getUi().quit(true);
 			
 			HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy);
-			testDb = new LibrisDatabase(testDatabaseFileCopy, null, ui, false);
-			testDb.getUi().quit(true);
-			checkRecordOrder(testDb, expectedData);
+			ui.openDatabase();
+			checkRecordOrder(ui.getDatabase(), expectedData);
 			
 			testDb.exportDatabaseXml(new FileOutputStream(testDatabaseFileCopy), true, true, false);
-			testDb.getUi().quit(true);
+			ui.quit(true);
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			checkRecordOrder(testDb, expectedData);
 			/*
@@ -209,9 +208,10 @@ public class RecordListTests extends TestCase {
 			 * export database and rebuild
 			 * check records
 			 */
+			testDb.getUi().quit(true);
 		} catch (Exception e) {
-			fail("unexpected exception "+e.getMessage());
 			e.printStackTrace();
+			fail("unexpected exception "+e.getMessage());
 		}			
 	}
 

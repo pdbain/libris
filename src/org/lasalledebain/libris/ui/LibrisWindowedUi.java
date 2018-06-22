@@ -59,6 +59,10 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		showMessageDialog(parentComponent, formatAlertString(msg, e));
 	}
 	
+	public static void alert(Component parentComponent, String msg) {
+		showMessageDialog(parentComponent, msg);
+	}
+	
 	public static String formatAlertString(String msg, Exception e) {
 		StringBuilder buff = new StringBuilder(msg);
 		LibrisDatabase.log(Level.WARNING, e.getMessage(), e);
@@ -157,6 +161,11 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	public void alert(String msg, Exception e) {
 		String errorString = formatAlertString(msg, e);
 		alert(errorString);
+	}
+
+	@Override
+	public void alert(String msg) {
+		alert(msg);
 	}
 
 	@Override

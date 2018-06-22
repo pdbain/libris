@@ -23,7 +23,7 @@ import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 
 public class NameList extends GuiControl {
 
-	private  JList<KeyIntegerTuple> control;
+	private final JList<KeyIntegerTuple> control;
 	private final GroupDef grpDef;
 	private final LibrisDatabase dBase;
 	Vector <KeyIntegerTuple> affiliateInfo;
@@ -46,6 +46,7 @@ public class NameList extends GuiControl {
 		dBase = db;
 		currentRecord = rec;
 		affiliateInfo = new Vector<KeyIntegerTuple>(0);
+		control = displayControls();
 		setValues(rec, gd);
 	}
 
@@ -65,19 +66,19 @@ public class NameList extends GuiControl {
 				affiliateInfo.add(new KeyIntegerTuple(dBase.getRecordName(recordNumber), recordNumber));
 			}
 		}
-		displayControls();
 	}
 
 	@Override
-	protected void displayControls() {
-		control = new JList<KeyIntegerTuple>(affiliateInfo);
+	protected JList <KeyIntegerTuple> displayControls() {
+		JList<KeyIntegerTuple> tempControl = new JList<KeyIntegerTuple>(affiliateInfo);
 		if (affiliateInfo.size() > 0) {
-			control.setSelectedIndex(0);
+			tempControl.setSelectedIndex(0);
 			// TODO add menu item to edit affiliate list
 		}
-		control.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tempControl.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		GroupMouseListener listener = new GroupMouseListener();
-		control.addMouseListener(listener);
+		tempControl.addMouseListener(listener);
+		return tempControl;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.ui;
 
 import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 
 public class RecordTextField extends GenericTextControl {
 
@@ -13,10 +14,10 @@ public class RecordTextField extends GenericTextControl {
 	}
 
 	@Override
-	protected void displayControls() {
+	protected JTextComponent displayControls() {
 		JTextField tempControl = new JTextField(mainValue);
 		tempControl.getDocument().addDocumentListener(getModificationListener());
 		tempControl.setCaretPosition(0);
-		control = tempControl;
+		return tempControl;
 	}
 }

@@ -15,9 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
+
+import org.lasalledebain.libris.exception.FieldDataException;
 
 public class LocationField extends ValuePairField {
 
@@ -28,26 +32,24 @@ public class LocationField extends ValuePairField {
 		super(height, width, editable);
 		LayoutManager layout = new BoxLayout(control, BoxLayout.Y_AXIS);
 		control.setLayout(layout);
+		copyValuesToControls();
 	}
 	
-	protected void displayControls() {	
-		if (editable) {
-			showEditableFields();
-		} else  {
-			showNonEditableFields();			
-		}
+	protected JPanel displayControls() {	
+		return new JPanel();			
 	}
 	
 	private final void showEditableFields() {
-		control.removeAll();
 		JPanel urlPanel = new JPanel();
 		urlPanel.add(urlLabel);
-		urlBox = new JTextField(mainValue);
+		urlBox = new JTextField(mainValue, width);
+		addModificationListener(urlBox);
 		urlPanel.add(urlBox);
 		control.add(urlPanel);
 		JPanel textPanel = new JPanel();
 		textPanel.add(textLabel);
-		linkTextBox = new JTextField(extraValue);
+		linkTextBox = new JTextField(extraValue, width);
+		addModificationListener(linkTextBox);
 		textPanel.add(linkTextBox);
 		control.add(textPanel);
 	}
@@ -57,30 +59,37 @@ public class LocationField extends ValuePairField {
 		control.removeAll();
 		if (!isEmpty()) {
 			JLabel urlFld;
-			try {
-				final URL fieldURL = new URL(mainValue);
-				urlFld = extraValue.isEmpty()? new URLField(fieldURL): new URLField(fieldURL, extraValue);
+			URL fieldURL = checkURL();
+			if (null != fieldURL) {
+				URL finalUrl = fieldURL;
+				urlFld = extraValue.isEmpty()? new URLField(finalUrl): new URLField(finalUrl, extraValue);
 				if (Desktop.isDesktopSupported()) {
 					urlFld.addMouseListener(new MouseAdapter() {
 
 						@Override
 						public void mouseClicked(MouseEvent e) {
 							try {
-								Desktop.getDesktop().browse(fieldURL.toURI());
+								Desktop.getDesktop().browse(finalUrl.toURI());
 							} catch (IOException | URISyntaxException urlExceptiopn) {
 								LibrisWindowedUi.alert(parentFrame, "Invalid URL: "+mainValue, urlExceptiopn);
 							}
 						}
 					});
 				}
-			} catch (MalformedURLException e) {
-				LibrisWindowedUi.alert(parentFrame, "Invalid URL: "+mainValue, e);
-				urlFld = extraValue.isEmpty()? new JLabel(mainValue): new JLabel(extraValue);
-
-
+				control.add(urlFld);
 			}
-			control.add(urlFld);
 		}
+	}
+
+	protected URL checkURL() {
+		URL fieldURL;
+		try {
+			fieldURL = new URL(mainValue);
+		} catch (MalformedURLException e) {
+			fieldURL = null;
+			LibrisWindowedUi.alert(parentFrame, "Invalid URL: "+mainValue, e);
+		}
+		return fieldURL;
 	}
 
 	@SuppressWarnings("serial")
@@ -110,4 +119,34 @@ public class LocationField extends ValuePairField {
 			extraValue = linkTextBox.getText();
 		}
 	}
+
+	@Override
+	protected void checkFieldValues() throws FieldDataException {
+		if (mainValue.isEmpty()) {
+			if (!extraValue.isEmpty()) {
+				throw new FieldDataException("URL is empty");
+			}
+		} else {
+			if (null == checkURL()) {
+				throw new FieldDataException("URL "+mainValue+" is invalid");
+				}
+		}
+
+	}
+
+	@Override
+	protected void copyValuesToControls() {
+		if (editable) {
+			showEditableFields();
+		} else  {
+			showNonEditableFields();			
+		}
+	}
+	
+	protected void addModificationListener(JTextComponent comp) {
+		comp.getDocument().addDocumentListener(getModificationListener());
+	}
 }
+
+
+
