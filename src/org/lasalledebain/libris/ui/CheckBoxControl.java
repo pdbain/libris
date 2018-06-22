@@ -13,7 +13,7 @@ import org.lasalledebain.libris.field.FieldValue;
 public class CheckBoxControl extends GuiControl {
 
 	boolean selected;
-	Checkbox control;
+	protected final Checkbox control;
 	private String title;
 	private boolean empty;
 
@@ -27,7 +27,7 @@ public class CheckBoxControl extends GuiControl {
 		super(height, width, editable);
 		this.title = title;
 		empty = true;
-		displayControls();
+		control = displayControls();
 	}
 	@Override
 	public void setFieldValue(String controlValue) {
@@ -53,9 +53,9 @@ public class CheckBoxControl extends GuiControl {
 	}
 
 	@Override
-	protected void displayControls() {
-		control = new Checkbox(title);
-		control.addItemListener(new ItemListener() {
+	protected Checkbox displayControls() {
+		Checkbox tempControl = new Checkbox(title);
+		tempControl.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
 				if (!editable) {
@@ -67,7 +67,8 @@ public class CheckBoxControl extends GuiControl {
 
 		}
 				);
-		control.setEnabled(editable);
+		tempControl.setEnabled(editable);
+		return tempControl;
 	}
 	@Override
 	protected void copyValuesFromControls() {

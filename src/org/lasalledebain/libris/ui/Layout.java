@@ -86,7 +86,7 @@ public abstract class Layout implements XMLElement {
 		this.height = Integer.parseInt(h);
 	}
 	void setWidth(String w) {
-		this.width = Integer.parseInt(w);		
+		this.width = Integer.parseInt(w);
 	}
 	public String getTitle() {
 		return title;

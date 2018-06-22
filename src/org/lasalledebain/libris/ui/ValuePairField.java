@@ -12,23 +12,25 @@ import org.lasalledebain.libris.field.FieldValue;
 
 public abstract class ValuePairField extends GuiControl {
 
-	protected JPanel control;
+	protected final JPanel control;
 	JPanel pairArea;
 	protected int width;
 	String mainValue, extraValue;
 	public ValuePairField(int height, int width, boolean editable) {
 		super(height, width, editable);
-		control = new JPanel();
 		this.width = width;
 		mainValue = EMPTY_TEXT_VALUE;
 		extraValue = EMPTY_TEXT_VALUE;
-		displayControls();
+		control = displayControls();
 	}
 
 	@Override
 	public boolean isEmpty() {
 		return mainValue.isEmpty();
 	}
+
+	@Override
+	protected abstract JPanel displayControls();
 
 	@Override
 	public Component getGuiComponent() {
@@ -51,18 +53,22 @@ public abstract class ValuePairField extends GuiControl {
 	public void setFieldValue(String firstValue, String secondValue, boolean twoValues) {
 		mainValue = firstValue;
 		extraValue = twoValues? secondValue: EMPTY_TEXT_VALUE;
-		displayControls();
+		copyValuesToControls();
 	}
 
 	@Override
 	public void setEmpty(boolean empty) {
 		mainValue = extraValue = EMPTY_TEXT_VALUE;
 	}
+	
 	protected abstract void copyValuesFromControls();
+
+	protected abstract void copyValuesToControls();
 
 	@Override
 	public FieldValue getFieldValue() throws FieldDataException {
 		if (editable) {
+			checkFieldValues();
 			copyValuesFromControls();
 		}
 
@@ -77,5 +83,9 @@ public abstract class ValuePairField extends GuiControl {
 			result = FieldValue.getEmptyfieldvaluesingleton();
 		}
 		return result;
+	}
+
+	protected void checkFieldValues() throws FieldDataException {
+		return;
 	}
 }

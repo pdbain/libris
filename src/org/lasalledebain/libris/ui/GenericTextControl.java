@@ -11,11 +11,15 @@ import org.lasalledebain.libris.field.FieldValue;
 public abstract class GenericTextControl extends GuiControl {
 
 	protected String mainValue;
-	protected JTextComponent control;
+	protected final JTextComponent control;
+	protected abstract JTextComponent displayControls();
 	public GenericTextControl(int height, int width, boolean editable) {
 		super(height, width, editable);
 		mainValue = EMPTY_TEXT_VALUE;
-		displayControls();
+		control = displayControls();
+		if (editable) {
+			addModificationListener();
+		}
 	}
 
 	@Override
@@ -60,9 +64,7 @@ public abstract class GenericTextControl extends GuiControl {
 	}
 
 	 void copyValuesToControls() {
-		if (isEditable()) {
-			control.setText(mainValue);
-		}
-	}
+		 control.setText(mainValue);
+	 }
 
 }

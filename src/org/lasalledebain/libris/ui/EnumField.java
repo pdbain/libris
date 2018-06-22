@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
@@ -16,33 +17,33 @@ import org.lasalledebain.libris.field.FieldValue;
 
 public class EnumField extends GuiControl {
 
-	JPanel control;
+	protected final JPanel control;
 	private EnumFieldChoices legalValues;
 	private ArrayList<String> extraValues;
-	JComboBox<String> valueSelector;
+	private final JComboBox<String> valueSelector;
 	private int numLegalValues;
 	private JPanel filler;
 	private boolean empty;
 	
 	public EnumField(int height, int width, boolean editable) {
 		super(height, width, editable);
+		control = displayControls();
+		setEmpty(true);
+		valueSelector = new JComboBox<String>();
 		valueSelector.setEnabled(editable);
-		if (isEmpty()) {
-			setContent(!editable);
-		}
-		displayControls();
+		setContent(!editable);
 	}
 
-	protected void displayControls() {
-		control = new JPanel();
+	protected JPanel displayControls() {
+		JPanel tempControl = new JPanel();
 		filler = new JPanel();
-		control.setSize(width, height);
+		tempControl.setSize(width, height);
 		Dimension ctrlDim = new Dimension(Math.max(100, width), Math.max(20,height));
 		filler.setPreferredSize(ctrlDim);
 		filler.setMinimumSize(ctrlDim);
-		control.setVisible(true);
+		tempControl.setVisible(true);
 		filler.setVisible(true);
-		setEmpty(true);
+		return tempControl;
 	}
 	
 	@Override
@@ -81,7 +82,7 @@ public class EnumField extends GuiControl {
 		for (int i = 0; i < numLegalValues; ++i) {
 			comboValues[i] = comboValues[i].intern();
 		}
-		valueSelector = new JComboBox<String>(comboValues);
+		valueSelector.setModel(new DefaultComboBoxModel<>(comboValues));
 		valueSelector.setSelectedIndex(-1);
 		if ((height > 0) && (width > 0)) {
 			valueSelector.setSize(width, height);

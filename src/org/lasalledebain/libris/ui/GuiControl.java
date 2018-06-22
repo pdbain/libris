@@ -24,6 +24,20 @@ public abstract class GuiControl {
 		this.editable = editable;
 		this.height = height;
 		this.width = width;
+		modListener = new DocumentListener() {
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				setModified(true);
+			}
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				setModified(true);
+			}
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				setModified(true);
+			}
+		};
 	}
 
 	public boolean isSingleValue() {
@@ -45,7 +59,7 @@ public abstract class GuiControl {
 	boolean singleValue;
 	boolean restricted;
 	protected Frame parentFrame = null;
-	protected DocumentListener modListener;
+	protected final DocumentListener modListener;
 
 	public abstract boolean isEmpty();
 
@@ -87,7 +101,7 @@ public abstract class GuiControl {
 		return editable;
 	}
 
-	protected abstract void displayControls();
+	protected abstract Component displayControls();
 
 	protected void setModified(boolean modified) {
 		modMon.setModified(modified);
@@ -118,23 +132,6 @@ public abstract class GuiControl {
 	}
 
 	protected DocumentListener getModificationListener() {
-		if (null == modListener) {
-			modListener = new DocumentListener() {
-				@Override
-				public void removeUpdate(DocumentEvent e) {
-					setModified(true);
-				}
-				@Override
-				public void insertUpdate(DocumentEvent e) {
-					setModified(true);
-				}
-				@Override
-				public void changedUpdate(DocumentEvent e) {
-					setModified(true);
-				}
-			};
-		}
 		return modListener;
-	
 	}
 }

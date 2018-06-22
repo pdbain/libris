@@ -77,6 +77,7 @@ public class Libris {
 		buildIndexes(databaseFile, ui);
 		
 		LibrisDatabase result = new LibrisDatabase(databaseFile, null, ui, false);
+		result.openDatabase();
 		return result;
 	}
 
