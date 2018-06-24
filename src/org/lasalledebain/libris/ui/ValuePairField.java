@@ -42,7 +42,6 @@ public abstract class ValuePairField extends GuiControl {
 		setFieldValue(controlValue, null, false);
 	}
 	
-	// TODO eliminate setFieldValue
 	public void setFieldValue(FieldValue val) throws FieldDataException {
 		String firstValue = val.getMainValueAsString();
 		String secondValue = val.getExtraValueAsString();

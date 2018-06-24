@@ -20,7 +20,6 @@ public interface LibrisUi {
 	public boolean isDatabaseOpen();
 	public LibrisDatabase getDatabase();
 	void setDatabaseFile(File dbFile);
-	void setAuxiliaryDirectory(File auxDir);
 	public abstract String SelectSchemaFile(String schemaName) throws DatabaseException;
 	public void setTitle(String title);
 
