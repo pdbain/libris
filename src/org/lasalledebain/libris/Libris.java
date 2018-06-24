@@ -85,10 +85,7 @@ public class Libris {
 		if (null == ui) {
 			ui = new HeadlessUi(databaseFile);
 		}
-		LibrisDatabase db = new LibrisDatabase(databaseFile, null, ui, false);
-		if (db.isDatabaseReserved() || !db.reserveDatabase()) {
-			db = null;
-		}
+		LibrisDatabase db = ui.openDatabase();
 		return db;
 	}
 

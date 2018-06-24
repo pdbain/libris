@@ -73,7 +73,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private LibrisJournalFileManager journalFile;
 	private Records databaseRecords;
 	public static Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());
-	private DatabaseAttributes xmlAttributes;
+	protected DatabaseAttributes xmlAttributes;
 	private boolean readOnly;
 	private Date databaseDate;
 	public static final String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
