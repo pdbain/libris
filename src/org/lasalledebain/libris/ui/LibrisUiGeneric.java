@@ -144,9 +144,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		return null;
 	}
 
-	public void setAuxiliaryDirectory(File auxDir) {
-		 auxDirectory = auxDir;
-	}
 	 @Override
 	public void recordsAccessible(boolean accessible) {
 	}

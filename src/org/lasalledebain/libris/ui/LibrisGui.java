@@ -484,12 +484,6 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	public void setAuxiliaryDirectory(File auxDir) {
-		// TODO implement or remove setAuxiliaryDirectory
-		
-	}
-
-	@Override
 	public void setRecordName(NamedRecordList namedRecs) throws InputException {
 		RecordWindow currentRecordWindow = getCurrentRecordWindow();
 		if (null != currentRecordWindow){
