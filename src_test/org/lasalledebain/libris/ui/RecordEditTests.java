@@ -48,7 +48,6 @@ public class RecordEditTests extends TestCase {
 			pause("opened record");
 			info("selected "+rid);
 			gui.setRecordWindowEditable(true);
-			gui.closeDatabase(false);
 			pause("re-open record");
 			gui.displaySelectedRecord();
 			RecordDisplayPanel dispPanel = gui.getDisplayPanel();

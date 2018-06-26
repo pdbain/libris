@@ -32,25 +32,24 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	protected boolean databaseSelected = false;
 
 	public abstract void closeWindow(boolean allWindows);
+
 	@Override
-	public boolean closeDatabase(boolean force) {
+	protected boolean checkAndCloseDatabase(boolean force) {
 		boolean result = false;
-		if (Objects.nonNull(currentDatabase)) {
-			if (!force && currentDatabase.isModified()) {
-				int choice = confirmWithCancel(Messages.getString("LibrisDatabase.save_database_before_close")); //$NON-NLS-1$
-				switch (choice) {
-				case JOptionPane.YES_OPTION:
-					currentDatabase.save();
-					result =  currentDatabase.closeDatabase(true);
-				case JOptionPane.NO_OPTION:
-					result =  currentDatabase.closeDatabase(true);
-				case JOptionPane.CANCEL_OPTION:
-				default:
-					/* do nothing */
-				}
-			} else {
-				return currentDatabase.closeDatabase(force);
+		if (!force && currentDatabase.isModified()) {
+			int choice = confirmWithCancel(Messages.getString("LibrisDatabase.save_database_before_close")); //$NON-NLS-1$
+			switch (choice) {
+			case JOptionPane.YES_OPTION:
+				currentDatabase.save();
+				result =  currentDatabase.closeDatabase(true);
+			case JOptionPane.NO_OPTION:
+				result =  currentDatabase.closeDatabase(true);
+			case JOptionPane.CANCEL_OPTION:
+			default:
+				/* do nothing */
 			}
+		} else {
+			return currentDatabase.closeDatabase(force);
 		}
 		return result;
 	}
@@ -113,14 +112,12 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		initializeUi();
 		selectedGroupDef = null;
 	}
-	public LibrisWindowedUi(File dbFile) throws LibrisException {
-		this(dbFile, null, false);
-	}
-	public LibrisWindowedUi(File databaseFile, File auxDirectory,
-			boolean readOnly) throws LibrisException {
-		super(databaseFile, auxDirectory, readOnly);
+
+	public LibrisWindowedUi(File databaseFile, boolean readOnly) throws LibrisException {
+		super(databaseFile, readOnly);
 		initializeUi();
 	}
+
 	protected void initializeUi() {
 		mainFrame = new JFrame();
 	}

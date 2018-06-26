@@ -6,25 +6,16 @@ import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
-import javax.xml.namespace.QName;
-
 import org.lasalledebain.libris.Field.FieldType;
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexDefs;
 import org.lasalledebain.libris.index.IndexField;
-import org.lasalledebain.libris.xmlUtils.ElementManager;
-import org.lasalledebain.libris.xmlUtils.ElementReader;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-import org.lasalledebain.libris.xmlUtils.XmlShapes;
-import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
 public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	protected static final IndexField[] emptyIndexFieldList = new IndexField[0];
