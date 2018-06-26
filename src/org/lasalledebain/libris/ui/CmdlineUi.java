@@ -14,13 +14,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 
-	public CmdlineUi(String dbFilePath, String auxPath, boolean readOnly) throws LibrisException {
-		super(new File(dbFilePath), new File(auxPath), readOnly);
-		if (doIndexing) {
-			rebuildDatabase();
-		}
-	}
-
 	BufferedReader cmdlineInput;
 	private boolean doIndexing;
 
@@ -113,7 +106,7 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
 	}
 
-	public boolean isReadOnly() {
+	public boolean isDatabaseReadOnly() {
 		return false;
 	}
 
@@ -130,6 +123,12 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 	@Override
 	public boolean quit(boolean force) {
 		return closeDatabase(force);
+	}
+
+	@Override
+	protected boolean checkAndCloseDatabase(boolean force) {
+		// TODO write checkAndCloseDatabase
+		return currentDatabase.closeDatabase(force);
 	}
 
 }

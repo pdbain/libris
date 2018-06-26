@@ -190,7 +190,7 @@ public class RecordListTests extends TestCase {
 			testDb.save();
 			testDb.getUi().quit(true);
 			
-			HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy);
+			HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy, false);
 			ui.openDatabase();
 			checkRecordOrder(ui.getDatabase(), expectedData);
 			

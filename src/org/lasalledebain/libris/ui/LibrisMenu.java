@@ -289,7 +289,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		editRecordListener = new EditRecordListenerImpl();
 		editRecord.addActionListener(editRecordListener);
 		recMenu.add(editRecord);
-		editRecord.setEnabled(!guiMain.isReadOnly());
+		editRecord.setEnabled(!guiMain.isDatabaseReadOnly());
 		editRecord.setState(false);
 		
 		enterRecord = new JMenuItem("Enter record");

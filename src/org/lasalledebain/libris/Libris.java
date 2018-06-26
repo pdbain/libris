@@ -57,8 +57,9 @@ public class Libris {
 						auxDir = new File(auxDirpath);
 					}
 				}
-				LibrisGui ui = new LibrisGui(dbFile, auxDir, readOnly);
-				if (true)
+				LibrisGui ui = new LibrisGui(dbFile, readOnly);
+				LibrisDatabaseParameter params = ui.getParameters();
+				params.auxDir = auxDir;
 				if (null != dbFile) {
 					ui.openDatabase();
 				} else {
@@ -73,17 +74,16 @@ public class Libris {
 	}
 
 	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
-		HeadlessUi ui = new HeadlessUi(databaseFile);
+		HeadlessUi ui = new HeadlessUi(databaseFile, false);
 		buildIndexes(databaseFile, ui);
 		
-		LibrisDatabase result = new LibrisDatabase(databaseFile, null, ui, false);
-		result.openDatabase();
+		LibrisDatabase result = ui.openDatabase();
 		return result;
 	}
 
 	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi ui) throws LibrisException {
 		if (null == ui) {
-			ui = new HeadlessUi(databaseFile);
+			ui = new HeadlessUi(databaseFile, false);
 		}
 		LibrisDatabase db = ui.openDatabase();
 		return db;
@@ -92,7 +92,7 @@ public class Libris {
 	public static boolean buildIndexes(File databaseFile, LibrisUi ui)
 			throws UserErrorException, DatabaseException, InputException,
 			LibrisException {
-		LibrisDatabase db = new LibrisDatabase(databaseFile, null, ui, false);
+		LibrisDatabase db = new LibrisDatabase(new LibrisDatabaseParameter(ui, databaseFile));
 		if (!db.isDatabaseReserved()) {
 			if (!db.buildIndexes()) {
 				return false;

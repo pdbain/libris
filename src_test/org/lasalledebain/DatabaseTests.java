@@ -136,9 +136,9 @@ public class DatabaseTests extends TestCase {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
 			rootDb = buildTestDatabase(testDatabaseFileCopy);
 			LibrisUi testUi = rootDb.getUi();
-			rootDb.closeDatabase(false);
+			testUi.closeDatabase(false);
 			rootDb = testUi.openDatabase();
-			rootDb.closeDatabase(false);
+			testUi.closeDatabase(false);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");
@@ -161,15 +161,14 @@ public class DatabaseTests extends TestCase {
 		try {			
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile();			
 			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			LibrisUi ui = rootDb.getUi();
 			LibrisMetadata meta = rootDb.getMetadata();
 			int numRecs = meta.getSavedRecords();
 			assertEquals("Wrong number of records initial build", 4, numRecs);
-			rootDb.closeDatabase(false);
+			ui.closeDatabase(false);
 			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
-			LibrisUi ui = rootDb.getUi();
-			rootDb.closeDatabase(false);
-;
-
+			ui = rootDb.getUi();
+			ui.closeDatabase(false);
 			forkDb = ui.openDatabase();
 			assertEquals("Wrong number of records after rebuild", 4, forkDb.getMetadata().getSavedRecords());
 			for (int i = 1; i < authors.length; ++i) {
@@ -197,15 +196,14 @@ public class DatabaseTests extends TestCase {
 				expected = f.getValuesAsString();
 				rootDb.put(rec);
 				rootDb.save();
-				rootDb.closeDatabase(false);
-;
+				testUi.closeDatabase(false);
 			}
 			forkDb = testUi.openDatabase();
 			Record rec = forkDb.getRecord(1);
 			Field f = rec.getField(ID_publisher);
 			String actual = f.getValuesAsString();
 			assertEquals("Out of range enum wrong", expected, actual);
-			forkDb.closeDatabase(false);
+			testUi.closeDatabase(false);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("unexpected exception");

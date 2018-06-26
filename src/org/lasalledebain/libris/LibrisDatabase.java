@@ -62,7 +62,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private LibrisFileManager fileMgr;
 	private IndexManager indexMgr;
 	private GroupManager groupMgr;
-	LibrisXmlFactory xmlFactory;
+	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 	private Schema mySchema;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisMetadata metadata;
@@ -78,20 +78,33 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private Date databaseDate;
 	public static final String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
 
-	public LibrisDatabase(File databaseFile, File auxDir, LibrisUi ui, boolean readOnly) throws LibrisException  {	
-		fileMgr = new LibrisFileManager(databaseFile, auxDir);
+	public LibrisDatabase(LibrisDatabaseParameter parameterObject) throws LibrisException  {
+		fileMgr = new LibrisFileManager(parameterObject.databaseFile, parameterObject.auxDir);
 		indexMgr = new IndexManager(this, metadata, fileMgr);
-		this.ui = ui;
-		this.readOnly = readOnly;
+		this.ui = parameterObject.ui;
+		this.readOnly = parameterObject.readOnly;
 		mySchema = null;
-		if (!readOnly) {
+		if (!parameterObject.readOnly) {
 			modifiedRecords = new ModifiedRecordList();			
 		}
 	}
 
+	public void openDatabase(Schema theSchema) throws DatabaseNotIndexedException, DatabaseException, LibrisException {
+		if (Objects.nonNull(theSchema)) {
+			mySchema = theSchema;
+			openDatabaseImpl();
+		} else {
+			openDatabase();
+		}
+	}
 	public void openDatabase() throws DatabaseNotIndexedException, DatabaseException, LibrisException {
-		if (Objects.isNull(mySchema)) {
-			loadSchema();
+		loadSchema();
+		openDatabaseImpl();
+	}
+
+	private void openDatabaseImpl() throws DatabaseNotIndexedException, DatabaseException, LibrisException {
+		if (isDatabaseReserved()) { 
+			throw new DatabaseException("Database already opened");
 		}
 		groupMgr = new GroupManager(this);
 		mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
@@ -548,6 +561,10 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return xmlAttributes;
 	}
 
+	public void setAttributes(DatabaseAttributes attrs) {
+		xmlAttributes = attrs;
+	}
+
 	public Layouts getLayouts() {
 		return metadata.getLayouts();
 	}
@@ -561,10 +578,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return journalFile;
 	}
 
-	public synchronized LibrisXmlFactory getXmlFactory() {
-		if (null == xmlFactory) {
-			xmlFactory = new LibrisXmlFactory();
-		}
+	public static LibrisXmlFactory getXmlFactory() {
 		return xmlFactory;
 	}
 

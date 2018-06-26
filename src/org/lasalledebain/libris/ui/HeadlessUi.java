@@ -18,12 +18,12 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	private int confirmValue;
 	private boolean accessible; 
 
-	public HeadlessUi() {
-		super();
+	public HeadlessUi(File databaseFile, boolean readOnly) throws LibrisException {
+		super(databaseFile, readOnly);
 	}
 
-	public HeadlessUi(File dbFile) throws LibrisException {
-		super(dbFile);
+	public HeadlessUi() {
+		super();
 	}
 
 	// TODO write headless UI
@@ -70,14 +70,6 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	@Override
 	public void recordsAccessible(boolean accessible) {
 		this.accessible = accessible;
-	}
-
-	public void setReadOnly(boolean readOnly) {
-		return;
-	}
-
-	public boolean isReadOnly() {
-		return false;
 	}
 
 	public int getConfirmValue() {

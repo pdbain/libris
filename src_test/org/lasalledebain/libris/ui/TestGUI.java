@@ -7,7 +7,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 public class TestGUI extends LibrisGui {
 
 	public TestGUI(File dbFile) throws LibrisException {
-		super(dbFile, null, false);
+		super(dbFile, false);
 	}
 	public BrowserWindow getResultsWindow() {
 		return resultsPanel;

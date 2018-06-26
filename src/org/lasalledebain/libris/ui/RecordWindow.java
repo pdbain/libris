@@ -115,7 +115,7 @@ public class RecordWindow extends JPanel {
 	}
 
 	public boolean setEditable(boolean isEditable) {
-		if (isEditable && ui.isReadOnly()) {
+		if (isEditable && ui.isDatabaseReadOnly()) {
 			return false;
 		}
 		modTracker.setModifiable(isEditable);
