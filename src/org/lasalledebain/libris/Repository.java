@@ -1,28 +1,27 @@
 package org.lasalledebain.libris;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Objects;
 
 import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamException;
 
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.DatabaseNotIndexedException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.xmlUtils.ElementReader;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
 public class Repository extends Libris {
 private static final String ID_SOURCE = "ID_source";
 
 private static final String ID_TITLE = "ID_title";
 
-private static final String schemaDefinition = "	<schema>"+
+private static final String schemaDefinition = 
 "<schema>"+
 "<groupdefs>"+
 "				<groupdef id=\"GRP_pubinfo\" structure=\"flat\"/>"+
@@ -53,41 +52,40 @@ private static final String schemaDefinition = "	<schema>"+
 
 	}
 
-	public static Repository Initialize(File databaseFile) throws LibrisException {
+	public static Repository initialize(File databaseFile) throws LibrisException, XMLStreamException, IOException {
 		HeadlessUi theUi = new HeadlessUi();
-		LibrisDatabaseParameter params = new LibrisDatabaseParameter(theUi);
-		 LibrisDatabase result = new LibrisDatabase(params);
+		if (!LibrisDatabase.newDatabase(theUi, databaseFile, "Repository")) {
+			return null;
+		}
+		LibrisDatabaseParameter params = new LibrisDatabaseParameter(theUi, databaseFile);
+		LibrisDatabase result = new LibrisDatabase(params);
 
 		result.getFileMgr().createAuxFiles(true);
-		HashMap<String, String> attrs = new HashMap<String, String>();
-		attrs.put(LibrisXMLConstants.XML_DATABASE_NAME_ATTR, "unknown");
-		attrs.put(LibrisXMLConstants.XML_DATABASE_SCHEMA_NAME_ATTR, "unknown");
-		attrs.put(LibrisXMLConstants.XML_SCHEMA_VERSION_ATTR, "unknown");
-		result.setAttributes(new DatabaseAttributes(result, attrs));
 		return new Repository(result);
-	
+
 	}
-	public static Repository Open(File databaseFile, boolean readOnly) throws FactoryConfigurationError, LibrisException {
+	public static Repository open(File databaseFile, boolean readOnly) throws FactoryConfigurationError, LibrisException {
 		HeadlessUi ui = new HeadlessUi(databaseFile, readOnly);
-		XmlSchema mySchema = new XmlSchema(LibrisDatabase.xmlFactory.makeReader(new StringReader(schemaDefinition), "<internal>"));
+		final ElementReader xmlRdr = LibrisDatabase.xmlFactory.makeReader(new StringReader(schemaDefinition), "<internal>");
+		XmlSchema mySchema = new XmlSchema(xmlRdr);
 		ui.setSchema(mySchema);
 		Repository result = new Repository(ui.openDatabase());
 		return result;
 	}
 
-	File getArtifact(int artifactId) {
+	public File getArtifact(int artifactId) {
 		// TODO write getArtifact
 		return null;
 		
 	}
 	
-	ArtifactParameters getArtifactInfo(int artifactId) {
+	public ArtifactParameters getArtifactInfo(int artifactId) {
 		// TODO write getArtifact
 		return null;
 		
 	}
 	
-	int putArtifact(ArtifactParameters params) throws InputException {
+	public int putArtifact(ArtifactParameters params) throws InputException {
 		Record rec = database.newRecord();
 		rec.addFieldValue(ID_SOURCE, params.location.toString());
 		if (!params.recordName.isEmpty()) {
@@ -103,7 +101,7 @@ private static final String schemaDefinition = "	<schema>"+
 		return 0;	
 	}
 	
-	int putArtifact(URI location) throws InputException {
+	public int putArtifact(URI location) throws InputException {
 		return putArtifact(new ArtifactParameters(location));	
 	}
 	

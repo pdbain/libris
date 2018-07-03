@@ -6,7 +6,6 @@ import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 public class XmlMetadata extends LibrisMetadata {
-	private boolean schemaInline;
 
 	public XmlMetadata(LibrisDatabase database) {
 		super(database);
@@ -23,12 +22,4 @@ public class XmlMetadata extends LibrisMetadata {
 		uiLayouts.fromXml(layoutsMgr);
 		metadataMgr.parseClosingTag();
 	}
-	public void setSchemaInline(boolean schemaInline) {
-		this.schemaInline = schemaInline;
-	}
-
-	public boolean isSchemaInline() {
-		return schemaInline;
-	}
-
 }

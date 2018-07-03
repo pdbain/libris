@@ -19,6 +19,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	protected static final IndexField[] emptyIndexFieldList = new IndexField[0];
+	public static String currentVersion = "1.0";
 	protected TreeMap<String, EnumFieldChoices> enumSets;
 	protected ArrayList<FieldTemplate> fieldList;
 	HashMap <String, Short> fieldNumById;
