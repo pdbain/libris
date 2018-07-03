@@ -66,9 +66,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private Schema mySchema;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisMetadata metadata;
-	private LibrisUi ui = null;
+	private LibrisUi ui;
 	DatabaseUsageMode usageMode = DatabaseUsageMode.USAGE_BATCH;
-	private boolean isModified = false;
+	private boolean isModified;
 	private ModifiedRecordList modifiedRecords;
 	private LibrisJournalFileManager journalFile;
 	private Records databaseRecords;
@@ -81,12 +81,14 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public LibrisDatabase(LibrisDatabaseParameter parameterObject) throws LibrisException  {
 		fileMgr = new LibrisFileManager(parameterObject.databaseFile, parameterObject.auxDir);
 		indexMgr = new IndexManager(this, metadata, fileMgr);
-		this.ui = parameterObject.ui;
-		this.readOnly = parameterObject.readOnly;
+		ui = parameterObject.ui;
+		isModified = false;
+		readOnly = parameterObject.readOnly;
 		mySchema = null;
 		if (!parameterObject.readOnly) {
 			modifiedRecords = new ModifiedRecordList();			
 		}
+		metadata = new XmlMetadata(this);
 	}
 
 	public void openDatabase(Schema theSchema) throws DatabaseNotIndexedException, DatabaseException, LibrisException {
@@ -197,10 +199,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		}
 	}
 
-	/**
-	 * @return path to the schema file. null if the schema is included in the database file
-	 * @throws LibrisException 
-	 */
 	private void loadSchema() throws LibrisException {
 		try {
 			FileAccessManager databaseFileMgr = fileMgr.getDatabaseFileMgr();
@@ -222,7 +220,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 
 	@Override
 	public void fromXml(ElementManager librisMgr) throws LibrisException {
-		String schemaLocation;
 		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
 		String dateString = dbElementAttrs.get(XML_DATABASE_DATE_ATTR);
 		if ((null == dateString) || dateString.isEmpty()) {
@@ -247,21 +244,37 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		if (xmlAttributes.isLocked()) {
 			readOnly = true;
 		}
-		final XmlMetadata myMetadata = new XmlMetadata(this);
-		this.metadata = myMetadata;
 		ElementManager metadataMgr;
 		if (XML_METADATA_TAG.equals(nextElement)) {
 			metadataMgr = librisMgr.nextElement();
 		} else {
-			schemaLocation = dbElementAttrs.get(XML_DATABASE_SCHEMA_LOCATION_ATTR);
+			final String schemaLocation = dbElementAttrs.get(XML_DATABASE_SCHEMA_LOCATION_ATTR);
 			metadataMgr = makeMetadataMgr(dbElementAttrs.get(XML_DATABASE_SCHEMA_NAME_ATTR), schemaLocation);
-			myMetadata.setSchemaInline(null == schemaLocation);
 		}
 		Assertion.assertNotNullInputException("could not open schema file", metadataMgr);
 		metadata.fromXml(metadataMgr);
 		if (null != instanceInfo) {
 			metadata.setInstanceInfo(instanceInfo);
 		}
+	}
+	
+	public static boolean newDatabase(LibrisUi ui, File databaseFile, String schemaName) 
+			throws XMLStreamException, IOException, DatabaseException, XmlException {
+		if (!databaseFile.createNewFile()) {
+			ui.alert("Database file "+databaseFile.getAbsolutePath()+" already exisits");
+			return false;
+		}
+		FileOutputStream databaseStream = new FileOutputStream(databaseFile);
+		ElementWriter databaseWriter = ElementWriter.eventWriterFactory(databaseStream, 0);
+		LibrisAttributes attrs = new LibrisAttributes();
+		attrs.setAttribute(XML_DATABASE_SCHEMA_NAME_ATTR, schemaName);
+		attrs.setAttribute(XML_SCHEMA_VERSION_ATTR, Schema.currentVersion);
+		databaseWriter.writeStartElement(XML_LIBRIS_TAG, attrs, false);
+		databaseWriter.writeEndElement();
+		databaseWriter.flush();
+		databaseStream.close();
+		
+		return true;
 	}
 
 	boolean buildIndexes() throws LibrisException {
