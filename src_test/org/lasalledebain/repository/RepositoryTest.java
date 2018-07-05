@@ -3,6 +3,7 @@ package org.lasalledebain.repository;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -27,15 +28,15 @@ public class RepositoryTest  extends TestCase {
 
 	public void testRepoSanity(){
 	try {
-		Repository repo = Repository.initialize(dbFile);
+		assertTrue("could not create database", Repository.initialize(dbFile));
 		File testArtifact = new File(workdir, "test_artifact");
-		Repository.open(dbFile, false);
+		Repository repo = Repository.open(dbFile, false);
 		testArtifact.deleteOnExit();
 		URI originalUri = testArtifact.toURI();
 		int id = repo.putArtifact(originalUri);
 		File newUri = repo.getArtifact(id);
 		assertEquals(originalUri, newUri.toURI());
-	} catch (LibrisException | XMLStreamException | IOException e) {
+	} catch (LibrisException | XMLStreamException | IOException | URISyntaxException e) {
 		e.printStackTrace();
 		fail("unexpected error");
 	}

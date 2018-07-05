@@ -94,7 +94,7 @@ public class Libris {
 			LibrisException {
 		LibrisDatabase db = new LibrisDatabase(new LibrisDatabaseParameter(ui, databaseFile));
 		if (!db.isDatabaseReserved()) {
-			if (!db.buildIndexes()) {
+			if (!db.buildIndexes(true)) {
 				return false;
 			};
 			return db.closeDatabase(false);
