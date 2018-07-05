@@ -10,10 +10,11 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLConstants {
 	private Date modificationDate;
-	private LibrisDatabase db;
-	private String databaseName;
+	private final LibrisDatabase db;
+	private final String databaseName;
 	private boolean locked;
-	private String schemaName;
+	private final String schemaName;
+	private final String schemaLocation;
 
 	public LibrisDatabase getDatabase() {
 		return db;
@@ -29,6 +30,7 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 		this.db = db;
 		String schemaversion = attrs.get(XML_SCHEMA_VERSION_ATTR);
 		schemaName = attrs.get(XML_DATABASE_SCHEMA_NAME_ATTR);
+		schemaLocation = attrs.get(XML_DATABASE_SCHEMA_LOCATION_ATTR);
 		databaseName = attrs.get(XML_DATABASE_NAME_ATTR);
 		if ( schemaversion.isEmpty() || schemaName.isEmpty()) {
 			throw new DatabaseException("Missing required attributes in the "+XML_LIBRIS_TAG+" element");
@@ -63,4 +65,19 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	public String getSchemaName() {
 		return schemaName;
 	}
+
+	/**
+	 * @return the db
+	 */
+	public LibrisDatabase getDb() {
+		return db;
+	}
+
+	/**
+	 * @return the schemaLocation
+	 */
+	public String getSchemaLocation() {
+		return schemaLocation;
+	}
+
 }

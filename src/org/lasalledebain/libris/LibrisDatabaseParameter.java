@@ -10,6 +10,7 @@ public class LibrisDatabaseParameter {
 	public LibrisUi ui;
 	public boolean readOnly;
 	public Schema databaseSchema;
+	public String schemaName;
 
 	public LibrisDatabaseParameter(LibrisUi theUi) {
 		this(theUi, null);
@@ -21,5 +22,6 @@ public class LibrisDatabaseParameter {
 		this.ui = theUi;
 		this.readOnly = false;
 		databaseSchema = null;
+		schemaName = "";
 	}
 }

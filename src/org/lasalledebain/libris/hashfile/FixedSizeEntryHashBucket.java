@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends HashBucket {
 
 	protected TreeMap<Integer, T> entries;
