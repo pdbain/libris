@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
@@ -72,6 +73,9 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	
 	@Override
 	public Field addFieldValue(int position, String fieldData) throws InputException {
+		if (Objects.isNull(fieldData) || fieldData.isEmpty()){
+			return null;
+		}
 		if (null == recordData[position]) {
 			recordData[position] = template.newField(position, fieldData);
 		} else {

@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.util;
 
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 public class StringUtils {
 	public static final Charset standardCharset = Charset.forName("ISO-8859-1");
@@ -25,5 +26,13 @@ public class StringUtils {
 	
 	public static String changeFileExtension(String original, String newExtension) {
 		return stripSuffix(original)+"."+newExtension;
+	}
+	
+	public static boolean stringEquals(String a, String b) {
+		if (Objects.isNull(a) && Objects.isNull(b)) {
+			return true;
+		} else 	if (Objects.nonNull(a) && Objects.nonNull(b)) {
+			return a.equals(b);
+		} else return false;
 	}
 }

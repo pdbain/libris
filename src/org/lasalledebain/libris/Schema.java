@@ -77,7 +77,8 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 		fieldIds.add(fieldId);
 		fieldTitles.add(field.getFieldTitle());
 		fieldNumById.put(fieldId, (short) (fieldIds.size()-1));
-		fieldList.add((fieldIds.size()-1), field);
+		final int index = fieldIds.size()-1;
+		fieldList.add(index, field);
 	}
 
 	public EnumFieldChoices getEnumSet(String id) {
