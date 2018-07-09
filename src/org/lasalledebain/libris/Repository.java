@@ -45,6 +45,7 @@ static public int DOI_FIELD;
 static public int DATE_FIELD;
 static public int KEYWORDS_FIELD;
 static public int COMMENTS_FIELD;
+static final int FANOUT = 100;
 
 	private static final DynamicSchema mySchema = makeSchema();
 
@@ -55,22 +56,15 @@ static public int COMMENTS_FIELD;
 	private static DynamicSchema makeSchema() {
 		DynamicSchema theSchema = new DynamicSchema();
 		GroupDef grp = new GroupDef(theSchema, ID_GROUPS,"", 0);
-		theSchema.addField(grp);
+		GROUP_FIELD = theSchema.addField(grp);
 		GroupDefs defs = theSchema.getGroupDefs();
 		defs.addGroup(grp);
-		theSchema.addField(new FieldTemplate(theSchema, ID_TITLE, "", T_FIELD_STRING));
-		theSchema.addField(new FieldTemplate(theSchema, ID_SOURCE, "", T_FIELD_LOCATION));
-		theSchema.addField(new FieldTemplate(theSchema, ID_DOI, "", T_FIELD_STRING));
-		theSchema.addField(new FieldTemplate(theSchema, ID_DATE, "", T_FIELD_STRING));
-		theSchema.addField(new FieldTemplate(theSchema, ID_KEYWORDS, "", T_FIELD_STRING));
-		theSchema.addField(new FieldTemplate(theSchema, ID_COMMENTS, "", T_FIELD_STRING));
-		GROUP_FIELD = theSchema.getFieldNum(ID_GROUPS);
-		TITLE_FIELD = theSchema.getFieldNum(ID_TITLE);
-		SOURCE_FIELD = theSchema.getFieldNum(ID_SOURCE);
-		DOI_FIELD = theSchema.getFieldNum(ID_DOI);
-		DATE_FIELD = theSchema.getFieldNum(ID_DATE);
-		KEYWORDS_FIELD = theSchema.getFieldNum(ID_KEYWORDS);
-		COMMENTS_FIELD = theSchema.getFieldNum(ID_COMMENTS);
+		TITLE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_TITLE, "", T_FIELD_STRING));
+		SOURCE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_SOURCE, "", T_FIELD_LOCATION));
+		DOI_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DOI, "", T_FIELD_STRING));
+		DATE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DATE, "", T_FIELD_STRING));
+		KEYWORDS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_KEYWORDS, "", T_FIELD_STRING));
+		COMMENTS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_COMMENTS, "", T_FIELD_STRING));
 		return theSchema;
 	}
 
@@ -93,6 +87,22 @@ static public int COMMENTS_FIELD;
 		HeadlessUi ui = new HeadlessUi(databaseFile, readOnly);
 		Repository result = new Repository(ui.openDatabase());
 		return result;
+	}
+
+	public URI idToPath(File root, int id) {
+		int levels = 1;
+		int count = id;
+		while (count > FANOUT) {
+			++levels;
+			count /= FANOUT;
+		}
+		String dirNames[] = new String[levels];
+		dirNames[0] = "r_"+levels;
+		count = id;
+		for (int l = levels - 1; l > 0; l--) {
+			count /= FANOUT;
+			dirNames[l] = "D_"+count+"_L"+l;
+		}
 	}
 
 	public File getArtifact(int artifactId) throws InputException, URISyntaxException {

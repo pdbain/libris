@@ -2,8 +2,13 @@ package org.lasalledebain.repository;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
@@ -35,7 +40,7 @@ public class RepositoryTest  extends TestCase {
 			File testArtifact = new File(workdir, "test_artifact");
 			testArtifact.deleteOnExit();
 			URI originalUri = testArtifact.toURI();
-			int id = repo.putArtifact(originalUri);
+			int id = repo.putArtifactInfo(originalUri);
 			File newUri = repo.getArtifact(id);
 			assertEquals(originalUri, newUri.toURI());
 		} catch (LibrisException | XMLStreamException | IOException | URISyntaxException e) {
@@ -64,7 +69,7 @@ public class RepositoryTest  extends TestCase {
 				params.recordName = RECORD+expectedId;
 				params.title = "title_"+expectedId;
 				params.recordParentName = generateParentName(expectedId);
-				int id = repo.putArtifact(params);
+				int id = repo.putArtifactInfo(params);
 				assertEquals(expectedId, id);
 			}
 			for (int i = 0; i < numArtifacts; ++i) {
@@ -77,6 +82,41 @@ public class RepositoryTest  extends TestCase {
 			fail("unexpected error");
 		}
 	}
+	
+	public void testImportFile(){
+		File originalFiles = new File(workdir, "originals");
+		originalFiles.mkdir();
+		File repoRoot = new File(workdir, "root");
+		repoRoot.mkdir();
+		String originalRoot = originalFiles.getAbsolutePath();
+		try {
+			Repository repo = createDatabase();
+			ArrayList<URI> uris = new ArrayList<>();
+			for (int i = 1; i < 10; ++i) {
+				byte[] fileContent = makeTestData(i);
+				Path testFile = Paths.get(originalRoot, "f"+i);
+				Files.write(testFile, fileContent);
+				URI theUri = repo.copyFileToRepo(testFile.toFile(), repoRoot, i);
+				uris.set(i, theUri);
+			}
+			for (int i = 1; i < 10; ++i) {
+				byte[] expectedContent = makeTestData(i);
+				URI theUri = uris.get(i);
+				InputStream actual = Files.newInputStream(Paths.get(theUri));
+				for (int j = 0; j < expectedContent.length; ++j) {
+					int b = actual.read();
+				}
+			}
+		} catch (IOException | LibrisException | XMLStreamException | FactoryConfigurationError e) {
+			e.printStackTrace();
+			fail("unexpected exception");
+		}
+	}
+
+	protected byte[] makeTestData(int i) {
+		return ("teststring_"+i).getBytes();
+	}
+
 
 	private String generateParentName(int expectedId) {
 		String result = "";
