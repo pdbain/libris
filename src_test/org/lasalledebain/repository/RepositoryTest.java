@@ -1,5 +1,6 @@
 package org.lasalledebain.repository;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
@@ -84,6 +86,10 @@ public class RepositoryTest  extends TestCase {
 	}
 	
 	public void testImportFile(){
+		importAndCheckFiles(10);
+	}
+
+	protected void importAndCheckFiles(final int numFiles) {
 		File originalFiles = new File(workdir, "originals");
 		originalFiles.mkdir();
 		File repoRoot = new File(workdir, "root");
@@ -91,26 +97,41 @@ public class RepositoryTest  extends TestCase {
 		String originalRoot = originalFiles.getAbsolutePath();
 		try {
 			Repository repo = createDatabase();
-			ArrayList<URI> uris = new ArrayList<>();
-			for (int i = 1; i < 10; ++i) {
+			ArrayList<URI> uris = new ArrayList<>(11);uris.add(null);
+			for (int i = 1; i <= numFiles; ++i) {
 				byte[] fileContent = makeTestData(i);
 				Path testFile = Paths.get(originalRoot, "f"+i);
 				Files.write(testFile, fileContent);
 				URI theUri = repo.copyFileToRepo(testFile.toFile(), repoRoot, i);
-				uris.set(i, theUri);
+				uris.add(theUri);
 			}
-			for (int i = 1; i < 10; ++i) {
+			checkDirectorySize(repoRoot);
+			for (int i = 1; i <= numFiles; ++i) {
 				byte[] expectedContent = makeTestData(i);
 				URI theUri = uris.get(i);
-				InputStream actual = Files.newInputStream(Paths.get(theUri));
-				for (int j = 0; j < expectedContent.length; ++j) {
-					int b = actual.read();
-				}
+				ByteArrayOutputStream actualBuffer = new ByteArrayOutputStream();
+				Files.copy(Paths.get(theUri), actualBuffer);
+				byte[] actualBytes = actualBuffer.toByteArray();
+				assertTrue("wrong data in "+theUri, Arrays.equals(actualBytes, expectedContent));
 			}
 		} catch (IOException | LibrisException | XMLStreamException | FactoryConfigurationError e) {
 			e.printStackTrace();
 			fail("unexpected exception");
 		}
+	}
+
+	private void checkDirectorySize(File root) {
+		File[] children = root.listFiles();
+		assertTrue("Too many files in "+root.getAbsolutePath(), children.length <= 100);
+		for (File f: children) {
+			if (f.isDirectory()) {
+				checkDirectorySize(f);
+			}
+		}
+	}
+
+	public void testImportStress(){
+		importAndCheckFiles(1000);
 	}
 
 	protected byte[] makeTestData(int i) {
