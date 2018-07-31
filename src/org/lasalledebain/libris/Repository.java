@@ -7,6 +7,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Objects;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -22,6 +26,12 @@ import org.lasalledebain.libris.ui.Layouts;
 import static org.lasalledebain.libris.util.StringUtils.stringEquals;
 
 public class Repository extends Libris {
+
+private static final String LEVEL_PREFIX = "_L";
+
+private static final String DIRECTORY_PREFIX = "D_";
+
+private static final String ARTIFACT_PREFIX = "A_";
 
 private static final String ID_GROUPS = "ID_groups";
 
@@ -89,7 +99,7 @@ static final int FANOUT = 100;
 		return result;
 	}
 
-	public URI idToPath(File root, int id) {
+	public File idToDirectoryPath(File root, int id) {
 		int levels = 1;
 		int count = id;
 		while (count > FANOUT) {
@@ -101,8 +111,27 @@ static final int FANOUT = 100;
 		count = id;
 		for (int l = levels - 1; l > 0; l--) {
 			count /= FANOUT;
-			dirNames[l] = "D_"+count+"_L"+l;
+			dirNames[l] = DIRECTORY_PREFIX+count+LEVEL_PREFIX+l;
 		}
+		String path = String.join(File.separator, Arrays.asList(dirNames));
+		return new File(root, path);
+	}
+	
+	public URI copyFileToRepo(File original, File root, int id) throws InputException, IOException {
+		File dir = idToDirectoryPath(root, id);
+		if (!dir.exists()) {
+			if (!dir.mkdirs()) {
+				throw new InputException("Cannot create directory "+dir.getAbsolutePath()+" to hold artifact "+id+" "+original.getName());
+			};
+		}
+		if (!dir.isDirectory()) {
+			throw new InputException(dir.getAbsolutePath()+" is not a directory");
+		}
+		String originalName = original.getName();
+		String nameWithId = ARTIFACT_PREFIX+Integer.toString(id)+"_"+originalName;
+		Path destinationPath = Paths.get(dir.getAbsolutePath(), nameWithId);
+		Files.copy(original.toPath(), destinationPath);
+		return destinationPath.toUri();
 	}
 
 	public File getArtifact(int artifactId) throws InputException, URISyntaxException {
@@ -131,7 +160,7 @@ static final int FANOUT = 100;
 		
 	}
 	
-	public int putArtifact(ArtifactParameters params) throws LibrisException {
+	public int putArtifactInfo(ArtifactParameters params) throws LibrisException {
 		Record rec = database.newRecord();
 		rec.addFieldValue(ID_SOURCE, params.getSourceString());
 		rec.addFieldValue(ID_DATE, params.date);
@@ -154,8 +183,8 @@ static final int FANOUT = 100;
 		return id;	
 	}
 	
-	public int putArtifact(URI location) throws LibrisException {
-		return putArtifact(new ArtifactParameters(location));	
+	public int putArtifactInfo(URI location) throws LibrisException {
+		return putArtifactInfo(new ArtifactParameters(location));	
 	}
 	
 	public static class ArtifactParameters {
