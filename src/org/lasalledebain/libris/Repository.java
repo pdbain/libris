@@ -18,6 +18,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
@@ -26,7 +27,7 @@ import org.lasalledebain.libris.ui.Layouts;
 import static org.lasalledebain.libris.util.StringUtils.stringEquals;
 
 public class Repository extends Libris {
-
+// TODO 1 Add Repository field to LibrisDatabase and add repository field to record
 private static final String LEVEL_PREFIX = "_L";
 
 private static final String DIRECTORY_PREFIX = "D_";
@@ -58,9 +59,10 @@ static public int COMMENTS_FIELD;
 static final int FANOUT = 100;
 
 	private static final DynamicSchema mySchema = makeSchema();
-
-	public Repository(LibrisDatabase db) {
+	File root;
+	public Repository(LibrisDatabase db, File theRoot) {
 		database = db;
+		root = theRoot;
 	}
 
 	private static DynamicSchema makeSchema() {
@@ -93,9 +95,9 @@ static final int FANOUT = 100;
 		return LibrisDatabase.newDatabase(params, metadata);
 	}
 
-	public static Repository open(File databaseFile, boolean readOnly) throws FactoryConfigurationError, LibrisException {
+	public static Repository open(File databaseFile, File theRoot, boolean readOnly) throws FactoryConfigurationError, LibrisException {
 		HeadlessUi ui = new HeadlessUi(databaseFile, readOnly);
-		Repository result = new Repository(ui.openDatabase());
+		Repository result = new Repository(ui.openDatabase(), theRoot);
 		return result;
 	}
 
@@ -117,7 +119,18 @@ static final int FANOUT = 100;
 		return new File(root, path);
 	}
 	
-	public URI copyFileToRepo(File original, File root, int id) throws InputException, IOException {
+	public int importFile(ArtifactParameters params) throws LibrisException, IOException {
+		final URI sourceUri = params.source;
+		File sourceFile = new File(sourceUri);
+		if (!sourceFile.isFile()) {
+			throw new UserErrorException(sourceUri.toString()+" is not a file");
+		}
+		int id = putArtifactInfo(params);
+		copyFileToRepo(sourceFile, id);
+		return id;
+	}
+	
+	public URI copyFileToRepo(File original, int id) throws InputException, IOException {
 		File dir = idToDirectoryPath(root, id);
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
@@ -183,8 +196,8 @@ static final int FANOUT = 100;
 		return id;	
 	}
 	
-	public int putArtifactInfo(URI location) throws LibrisException {
-		return putArtifactInfo(new ArtifactParameters(location));	
+	public int putArtifactInfo(URI sourceLocation) throws LibrisException {
+		return putArtifactInfo(new ArtifactParameters(sourceLocation));	
 	}
 	
 	public static class ArtifactParameters {
@@ -193,6 +206,7 @@ static final int FANOUT = 100;
 			this.source = source;
 			recordName = "";
 			recordParentName = "";
+			date = LibrisMetadata.getCurrentDateAndTimeString();
 		}
 		public String getSourceString() {
 			return source.toASCIIString();

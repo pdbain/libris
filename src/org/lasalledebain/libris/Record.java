@@ -15,8 +15,27 @@ import org.lasalledebain.libris.xmlUtils.ElementShape;
 
 public abstract class Record implements Comparable<Record>, XMLElement {
 	static final String elementTag = XML_RECORD_TAG;
+	protected static final int NULL_ID = RecordId.getNullId();
 	public static String getXmlTag() {
 		return elementTag;
+	}
+	private int artifactId;
+// TODO 1 save artifactId in native file
+	
+	public Record() {
+		artifactId = NULL_ID;
+	}
+	/**
+	 * @return id of the related file in the artifact database
+	 */
+	public int getArtifactId() {
+		return artifactId;
+	}
+	/**
+	 * @param artifactId id of the related file in the artifact database
+	 */
+	public void setArtifactId(int artifactId) {
+		this.artifactId = artifactId;
 	}
 	public static ElementShape getShape() {
 		ElementShape shape = new ElementShape(elementTag);
@@ -29,7 +48,9 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public static boolean validateRecordName(String name) {
 		return name.matches("^\\p{Alpha}[\\p{Alpha}\\p{Digit}_]*");
 	}
+	public abstract void setRecordId(int recId);
 	public abstract int getRecordId();
+	
 	/**
 	 * @return name of record, or null if no name
 	 */
@@ -37,9 +58,8 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract void setName(String name) throws InputException;
 	public abstract void setEditable(boolean newValue);
 	public abstract boolean isEditable();
-	public abstract void setRecordId(int recId);
 	/**
-	 * Add idAdjustment to the recordId.  Also add idAdjustment to all references to other records
+	 * TODO Add idAdjustment to the recordId.  Also add idAdjustment to all references to other records
 	 * greater than baseId.
 	 * @param baseId ID of the last record at the time of the fork
 	 * @param idAdjustment amount to adjust the IDs.

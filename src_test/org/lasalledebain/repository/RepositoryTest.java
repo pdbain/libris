@@ -3,7 +3,6 @@ package org.lasalledebain.repository;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -27,6 +26,7 @@ public class RepositoryTest  extends TestCase {
 	private static final String RECORD = "record_";
 	private File workdir;
 	private File dbFile;
+	private File repoRoot;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -34,6 +34,7 @@ public class RepositoryTest  extends TestCase {
 		dbFile = new File(workdir, "test_repo");
 		dbFile.delete();
 		dbFile.deleteOnExit();
+		repoRoot = new File(workdir, "root");
 	}
 
 	public void testRepoSanity(){
@@ -92,7 +93,6 @@ public class RepositoryTest  extends TestCase {
 	protected void importAndCheckFiles(final int numFiles) {
 		File originalFiles = new File(workdir, "originals");
 		originalFiles.mkdir();
-		File repoRoot = new File(workdir, "root");
 		repoRoot.mkdir();
 		String originalRoot = originalFiles.getAbsolutePath();
 		try {
@@ -102,7 +102,7 @@ public class RepositoryTest  extends TestCase {
 				byte[] fileContent = makeTestData(i);
 				Path testFile = Paths.get(originalRoot, "f"+i);
 				Files.write(testFile, fileContent);
-				URI theUri = repo.copyFileToRepo(testFile.toFile(), repoRoot, i);
+				URI theUri = repo.copyFileToRepo(testFile.toFile(), i);
 				uris.add(theUri);
 			}
 			checkDirectorySize(repoRoot);
@@ -150,7 +150,7 @@ public class RepositoryTest  extends TestCase {
 	private Repository createDatabase()
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
 		assertTrue("could not create database", Repository.initialize(dbFile));
-		Repository repo = Repository.open(dbFile, false);
+		Repository repo = Repository.open(dbFile, repoRoot, false);
 		return repo;
 	}
 	@Override
