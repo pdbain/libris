@@ -147,6 +147,7 @@ public class RepositoryTest  extends TestCase {
 		return result;
 	}
 
+	// TODO make this a common utility
 	private Repository createDatabase()
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
 		assertTrue("could not create database", Repository.initialize(dbFile));
