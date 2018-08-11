@@ -19,13 +19,35 @@ public class PdfRecordImporter {
 	private static final int MIN_ABSTRACT_LENGTH = 1000;
 	LibrisDatabase recordDatabase;
 	Repository artifactRepository;
-	int abstractField, keywordsField, repositoryIdField;
-	private PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository) {
+	short abstractField, keywordsField;
+	public void setAbstractField(short abstractField) {
+		this.abstractField = abstractField;
+		setAbstract = true;
+	}
+
+	public void setKeywordsField(short keywordsField) {
+		this.keywordsField = keywordsField;
+		setKeywords = true;
+	}
+	boolean setAbstract;
+	boolean setKeywords;
+	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository) {
 		this.recordDatabase = recordDatabase;
 		this.artifactRepository = artifactRepository;
+		setAbstract = false;
+		setKeywords = false;
 	}
 	
-	void importDocument(URI sourceFileUri, Record rec, boolean setAbstract, boolean setKeywords) throws LibrisException, IOException {
+	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository, short keyField, short absField) {
+		this.recordDatabase = recordDatabase;
+		this.artifactRepository = artifactRepository;
+		setAbstract = false;
+		setKeywords = false;
+		setKeywordsField(keyField);
+		setAbstractField(absField);
+	}
+	
+	public void importDocument(URI sourceFileUri, Record rec) throws LibrisException, IOException {
 		
 		/* copy file to repository */
 		int artifactId = artifactRepository.importFile(new ArtifactParameters(sourceFileUri));
@@ -52,7 +74,7 @@ public class PdfRecordImporter {
 				endOfAbstract = MIN_ABSTRACT_LENGTH;
 			}
 				endOfAbstract = Math.min(endOfAbstract, docString.length());
-				rec.addFieldValue(abstractField, docString.substring(0, endOfAbstract + 1));
+				rec.addFieldValue(abstractField, docString.substring(0, endOfAbstract));
 		}
 	}
 // TODO limit strings based on term frequency/inverse document frequency
