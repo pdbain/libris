@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
 import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.exception.Assertion;
@@ -44,7 +43,6 @@ import org.lasalledebain.libris.records.XmlRecordsReader;
 import org.lasalledebain.libris.search.KeywordFilter;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
-import org.lasalledebain.libris.ui.LibrisUiGeneric;
 import org.lasalledebain.libris.ui.Messages;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
