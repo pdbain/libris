@@ -75,6 +75,7 @@ public class Utilities extends TestCase {
 	public static final String DATABASE_WITH_GROUPS_AND_RECORDS_XML = "DatabaseWithGroupsAndRecords.xml";
 	public static final String TEST_DATABASE_UNORDERED_XML = "testDatabaseUnordered.xml";
 	public static final String EXAMPLE_ARTIFACT_PDF = "example_artifact.pdf";
+	public static final String EXAMPLE_LARGE_PDF = "mesa.pdf";
 	
 	static RecordTemplate makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {

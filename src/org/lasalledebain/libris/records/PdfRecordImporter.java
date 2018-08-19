@@ -57,6 +57,7 @@ public class PdfRecordImporter {
 		PDDocument pdfDoc = PDDocument.load(sourceFileUri.toURL());
 		PDFTextStripper doc = new PDFTextStripper();
 		String docString = doc.getText(pdfDoc).trim();
+		pdfDoc.close();
 		if (setKeywords) {
 			Set <String> terms = getTerms(docString);
 			StringBuilder keywordsString = new StringBuilder(5 * terms.size());
