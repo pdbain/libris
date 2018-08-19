@@ -13,7 +13,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.BucketOverflowFileManager;
 
 @SuppressWarnings("unchecked")
-public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> extends HashBucket {
+public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntry> extends NumericEntryHashBucket<EntryType> {
 
 	static final int MAX_VARIABLE_HASH_ENTRY=256;
 	/**
@@ -26,7 +26,7 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 	private BucketOverflowFileManager overflowManager;
 	public VariableSizeEntryHashBucket(RandomAccessFile backingStore,
 			int bucketNum, BucketOverflowFileManager overflowManager,
-			EntryFactory<T> eFact) {
+			EntryFactory<EntryType> eFact) {
 		super(backingStore, bucketNum);
 		occupancy = 2;
 		this.overflowManager = overflowManager;
@@ -38,15 +38,15 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 	EntryInfo lastEntry;
 	private ByteBuffer bucketEntryData;
 	private ArrayList<EntryInfo> victimList;
-	protected EntryFactory<T> entryFact;
+	protected EntryFactory<EntryType> entryFact;
 
 	@Override
-	protected void addToBucket(int key, HashEntry newEntry) {
+	protected void addToBucket(int key, EntryType newEntry) {
 		EntryInfo oldEi = entries.remove(key);
 		if ((null != oldEi) && oldEi.getEntry().isOversize()) {
 			addOversizeVictim(oldEi);
 		}
-		EntryInfo newEi = new EntryInfo(key, (T) newEntry);
+		EntryInfo newEi = new EntryInfo(key, newEntry);
 		entries.put(key, newEi);	
 	}
 
@@ -75,7 +75,7 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 		}
 		try {
 			for (EntryInfo ei: entries.values()) {
-				T entry = (T) ei.getEntry();
+				EntryType entry = (EntryType) ei.getEntry();
 				offset += entry.getEntryLength();
 				idStream.writeInt(entry.getKey());
 				if (entry.isOversize()) {
@@ -166,28 +166,32 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 		return new VariableSizeBucketHashBucketFactory(overflowManager);
 	}
 	
-	private static class VariableSizeBucketHashBucketFactory implements HashBucketFactory {
+	private static class VariableSizeBucketHashBucketFactory<EntryType extends VariableSizeHashEntry, BucketType extends HashBucket<EntryType>> implements HashBucketFactory {
 		BucketOverflowFileManager overflowManager;
 		public VariableSizeBucketHashBucketFactory(
 				BucketOverflowFileManager overflowManager) {
 			super();
 			this.overflowManager = overflowManager;
 		}
+			public NumericEntryHashBucket<NumericKeyHashEntry> foocreateBucket(RandomAccessFile backingStore,
+				int bucketNum, EntryFactory<EntryType> fact) {
+			return new VariableSizeEntryHashBucket(backingStore, bucketNum, overflowManager, fact);
+		}
 		@Override
-		public HashBucket<HashEntry> createBucket(RandomAccessFile backingStore,
-				int bucketNum, EntryFactory fact) {
+		public HashBucket createBucket(RandomAccessFile backingStore, int bucketNum, EntryFactory fact) {
+			// TODO Auto-generated method stub
 			return new VariableSizeEntryHashBucket(backingStore, bucketNum, overflowManager, fact);
 		}		
 	}
 
 	@Override
-	public Iterator<T> iterator() {
+	public Iterator<EntryType> iterator() {
 		return new EntryIterator();
 	}
 
 	@Override
 	public
-	T getEntry(int key) {
+	EntryType getEntry(int key) {
 
 		EntryInfo ei = entries.get(key);
 		if (null != ei) {
@@ -212,7 +216,7 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 
 	protected class EntryInfo {
 		int id;
-		protected final T entry;
+		protected final EntryType entry;
 		private long oversizeFilePosition;
 		public long getOversizeFilePosition() {
 			return oversizeFilePosition;
@@ -222,7 +226,7 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 			this.oversizeFilePosition = oversizeFilePosition;
 		}
 
-		public EntryInfo(int key, T newEntry) {
+		public EntryInfo(int key, EntryType newEntry) {
 			id = key;
 			entry = newEntry;
 			oversizeFilePosition = -1;
@@ -250,12 +254,12 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 			this.id = id;
 		}
 
-		public T getEntry() {
+		public EntryType getEntry() {
 			return entry;
 		}
 	}
 	
-	protected class EntryIterator implements Iterator<T>  {
+	protected class EntryIterator implements Iterator<EntryType>  {
 		
 		private Iterator<Integer> ki;
 		private Integer currentKey;
@@ -270,11 +274,11 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 		}
 
 		@Override
-		public T next() {
+		public EntryType next() {
 			currentKey = ki.next();
 			if (null != currentKey) {
 				currentEntryInfo = entries.get(currentKey);
-				T currentEntry = (T) currentEntryInfo.getEntry();
+				EntryType currentEntry = (EntryType) currentEntryInfo.getEntry();
 				return currentEntry;
 			}
 			return null;
@@ -295,7 +299,7 @@ public class VariableSizeEntryHashBucket <T extends VariableSizeHashEntry> exten
 	}
 
 	@Override
-	protected T removeFromBucket(int key) {
+	protected EntryType removeFromBucket(int key) {
 		return entries.remove(key).getEntry();
 	}
 }

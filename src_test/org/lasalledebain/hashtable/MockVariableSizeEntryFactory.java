@@ -3,7 +3,7 @@ package org.lasalledebain.hashtable;
 import java.io.DataInput;
 import java.nio.ByteBuffer;
 
-import org.lasalledebain.libris.hashfile.HashEntry;
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 
@@ -47,13 +47,13 @@ public class MockVariableSizeEntryFactory implements VariableSizeEntryFactory<Mo
 	}
 
 	@Override
-	public HashEntry makeEntry(int key, ByteBuffer src, int len) {
+	public NumericKeyHashEntry makeEntry(int key, ByteBuffer src, int len) {
 		return new MockVariableSizeHashEntry(key, src, len);
 
 	}
 
 	@Override
-	public HashEntry makeEntry(DataInput backingStore) {
+	public NumericKeyHashEntry makeEntry(DataInput backingStore) {
 		throw new UnsupportedOperationException();
 	}
 

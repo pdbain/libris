@@ -6,13 +6,14 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.HashBucket;
-import org.lasalledebain.libris.hashfile.HashEntry;
+import org.lasalledebain.libris.hashfile.NumericEntryHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
+
+import junit.framework.TestCase;
 
 public class Util extends TestCase {
 
@@ -20,13 +21,13 @@ public class Util extends TestCase {
 	 * @param buck
 	 * @param entries
 	 */
-	static void checkBucket(HashBucket<HashEntry> buck,
-			ArrayList<HashEntry> entries) {
-		Iterator<HashEntry> ti = entries.iterator();
+	static void checkBucket(HashBucket<NumericKeyHashEntry> buck,
+			ArrayList<NumericKeyHashEntry> entries) {
+		Iterator<NumericKeyHashEntry> ti = entries.iterator();
 		int entryCount = 0;
-		for (HashEntry e: buck) {
+		for (NumericKeyHashEntry e: buck) {
 			assertTrue("too many entries in the bucket", ti.hasNext());
-			HashEntry t = ti.next();
+			NumericKeyHashEntry t = ti.next();
 			assertTrue("mismatch in hash entries", t.equals(e));
 			++entryCount;
 		}
@@ -39,13 +40,13 @@ public class Util extends TestCase {
 	 * @return
 	 * @throws DatabaseException 
 	 */
-	static ArrayList<HashEntry> variableSizeFillBucket(HashBucket<HashEntry> buck, byte initialData) throws DatabaseException {
-		int bucketSize = HashBucket.getBucketSize();
-		ArrayList<HashEntry> entries;
+	static ArrayList<NumericKeyHashEntry> variableSizeFillBucket(HashBucket<NumericKeyHashEntry> buck, byte initialData) throws DatabaseException {
+		int bucketSize = NumericEntryHashBucket.getBucketSize();
+		ArrayList<NumericKeyHashEntry> entries;
 		int entryCount = 0;
 		int entryLength = 10; 
 		MockVariableSizeHashEntry newEntry = null;
-		entries = new ArrayList<HashEntry>();
+		entries = new ArrayList<NumericKeyHashEntry>();
 		
 		do {
 			if (null != newEntry) {
@@ -70,9 +71,9 @@ public class Util extends TestCase {
 	 * @return
 	 * @throws DatabaseException 
 	 */
-	static ArrayList<FixedSizeHashEntry> fixedSizeFillBucket(HashBucket<HashEntry> buck, int entryLength,
+	static ArrayList<FixedSizeHashEntry> fixedSizeFillBucket(HashBucket<NumericKeyHashEntry> buck, int entryLength,
 			byte initialData) throws DatabaseException {
-		int bucketSize = HashBucket.getBucketSize();
+		int bucketSize = NumericEntryHashBucket.getBucketSize();
 		ArrayList<FixedSizeHashEntry> entries;
 		int entryCount = 0;
 		MockFixedSizeHashEntry newEntry = null;

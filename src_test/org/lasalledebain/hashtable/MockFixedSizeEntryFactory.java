@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.lasalledebain.libris.hashfile.FixedSizeEntryFactory;
-import org.lasalledebain.libris.hashfile.HashEntry;
+import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 
 public class MockFixedSizeEntryFactory implements FixedSizeEntryFactory<MockFixedSizeHashEntry> {
 
@@ -44,7 +45,7 @@ public class MockFixedSizeEntryFactory implements FixedSizeEntryFactory<MockFixe
 	}
 
 	@Override
-	public HashEntry makeEntry(DataInput backingStore) throws IOException {
+	public MockFixedSizeHashEntry makeEntry(DataInput backingStore) throws IOException {
 		return new MockFixedSizeHashEntry(backingStore, length);
 	}
 }

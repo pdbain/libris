@@ -14,9 +14,11 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.HashBucketFactory;
 import org.lasalledebain.libris.hashfile.HashFile;
+import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
+import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
-import org.lasalledebain.libris.index.AbstractHashEntry;
+import org.lasalledebain.libris.index.AbstractNumericKeyHashEntry;
 import org.lasalledebain.libris.index.AbstractVariableSizeHashEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 
@@ -30,14 +32,14 @@ public class VariableSizeHashFileTests extends TestCase {
 	@Test
 	public void testAddAndGet() {
 		try {
-			HashFile<MockVariableSizeHashEntry> htable = new HashFile<MockVariableSizeHashEntry>(backingStore, 
+			HashFile<MockVariableSizeHashEntry,VariableSizeEntryHashBucket<MockVariableSizeHashEntry>> htable = new NumericKeyHashFile<MockVariableSizeHashEntry, VariableSizeEntryHashBucket<MockVariableSizeHashEntry>>(backingStore, 
 					getFactory(), efactory);
 			ArrayList<MockVariableSizeHashEntry> entries = new ArrayList<MockVariableSizeHashEntry>();
 
 			addEntries(htable, entries, 32, 0, true);
 
 			for (AbstractVariableSizeHashEntry e: entries) {
-				AbstractHashEntry f = htable.getEntry(e.getKey());
+				AbstractNumericKeyHashEntry f = htable.getEntry(e.getKey());
 				assertNotNull("Could not find entry", f);
 				assertEquals("Entry mismatch", e, f);
 			}
@@ -53,7 +55,7 @@ public class VariableSizeHashFileTests extends TestCase {
 	@Test
 	public void testOverflow() {
 		try {
-			HashFile<MockVariableSizeHashEntry> htable = new HashFile<MockVariableSizeHashEntry>(backingStore, getFactory(), efactory);
+			HashFile<MockVariableSizeHashEntry,VariableSizeEntryHashBucket<MockVariableSizeHashEntry>> htable = new NumericKeyHashFile<MockVariableSizeHashEntry, VariableSizeEntryHashBucket<MockVariableSizeHashEntry>>(backingStore, getFactory(), efactory);
 			ArrayList<MockVariableSizeHashEntry> entries = new ArrayList<MockVariableSizeHashEntry>();
 
 			int currentKey = 1;
@@ -62,7 +64,7 @@ public class VariableSizeHashFileTests extends TestCase {
 				print(currentKey+" entries added.  Checking...\n");
 				for (AbstractVariableSizeHashEntry e: entries) {
 					int key = e.getKey();
-					AbstractHashEntry f = htable.getEntry(key);
+					AbstractNumericKeyHashEntry f = htable.getEntry(key);
 					if (null == f) {
 						print("key="+key+" not found; ");
 						print("\n");
@@ -87,7 +89,7 @@ public class VariableSizeHashFileTests extends TestCase {
 	@Test
 	public void testVariableSizedEntries() {
 		try {
-			HashFile<VariableSizeHashEntry> htable = new HashFile<VariableSizeHashEntry>(backingStore, getFactory(), efactory);
+			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = new NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>>(backingStore, getFactory(), efactory);
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int currentKey = 1;
@@ -122,14 +124,15 @@ public class VariableSizeHashFileTests extends TestCase {
 	public void testFlush() {
 		try {
 	//s		efactory = new MockVariableSizeEntryFactory(4096);
-			HashFile<VariableSizeHashEntry> htable = new HashFile<VariableSizeHashEntry>(backingStore, getFactory(), efactory);
+			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = new NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>>(backingStore, getFactory(), efactory);
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int currentKey = 1;
 
 			currentKey = addVariableSizeEntries(htable, entries, 20, currentKey, 1, 1024);
 			htable.flush();
-			HashFile<VariableSizeHashEntry> htable2 = new HashFile<VariableSizeHashEntry>(backingStore, getFactory(), efactory);
+			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable2 
+			= new NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>>(backingStore, getFactory(), efactory);
 			print(currentKey+" entries added.  Checking...\n");
 			for (VariableSizeHashEntry e: entries) {
 				int key = e.getKey();
@@ -157,7 +160,8 @@ public class VariableSizeHashFileTests extends TestCase {
 	@Test
 	public void testReplace() {
 		try {
-			HashFile<VariableSizeHashEntry> htable = new HashFile<VariableSizeHashEntry>(backingStore, getFactory(), efactory);
+			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable 
+			= new NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>>(backingStore, getFactory(), efactory);
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			for (VariableSizeHashEntry e: entries) {
@@ -182,7 +186,7 @@ public class VariableSizeHashFileTests extends TestCase {
 		}
 	}
 
-	private int addVariableSizeEntries(HashFile<VariableSizeHashEntry> htable,
+	private int addVariableSizeEntries(HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable,
 			ArrayList<VariableSizeHashEntry> entries, int numEntries, int keyBase, int minimum,
 			int maximum) throws DatabaseException, IOException {
 		int modulus = Math.max(1, numEntries/64);
@@ -206,7 +210,7 @@ public class VariableSizeHashFileTests extends TestCase {
 	private FileSpaceManager mgr;
 	private StringBuffer logBuffer;
 
-	private int addEntries(HashFile<MockVariableSizeHashEntry> htable,
+	private int addEntries(HashFile<MockVariableSizeHashEntry, VariableSizeEntryHashBucket<MockVariableSizeHashEntry>> htable,
 			ArrayList<MockVariableSizeHashEntry> entries, int numEntries, int keyBase, boolean countUp)
 	throws IOException, DatabaseException {
 		int modulus = Math.max(1, numEntries/64);

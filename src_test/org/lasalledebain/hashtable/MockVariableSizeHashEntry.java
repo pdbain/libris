@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import org.lasalledebain.libris.hashfile.HashEntry;
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 import org.lasalledebain.libris.index.AbstractVariableSizeHashEntry;
 
@@ -104,7 +104,7 @@ class MockVariableSizeHashEntry extends AbstractVariableSizeHashEntry implements
 		return oversize;
 	}
 
-	public int compareTo(HashEntry arg0) {
+	public int compareTo(NumericKeyHashEntry arg0) {
 		int otherKey = arg0.getKey();
 		int myKey = getKey();
 		return (otherKey == myKey)? 0: ((otherKey < myKey)? -1: 1);

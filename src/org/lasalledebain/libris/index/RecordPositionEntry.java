@@ -3,6 +3,8 @@ package org.lasalledebain.libris.index;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
+
 /**
  * Entry comprises 2 bytes:
  * 4 bytes for record ID
@@ -87,5 +89,16 @@ public class RecordPositionEntry extends AbstractFixedSizeHashEntry {
 	@Override
 	public void setOversize(boolean oversize) {
 		this.oversize = oversize;
+	}
+
+	@Override
+	public int compareTo(NumericKeyHashEntry comparand) {
+		if (this == comparand) {
+			return 0;
+		} else if (this.getClass().isInstance(comparand)) {
+			return Integer.compare(((AbstractNumericKeyHashEntry)comparand).key, key);
+		} else {
+			return -1;
+		}
 	}
 }
