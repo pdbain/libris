@@ -13,7 +13,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.BucketOverflowFileManager;
 
 @SuppressWarnings("unchecked")
-public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntry> extends NumericEntryHashBucket<EntryType> {
+public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntry> extends NumericKeyHashBucket<EntryType> {
 
 	static final int MAX_VARIABLE_HASH_ENTRY=256;
 	/**
@@ -173,7 +173,7 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 			super();
 			this.overflowManager = overflowManager;
 		}
-			public NumericEntryHashBucket<NumericKeyHashEntry> foocreateBucket(RandomAccessFile backingStore,
+			public NumericKeyHashBucket<NumericKeyHashEntry> foocreateBucket(RandomAccessFile backingStore,
 				int bucketNum, EntryFactory<EntryType> fact) {
 			return new VariableSizeEntryHashBucket(backingStore, bucketNum, overflowManager, fact);
 		}

@@ -21,7 +21,7 @@ import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.HashFile;
-import org.lasalledebain.libris.hashfile.NumericEntryHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
@@ -238,8 +238,8 @@ public class HashFileTest extends TestCase {
 	public void testNumEntries() {
 		try {
 			NumericKeyEntryFactory f = fFactory;
-			HashFile<FixedSizeHashEntry, NumericEntryHashBucket<FixedSizeHashEntry>> htable 
-			= new NumericKeyHashFile<FixedSizeHashEntry, NumericEntryHashBucket<FixedSizeHashEntry>>(backingStore, FixedSizeEntryHashBucket.getFactory(), f);
+			HashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>> htable 
+			= new NumericKeyHashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>>(backingStore, FixedSizeEntryHashBucket.getFactory(), f);
 			ArrayList<FixedSizeHashEntry> entries = new ArrayList<FixedSizeHashEntry>();
 
 			final int NUM_ENTRIES_INCREMENT = 400;
@@ -334,7 +334,7 @@ public class HashFileTest extends TestCase {
 			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
-			int recordsPerBucket = NumericEntryHashBucket.BUCKET_SIZE/vFactory.getEntrySize();
+			int recordsPerBucket = NumericKeyHashBucket.BUCKET_SIZE/vFactory.getEntrySize();
 			int requestedBuckets = (NUM_ENTRIES*2+recordsPerBucket-1)/recordsPerBucket;
 			LibrisDatabase.log(Level.INFO,  "resize hash table: "+requestedBuckets+" buckets");
 			htable.resize(requestedBuckets);
@@ -382,7 +382,7 @@ public class HashFileTest extends TestCase {
 		return keyBase+numEntries;
 	}
 
-	private int addFixedSizeEntries(HashFile<FixedSizeHashEntry, NumericEntryHashBucket<FixedSizeHashEntry>> htable,
+	private int addFixedSizeEntries(HashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>> htable,
 			ArrayList<FixedSizeHashEntry> entries, int numEntries, int keyBase, boolean countUp)
 					throws IOException, DatabaseException {
 		LibrisDatabase.log(Level.INFO, "Add "+numEntries);

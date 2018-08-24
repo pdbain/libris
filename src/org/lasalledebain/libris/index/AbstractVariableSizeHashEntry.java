@@ -5,7 +5,7 @@ import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import org.lasalledebain.libris.hashfile.NumericEntryHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 
 public abstract class AbstractVariableSizeHashEntry extends AbstractNumericKeyHashEntry implements VariableSizeHashEntry {
@@ -38,7 +38,7 @@ public abstract class AbstractVariableSizeHashEntry extends AbstractNumericKeyHa
 	}
 	
 	public boolean isOversize() {
-		return getDataLength() >= (NumericEntryHashBucket.BUCKET_SIZE/2);
+		return getDataLength() >= (NumericKeyHashBucket.BUCKET_SIZE/2);
 	}
 
 }

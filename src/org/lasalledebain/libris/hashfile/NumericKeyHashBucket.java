@@ -4,14 +4,14 @@ import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-public abstract class NumericEntryHashBucket <T extends NumericKeyHashEntry> extends HashBucket<T> {
+public abstract class NumericKeyHashBucket <T extends NumericKeyHashEntry> extends HashBucket<T> {
 
 	/** 
 	 * @param backingStore File to hold buckets
 	 * @param bucketNum position in the file
 	 * @param fact Factory for hash bucket entries
 	 */
-	public NumericEntryHashBucket(RandomAccessFile backingStore, int bucketNum) {
+	public NumericKeyHashBucket(RandomAccessFile backingStore, int bucketNum) {
 		super(backingStore, bucketNum);
 	}
 

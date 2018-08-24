@@ -11,7 +11,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.HashBucketFactory;
-import org.lasalledebain.libris.hashfile.NumericEntryHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
@@ -61,7 +61,7 @@ public class HashBucketTests extends TestCase {
 		}
 		
 		try {
-		Util.checkBucket((NumericEntryHashBucket<NumericKeyHashEntry>) readBucket, entries);
+		Util.checkBucket((NumericKeyHashBucket<NumericKeyHashEntry>) readBucket, entries);
 			hashFile.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -97,7 +97,7 @@ public class HashBucketTests extends TestCase {
 		}
 		
 		try {
-		Util.checkBucket((NumericEntryHashBucket<NumericKeyHashEntry>) readBucket, entries);
+		Util.checkBucket((NumericKeyHashBucket<NumericKeyHashEntry>) readBucket, entries);
 			hashFile.close();
 		} catch (IOException e) {
 			e.printStackTrace();

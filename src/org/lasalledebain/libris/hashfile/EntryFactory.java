@@ -6,8 +6,6 @@ import java.nio.ByteBuffer;
 
 public interface EntryFactory<EntryType extends HashEntry> {
 
-	//EntryType makeEntry(RandomAccessFile backingStore);
-
 	EntryType makeEntry(int entryId, byte[] dat);
 
 	EntryType makeEntry(int entryId, ByteBuffer bucketEntryData, int length);

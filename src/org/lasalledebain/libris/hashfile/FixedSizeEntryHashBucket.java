@@ -8,7 +8,7 @@ import java.util.TreeMap;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
-public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> extends NumericEntryHashBucket<EntryType> {
+public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> extends NumericKeyHashBucket<EntryType> {
 
 	protected TreeMap<Integer, EntryType> entries;
 	protected EntryFactory<EntryType> entryFact;
@@ -27,7 +27,7 @@ public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> ext
 	private static class FixedSizeEntryHashBucketFactory implements HashBucketFactory {
 
 		@Override
-		public NumericEntryHashBucket<NumericKeyHashEntry> createBucket(RandomAccessFile backingStore,
+		public NumericKeyHashBucket<NumericKeyHashEntry> createBucket(RandomAccessFile backingStore,
 				int bucketNum, EntryFactory fact) {
 			return new FixedSizeEntryHashBucket(backingStore, bucketNum, fact);
 		}

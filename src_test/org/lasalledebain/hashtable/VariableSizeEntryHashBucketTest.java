@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.hashfile.NumericEntryHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.HashBucketFactory;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
@@ -28,7 +28,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 	private File testFile;
 	private HashBucketFactory bfact;
 	private MockVariableSizeEntryFactory entryFactory;
-	private NumericEntryHashBucket<VariableSizeHashEntry> buck;
+	private NumericKeyHashBucket<VariableSizeHashEntry> buck;
 	private RandomAccessFile backingStore;
 	boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
 	FileSpaceManager mgr;
@@ -76,7 +76,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 				boolean result = buck.addEntry(newEntry);
 				++entryCount;
 				expectedOccupancy += 4 + 2 + length;
-				if (expectedOccupancy <= NumericEntryHashBucket.getBucketSize()) {
+				if (expectedOccupancy <= NumericKeyHashBucket.getBucketSize()) {
 					assertTrue("bucket add failed on key "+key, result);
 				} else {
 					assertFalse("overflow not detected on key "+key, result);
@@ -151,20 +151,20 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			HashMap<Integer, VariableSizeHashEntry> entries= new HashMap<Integer, VariableSizeHashEntry>(numEntries);
 			int expectedOccupancy = 2;
 			for (int key = 1; key < numEntries; key++ ) {
-				int length = Math.min(32, NumericEntryHashBucket.getBucketSize()-(expectedOccupancy + 6));
+				int length = Math.min(32, NumericKeyHashBucket.getBucketSize()-(expectedOccupancy + 6));
 				VariableSizeHashEntry newEntry = entryFactory.makeVariableSizeEntry(key, length);
 				entries.put(new Integer(key), newEntry);
 				boolean result = buck.addEntry(newEntry);
 				++entryCount;
 				expectedOccupancy += 4 + 2 + length;
-				if (expectedOccupancy >= NumericEntryHashBucket.getBucketSize()) {
+				if (expectedOccupancy >= NumericKeyHashBucket.getBucketSize()) {
 					break;
 				}
 				assertTrue("bucket add failed on key "+key, result);
 				int actualOccupancy = buck.getOccupancy();
 				assertEquals("Wrong occupancy on key "+key+": ", expectedOccupancy, actualOccupancy);
 			}
-			assertEquals("bucket not exactly filled.  Occupancy: ", expectedOccupancy, NumericEntryHashBucket.getBucketSize());
+			assertEquals("bucket not exactly filled.  Occupancy: ", expectedOccupancy, NumericKeyHashBucket.getBucketSize());
 			checkEntries(buck, entryCount, entries);
 
 		} catch (DatabaseException e) {
@@ -178,7 +178,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 		try {
 			int expectedOccupancy = 2;
 			int initialSize = 128;
-			final int bucketSize = NumericEntryHashBucket.getBucketSize();
+			final int bucketSize = NumericKeyHashBucket.getBucketSize();
 			int totalLength = entryFactory.makeVariableSizeEntry(1, initialSize).getTotalLength();
 			final int numEntries = (bucketSize - expectedOccupancy)/totalLength;
 			VariableSizeHashEntry newEntry;
@@ -225,7 +225,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			populateBucket(numEntries, entries);
 			buck.write();
 			checkEntries(buck, numEntries, entries);
-			NumericEntryHashBucket<VariableSizeHashEntry> newBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 			newBuck.read();
 			checkEntries(newBuck, numEntries, entries);
 		} catch (Exception e) {
@@ -252,7 +252,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			}			
 			buck.write();
 			checkEntries(buck, numEntries, entries);
-			NumericEntryHashBucket<VariableSizeHashEntry> newBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 			newBuck.read();
 			checkEntries(newBuck, numEntries, entries);
 		} catch (Exception e) {
@@ -283,7 +283,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			}			
 			buck.write();
 			checkEntries(buck, numEntries, entries);
-			NumericEntryHashBucket<VariableSizeHashEntry> newBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 			newBuck.read();
 			checkEntries(newBuck, numEntries, entries);
 		} catch (Exception e) {
@@ -300,7 +300,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			populateBucket(numEntries, entries);
 			buck.write();
 			checkEntries(buck, numEntries, entries);
-			NumericEntryHashBucket<VariableSizeHashEntry> newBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 			newBuck.read();
 			int actualCount = 0;
 			Iterator<VariableSizeHashEntry> iter = newBuck.iterator();
@@ -318,7 +318,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			iter = newBuck.iterator();
 			assertFalse("remove didn't work", iter.hasNext());
 			newBuck.write();
-			newBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 			newBuck.read();
 			iter = newBuck.iterator();
 			assertFalse("remove didn't work", iter.hasNext());
@@ -347,7 +347,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			buck.write();
 
 			checkEntries(buck, numEntries, entries);
-			NumericEntryHashBucket<VariableSizeHashEntry> newBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 			newBuck.read();
 			Iterator<VariableSizeHashEntry> iter = newBuck.iterator();
 			while (iter.hasNext()) { /* remove half the entries */
@@ -356,7 +356,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 				iter.next();
 			}
 			newBuck.write();
-			newBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 			newBuck.read();
 			countOversize(2);
 		} catch (Exception e) {
@@ -387,7 +387,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			checkEntries(buck, numEntries, entries);
 			buck.write();
 			{
-				NumericEntryHashBucket<VariableSizeHashEntry> tempBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+				NumericKeyHashBucket<VariableSizeHashEntry> tempBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 				tempBuck.read();
 				checkEntries(tempBuck, numEntries, entries);
 				VariableSizeHashEntry e = tempBuck.getEntry(3);
@@ -418,7 +418,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			HashMap<Integer, VariableSizeHashEntry> entries= new HashMap<Integer, VariableSizeHashEntry>(numEntries);
 
 			{
-				NumericEntryHashBucket<VariableSizeHashEntry> tempBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+				NumericKeyHashBucket<VariableSizeHashEntry> tempBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 
 
 				int length = 2;
@@ -435,7 +435,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			countOversize(numEntries - 5);
 
 			{
-				NumericEntryHashBucket<VariableSizeHashEntry> tempBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+				NumericKeyHashBucket<VariableSizeHashEntry> tempBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 				tempBuck.read();
 				checkEntries(tempBuck, numEntries, entries);
 
@@ -455,7 +455,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 				}			
 				tempBuck.write();
 			}
-			NumericEntryHashBucket<VariableSizeHashEntry> newBuck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 			newBuck.read();
 			checkEntries(newBuck, numEntries, entries);
 		} catch (Exception e) {
@@ -474,7 +474,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 		oversizeEntryManager = new MockOverflowManager(mgr);
 		bfact = VariableSizeEntryHashBucket.getFactory(oversizeEntryManager);
 		entryFactory = new MockVariableSizeEntryFactory();
-		buck = (NumericEntryHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+		buck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
 	}
 
 	@Override
@@ -496,7 +496,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			entries.put(key, newEntry);
 			boolean result = buck.addEntry(newEntry);
 			expectedOccupancy += 4 + 2 + length;
-			if (expectedOccupancy <= NumericEntryHashBucket.getBucketSize()) {
+			if (expectedOccupancy <= NumericKeyHashBucket.getBucketSize()) {
 				++entryCount;
 				assertTrue("bucket add failed on key "+key, result);
 			} else {
@@ -520,7 +520,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 		return newEntry;
 	}
 
-	private void checkEntries(NumericEntryHashBucket<VariableSizeHashEntry> testBucket, int expectedCount, HashMap<Integer, VariableSizeHashEntry> entries) {
+	private void checkEntries(NumericKeyHashBucket<VariableSizeHashEntry> testBucket, int expectedCount, HashMap<Integer, VariableSizeHashEntry> entries) {
 		int actualCount = 0;
 		for (VariableSizeHashEntry e: testBucket) {
 			assertNotNull("missing entry after "+actualCount+" entries", e);

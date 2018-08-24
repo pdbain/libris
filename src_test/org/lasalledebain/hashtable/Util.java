@@ -10,7 +10,7 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.HashBucket;
-import org.lasalledebain.libris.hashfile.NumericEntryHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 
 import junit.framework.TestCase;
@@ -41,7 +41,7 @@ public class Util extends TestCase {
 	 * @throws DatabaseException 
 	 */
 	static ArrayList<NumericKeyHashEntry> variableSizeFillBucket(HashBucket<NumericKeyHashEntry> buck, byte initialData) throws DatabaseException {
-		int bucketSize = NumericEntryHashBucket.getBucketSize();
+		int bucketSize = NumericKeyHashBucket.getBucketSize();
 		ArrayList<NumericKeyHashEntry> entries;
 		int entryCount = 0;
 		int entryLength = 10; 
@@ -73,7 +73,7 @@ public class Util extends TestCase {
 	 */
 	static ArrayList<FixedSizeHashEntry> fixedSizeFillBucket(HashBucket<NumericKeyHashEntry> buck, int entryLength,
 			byte initialData) throws DatabaseException {
-		int bucketSize = NumericEntryHashBucket.getBucketSize();
+		int bucketSize = NumericKeyHashBucket.getBucketSize();
 		ArrayList<FixedSizeHashEntry> entries;
 		int entryCount = 0;
 		MockFixedSizeHashEntry newEntry = null;

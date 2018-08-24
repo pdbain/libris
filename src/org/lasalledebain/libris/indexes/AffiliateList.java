@@ -11,7 +11,7 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.hashfile.NumericEntryHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
@@ -58,7 +58,7 @@ public class AffiliateList {
 	
 	public void setSize(long expectedEntries) throws DatabaseException {
 		long totalExpectedSize = 6 * expectedEntries; /* 4 bytes per entry + 5% overhead for length and parent */
-		int requestedBuckets = (int) (totalExpectedSize/NumericEntryHashBucket.BUCKET_SIZE);
+		int requestedBuckets = (int) (totalExpectedSize/NumericKeyHashBucket.BUCKET_SIZE);
 		affiliateHashFile.resize(requestedBuckets);
 	}
 

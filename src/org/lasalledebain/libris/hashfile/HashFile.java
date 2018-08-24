@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.index.RecordPositionEntry;
 
 public abstract class HashFile<EntryType extends HashEntry, BucketType extends HashBucket<EntryType>> {
 
@@ -25,7 +24,7 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 		this.backingStore = backingStore;
 		this.bucketFactory = bFact;
 		long fileLength = backingStore.length();
-		bucketSize = NumericEntryHashBucket.getBucketSize();
+		bucketSize = NumericKeyHashBucket.getBucketSize();
 		setNumBuckets((int) fileLength/bucketSize + 1);
 		bucketCache = new HashMap<Integer, BucketType>();
 	}
