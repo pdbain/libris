@@ -127,12 +127,12 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 		}
 
 		@Override
-		public NumericKeyHashEntry makeEntry(int key, byte[] dat) {
+		public AffiliateListEntry makeEntry(int key, byte[] dat) {
 			return makeEntry(key, ByteBuffer.wrap(dat, 0, dat.length), dat.length);
 		}
 
 		@Override
-		public NumericKeyHashEntry makeEntry(int key, ByteBuffer src, int len) {
+		public AffiliateListEntry makeEntry(int key, ByteBuffer src, int len) {
 			int nChildren = src.getInt();
 			int[] tempChildren = new int[nChildren];
 			for (int i = 0; i < nChildren; i++) {
@@ -152,7 +152,7 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 		 * @see org.lasalledebain.libris.hashfile.EntryFactory#makeEntry(java.io.DataInput)
 		 */
 		@Override
-		public NumericKeyHashEntry makeEntry(DataInput src) throws IOException {
+		public AffiliateListEntry makeEntry(DataInput src) throws IOException {
 			int key = src.readInt();
 			int nChildren = src.readInt();
 			int[] tempChildren = new int[nChildren];

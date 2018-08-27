@@ -5,7 +5,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.StringKeyEntryFactory;
 import org.lasalledebain.libris.hashfile.StringKeyHashEntry;
 import org.lasalledebain.libris.util.ByteArraySlice;
@@ -24,6 +23,29 @@ public class TermCountEntry extends StringKeyHashEntry{
 		termCount = src.getInt(src.getLength() - 4);
 		keyBytes = src;
 		keyBytes.setLength(src.getLength() - 4);
+	}
+
+	public TermCountEntry(String term, int initialCount) {
+		keyBytes = new ByteArraySlice(term.getBytes());
+		termCount = initialCount;
+	}
+
+	/**
+	 * @return the termCount
+	 */
+	public int getTermCount() {
+		return termCount;
+	}
+
+	/**
+	 * @param termCount the termCount to set
+	 */
+	public void setTermCount(int termCount) {
+		this.termCount = termCount;
+	}
+	
+	public int incrementCount() {
+		return ++termCount;
 	}
 
 	@Override
@@ -55,35 +77,33 @@ public class TermCountEntry extends StringKeyHashEntry{
 	@Override
 	public void setOversize(boolean oversize) {
 		return;
-}
+	}
 
 	@Override
 	public int getDataLength() {
 		return keyBytes.getLength() + 4;
 	}
 
-	public static class TermCountEntryFactory implements StringKeyEntryFactory {
+	public static class TermCountEntryFactory implements StringKeyEntryFactory<TermCountEntry> {
 
 		@Override
-		public NumericKeyHashEntry makeEntry(int key, byte[] dat) {
+		public TermCountEntry makeEntry(int key, byte[] dat) {
 			return null;
 		}
 
 		@Override
-		public NumericKeyHashEntry makeEntry(int key, ByteBuffer src, int len) {
-			// TODO Auto-generated method stub
-			return null;
+		public TermCountEntry makeEntry(int key, ByteBuffer src, int len) {
+			return null;			
 		}
 
 		@Override
-		public NumericKeyHashEntry makeEntry(DataInput backingStore) throws IOException {
-			// TODO Auto-generated method stub
+		public TermCountEntry makeEntry(DataInput backingStore) throws IOException {
 			return null;
 		}
 
 		public TermCountEntry makeEntry(byte[] baseArray, int offset, int length) {
 			return new TermCountEntry(new ByteArraySlice(baseArray, offset, length));
 		}
-		
+
 	}
 }

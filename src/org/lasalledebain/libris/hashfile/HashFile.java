@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-public abstract class HashFile<EntryType extends HashEntry, BucketType extends HashBucket<EntryType>> {
+public abstract class HashFile<EntryType extends HashEntry, 
+BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<EntryType>> {
 
 	protected RandomAccessFile backingStore;
 	int numBuckets;
@@ -17,10 +19,10 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 	HashMap<Integer, BucketType> bucketCache;
 
 	int bucketAge = 0;
-	private HashBucketFactory<EntryType, BucketType> bucketFactory;
-	EntryFactory<EntryType> entryFact;
+	private HashBucketFactory<EntryType, BucketType, FactoryType> bucketFactory;
+	FactoryType entryFact;
 
-	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType> bFact) throws IOException {
+	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact) throws IOException {
 		this.backingStore = backingStore;
 		this.bucketFactory = bFact;
 		long fileLength = backingStore.length();
@@ -33,7 +35,7 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 	 * @param backingStore
 	 * @throws IOException accessing backing store
 	 */
-	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType> bFact, EntryFactory<EntryType> eFact) throws IOException {
+	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact, EntryFactory<EntryType> eFact) throws IOException {
 		this(backingStore, bFact);
 	}
 
@@ -58,8 +60,6 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 		}
 	}
 
-	protected abstract void expandAndRehash(HashBucket<EntryType> oldOverflowBucket) throws IOException, DatabaseException;
-	
 	/**
 	 * @param bucketNum
 	 * @return
@@ -162,5 +162,67 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 		return true;
 	}
 
+	protected void expandAndRehash(HashBucket<EntryType> oldOverflowBucket) throws IOException, DatabaseException {
+		ArrayList<EntryType> splitEntries = new ArrayList<EntryType>();
+		ArrayList<EntryType> oldOverflowNativeEntries = new ArrayList<EntryType>();
+		ArrayList<EntryType> newOverflowEntries = new ArrayList<EntryType>();
+		int oldOverflowBucketNum = numBuckets-1;
+		int splitBucketNum = (2*bucketModulus == numBuckets)? 0: (numBuckets - bucketModulus);
+		setNumBuckets(numBuckets+1);
+
+		for (EntryType entry: oldOverflowBucket) {
+			int homeBucket = findHomeBucket(entry);
+			if (homeBucket == oldOverflowBucketNum) {
+				oldOverflowNativeEntries.add(entry);
+			} else if (homeBucket == splitBucketNum) {
+				splitEntries.add(entry);
+			} else {
+				newOverflowEntries.add(entry);
+			}
+		}
+		oldOverflowBucket.clear();
+		for (EntryType e: oldOverflowNativeEntries) {
+			oldOverflowBucket.addEntry(e);
+		}
+
+		BucketType splitBucket = getBucket(splitBucketNum);
+		for (EntryType entry: splitBucket) {
+			int homeBucket = findHomeBucket(entry);
+			if (homeBucket == splitBucketNum) {
+				splitEntries.add(entry);
+			} else {
+				newOverflowEntries.add(entry);
+			}
+		}
+		splitBucket.clear();
+		for (EntryType e: splitEntries) {
+			if (!splitBucket.addEntry(e)) {
+				newOverflowEntries.addAll(splitEntries.subList(splitEntries.indexOf(e), splitEntries.size()));
+				break;
+			}
+		}
+
+		int lastIndex = -1;
+		if (newOverflowEntries.size() > 0) {
+			BucketType newOverflowBucket = getBucket(numBuckets-1);
+			for (EntryType e: newOverflowEntries) {
+				if (!newOverflowBucket.addEntry(e)) {
+					lastIndex = newOverflowEntries.indexOf(e);
+					break;
+				}
+			}
+
+			if (lastIndex >= 0) { /* overflow bucket overflowed */
+				List<EntryType> remainder = newOverflowEntries.subList(lastIndex, newOverflowEntries.size());
+				expandAndRehash(newOverflowBucket);
+				for (EntryType e: remainder) {
+					addEntry(e);
+				}
+			}
+		}
+}
+
 	public abstract EntryType getEntry(int recordId) throws IOException, DatabaseException;
+
+	protected abstract int findHomeBucket(EntryType entry);
 }

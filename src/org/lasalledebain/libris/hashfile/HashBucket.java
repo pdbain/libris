@@ -27,6 +27,13 @@ public abstract class HashBucket<T extends HashEntry>  implements Iterable<T>{
 	}
 
 	public abstract Iterator<T> iterator();
+	
+	/**
+	 * @param newEntry Entry to add to the bucket
+	 * @return true if the entry was added, false if the bucket was full
+	 * @throws DatabaseException 
+	 * @note if an entry with newEntry's key exists in the bucket, it is removed before adding newEntry.
+	 */
 	public abstract  boolean addEntry(T newEntry) throws DatabaseException;
 
 	public int getOccupancy() {

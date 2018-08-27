@@ -162,23 +162,27 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		victimList.add(victim);
 	}
 
-	public static HashBucketFactory getFactory(BucketOverflowFileManager overflowManager) {
+	public static NumericKeyHashBucketFactory getFactory(BucketOverflowFileManager overflowManager) {
 		return new VariableSizeBucketHashBucketFactory(overflowManager);
 	}
 	
-	private static class VariableSizeBucketHashBucketFactory<EntryType extends VariableSizeHashEntry, BucketType extends HashBucket<EntryType>> implements HashBucketFactory {
+	private static class VariableSizeBucketHashBucketFactory<EntryType extends VariableSizeHashEntry, BucketType extends HashBucket<EntryType>> implements NumericKeyHashBucketFactory {
 		BucketOverflowFileManager overflowManager;
 		public VariableSizeBucketHashBucketFactory(
 				BucketOverflowFileManager overflowManager) {
 			super();
 			this.overflowManager = overflowManager;
 		}
-			public NumericKeyHashBucket<NumericKeyHashEntry> foocreateBucket(RandomAccessFile backingStore,
-				int bucketNum, EntryFactory<EntryType> fact) {
-			return new VariableSizeEntryHashBucket(backingStore, bucketNum, overflowManager, fact);
-		}
+
 		@Override
 		public HashBucket createBucket(RandomAccessFile backingStore, int bucketNum, EntryFactory fact) {
+			// TODO Auto-generated method stub
+			return new VariableSizeEntryHashBucket(backingStore, bucketNum, overflowManager, fact);
+		}
+
+		@Override
+		public NumericKeyHashBucket createBucket(RandomAccessFile backingStore, int bucketNum,
+				NumericKeyEntryFactory fact) {
 			// TODO Auto-generated method stub
 			return new VariableSizeEntryHashBucket(backingStore, bucketNum, overflowManager, fact);
 		}		

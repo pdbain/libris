@@ -28,6 +28,7 @@ public class LibrisTestSuite {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.lasalledebain");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(UtilitiesTest.class);
 		suite.addTestSuite(TestPDF.class);
 		suite.addTestSuite(RepositoryTest.class);
 		suite.addTestSuite(BloomFilterTest.class);

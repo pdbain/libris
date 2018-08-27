@@ -21,16 +21,22 @@ public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> ext
 		occupancy = 4;
 	}
 
-	public static HashBucketFactory getFactory() {
+	public static FixedSizeEntryHashBucketFactory getFactory() {
 		return new FixedSizeEntryHashBucketFactory();
 	}
-	private static class FixedSizeEntryHashBucketFactory implements HashBucketFactory {
+	public static class FixedSizeEntryHashBucketFactory implements NumericKeyHashBucketFactory {
 
 		@Override
 		public NumericKeyHashBucket<NumericKeyHashEntry> createBucket(RandomAccessFile backingStore,
 				int bucketNum, EntryFactory fact) {
 			return new FixedSizeEntryHashBucket(backingStore, bucketNum, fact);
 		}
+
+		@Override
+		public NumericKeyHashBucket createBucket(RandomAccessFile backingStore, int bucketNum,
+				NumericKeyEntryFactory fact) {
+			return new FixedSizeEntryHashBucket(backingStore, bucketNum, fact);
+			}
 
 	}
 	

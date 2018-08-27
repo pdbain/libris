@@ -10,7 +10,7 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.HashBucket;
-import org.lasalledebain.libris.hashfile.HashBucketFactory;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucketFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
@@ -24,7 +24,7 @@ public class HashBucketTests extends TestCase {
 
 	@Test
 	public void testAddEntry() {
-		HashBucketFactory bfact = FixedSizeEntryHashBucket.getFactory();
+		NumericKeyHashBucketFactory bfact = FixedSizeEntryHashBucket.getFactory();
 		HashBucket buck = bfact.createBucket(null, 0, null);
 		ArrayList<NumericKeyHashEntry> entries;
 		try {
@@ -39,7 +39,7 @@ public class HashBucketTests extends TestCase {
 
 	@Test
 	public void testReadAndWrite() {
-		HashBucketFactory bfact = FixedSizeEntryHashBucket.getFactory();
+		NumericKeyHashBucketFactory bfact = FixedSizeEntryHashBucket.getFactory();
 		MockFixedSizeEntryFactory fact = new MockFixedSizeEntryFactory(10);
 		RandomAccessFile hashFile = Util.MakeHashFile(testFile);
 		HashBucket writeBucket = bfact.createBucket(hashFile,0,fact);
@@ -75,7 +75,7 @@ public class HashBucketTests extends TestCase {
 		FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 		MockOverflowManager oversizeEntryManager = new MockOverflowManager(mgr);
 
-		HashBucketFactory bfact = VariableSizeEntryHashBucket.getFactory(oversizeEntryManager);
+		NumericKeyHashBucketFactory bfact = VariableSizeEntryHashBucket.getFactory(oversizeEntryManager);
 		MockVariableSizeEntryFactory fact = new MockVariableSizeEntryFactory(10);
 		RandomAccessFile hashFile = Util.MakeHashFile(testFile);
 		HashBucket writeBucket = bfact.createBucket(hashFile,0,fact);

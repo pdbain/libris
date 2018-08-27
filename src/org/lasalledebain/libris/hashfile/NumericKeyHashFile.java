@@ -2,16 +2,17 @@ package org.lasalledebain.libris.hashfile;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-public class NumericKeyHashFile<EntryType extends NumericKeyHashEntry, BucketType extends NumericKeyHashBucket<EntryType>> extends HashFile<EntryType, BucketType> {
+public class NumericKeyHashFile<EntryType extends NumericKeyHashEntry, 
+BucketType extends NumericKeyHashBucket<EntryType>, FactoryType extends NumericKeyEntryFactory<EntryType>> 
+extends HashFile<EntryType, BucketType,FactoryType> {
 
 	HashMap<Integer, NumericKeyHashBucket<EntryType>> bucketCache;
-	public NumericKeyHashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType> bFact, NumericKeyEntryFactory<EntryType> eFact)
+	public NumericKeyHashFile(RandomAccessFile backingStore, 
+			NumericKeyHashBucketFactory<EntryType, BucketType, FactoryType> bFact, FactoryType eFact)
 			throws IOException {
 		super(backingStore, bFact);
 		this.entryFact = eFact;
@@ -34,65 +35,10 @@ public class NumericKeyHashFile<EntryType extends NumericKeyHashEntry, BucketTyp
 		return null;
 	}
 
-	protected void expandAndRehash(HashBucket<EntryType> oldOverflowBucket) throws IOException, DatabaseException {
-		ArrayList<EntryType> splitEntries = new ArrayList<EntryType>();
-		ArrayList<EntryType> oldOverflowNativeEntries = new ArrayList<EntryType>();
-		ArrayList<EntryType> newOverflowEntries = new ArrayList<EntryType>();
-		int oldOverflowBucketNum = numBuckets-1;
-		int splitBucketNum = (2*bucketModulus == numBuckets)? 0: (numBuckets - bucketModulus);
-		setNumBuckets(numBuckets+1);
-
-		for (EntryType entry: oldOverflowBucket) {
-			int homeBucket = findHomeBucket(entry.getKey());
-			if (homeBucket == oldOverflowBucketNum) {
-				oldOverflowNativeEntries.add(entry);
-			} else if (homeBucket == splitBucketNum) {
-				splitEntries.add(entry);
-			} else {
-				newOverflowEntries.add(entry);
-			}
-		}
-		oldOverflowBucket.clear();
-		for (EntryType e: oldOverflowNativeEntries) {
-			oldOverflowBucket.addEntry(e);
-		}
-
-		NumericKeyHashBucket <EntryType> splitBucket = getBucket(splitBucketNum);
-		for (EntryType entry: splitBucket) {
-			int homeBucket = findHomeBucket(entry.getKey());
-			if (homeBucket == splitBucketNum) {
-				splitEntries.add(entry);
-			} else {
-				newOverflowEntries.add(entry);
-			}
-		}
-		splitBucket.clear();
-		for (EntryType e: splitEntries) {
-			if (!splitBucket.addEntry(e)) {
-				newOverflowEntries.addAll(splitEntries.subList(splitEntries.indexOf(e), splitEntries.size()));
-				break;
-			}
-		}
-
-		int lastIndex = -1;
-		if (newOverflowEntries.size() > 0) {
-			NumericKeyHashBucket<EntryType> newOverflowBucket = getBucket(numBuckets-1);
-			for (EntryType e: newOverflowEntries) {
-				if (!newOverflowBucket.addEntry(e)) {
-					lastIndex = newOverflowEntries.indexOf(e);
-					break;
-				}
-			}
-
-			if (lastIndex >= 0) { /* overflow bucket overflowed */
-				List<EntryType> remainder = newOverflowEntries.subList(lastIndex, newOverflowEntries.size());
-				expandAndRehash(newOverflowBucket);
-				for (EntryType e: remainder) {
-					addEntry(e);
-				}
-			}
-		}
-}
+	@Override
+	protected int findHomeBucket(EntryType entry) {
+		return findHomeBucket(entry.getKey());
+	}
 
 	protected int findHomeBucket(long key) {
 		int hashedKey = hash(key);
@@ -104,8 +50,7 @@ public class NumericKeyHashFile<EntryType extends NumericKeyHashEntry, BucketTyp
 	}
 
 	public void addEntry(EntryType entry) throws IOException, DatabaseException {
-	int key = entry.getKey();
-	int bucketNum = findHomeBucket(key);
+	int bucketNum = findHomeBucket(entry);
 	NumericKeyHashBucket<EntryType> homeBucket = getBucket(bucketNum);
 	if (!homeBucket.addEntry(entry)) {
 		NumericKeyHashBucket<EntryType> overflowBucket = getBucket(numBuckets-1);

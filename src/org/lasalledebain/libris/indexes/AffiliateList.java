@@ -11,6 +11,7 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
@@ -27,7 +28,9 @@ public class AffiliateList {
 	RandomAccessFile overflowFile;
 	FileSpaceManager overflowSpaceMgr;
 	private AffiliateListEntryFactory eFactory;
-	private NumericKeyHashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>> affiliateHashFile;
+	private NumericKeyHashFile
+	<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, NumericKeyEntryFactory<AffiliateListEntry>> 
+	affiliateHashFile;
 	private BucketOverflowFileManager bucketOverflowMgr;
 	private static int[] empty = new int[0];
 
@@ -49,7 +52,9 @@ public class AffiliateList {
 		}
 		eFactory = new AffiliateListEntry.AffiliateListEntryFactory();
 		try {
-			affiliateHashFile = new NumericKeyHashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>>(hashTableFile, 
+			affiliateHashFile = new NumericKeyHashFile
+					<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, NumericKeyEntryFactory<AffiliateListEntry>>
+			(hashTableFile, 
 					VariableSizeEntryHashBucket.getFactory(bucketOverflowMgr), eFactory);
 		} catch (IOException e) {
 			throw new DatabaseException(e);

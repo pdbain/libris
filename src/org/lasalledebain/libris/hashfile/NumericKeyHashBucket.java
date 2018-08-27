@@ -15,12 +15,7 @@ public abstract class NumericKeyHashBucket <T extends NumericKeyHashEntry> exten
 		super(backingStore, bucketNum);
 	}
 
-	/**
-	 * @param newEntry Entry to add to the bucket
-	 * @return true if the entry was added, false if the bucket was full
-	 * @throws DatabaseException 
-	 * @note if and entry with newEntry's key exists in the bucket, it is removed before adding newEntry.
-	 */
+	@Override
 	public  boolean addEntry(T newEntry) throws DatabaseException {
 		int key = newEntry.getKey();
 		int netLength = newEntry.getTotalLength();

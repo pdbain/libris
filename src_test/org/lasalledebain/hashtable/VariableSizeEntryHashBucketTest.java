@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
-import org.lasalledebain.libris.hashfile.HashBucketFactory;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucketFactory;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 import org.lasalledebain.libris.index.AffiliateListEntry;
@@ -26,7 +26,7 @@ import org.lasalledebain.libris.indexes.FileSpaceManager;
 public class VariableSizeEntryHashBucketTest extends TestCase{
 
 	private File testFile;
-	private HashBucketFactory bfact;
+	private NumericKeyHashBucketFactory bfact;
 	private MockVariableSizeEntryFactory entryFactory;
 	private NumericKeyHashBucket<VariableSizeHashEntry> buck;
 	private RandomAccessFile backingStore;

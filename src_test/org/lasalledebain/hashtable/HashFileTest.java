@@ -17,13 +17,16 @@ import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.hashfile.FixedSizeEntryFactory;
 import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.HashFile;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
+import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
@@ -44,7 +47,9 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testAddAndGet() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = makeVHashTable();
+			HashFile
+			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, 
+			VariableSizeEntryFactory<VariableSizeHashEntry>> htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			addVariableSizeEntries(htable, entries, 32, 0, true);
@@ -66,7 +71,9 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testOverflow() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = makeVHashTable();
+			HashFile
+			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
+			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int currentKey = 1;
@@ -102,7 +109,9 @@ public class HashFileTest extends TestCase {
 	public void testExpand() {
 		int searchKey=0;
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = makeVHashTable();
+			HashFile
+			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
+			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			LibrisDatabase.log(Level.INFO, "add first batch of entries\n");
@@ -139,7 +148,8 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testMissing() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = makeVHashTable();
+			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
+			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int nextKey = addVariableSizeEntries(htable, entries, 400, 1, true);
@@ -159,7 +169,8 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testReplace() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = makeVHashTable();
+			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
+			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int nextKey = addVariableSizeEntries(htable, entries, 400, 1, true);
@@ -188,7 +199,8 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testAddDecreasing() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = makeVHashTable();
+			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
+			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			addVariableSizeEntries(htable, entries, 1000, 0, false);
@@ -210,7 +222,8 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testAddRandom() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = makeVHashTable();
+			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
+			htable = makeVHashTable();
 			ArrayList<MockVariableSizeHashEntry> entries = new ArrayList<MockVariableSizeHashEntry>();
 			int seed = 1234567;
 			Random key = new Random(seed);
@@ -238,8 +251,9 @@ public class HashFileTest extends TestCase {
 	public void testNumEntries() {
 		try {
 			NumericKeyEntryFactory f = fFactory;
-			HashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>> htable 
-			= new NumericKeyHashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>>(backingStore, FixedSizeEntryHashBucket.getFactory(), f);
+			HashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>, FixedSizeEntryFactory<FixedSizeHashEntry>> htable 
+			= new NumericKeyHashFile
+			(backingStore, FixedSizeEntryHashBucket.getFactory(), f);
 			ArrayList<FixedSizeHashEntry> entries = new ArrayList<FixedSizeHashEntry>();
 
 			final int NUM_ENTRIES_INCREMENT = 400;
@@ -265,7 +279,11 @@ public class HashFileTest extends TestCase {
 			FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 			MockOverflowManager oversizeEntryManager = new MockOverflowManager(mgr);
 			AffiliateListEntryFactory aFact = new AffiliateListEntryFactory();
-			HashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>> htable = new NumericKeyHashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>>(backingStore, 
+			HashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, VariableSizeEntryFactory<AffiliateListEntry>> 
+			htable 
+			= new NumericKeyHashFile
+			<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, VariableSizeEntryFactory<AffiliateListEntry>>
+			(backingStore, 
 					VariableSizeEntryHashBucket.getFactory(oversizeEntryManager), aFact);
 
 			try {
@@ -331,7 +349,9 @@ public class HashFileTest extends TestCase {
 	public void testHugeFile() {
 		try {
 			final int NUM_ENTRIES=100000;
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = makeVHashTable();
+			HashFile
+			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
+			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int recordsPerBucket = NumericKeyHashBucket.BUCKET_SIZE/vFactory.getEntrySize();
@@ -366,7 +386,8 @@ public class HashFileTest extends TestCase {
 	 * @throws IOException
 	 * @throws DatabaseException 
 	 */
-	private int addVariableSizeEntries(HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable,
+	private int addVariableSizeEntries(HashFile
+			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> htable,
 			ArrayList<VariableSizeHashEntry> entries, int numEntries, int keyBase, boolean countUp)
 					throws IOException, DatabaseException {
 
@@ -382,7 +403,8 @@ public class HashFileTest extends TestCase {
 		return keyBase+numEntries;
 	}
 
-	private int addFixedSizeEntries(HashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>> htable,
+	private int addFixedSizeEntries(HashFile
+			<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>, FixedSizeEntryFactory<FixedSizeHashEntry>> htable,
 			ArrayList<FixedSizeHashEntry> entries, int numEntries, int keyBase, boolean countUp)
 					throws IOException, DatabaseException {
 		LibrisDatabase.log(Level.INFO, "Add "+numEntries);
@@ -397,11 +419,12 @@ public class HashFileTest extends TestCase {
 		return keyBase+numEntries;
 	}
 
-	private HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> makeVHashTable() throws IOException {
+	private HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
+	makeVHashTable() throws IOException {
 		FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 		MockOverflowManager oversizeEntryManager = new MockOverflowManager(mgr);
-		NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>> htable = 
-				new NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>>(backingStore, 
+		NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> htable = 
+				new NumericKeyHashFile(backingStore, 
 						VariableSizeEntryHashBucket.getFactory(oversizeEntryManager), vFactory);
 		return htable;
 	}
