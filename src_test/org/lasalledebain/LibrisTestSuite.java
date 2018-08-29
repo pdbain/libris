@@ -1,14 +1,12 @@
 package org.lasalledebain;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
+import org.lasalledebain.group.GroupDefsTests;
 import org.lasalledebain.group.GroupManagerTests;
 import org.lasalledebain.group.InheritanceTest;
-import org.lasalledebain.group.GroupDefsTests;
 import org.lasalledebain.group.MemberTest;
 import org.lasalledebain.hashtable.HashBucketTests;
 import org.lasalledebain.hashtable.HashFileTest;
+import org.lasalledebain.hashtable.TermCountEntryBucketTest;
 import org.lasalledebain.hashtable.VariableSizeEntryHashBucketTest;
 import org.lasalledebain.libris.indexes.FileSpaceManagerTests;
 import org.lasalledebain.libris.indexes.LibrisRecordMapTest;
@@ -22,12 +20,16 @@ import org.lasalledebain.recordimport.CsvImportTest;
 import org.lasalledebain.recordimport.TestPDF;
 import org.lasalledebain.repository.RepositoryTest;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 public class LibrisTestSuite {
 
 	static boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.lasalledebain");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(TermCountEntryBucketTest.class);
 		suite.addTestSuite(UtilitiesTest.class);
 		suite.addTestSuite(TestPDF.class);
 		suite.addTestSuite(RepositoryTest.class);

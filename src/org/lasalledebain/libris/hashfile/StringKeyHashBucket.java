@@ -7,5 +7,6 @@ public abstract class StringKeyHashBucket<EntryType extends StringKeyHashEntry> 
 	public StringKeyHashBucket(RandomAccessFile backingStore, int bucketNum) {
 		super(backingStore, bucketNum);
 	}
-
+	
+	public abstract EntryType get(String key);
 }

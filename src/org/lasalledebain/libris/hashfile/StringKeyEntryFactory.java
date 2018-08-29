@@ -2,10 +2,7 @@ package org.lasalledebain.libris.hashfile;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
-public interface StringKeyEntryFactory <T extends HashEntry> extends EntryFactory<T> {
-	public T makeEntry(int key, byte dat[]);
-	public T makeEntry(int key, ByteBuffer src, int len);
-	public T makeEntry(DataInput backingStore) throws IOException;
+public interface StringKeyEntryFactory <EntryType extends StringKeyHashEntry> extends EntryFactory<EntryType> {
+	public EntryType makeEntry(DataInput backingStore) throws IOException;
 }

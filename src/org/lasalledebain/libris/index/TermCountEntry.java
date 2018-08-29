@@ -23,6 +23,7 @@ public class TermCountEntry extends StringKeyHashEntry{
 		termCount = src.getInt(src.getLength() - 4);
 		keyBytes = src;
 		keyBytes.setLength(src.getLength() - 4);
+		termCount = 0;
 	}
 
 	public TermCountEntry(String term, int initialCount) {
@@ -84,6 +85,15 @@ public class TermCountEntry extends StringKeyHashEntry{
 		return keyBytes.getLength() + 4;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		String result = keyBytes.toString() + ","+termCount;
+		return result;
+	}
+
 	public static class TermCountEntryFactory implements StringKeyEntryFactory<TermCountEntry> {
 
 		@Override
@@ -103,6 +113,10 @@ public class TermCountEntry extends StringKeyHashEntry{
 
 		public TermCountEntry makeEntry(byte[] baseArray, int offset, int length) {
 			return new TermCountEntry(new ByteArraySlice(baseArray, offset, length));
+		}
+		public TermCountEntry makeEntry(String key, int initialCount) {
+			final byte[] stringBytes = key.getBytes();
+			return new TermCountEntry(key, initialCount);
 		}
 
 	}

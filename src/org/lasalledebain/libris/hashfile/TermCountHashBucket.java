@@ -4,12 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.index.TermCountEntry;
 import org.lasalledebain.libris.index.TermCountEntry.TermCountEntryFactory;
+import org.lasalledebain.libris.util.ByteArraySlice;
 
 /**
  * File format:
@@ -24,13 +25,13 @@ import org.lasalledebain.libris.index.TermCountEntry.TermCountEntryFactory;
  */
 public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 
-	HashSet<TermCountEntry> entries;
+	HashMap<ByteArraySlice, TermCountEntry> entries;
 	TermCountEntryFactory myFact;
 	public TermCountHashBucket(RandomAccessFile backingStore, int bucketNum, TermCountEntryFactory fact) {
 		super(backingStore, bucketNum);
-		entries = new HashSet<>();
+		entries = new HashMap<>();
 		myFact = fact;
-		occupancy = 0;
+		occupancy = 2;
 	}
 
 	@Override
@@ -39,8 +40,9 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 		if (newOccupancy > BUCKET_SIZE) {
 			return false;
 		} else {
-			entries.add(newEntry);
+			entries.put(newEntry.getKey(), newEntry);
 			occupancy = newOccupancy;
+			dirty = true;
 			return true;
 		}
 	}
@@ -60,7 +62,7 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 				int cursor = 0;
 				ByteArrayOutputStream bos = new ByteArrayOutputStream(occupancy);
 				DataOutputStream dos = new DataOutputStream(bos);
-				for (TermCountEntry e: entries) {
+				for (TermCountEntry e: entries.values()) {
 					short entryLen = (short) e.getEntryLength();
 					positionInfo[cursor][0] = offset;
 					positionInfo[cursor][1] = entryLen;
@@ -99,7 +101,7 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 		entries.clear();
 		for (short[] posAndLen: positionInfo) {
 			final TermCountEntry newEntry = myFact.makeEntry(mainBuffer, posAndLen[0], posAndLen[1]);
-			entries.add(newEntry);		
+			entries.put(newEntry.getKey(), newEntry);		
 		}
 		occupancy = 2 /* numEntries */
 				+ (4 * numEntries) /* index */
@@ -107,8 +109,18 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 	}
 
 	@Override
+	public TermCountEntry get(String key) {
+		final ByteArraySlice temp = new ByteArraySlice(key);
+		return entries.get(temp);
+	}
+
+	public TermCountEntry get(ByteArraySlice key) {
+		return entries.get(key);
+	}
+
+	@Override
 	public Iterator<TermCountEntry> iterator() {
-		return entries.iterator();
+		return entries.values().iterator();
 	}
 
 	@Override
