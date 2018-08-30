@@ -467,9 +467,9 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 	@Before
 	public void setUp() throws Exception {
 		if (null == testFile) {
-			testFile = Util.makeTestFileObject("variableHashFile");
+			testFile = Utilities.makeTestFileObject("variableHashFile");
 		}
-		backingStore = Util.MakeHashFile(testFile);
+		backingStore = HashUtils.MakeHashFile(testFile);
 		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 		oversizeEntryManager = new MockOverflowManager(mgr);
 		bfact = VariableSizeEntryHashBucket.getFactory(oversizeEntryManager);

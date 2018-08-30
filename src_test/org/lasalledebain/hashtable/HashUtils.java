@@ -6,7 +6,6 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.HashBucket;
@@ -15,7 +14,7 @@ import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 
 import junit.framework.TestCase;
 
-public class Util extends TestCase {
+public class HashUtils extends TestCase {
 
 	/**
 	 * @param buck
@@ -97,21 +96,9 @@ public class Util extends TestCase {
 		return entries;
 	}
 
-	/**
-	 * @param fileName 
-	 * 
-	 */
-	static File makeTestFileObject(String fileName) {
-		File workingDirectory = new File(Utilities.getTempTestDirectory(), fileName);
-		Utilities.deleteRecursively(workingDirectory);
-		workingDirectory.mkdirs();
-		File tf = new File(workingDirectory, "testIndexFile");
-		tf.deleteOnExit();
-		return tf;
-	}
-
-	static RandomAccessFile MakeHashFile(File tf) {
+	public static RandomAccessFile MakeHashFile(File tf) {
 		try {
+			tf.delete();
 			RandomAccessFile f = new RandomAccessFile(tf, "rw");
 			tf.deleteOnExit();
 			return f;

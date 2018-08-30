@@ -94,6 +94,14 @@ public class TermCountEntry extends StringKeyHashEntry{
 		return result;
 	}
 
+	public static TermCountEntry makeEntry(byte[] baseArray, int offset, int length) {
+		return new TermCountEntry(new ByteArraySlice(baseArray, offset, length));
+	}
+
+	public static TermCountEntry makeEntry(String key, int initialCount) {
+		return new TermCountEntry(key, initialCount);
+	}
+
 	public static class TermCountEntryFactory implements StringKeyEntryFactory<TermCountEntry> {
 
 		@Override
@@ -109,14 +117,6 @@ public class TermCountEntry extends StringKeyHashEntry{
 		@Override
 		public TermCountEntry makeEntry(DataInput backingStore) throws IOException {
 			return null;
-		}
-
-		public TermCountEntry makeEntry(byte[] baseArray, int offset, int length) {
-			return new TermCountEntry(new ByteArraySlice(baseArray, offset, length));
-		}
-		public TermCountEntry makeEntry(String key, int initialCount) {
-			final byte[] stringBytes = key.getBytes();
-			return new TermCountEntry(key, initialCount);
 		}
 
 	}

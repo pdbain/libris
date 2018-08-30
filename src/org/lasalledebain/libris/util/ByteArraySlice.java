@@ -2,8 +2,6 @@ package org.lasalledebain.libris.util;
 
 import java.nio.ByteBuffer;
 
-import org.lasalledebain.libris.hashfile.StringKeyHashEntry;
-
 public class ByteArraySlice {
 	byte[] baseArray;
 	int offset;
@@ -46,7 +44,7 @@ public class ByteArraySlice {
 				return false;
 			} else {
 				for (int i = 0; i < length; ++ i) {
-					if (baseArray[offset + 1] != thatSlice.baseArray[thatSlice.offset + 1]) {
+					if (baseArray[offset + i] != thatSlice.baseArray[thatSlice.offset + i]) {
 						return false;
 					}
 				}

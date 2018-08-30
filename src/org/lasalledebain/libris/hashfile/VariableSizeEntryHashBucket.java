@@ -83,7 +83,7 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 					long oldPosition = ei.getOversizeFilePosition();
 					long position = -1;
 					if (-1 != oldPosition) {
-						 position = overflowManager.update(oldPosition, entry.getData());
+						position = overflowManager.update(oldPosition, entry.getData());
 					} else {
 						position = overflowManager.put(entry.getData());
 					}
@@ -92,7 +92,7 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 				} else {
 					long oldPosition = ei.getOversizeFilePosition();
 					if (-1 != oldPosition) {
-						 overflowManager.remove(oldPosition);
+						overflowManager.remove(oldPosition);
 					}
 					offsetStream.writeShort(offset);
 					valueStream.write(entry.getData(), 0, entry.getDataLength());
@@ -109,7 +109,7 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		}
 		overflowManager.flush();
 	}
-	
+
 	public void read() throws IOException, DatabaseException {
 		clear();
 		byte[] bucketBuffer = new byte[BUCKET_SIZE];
@@ -134,7 +134,7 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		ByteBuffer sizeBuff =  ByteBuffer.wrap(bucketBuffer);
 		short numEntries = sizeBuff.getShort();
 		int  idList[] =  new int[numEntries];
-		
+
 		for (int i = 0; i < numEntries; ++i) {
 			idList[i] = sizeBuff.getInt();
 		}
@@ -154,7 +154,7 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		}
 		dirty = false;
 	}
-	
+
 	protected void addOversizeVictim(EntryInfo victim) {
 		if (null == victimList) {
 			victimList = new ArrayList<EntryInfo>(1);
@@ -165,8 +165,11 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 	public static NumericKeyHashBucketFactory getFactory(BucketOverflowFileManager overflowManager) {
 		return new VariableSizeBucketHashBucketFactory(overflowManager);
 	}
-	
-	private static class VariableSizeBucketHashBucketFactory<EntryType extends VariableSizeHashEntry, BucketType extends HashBucket<EntryType>> implements NumericKeyHashBucketFactory {
+
+	private static class VariableSizeBucketHashBucketFactory
+	<EntryType extends VariableSizeHashEntry, 
+	FactoryType extends VariableSizeEntryFactory<EntryType> > 
+	implements NumericKeyHashBucketFactory<EntryType, VariableSizeEntryHashBucket<EntryType>, FactoryType> {
 		BucketOverflowFileManager overflowManager;
 		public VariableSizeBucketHashBucketFactory(
 				BucketOverflowFileManager overflowManager) {
@@ -175,17 +178,10 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		}
 
 		@Override
-		public HashBucket createBucket(RandomAccessFile backingStore, int bucketNum, EntryFactory fact) {
-			// TODO Auto-generated method stub
-			return new VariableSizeEntryHashBucket(backingStore, bucketNum, overflowManager, fact);
+		public VariableSizeEntryHashBucket<EntryType> createBucket(RandomAccessFile backingStore, int bucketNum, FactoryType fact) {
+			return new VariableSizeEntryHashBucket<EntryType>(backingStore, bucketNum, overflowManager, fact);
 		}
 
-		@Override
-		public NumericKeyHashBucket createBucket(RandomAccessFile backingStore, int bucketNum,
-				NumericKeyEntryFactory fact) {
-			// TODO Auto-generated method stub
-			return new VariableSizeEntryHashBucket(backingStore, bucketNum, overflowManager, fact);
-		}		
 	}
 
 	@Override
@@ -253,7 +249,7 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		public int getId() {
 			return id;
 		}
-		
+
 		public void setId(int id) {
 			this.id = id;
 		}
@@ -262,9 +258,9 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 			return entry;
 		}
 	}
-	
+
 	protected class EntryIterator implements Iterator<EntryType>  {
-		
+
 		private Iterator<Integer> ki;
 		private Integer currentKey;
 		private EntryInfo currentEntryInfo;
@@ -299,7 +295,7 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 			ki.remove();
 			dirty = true;
 		}
-		
+
 	}
 
 	@Override

@@ -46,11 +46,7 @@ public abstract class HashBucket<T extends HashEntry>  implements Iterable<T>{
 
 	public abstract void write() throws DatabaseException;
 
-	public void clear() {
-		occupancy = 4;
-		dirty = true;
-	}
-	
+	public abstract void clear(); 
 
 	public int getNumEntries() throws IOException {
 		int numEntries;

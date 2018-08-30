@@ -13,7 +13,6 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.TermCountHashBucket;
 import org.lasalledebain.libris.hashfile.TermCountHashBucket.TermCountBucketFactory;
 import org.lasalledebain.libris.index.TermCountEntry;
-import org.lasalledebain.libris.index.TermCountEntry.TermCountEntryFactory;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 
 import junit.framework.TestCase;
@@ -24,18 +23,16 @@ public class TermCountEntryBucketTest extends TestCase {
 	private File testFile;
 	FileSpaceManager mgr;
 	private TermCountHashBucket buck;
-	private TermCountEntryFactory entryFactory;
-
 	@Before
 	protected void setUp() throws Exception {
 		if (null == testFile) {
-			testFile = Util.makeTestFileObject("termCountHashFile");
+			testFile = Utilities.makeTestFileObject("termCountHashFile");
 		}
-		backingStore = Util.MakeHashFile(testFile);
+		backingStore = HashUtils.MakeHashFile(testFile);
 		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 		TermCountBucketFactory bfact = new TermCountBucketFactory();
-		entryFactory = new TermCountEntry.TermCountEntryFactory();
-		buck = bfact.createBucket(backingStore, 0, entryFactory);
+		new TermCountEntry.TermCountEntryFactory();
+		buck = bfact.createBucket(backingStore, 0);
 	}
 
 	@After
@@ -45,9 +42,9 @@ public class TermCountEntryBucketTest extends TestCase {
 
 	@Test
 	public void testSanity() throws DatabaseException {
-		TermCountEntry e = entryFactory.makeEntry(TESTSTRING1, 0);
+		TermCountEntry e = TermCountEntry.makeEntry(TESTSTRING1, 0);
 		buck.addEntry(e);
-		TermCountEntry e2 = buck.get(TESTSTRING1);
+		TermCountEntry e2 = buck.getEntry(TESTSTRING1);
 		assertEquals(e, e2);
 		e.incrementCount();
 		assertEquals("Increment failed",  e2.getTermCount(), 1);
@@ -60,7 +57,7 @@ public class TermCountEntryBucketTest extends TestCase {
 		int count = 0;
 		while (success) {
 			final String key = TESTSTRING1+"_"+count;
-			TermCountEntry e = entryFactory.makeEntry(key, 0);
+			TermCountEntry e = TermCountEntry.makeEntry(key, 0);
 			success = buck.addEntry(e);
 			if (success) expected.put(key, e);
 			++count;
@@ -68,7 +65,7 @@ public class TermCountEntryBucketTest extends TestCase {
 		for (TermCountEntry e: expected.values()) {
 			TermCountEntry actual = buck.get(e.getKey());
 			assertNotNull(e.toString()+" missing (byte array)", actual);
-			actual = buck.get(e.getKey().toString());
+			actual = buck.getEntry(e.getKey().toString());
 			assertNotNull(e.toString()+" missing (string):", actual);
 		}
 	}
@@ -80,7 +77,7 @@ public class TermCountEntryBucketTest extends TestCase {
 		int count = 0;
 		while (success) {
 			final String key = TESTSTRING1+"_"+count;
-			TermCountEntry e = entryFactory.makeEntry(key, 0);
+			TermCountEntry e = TermCountEntry.makeEntry(key, 0);
 			success = buck.addEntry(e);
 			if (success) expected.put(key, e);
 			++count;
@@ -89,7 +86,7 @@ public class TermCountEntryBucketTest extends TestCase {
 		backingStore.getChannel().force(true);
 		RandomAccessFile raf = new RandomAccessFile(testFile, "rw");
 
-		TermCountHashBucket newBucket = new TermCountHashBucket(raf, 0, entryFactory);
+		TermCountHashBucket newBucket = new TermCountHashBucket(raf, 0);
 		newBucket.read();
 		for (TermCountEntry e: expected.values()) {
 			TermCountEntry actual = newBucket.get(e.getKey());

@@ -65,7 +65,8 @@ public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> ext
 		if (null != entries) {
 			entries.clear();
 		}
-		super.clear();
+		occupancy = 4;
+		dirty = true;		
 	}
 
 	public void read() throws IOException, DatabaseException {

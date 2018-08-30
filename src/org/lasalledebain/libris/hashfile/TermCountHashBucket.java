@@ -26,11 +26,13 @@ import org.lasalledebain.libris.util.ByteArraySlice;
 public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 
 	HashMap<ByteArraySlice, TermCountEntry> entries;
-	TermCountEntryFactory myFact;
 	public TermCountHashBucket(RandomAccessFile backingStore, int bucketNum, TermCountEntryFactory fact) {
+		this(backingStore, bucketNum);
+	}
+
+	public TermCountHashBucket(RandomAccessFile backingStore, int bucketNum) {
 		super(backingStore, bucketNum);
 		entries = new HashMap<>();
-		myFact = fact;
 		occupancy = 2;
 	}
 
@@ -87,6 +89,12 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 
 	@Override
 	public void read() throws IOException, DatabaseException {
+		clear();
+		long fileSize = backingStore.length();
+		if (filePosition >= fileSize) {
+			return;
+		}
+		backingStore.seek(filePosition);
 		short numEntries = backingStore.readShort();
 		short [][] positionInfo = new short[numEntries][2];
 		int totalLen = 0;
@@ -100,7 +108,7 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 		backingStore.readFully(mainBuffer);
 		entries.clear();
 		for (short[] posAndLen: positionInfo) {
-			final TermCountEntry newEntry = myFact.makeEntry(mainBuffer, posAndLen[0], posAndLen[1]);
+			final TermCountEntry newEntry = TermCountEntry.makeEntry(mainBuffer, posAndLen[0], posAndLen[1]);
 			entries.put(newEntry.getKey(), newEntry);		
 		}
 		occupancy = 2 /* numEntries */
@@ -109,9 +117,14 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 	}
 
 	@Override
-	public TermCountEntry get(String key) {
-		final ByteArraySlice temp = new ByteArraySlice(key);
-		return entries.get(temp);
+	public TermCountEntry getEntry(String key) {
+		final ByteArraySlice keyBytes = new ByteArraySlice(key);
+		return getEntry(keyBytes);
+	}
+
+	@Override
+	public TermCountEntry getEntry(ByteArraySlice keyBytes) {
+		return entries.get(keyBytes);
 	}
 
 	public TermCountEntry get(ByteArraySlice key) {
@@ -125,18 +138,35 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 
 	@Override
 	protected int getNumEntriesImpl() {
-		return entries.size();
+		final int size = entries.size();
+		System.err.println("PDB_DEBUG expandAndRehash getNumEntriesImpl ="+size); // TODO DEBUG
+	return size;
 	}
 	
+	@Deprecated
 	public static class TermCountBucketFactory
-	implements StringKeyHashBucketFactory<TermCountEntry, TermCountHashBucket, TermCountEntryFactory> {
+	implements HashBucketFactory<TermCountEntry, TermCountHashBucket, TermCountEntryFactory> {
+		private TermCountEntryFactory entryFactory;
+
+		public TermCountBucketFactory() {
+			entryFactory = new TermCountEntry.TermCountEntryFactory();
+		}
 
 		@Override
 		public TermCountHashBucket createBucket(RandomAccessFile backingStore, int bucketNum, TermCountEntryFactory fact) {
-			// TODO Auto-generated method stub
-			return new TermCountHashBucket(backingStore, bucketNum, fact);
+			return new TermCountHashBucket(backingStore, bucketNum, entryFactory);
 		}
 
+		public TermCountHashBucket createBucket(RandomAccessFile backingStore, int bucketNum) {
+			return new TermCountHashBucket(backingStore, bucketNum, entryFactory);
+		}
+
+	}
+
+	@Override
+	public void clear() {
+		occupancy = 2;
+		entries.clear();
 	}
 
 }

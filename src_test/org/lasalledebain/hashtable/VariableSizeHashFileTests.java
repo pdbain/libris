@@ -12,11 +12,9 @@ import java.util.logging.Level;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.hashfile.NumericKeyHashBucketFactory;
 import org.lasalledebain.libris.hashfile.HashFile;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
-import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
-import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucketFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
@@ -61,7 +59,7 @@ public class VariableSizeHashFileTests extends TestCase {
 	@Test
 	public void testOverflow() {
 		try {
-			NumericKeyHashFile<MockVariableSizeHashEntry,NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable 
+			NumericKeyHashFile<MockVariableSizeHashEntry, NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable 
 			= new NumericKeyHashFile<MockVariableSizeHashEntry,NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory>(backingStore, getFactory(), efactory);
 			ArrayList<MockVariableSizeHashEntry> entries = new ArrayList<MockVariableSizeHashEntry>();
 
@@ -96,8 +94,7 @@ public class VariableSizeHashFileTests extends TestCase {
 	@Test
 	public void testVariableSizedEntries() {
 		try {
-			NumericKeyHashFile
-			<MockVariableSizeHashEntry, VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable 
+			NumericKeyHashFile<MockVariableSizeHashEntry, VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable 
 			= new NumericKeyHashFile<MockVariableSizeHashEntry, VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory>(backingStore, getFactory(), efactory);
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
@@ -198,7 +195,7 @@ public class VariableSizeHashFileTests extends TestCase {
 	}
 
 	private int addVariableSizeEntries(
-			NumericKeyHashFile<MockVariableSizeHashEntry, VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable,
+			HashFile<MockVariableSizeHashEntry, ?, MockVariableSizeEntryFactory> htable,
 			ArrayList<VariableSizeHashEntry> entries, int numEntries, int keyBase, int minimum,
 			int maximum) throws DatabaseException, IOException {
 		int modulus = Math.max(1, numEntries/64);
@@ -222,7 +219,7 @@ public class VariableSizeHashFileTests extends TestCase {
 	private FileSpaceManager mgr;
 	private StringBuffer logBuffer;
 
-	private int addEntries(NumericKeyHashFile<MockVariableSizeHashEntry, NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable,
+	private int addEntries(HashFile<MockVariableSizeHashEntry, NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable,
 			ArrayList<MockVariableSizeHashEntry> entries, int numEntries, int keyBase, boolean countUp)
 	throws IOException, DatabaseException {
 		int modulus = Math.max(1, numEntries/64);
@@ -248,7 +245,7 @@ public class VariableSizeHashFileTests extends TestCase {
 			efactory = new MockVariableSizeEntryFactory(28);
 		}
 		if (null == testFileObject) {
-			testFileObject = Util.makeTestFileObject("hashFile");
+			testFileObject = Utilities.makeTestFileObject("hashFile");
 		}
 		if (!testFileObject.exists()) {
 			backingStore = new RandomAccessFile(testFileObject, "rw");

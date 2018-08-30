@@ -12,6 +12,13 @@ public class Lorem implements Iterator<String[]> {
 		cursor = 0;
 	}
 
+	/**
+	 * @return the words
+	 */
+	public static String[] getWords() {
+		return words;
+	}
+
 	public static final String words[] =
 		{"Phasellus", "aliquet", "diam", "id", "accumsan", "ultrices", "est", "nulla",
 				"suscipit", "dui", "sit", "amet", "condimentum", "augue", "neque", "luctus",

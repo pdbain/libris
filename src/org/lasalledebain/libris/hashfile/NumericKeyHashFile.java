@@ -42,25 +42,9 @@ extends HashFile<EntryType, BucketType,FactoryType> {
 
 	protected int findHomeBucket(long key) {
 		int hashedKey = hash(key);
-		int homeBucket = (int) hashedKey % (2*bucketModulus);
-		if (homeBucket >= numBuckets) {
-			homeBucket -= bucketModulus;
-		}
+		int homeBucket = hashToBucketNumber(hashedKey);
 		return homeBucket;
 	}
-
-	public void addEntry(EntryType entry) throws IOException, DatabaseException {
-	int bucketNum = findHomeBucket(entry);
-	NumericKeyHashBucket<EntryType> homeBucket = getBucket(bucketNum);
-	if (!homeBucket.addEntry(entry)) {
-		NumericKeyHashBucket<EntryType> overflowBucket = getBucket(numBuckets-1);
-		if (!overflowBucket.addEntry(entry)) {
-			expandAndRehash(overflowBucket);
-			homeBucket = overflowBucket = null;
-			addEntry(entry);
-		}
-	}
-}
 
 
 }

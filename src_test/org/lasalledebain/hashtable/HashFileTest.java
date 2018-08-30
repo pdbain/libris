@@ -47,7 +47,7 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testAddAndGet() {
 		try {
-			HashFile
+			NumericKeyHashFile
 			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, 
 			VariableSizeEntryFactory<VariableSizeHashEntry>> htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
@@ -71,7 +71,7 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testOverflow() {
 		try {
-			HashFile
+			NumericKeyHashFile
 			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
 			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
@@ -109,7 +109,7 @@ public class HashFileTest extends TestCase {
 	public void testExpand() {
 		int searchKey=0;
 		try {
-			HashFile
+			NumericKeyHashFile
 			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
 			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
@@ -148,7 +148,7 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testMissing() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
+			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
 			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
@@ -169,7 +169,7 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testReplace() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
+			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
 			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
@@ -199,7 +199,7 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testAddDecreasing() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
+			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
 			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
@@ -222,7 +222,7 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testAddRandom() {
 		try {
-			HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
+			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
 			htable = makeVHashTable();
 			ArrayList<MockVariableSizeHashEntry> entries = new ArrayList<MockVariableSizeHashEntry>();
 			int seed = 1234567;
@@ -251,7 +251,7 @@ public class HashFileTest extends TestCase {
 	public void testNumEntries() {
 		try {
 			NumericKeyEntryFactory f = fFactory;
-			HashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>, FixedSizeEntryFactory<FixedSizeHashEntry>> htable 
+			NumericKeyHashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>, FixedSizeEntryFactory<FixedSizeHashEntry>> htable 
 			= new NumericKeyHashFile
 			(backingStore, FixedSizeEntryHashBucket.getFactory(), f);
 			ArrayList<FixedSizeHashEntry> entries = new ArrayList<FixedSizeHashEntry>();
@@ -279,7 +279,7 @@ public class HashFileTest extends TestCase {
 			FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 			MockOverflowManager oversizeEntryManager = new MockOverflowManager(mgr);
 			AffiliateListEntryFactory aFact = new AffiliateListEntryFactory();
-			HashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, VariableSizeEntryFactory<AffiliateListEntry>> 
+			NumericKeyHashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, VariableSizeEntryFactory<AffiliateListEntry>> 
 			htable 
 			= new NumericKeyHashFile
 			<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, VariableSizeEntryFactory<AffiliateListEntry>>
@@ -349,7 +349,7 @@ public class HashFileTest extends TestCase {
 	public void testHugeFile() {
 		try {
 			final int NUM_ENTRIES=100000;
-			HashFile
+			NumericKeyHashFile
 			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
 			htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
@@ -419,11 +419,11 @@ public class HashFileTest extends TestCase {
 		return keyBase+numEntries;
 	}
 
-	private HashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
+	private NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
 	makeVHashTable() throws IOException {
 		FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 		MockOverflowManager oversizeEntryManager = new MockOverflowManager(mgr);
-		NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> htable = 
+		NumericKeyHashFile htable = 
 				new NumericKeyHashFile(backingStore, 
 						VariableSizeEntryHashBucket.getFactory(oversizeEntryManager), vFactory);
 		return htable;
@@ -452,7 +452,7 @@ public class HashFileTest extends TestCase {
 			fFactory = new MockFixedSizeEntryFactory(28);
 		}
 		if (null == testFileObject) {
-			testFileObject = Util.makeTestFileObject("hashFile");
+			testFileObject = Utilities.makeTestFileObject("hashFile");
 		}
 		testFileObject.delete();
 		backingStore = new RandomAccessFile(testFileObject, "rw");

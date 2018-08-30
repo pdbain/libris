@@ -9,7 +9,6 @@ public abstract class NumericKeyHashBucket <T extends NumericKeyHashEntry> exten
 	/** 
 	 * @param backingStore File to hold buckets
 	 * @param bucketNum position in the file
-	 * @param fact Factory for hash bucket entries
 	 */
 	public NumericKeyHashBucket(RandomAccessFile backingStore, int bucketNum) {
 		super(backingStore, bucketNum);

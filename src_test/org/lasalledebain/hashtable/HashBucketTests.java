@@ -28,8 +28,8 @@ public class HashBucketTests extends TestCase {
 		HashBucket buck = bfact.createBucket(null, 0, null);
 		ArrayList<NumericKeyHashEntry> entries;
 		try {
-			entries = Util.fixedSizeFillBucket(buck, 42,(byte) 1);
-			Util.checkBucket(buck, entries);
+			entries = HashUtils.fixedSizeFillBucket(buck, 42,(byte) 1);
+			HashUtils.checkBucket(buck, entries);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 			fail("Unexpected exception on hashfile");
@@ -41,11 +41,11 @@ public class HashBucketTests extends TestCase {
 	public void testReadAndWrite() {
 		NumericKeyHashBucketFactory bfact = FixedSizeEntryHashBucket.getFactory();
 		MockFixedSizeEntryFactory fact = new MockFixedSizeEntryFactory(10);
-		RandomAccessFile hashFile = Util.MakeHashFile(testFile);
+		RandomAccessFile hashFile = HashUtils.MakeHashFile(testFile);
 		HashBucket writeBucket = bfact.createBucket(hashFile,0,fact);
 		ArrayList<NumericKeyHashEntry> entries = null;
 		try {
-			entries = Util.fixedSizeFillBucket(writeBucket, 10, (byte) 2);
+			entries = HashUtils.fixedSizeFillBucket(writeBucket, 10, (byte) 2);
 			writeBucket.write();
 		} catch (DatabaseException e) {
 			e.printStackTrace();
@@ -61,7 +61,7 @@ public class HashBucketTests extends TestCase {
 		}
 		
 		try {
-		Util.checkBucket((NumericKeyHashBucket<NumericKeyHashEntry>) readBucket, entries);
+		HashUtils.checkBucket((NumericKeyHashBucket<NumericKeyHashEntry>) readBucket, entries);
 			hashFile.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -77,11 +77,11 @@ public class HashBucketTests extends TestCase {
 
 		NumericKeyHashBucketFactory bfact = VariableSizeEntryHashBucket.getFactory(oversizeEntryManager);
 		MockVariableSizeEntryFactory fact = new MockVariableSizeEntryFactory(10);
-		RandomAccessFile hashFile = Util.MakeHashFile(testFile);
+		RandomAccessFile hashFile = HashUtils.MakeHashFile(testFile);
 		HashBucket writeBucket = bfact.createBucket(hashFile,0,fact);
 		ArrayList<NumericKeyHashEntry> entries = null;
 		try {
-			entries = Util.variableSizeFillBucket(writeBucket, (byte) 2);
+			entries = HashUtils.variableSizeFillBucket(writeBucket, (byte) 2);
 			writeBucket.write();
 		} catch (DatabaseException e) {
 			e.printStackTrace();
@@ -97,7 +97,7 @@ public class HashBucketTests extends TestCase {
 		}
 		
 		try {
-		Util.checkBucket((NumericKeyHashBucket<NumericKeyHashEntry>) readBucket, entries);
+		HashUtils.checkBucket((NumericKeyHashBucket<NumericKeyHashEntry>) readBucket, entries);
 			hashFile.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -109,7 +109,7 @@ public class HashBucketTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		if (null == testFile) {
-			testFile = Util.makeTestFileObject("TestFileRecordMap");
+			testFile = Utilities.makeTestFileObject("TestFileRecordMap");
 		}
 	}
 

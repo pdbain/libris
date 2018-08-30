@@ -234,6 +234,7 @@ public class Utilities extends TestCase {
 		FileChannel original = null; 
 		FileChannel copy = null; 
 		try {
+			// TODO close FileInputStream
 			original = (new FileInputStream(originalFile)).getChannel();
 			copy = (new FileOutputStream(copyFile)).getChannel();
 			copy.transferFrom(original, 0, original.size());
@@ -437,6 +438,19 @@ public class Utilities extends TestCase {
 				fail("unexpected exception "+e.getMessage());
 			}
 		}
+	}
+
+	/**
+	 * @param dirName 
+	 * 
+	 */
+	public static File makeTestFileObject(String dirName) {
+		File workingDirectory = new File(getTempTestDirectory(), dirName);
+		deleteRecursively(workingDirectory);
+		workingDirectory.mkdirs();
+		File tf = new File(workingDirectory, "testIndexFile");
+		tf.deleteOnExit();
+		return tf;
 	}
 
 }
