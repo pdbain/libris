@@ -48,18 +48,7 @@ public abstract class HashBucket<T extends HashEntry>  implements Iterable<T>{
 
 	public abstract void clear(); 
 
-	public int getNumEntries() throws IOException {
-		int numEntries;
-		if (dirty) {
-			numEntries = getNumEntriesImpl();
-		} else {
-			backingStore.seek(filePosition);
-			numEntries = backingStore.readInt();
-		}
-		return numEntries;
-	}
-
-	protected abstract int getNumEntriesImpl();
+	abstract public int getNumEntries() throws IOException;
 
 	public int getAge() {
 		return age;

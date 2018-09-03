@@ -72,7 +72,6 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 			bucketAge = 0;
 		}
 		if (null == buck) {
-			System.err.println("PDB_DEBUG getBucket failed "+bucketNum); // TODO DEBUG
 			if (bucketCache.size() >= CACHESIZE) {
 				flush(true);
 			}
@@ -173,6 +172,7 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		return true;
 	}
 
+	// TODO remove recursion level
 	protected int expandAndRehash(BucketType oldOverflowBucket) throws IOException, DatabaseException {
 		ArrayList<EntryType> splitEntries = new ArrayList<EntryType>();
 		ArrayList<EntryType> oldOverflowNativeEntries = new ArrayList<EntryType>();
@@ -181,7 +181,6 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		final int splitBucketNum = (2*bucketModulus == numBuckets)? 0: (numBuckets - bucketModulus);
 		setNumBuckets(numBuckets+1);
 		int recursionLevel = 0;
-		System.err.println("PDB_DEBUG expandAndRehash oldOverflowBucket="+oldOverflowBucket.getNumEntries()); // TODO DEBUG
 		for (EntryType entry: oldOverflowBucket) {
 			int homeBucket = findHomeBucket(entry);
 			if (homeBucket == oldOverflowBucketNum) {
@@ -199,7 +198,6 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		}
 
 		BucketType splitBucket = getBucket(splitBucketNum);
-		System.err.println("PDB_DEBUG expandAndRehash splitBucket ="+splitBucketNum+" "+splitBucket.hashCode()+" entries="+splitBucket.getNumEntries()); // TODO DEBUG
 		for (EntryType entry: splitBucket) {
 			int homeBucket = findHomeBucket(entry);
 			if (homeBucket == splitBucketNum) {
@@ -218,7 +216,6 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 
 		int lastIndex = -1;
 		if (newOverflowEntries.size() > 0) {
-			System.err.println("PDB_DEBUG expandAndRehash newOverflowEntries="+newOverflowEntries.size()); // TODO DEBUG
 			BucketType newOverflowBucket = getBucket(numBuckets-1);
 			for (EntryType e: newOverflowEntries) {
 				if (!newOverflowBucket.addEntry(e)) {
@@ -229,7 +226,6 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 
 			if (lastIndex >= 0) { /* overflow bucket overflowed */
 				List<EntryType> remainder = newOverflowEntries.subList(lastIndex, newOverflowEntries.size());
-				System.err.println("PDB_DEBUG expandAndRehash numbuckets="+numBuckets); // TODO DEBUG
 				recursionLevel = 1 + expandAndRehash(newOverflowBucket);
 				for (EntryType e: remainder) {
 					addEntry(e);
@@ -248,7 +244,6 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 			BucketType overflowBucket = getBucket(numBuckets-1);
 			if (!overflowBucket.addEntry(entry)) {
 				int recursionLevel = expandAndRehash(overflowBucket);
-				System.err.println("PDB_DEBUG recursionLevel="+recursionLevel); // TODO DEBUG
 				homeBucket = overflowBucket = null;
 				addEntry(entry);
 			}

@@ -90,7 +90,6 @@ public class TermcountHashfileTests extends TestCase {
 	@Test
 	public void testMultipleBuckets() throws DatabaseException, IOException {
 		HashMap<String, Integer> expected = new HashMap<>();
-	//	hashFile.resize(16);
 		for (int i = 0; i < 100; ++i) {
 			for (String baseKey: Lorem.getWords()) {
 				String key = baseKey+"_"+i;
@@ -116,6 +115,5 @@ public class TermcountHashfileTests extends TestCase {
 			assertNotNull("key "+key+" missing", entry);
 			assertEquals("key "+key+" wrong value", count.intValue(), entry.getTermCount());
 		}
-
 	}
 }

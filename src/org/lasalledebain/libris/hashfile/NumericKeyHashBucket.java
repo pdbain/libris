@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.hashfile;
 
+import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -35,10 +36,23 @@ public abstract class NumericKeyHashBucket <T extends NumericKeyHashEntry> exten
 			return true;
 		}
 	}
-	
+
 	protected abstract T removeFromBucket(int key);
 
 	protected abstract void addToBucket(int key, T newEntry);
 
 	public abstract T getEntry(int key);
+
+	protected abstract int getNumEntriesImpl();
+
+	public int getNumEntries() throws IOException {
+		int numEntries;
+		if (dirty) {
+			numEntries = getNumEntriesImpl();
+		} else {
+			backingStore.seek(filePosition);
+			numEntries = backingStore.readInt();
+		}
+		return numEntries;
+	}
 }

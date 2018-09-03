@@ -136,12 +136,20 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 		return entries.values().iterator();
 	}
 
-	@Override
 	protected int getNumEntriesImpl() {
-		final int size = entries.size();
-		System.err.println("PDB_DEBUG expandAndRehash getNumEntriesImpl ="+size); // TODO DEBUG
-	return size;
+		return entries.size();
 	}
+	
+	public int getNumEntries() throws IOException {
+	int numEntries;
+	if (dirty) {
+		numEntries = getNumEntriesImpl();
+	} else {
+		backingStore.seek(filePosition);
+		numEntries = backingStore.readShort();
+	}
+	return numEntries;
+}
 	
 	@Deprecated
 	public static class TermCountBucketFactory
