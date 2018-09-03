@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
@@ -15,7 +16,6 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
-import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -24,9 +24,9 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class RecordInstance extends Record implements  LibrisXMLConstants {
+	// TODO move this to parent class
 	private int id;
 	private String name;
-	private static final int NULL_ID = RecordId.getNullId();
 
 	Field[] recordData;
 	GroupMember affiliations[];
@@ -38,6 +38,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	private static final GroupMember[] dummyAffiliations = new GroupMember[0];
 
 	public RecordInstance(RecordTemplate recordTemplate) {
+		super();
 		template = recordTemplate;
 		name = null;
 		affiliations = null;
@@ -73,6 +74,9 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	
 	@Override
 	public Field addFieldValue(int position, String fieldData) throws InputException {
+		if (Objects.isNull(fieldData) || fieldData.isEmpty()){
+			return null;
+		}
 		if (null == recordData[position]) {
 			recordData[position] = template.newField(position, fieldData);
 		} else {

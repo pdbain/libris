@@ -10,14 +10,13 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -27,7 +26,6 @@ import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class FormLayout extends Layout {
-	private static Border nameBorder = BorderFactory.createTitledBorder("Name");
 	public FormLayout(Schema schem) throws DatabaseException {
 		super(schem);
 	}
@@ -70,8 +68,7 @@ public class FormLayout extends Layout {
 
 				Box groupBox = Box.createHorizontalBox();
 				groupBox.setBorder(affiliateBorder);
-				GuiControl uiField = new NameList(ui, db, rec, def);
-				uiField.setEditable(modifiable);
+				GuiControl uiField = new NameList(ui, db, rec, def, modifiable);
 				Component comp = uiField.getGuiComponent();
 				GroupMember gm = rec.getMember(groupNum);
 				if (null == gm) {

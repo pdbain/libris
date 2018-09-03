@@ -6,14 +6,16 @@ import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.HashFile;
+import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
+import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.index.AffiliateListEntry;
 import org.lasalledebain.libris.index.AffiliateListEntry.AffiliateListEntryFactory;
@@ -27,7 +29,8 @@ public class AffiliateList {
 	RandomAccessFile overflowFile;
 	FileSpaceManager overflowSpaceMgr;
 	private AffiliateListEntryFactory eFactory;
-	private HashFile<AffiliateListEntry> affiliateHashFile;
+	private NumericKeyHashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, NumericKeyEntryFactory<AffiliateListEntry>> 
+	affiliateHashFile;
 	private BucketOverflowFileManager bucketOverflowMgr;
 	private static int[] empty = new int[0];
 
@@ -49,7 +52,9 @@ public class AffiliateList {
 		}
 		eFactory = new AffiliateListEntry.AffiliateListEntryFactory();
 		try {
-			affiliateHashFile = new HashFile<AffiliateListEntry>(hashTableFile, 
+			affiliateHashFile = new NumericKeyHashFile
+					<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, NumericKeyEntryFactory<AffiliateListEntry>>
+			(hashTableFile, 
 					VariableSizeEntryHashBucket.getFactory(bucketOverflowMgr), eFactory);
 		} catch (IOException e) {
 			throw new DatabaseException(e);
@@ -58,7 +63,7 @@ public class AffiliateList {
 	
 	public void setSize(long expectedEntries) throws DatabaseException {
 		long totalExpectedSize = 6 * expectedEntries; /* 4 bytes per entry + 5% overhead for length and parent */
-		int requestedBuckets = (int) (totalExpectedSize/HashBucket.BUCKET_SIZE);
+		int requestedBuckets = (int) (totalExpectedSize/NumericKeyHashBucket.BUCKET_SIZE);
 		affiliateHashFile.resize(requestedBuckets);
 	}
 

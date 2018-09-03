@@ -44,7 +44,12 @@ public class GroupDefs implements XMLElement, Iterable<GroupDef> {
 		defList = new ArrayList<GroupDef>();
 		numGroups = 0;
 	}
-// TODO 1. Test max 255 members per group
+public GroupDefs(ElementManager groupDefsManager) throws InputException {
+		this();
+		fromXml(groupDefsManager);
+	}
+
+	// TODO 1. Test max 255 members per group
 	@Override
 	public void fromXml(ElementManager mgr) throws InputException {
 		mgr.parseOpenTag();

@@ -6,71 +6,43 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.index.AffiliateListEntry;
 
-@SuppressWarnings("rawtypes")
-public class HashFile<T extends HashEntry> {
+public abstract class HashFile<EntryType extends HashEntry, 
+BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<EntryType>> {
 
 	protected RandomAccessFile backingStore;
 	int numBuckets;
 	int bucketModulus = 0;
-	EntryFactory<T> entryFact;
 	private int bucketSize;
 	static final int CACHESIZE=8;
-	HashMap<Integer, HashBucket<T>> bucketCache;
+	HashMap<Integer, BucketType> bucketCache;
+
 	int bucketAge = 0;
-	private HashBucketFactory<T> bucketFactory;
+	private HashBucketFactory<EntryType, BucketType, FactoryType> bucketFactory;
+	FactoryType entryFact;
+
+	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact) throws IOException {
+		this.backingStore = backingStore;
+		this.bucketFactory = bFact;
+		long fileLength = backingStore.length();
+		bucketSize = NumericKeyHashBucket.getBucketSize();
+		setNumBuckets((int) fileLength/bucketSize + 1);
+		bucketCache = new HashMap<Integer, BucketType>();
+	}
 
 	/**
 	 * @param backingStore
 	 * @throws IOException accessing backing store
 	 */
-	public HashFile(RandomAccessFile backingStore, HashBucketFactory<T> bFact, EntryFactory<T> eFact) throws IOException {
-		this.backingStore = backingStore;
-		this.entryFact = eFact;
-		this.bucketFactory = bFact;
-		long fileLength = backingStore.length();
-		bucketSize = HashBucket.getBucketSize();
-		setNumBuckets((int) fileLength/bucketSize + 1);
-		bucketCache = new HashMap<Integer, HashBucket<T>>();
-	}
-
-	public void addEntry(T entry) throws IOException, DatabaseException {
-		int key = entry.getKey();
-		int bucketNum = findHomeBucket(key);
-		HashBucket<T> homeBucket = getBucket(bucketNum);
-		if (!homeBucket.addEntry(entry)) {
-			HashBucket<T> overflowBucket = getBucket(numBuckets-1);
-			if (!overflowBucket.addEntry(entry)) {
-				expandAndRehash(overflowBucket);
-				homeBucket = overflowBucket = null;
-				addEntry(entry);
-			}
-		}
-	}
-
-	public T getEntry(int key) throws IOException, DatabaseException {
-		int bucketNum = findHomeBucket(key);
-		HashBucket<T> homeBucket = getBucket(bucketNum);
-		T foundEntry = homeBucket.getEntry(key);
-		if (null != foundEntry) {
-			return foundEntry;
-		} else {
-			HashBucket<T> overflowBucket = getBucket(numBuckets-1);
-			foundEntry = overflowBucket.getEntry(key);
-			if (null != foundEntry) {
-				return foundEntry;
-			}
-		}
-		return null;
+	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact, EntryFactory<EntryType> eFact) throws IOException {
+		this(backingStore, bFact);
 	}
 
 	/**
 	 * @param fileLength
 	 */
-	private void setNumBuckets(int num) {
+	protected void setNumBuckets(int num) {
 		numBuckets = num;
 		if (0 == bucketModulus) {
 			bucketModulus = 1;
@@ -86,74 +58,14 @@ public class HashFile<T extends HashEntry> {
 		}
 	}
 
-	private void expandAndRehash(HashBucket<T> oldOverflowBucket) throws IOException, DatabaseException {
-		ArrayList<T> splitEntries = new ArrayList<T>();
-		ArrayList<T> oldOverflowNativeEntries = new ArrayList<T>();
-		ArrayList<T> newOverflowEntries = new ArrayList<T>();
-		int oldOverflowBucketNum = numBuckets-1;
-		int splitBucketNum = (2*bucketModulus == numBuckets)? 0: (numBuckets - bucketModulus);
-		setNumBuckets(numBuckets+1);
-		
-		for (T entry: oldOverflowBucket) {
-			int homeBucket = findHomeBucket(entry.getKey());
-			if (homeBucket == oldOverflowBucketNum) {
-				oldOverflowNativeEntries.add(entry);
-			} else if (homeBucket == splitBucketNum) {
-				splitEntries.add(entry);
-			} else {
-				newOverflowEntries.add(entry);
-			}
-		}
-		oldOverflowBucket.clear();
-		for (T e: oldOverflowNativeEntries) {
-			oldOverflowBucket.addEntry(e);
-		}
-		
-		HashBucket <T> splitBucket = getBucket(splitBucketNum);
-		for (T entry: splitBucket) {
-			int homeBucket = findHomeBucket(entry.getKey());
-			if (homeBucket == splitBucketNum) {
-				splitEntries.add(entry);
-			} else {
-				newOverflowEntries.add(entry);
-			}
-		}
-		splitBucket.clear();
-		for (T e: splitEntries) {
-			if (!splitBucket.addEntry(e)) {
-				newOverflowEntries.addAll(splitEntries.subList(splitEntries.indexOf(e), splitEntries.size()));
-				break;
-			}
-		}
-		
-		int lastIndex = -1;
-		if (newOverflowEntries.size() > 0) {
-			HashBucket<T> newOverflowBucket = getBucket(numBuckets-1);
-			for (T e: newOverflowEntries) {
-				if (!newOverflowBucket.addEntry(e)) {
-					lastIndex = newOverflowEntries.indexOf(e);
-					break;
-				}
-			}
-			
-			if (lastIndex >= 0) { /* overflow bucket overflowed */
-				List<T> remainder = newOverflowEntries.subList(lastIndex, newOverflowEntries.size());
-				expandAndRehash(newOverflowBucket);
-				for (T e: remainder) {
-					addEntry(e);
-				}
-			}
-		}
-	}
-
 	/**
 	 * @param bucketNum
 	 * @return
 	 * @throws IOException 
 	 * @throws DatabaseException 
 	 */
-	private HashBucket<T> getBucket(int bucketNum) throws IOException, DatabaseException {
-		HashBucket<T> buck = bucketCache.get(bucketNum);
+	protected BucketType getBucket(int bucketNum) throws IOException, DatabaseException {
+		BucketType buck = bucketCache.get(bucketNum);
 		++bucketAge;
 		if (bucketAge < 0) {
 			clear();
@@ -163,38 +75,43 @@ public class HashFile<T extends HashEntry> {
 			if (bucketCache.size() >= CACHESIZE) {
 				flush(true);
 			}
-			buck = bucketFactory.createBucket(backingStore, bucketNum, entryFact);
+			buck = createBucket(bucketNum);
 			buck.read();
 			bucketCache.put(bucketNum, buck);
 		}
 		buck.setAge(bucketAge);
 		return buck;
 	}
+
+	protected BucketType createBucket(int bucketNum) {
+		return bucketFactory.createBucket(backingStore, bucketNum, entryFact);
+	}
 	
-	private int findHomeBucket(long key) {
-		int hashedKey = hash(key);
-		int homeBucket = (int) hashedKey % (2*bucketModulus);
+	protected abstract int findHomeBucket(long key);
+	
+	public static int hash(long key) {
+		int hash = Math.abs((int) ((key ^ 0x5DEECE66DL) & ((1L << 48) - 1)));
+		return hash;
+	}
+
+	protected int hashToBucketNumber(long key) {
+		int homeBucket = Math.abs((int) key) % (2*bucketModulus);
 		if (homeBucket >= numBuckets) {
 			homeBucket -= bucketModulus;
 		}
 		return homeBucket;
 	}
 
-	public static int hash(long key) {
-		int hash = Math.abs((int) ((key ^ 0x5DEECE66DL) & ((1L << 48) - 1)));
-		return hash;
-	}
-
 	public void clear() throws IOException, DatabaseException {
-		for (HashBucket<T> b: bucketCache.values()) {
+		for (HashBucket<EntryType> b: bucketCache.values()) {
 			b.write();
 		}
 		bucketCache.clear();
 	}
 
 	private void flush(boolean removeOldest) throws IOException, DatabaseException {
-		HashBucket<T> oldestBucket = null;
-		for (HashBucket<T> b: bucketCache.values()) {
+		HashBucket<EntryType> oldestBucket = null;
+		for (HashBucket<EntryType> b: bucketCache.values()) {
 			if ((null == oldestBucket) || (b.getAge() < oldestBucket.getAge())) {
 				oldestBucket = b;
 			}
@@ -217,7 +134,7 @@ public class HashFile<T extends HashEntry> {
 				return 0;
 			}
 			for (int i=0; i < numBuckets; ++i) {
-				HashBucket<T> buck = bucketFactory.createBucket(backingStore, i, entryFact);
+				HashBucket<EntryType> buck = createBucket(i);
 				sumSizes += buck.getNumEntries();
 			}
 		} catch (IOException e) {
@@ -235,14 +152,14 @@ public class HashFile<T extends HashEntry> {
 			if (numEntries > 0) try {
 				flush();
 				for (int i = 0; i < numBuckets; ++i) {
-					HashBucket<T> buck = getBucket(i);
+					HashBucket<EntryType> buck = getBucket(i);
 					if (buck.getNumEntries() > 0) {
-						ArrayList<T> entries = new ArrayList<T>();
-						for (T e: buck) {
+						ArrayList<EntryType> entries = new ArrayList<EntryType>();
+						for (EntryType e: buck) {
 							entries.add(e);
 						}
 						buck.clear();
-						for (T e: entries) {
+						for (EntryType e: entries) {
 							addEntry(e);
 						}
 					}
@@ -253,5 +170,83 @@ public class HashFile<T extends HashEntry> {
 			}
 		}
 		return true;
+	}
+
+	// TODO remove recursion level
+	protected int expandAndRehash(BucketType oldOverflowBucket) throws IOException, DatabaseException {
+		ArrayList<EntryType> splitEntries = new ArrayList<EntryType>();
+		ArrayList<EntryType> oldOverflowNativeEntries = new ArrayList<EntryType>();
+		ArrayList<EntryType> newOverflowEntries = new ArrayList<EntryType>();
+		int oldOverflowBucketNum = numBuckets-1;
+		final int splitBucketNum = (2*bucketModulus == numBuckets)? 0: (numBuckets - bucketModulus);
+		setNumBuckets(numBuckets+1);
+		int recursionLevel = 0;
+		for (EntryType entry: oldOverflowBucket) {
+			int homeBucket = findHomeBucket(entry);
+			if (homeBucket == oldOverflowBucketNum) {
+				oldOverflowNativeEntries.add(entry);
+			} else if (homeBucket == splitBucketNum) {
+				splitEntries.add(entry);
+			} else {
+				newOverflowEntries.add(entry);
+			}
+		}
+
+		oldOverflowBucket.clear();
+		for (EntryType e: oldOverflowNativeEntries) {
+			oldOverflowBucket.addEntry(e);
+		}
+
+		BucketType splitBucket = getBucket(splitBucketNum);
+		for (EntryType entry: splitBucket) {
+			int homeBucket = findHomeBucket(entry);
+			if (homeBucket == splitBucketNum) {
+				splitEntries.add(entry);
+			} else {
+				newOverflowEntries.add(entry);
+			}
+		}
+		splitBucket.clear();
+		for (EntryType e: splitEntries) {
+			if (!splitBucket.addEntry(e)) {
+				newOverflowEntries.addAll(splitEntries.subList(splitEntries.indexOf(e), splitEntries.size()));
+				break;
+			}
+		}
+
+		int lastIndex = -1;
+		if (newOverflowEntries.size() > 0) {
+			BucketType newOverflowBucket = getBucket(numBuckets-1);
+			for (EntryType e: newOverflowEntries) {
+				if (!newOverflowBucket.addEntry(e)) {
+					lastIndex = newOverflowEntries.indexOf(e);
+					break;
+				}
+			}
+
+			if (lastIndex >= 0) { /* overflow bucket overflowed */
+				List<EntryType> remainder = newOverflowEntries.subList(lastIndex, newOverflowEntries.size());
+				recursionLevel = 1 + expandAndRehash(newOverflowBucket);
+				for (EntryType e: remainder) {
+					addEntry(e);
+				}
+			}
+		}
+		return recursionLevel;
+	}
+
+	protected abstract int findHomeBucket(EntryType entry);
+
+	public void addEntry(EntryType entry) throws IOException, DatabaseException {
+		int bucketNum = findHomeBucket(entry);
+		BucketType homeBucket = getBucket(bucketNum);
+		if (!homeBucket.addEntry(entry)) {
+			BucketType overflowBucket = getBucket(numBuckets-1);
+			if (!overflowBucket.addEntry(entry)) {
+				int recursionLevel = expandAndRehash(overflowBucket);
+				homeBucket = overflowBucket = null;
+				addEntry(entry);
+			}
+		}
 	}
 }

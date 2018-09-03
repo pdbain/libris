@@ -9,6 +9,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
 import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.LibrisUiGeneric;
 
 public class Libris {
 
@@ -39,7 +40,7 @@ public class Libris {
 				if (null == databaseFile) {
 					databaseFilePath = arg;
 				} else {
-					cmdlineError("only one database name can be specified");
+					LibrisUiGeneric.cmdlineError("only one database name can be specified");
 				}
 			}
 			++i;
@@ -50,56 +51,56 @@ public class Libris {
 				File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
 				File auxDir = null;
 				if ((null != dbFile) && (!dbFile.isFile())) {
-					cmdlineError(databaseFilePath+" is not a file");
+					LibrisUiGeneric.cmdlineError(databaseFilePath+" is not a file");
 				} else {
 					if (null != auxDirpath) {
 						auxDir = new File(auxDirpath);
 					}
 				}
-				LibrisGui ui = new LibrisGui(dbFile, auxDir, readOnly);
-				if (true)
+				LibrisGui ui = new LibrisGui(dbFile, readOnly);
+				LibrisDatabaseParameter params = ui.getParameters();
+				params.auxDir = auxDir;
 				if (null != dbFile) {
 					ui.openDatabase();
 				} else {
 					ui.sendChooseDatabase();
 				}
 			} catch (LibrisException e) {
-				cmdlineError("Cannot open Libris: "+e.getMessage());
+				LibrisUiGeneric.cmdlineError("Cannot open Libris: "+e.getMessage());
 
 			}
 		}
 
 	}
 
-	private static void cmdlineError(String msg) {
-		System.err.println(msg);
-		System.exit(1);
-	}
-
 	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
-		HeadlessUi ui = new HeadlessUi(databaseFile);
+		HeadlessUi ui = new HeadlessUi(databaseFile, false);
 		buildIndexes(databaseFile, ui);
 		
-		LibrisDatabase result = new LibrisDatabase(databaseFile, null, ui, false);
-		result.open();
+		LibrisDatabase result = ui.openDatabase();
 		return result;
 	}
 
 	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi ui) throws LibrisException {
 		if (null == ui) {
-			ui = new HeadlessUi(databaseFile);
+			ui = new HeadlessUi(databaseFile, false);
 		}
-		LibrisDatabase result = new LibrisDatabase(databaseFile, null, ui, false);
-		result.open();
-		return result;
+		LibrisDatabase db = ui.openDatabase();
+		return db;
 	}
 
-	public static void buildIndexes(File databaseFile, LibrisUi ui)
+	public static boolean buildIndexes(File databaseFile, LibrisUi ui)
 			throws UserErrorException, DatabaseException, InputException,
 			LibrisException {
-		LibrisDatabase indexDb = new LibrisDatabase(databaseFile, null, ui, false);
-		indexDb.buildIndexes();
-		indexDb.close();
+		LibrisDatabase db = new LibrisDatabase(new LibrisDatabaseParameter(ui, databaseFile));
+		if (!db.isDatabaseReserved()) {
+			if (!db.buildIndexes(true)) {
+				return false;
+			};
+			return db.closeDatabase(false);
+		} else {
+			return false;
+		}
 	}
 
 }

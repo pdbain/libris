@@ -1,8 +1,5 @@
 package org.lasalledebain.libris.util;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+// TODO replace this with the original
 import java.util.Objects;
 
 public class Stemmer {

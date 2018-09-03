@@ -5,7 +5,6 @@ import java.util.HashMap;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.field.AffiliatesField;
 import org.lasalledebain.libris.field.BooleanField;
@@ -15,6 +14,7 @@ import org.lasalledebain.libris.field.IntegerField;
 import org.lasalledebain.libris.field.PairField;
 import org.lasalledebain.libris.field.StringField;
 import org.lasalledebain.libris.index.GroupDef;
+import org.lasalledebain.libris.ui.LocationField;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -254,8 +254,14 @@ public class FieldTemplate implements XMLElement {
 		temp.put(Field.FieldType.T_FIELD_TEXT, new StringFieldFactory());
 		temp.put(Field.FieldType.T_FIELD_INTEGER, new IntegerFieldFactory());
 		temp.put(Field.FieldType.T_FIELD_PAIR, new PairFieldFactory());
+		temp.put(Field.FieldType.T_FIELD_LOCATION, new PairFieldFactory());
 		temp.put(Field.FieldType.T_FIELD_INDEXENTRY, new IndexEntryFieldFactory());
-		temp.put(Field.FieldType.T_FIELD_ENUM, new EnumFieldFactory());
+		temp.put(Field.FieldType.T_FIELD_ENUM, new FieldFactory() {
+			public GenericField newField(FieldTemplate template) {
+				return new EnumField(template);
+			}
+		}
+				);
 		temp.put(Field.FieldType.T_FIELD_AFFILIATES, new AffiliatesFieldFactory());
 		return temp;
 	}
@@ -271,13 +277,6 @@ public class FieldTemplate implements XMLElement {
 		public GenericField newField(FieldTemplate template) {
 			return new BooleanField(template);
 		}
-	}
-	static public class EnumFieldFactory implements FieldFactory {
-	
-		public GenericField newField(FieldTemplate template) {
-			return new EnumField(template);
-		}
-	
 	}
 
 	static public class IndexEntryFieldFactory implements FieldFactory {
@@ -301,23 +300,19 @@ public class FieldTemplate implements XMLElement {
 	}
 
 	static public class IntegerFieldFactory implements FieldFactory {
-	
 		@Override
 		public
 		GenericField newField(FieldTemplate template) {
 			return new IntegerField(template);
 		}
-	
 	}
 	
-	static public class AffiliatesFieldFactory implements FieldFactory {
-		
+	static public class AffiliatesFieldFactory implements FieldFactory {	
 		@Override
 		public
 		GenericField newField(FieldTemplate template) {
 			return new AffiliatesField(template);
 		}
-	
 	}
 
 	public static String getXmlTag() {

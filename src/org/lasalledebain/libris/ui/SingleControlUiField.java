@@ -47,8 +47,4 @@ public class SingleControlUiField extends UiField {
 	public boolean isMultiControl() {
 		return false;
 	}
-
-	public void setEditable(boolean edit) {
-		control.setEditable(edit);
-	}
 }

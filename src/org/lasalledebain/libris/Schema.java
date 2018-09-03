@@ -6,27 +6,31 @@ import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
-import javax.xml.namespace.QName;
-
 import org.lasalledebain.libris.Field.FieldType;
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexDefs;
 import org.lasalledebain.libris.index.IndexField;
-import org.lasalledebain.libris.xmlUtils.ElementManager;
-import org.lasalledebain.libris.xmlUtils.ElementReader;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-import org.lasalledebain.libris.xmlUtils.XmlShapes;
-import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
-public class Schema implements LibrisXMLConstants {
+public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	protected static final IndexField[] emptyIndexFieldList = new IndexField[0];
+	public static String currentVersion = "1.0";
+	protected TreeMap<String, EnumFieldChoices> enumSets;
+	protected ArrayList<FieldTemplate> fieldList;
+	HashMap <String, Short> fieldNumById;
+	ArrayList<String> fieldIds;
+	ArrayList<String> fieldTitles;
+	String fieldIdArray[];
+	String fieldTitleArray[];
+	protected GroupDefs myGroupDefs;
+	protected IndexDefs myIndexDefs;
+	protected LibrisAttributes xmlAttributes;
+
 	public Schema() {
 		enumSets = new TreeMap<String, EnumFieldChoices>();
 		fieldList = new ArrayList<FieldTemplate>();
@@ -34,49 +38,9 @@ public class Schema implements LibrisXMLConstants {
 		fieldIds = new ArrayList<String>();
 		fieldTitles = new ArrayList<String>();
 	}
-
+	
 	public GroupDefs getGroupDefs() {
 		return myGroupDefs;
-	}
-
-	TreeMap<String, EnumFieldChoices> enumSets;
-	ArrayList<FieldTemplate> fieldList;
-	HashMap <String, Short> fieldNumById;
-	ArrayList<String> fieldIds;
-	ArrayList<String> fieldTitles;
-	String fieldIdArray[];
-	String fieldTitleArray[];
-	private LibrisDatabase database;
-	private GroupDefs myGroupDefs;
-	private IndexDefs myIndexDefs;
-
-	public void fromXml(ElementReader xmlReader) throws DatabaseException, InputException {
-		ElementManager schemaManager = new ElementManager(xmlReader, new QName(LibrisXMLConstants.XML_SCHEMA_TAG),
-				new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
-		fromXml(schemaManager);
-	}
-
-	public void fromXml(ElementManager schemaManager) throws DatabaseException, InputException
-	{
-		schemaManager.parseOpenTag(getXmlTag());
-		if (!schemaManager.hasNext()) {
-			throw new XmlException(schemaManager, "<schema> cannot be empty");
-		}
-		ElementManager groupDefsManager = schemaManager.nextElement(XML_GROUPDEFS_TAG);
-		myGroupDefs = new GroupDefs();
-		myGroupDefs.fromXml(groupDefsManager);
-		for (GroupDef gd: myGroupDefs) {
-			addField(gd);
-		}
-
-		ElementManager fieldDefsManager = schemaManager.nextElement(XML_FIELDDEFS_TAG);
-		parseFieldDefs(fieldDefsManager);
-
-		ElementManager indexDefsManager = schemaManager.nextElement(XML_INDEXDEFS_TAG);
-		myIndexDefs = new IndexDefs(this);
-		myIndexDefs.fromXml(indexDefsManager);
-
-		schemaManager.parseClosingTag();
 	}
 
 	public void toXml(ElementWriter xmlWriter) throws LibrisException {
@@ -98,54 +62,24 @@ public class Schema implements LibrisXMLConstants {
 		xmlWriter.writeEndElement(); /* schema */
 	}
 
-	private void parseFieldDefs(ElementManager fieldDefsManager)
-	throws DatabaseException, InputException {
-		fieldDefsManager.parseOpenTag();
-		while (fieldDefsManager.hasNext()) {
-			String nextId;
-			nextId = fieldDefsManager.getNextId();
-			if (nextId.equals(EnumFieldChoices.getXmlTag())) {
-				ElementManager enumSetManager = fieldDefsManager.nextElement();
-				EnumFieldChoices c = EnumFieldChoices.fieldChoicesFactory(enumSetManager);
-				String cId = c.getId();
-				if (enumSets.containsKey(cId)) {
-					throw new XmlException(enumSetManager, "duplicate enumset "+cId);
-				}
-				addEnumSet(cId, c);					
-			} else {
-				break;
-			}
-		}
-		while (fieldDefsManager.hasNext()) {
-			String nextId;
-			nextId = fieldDefsManager.getNextId();
-			if (nextId.equals(LibrisXMLConstants.XML_FIELDDEF_TAG)) {
-				ElementManager fieldDefManager = fieldDefsManager.nextElement();
-				FieldTemplate f = new FieldTemplate(this);
-				f.fromXml(fieldDefManager);
-				String fId = f.getFieldId();
-				if (fieldNumById.containsKey(fId)) {
-					throw new XmlException(fieldDefManager, "duplicate field "+fId);
-				}
-				addField(f);
-			} else {
-				throw new XmlException("Unexpected tag "+nextId+" in "+XML_FIELDDEFS_TAG+" section");
-			}
-		}
-		fieldDefsManager.parseClosingTag();
+	public LibrisAttributes getAttributes() {
+		return xmlAttributes;
 	}
 
-	private EnumFieldChoices addEnumSet(String enumSetId,
+
+	protected EnumFieldChoices addEnumSet(String enumSetId,
 			EnumFieldChoices enumSet) {
 		return enumSets.put(enumSetId, enumSet);
 	}
 
-	public void addField(FieldTemplate field) {
+	public int addField(FieldTemplate field) {
 		String fieldId = field.getFieldId();
 		fieldIds.add(fieldId);
 		fieldTitles.add(field.getFieldTitle());
 		fieldNumById.put(fieldId, (short) (fieldIds.size()-1));
-		fieldList.add((fieldIds.size()-1), field);
+		final int index = fieldIds.size()-1;
+		fieldList.add(index, field);
+		return index;
 	}
 
 	public EnumFieldChoices getEnumSet(String id) {
@@ -248,7 +182,7 @@ public class Schema implements LibrisXMLConstants {
 				return fieldList.equals(otherSchema.fieldList);
 			}
 		} catch (ClassCastException e) {
-			database.log(Level.WARNING, "Incompatible comparand in "+getClass().getName()+".equals()", e);
+			LibrisDatabase.log(Level.WARNING, "Incompatible comparand in "+getClass().getName()+".equals()", e);
 			return false;
 		}
 	}

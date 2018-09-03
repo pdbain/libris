@@ -6,10 +6,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import org.lasalledebain.libris.hashfile.HashEntry;
+import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.index.AbstractFixedSizeHashEntry;
 
-class MockFixedSizeHashEntry extends AbstractFixedSizeHashEntry {
+class MockFixedSizeHashEntry<T extends FixedSizeHashEntry> extends AbstractFixedSizeHashEntry {
 
 	final byte data[];
 	/**
@@ -77,30 +78,6 @@ class MockFixedSizeHashEntry extends AbstractFixedSizeHashEntry {
 		backingStore.write(data);
 	}
 
-/* TODO delete
-	public void readData(DataInput backingStore) throws IOException {
-		key = backingStore.readInt();
-		try {
-			backingStore.readFully(data);
-		} catch (EOFException e) {
-			fail("unexpected end of file");
-		}
-	}
-
-	public void readData(ByteBuffer buff, int length) {
-		if (null == data) {
-			data = new byte[length];
-		}
-		buff.get(data, 0, length);
-	}
-
-	public void readData(DataInput ip, int length) throws IOException {
-		if (null == data) {
-			data = new byte[length];
-		}
-		ip.readFully(data);
-	}
-*/
 	@Override
 	public boolean equals(Object comparand) {
 		if (comparand.getClass() != this.getClass()) {
@@ -140,7 +117,7 @@ class MockFixedSizeHashEntry extends AbstractFixedSizeHashEntry {
 		return oversize;
 	}
 
-	public int compareTo(HashEntry arg0) {
+	public int compareTo(NumericKeyHashEntry arg0) {
 		int otherKey = arg0.getKey();
 		int myKey = getKey();
 		return (otherKey == myKey)? 0: ((otherKey < myKey)? -1: 1);

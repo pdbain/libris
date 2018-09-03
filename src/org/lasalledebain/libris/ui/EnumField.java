@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
@@ -16,33 +17,39 @@ import org.lasalledebain.libris.field.FieldValue;
 
 public class EnumField extends GuiControl {
 
-	JPanel control;
+	protected final JPanel control;
 	private EnumFieldChoices legalValues;
 	private ArrayList<String> extraValues;
-	JComboBox valueSelector;
-	private int height;
-	private int width;
+	private final JComboBox<String> valueSelector;
 	private int numLegalValues;
 	private JPanel filler;
+	private boolean empty;
 	
-	public EnumField(int height, int width) {
-		control = new JPanel();
+	public EnumField(int height, int width, boolean editable) {
+		super(height, width, editable);
+		control = displayControls();
+		setEmpty(true);
+		valueSelector = new JComboBox<String>();
+		valueSelector.setEnabled(editable);
+		setContent(!editable);
+	}
+
+	protected JPanel displayControls() {
+		JPanel tempControl = new JPanel();
 		filler = new JPanel();
-		control.setSize(width, height);
-		this.height = height;
-		this.width = width;
+		tempControl.setSize(width, height);
 		Dimension ctrlDim = new Dimension(Math.max(100, width), Math.max(20,height));
 		filler.setPreferredSize(ctrlDim);
 		filler.setMinimumSize(ctrlDim);
-		control.setVisible(true);
+		tempControl.setVisible(true);
 		filler.setVisible(true);
-		setEmpty(true);
+		return tempControl;
 	}
 	
 	@Override
-	public void setEmpty(boolean empty) {
-		super.setEmpty(empty);
-		setContent(empty);
+	public void setEmpty(boolean newEmpty) {
+		empty = newEmpty;
+		setContent(newEmpty);
 	}
 
 	private void setContent(boolean useFiller) {
@@ -75,12 +82,13 @@ public class EnumField extends GuiControl {
 		for (int i = 0; i < numLegalValues; ++i) {
 			comboValues[i] = comboValues[i].intern();
 		}
-		valueSelector = new JComboBox(comboValues);
+		valueSelector.setModel(new DefaultComboBoxModel<>(comboValues));
 		valueSelector.setSelectedIndex(-1);
 		if ((height > 0) && (width > 0)) {
 			valueSelector.setSize(width, height);
 		}
 		valueSelector.addItemListener(new ItemListener() {
+
 
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
@@ -138,13 +146,6 @@ public class EnumField extends GuiControl {
 		}
 		return extraValues;
 	}
-	@Override
-	public void setEditable(boolean editable) {
-		valueSelector.setEnabled(editable);
-		if (isEmpty()) {
-			setContent(!editable);
-		}
-	}
 
 	@Override
 	public void setRestricted(boolean restricted) {
@@ -153,7 +154,12 @@ public class EnumField extends GuiControl {
 	}
 
 	@Override
-	public boolean isEditable() {
-		return valueSelector.isEditable();
+	public boolean isEmpty() {
+		return empty;
+	}
+
+	@Override
+	protected void copyValuesFromControls() {
+		return;
 	}
 }

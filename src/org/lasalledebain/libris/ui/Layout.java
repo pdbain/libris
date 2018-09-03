@@ -68,7 +68,6 @@ public abstract class Layout implements XMLElement {
 	void readLayoutField(ElementManager fieldMgr, FieldPositionParameter fParams) throws InputException, DatabaseException {
 
 		HashMap<String, String> values = fieldMgr.parseOpenTag();
-
 		fParams.setParams(values);
 		fParams.setFieldNum(mySchema.getFieldNum(fParams.getId()));
 		addBodyField(fParams);
@@ -87,7 +86,7 @@ public abstract class Layout implements XMLElement {
 		this.height = Integer.parseInt(h);
 	}
 	void setWidth(String w) {
-		this.width = Integer.parseInt(w);		
+		this.width = Integer.parseInt(w);
 	}
 	public String getTitle() {
 		return title;

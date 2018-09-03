@@ -1,7 +1,6 @@
 package org.lasalledebain.libris;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -50,6 +49,7 @@ public class LibrisFileManager implements LibrisConstants {
 	private File lockFile;
 	private FileOutputStream dbLockFile;
 	private FileLock dbLock;
+	private boolean databaseReserved;
 
 	public LibrisFileManager(File dbFile, File auxDir) throws UserErrorException {
 		activeManagers = new HashMap<String, FileAccessManager>();
@@ -69,7 +69,7 @@ public class LibrisFileManager implements LibrisConstants {
 			auxDirectory = new File(databaseDir, AUX_DIRECTORY_NAME+'_'+directoryName);
 		}
 		lockFile = new File(auxDirectory, LOCK_FILENAME);
-		open(databaseFile, auxDirectory);
+		open(auxDirectory);
 		mgrLock  = new ReentrantLock();
 		locked = false;
 	}
@@ -87,6 +87,7 @@ public class LibrisFileManager implements LibrisConstants {
 			if (null != dbLock) {
 				String dateString = "Reserved "+DateFormat.getDateInstance().format(new Date());
 				dbLockFile.write(dateString.getBytes());
+				databaseReserved = true;
 				return true;
 			} else {
 				dbLockFile.close();
@@ -96,14 +97,19 @@ public class LibrisFileManager implements LibrisConstants {
 		}
 		return false;
 	}
+	
+	public boolean isDatabaseReserved() {
+		return databaseReserved;
+	}
 
-	public synchronized void unlockDatabase() {
+	public synchronized void freeDatabase() {
 		if (null != dbLock) {
 			try {
 				dbLock.release();
 				RandomAccessFile lckFile = new RandomAccessFile(lockFile, "rw");
 				lckFile.setLength(0);
 				lckFile.close();
+				databaseReserved = false;
 			} catch (IOException e) {
 				LibrisDatabase.librisLogger.log(Level.SEVERE, "Error unlocking file", e);
 			}
@@ -164,7 +170,7 @@ public class LibrisFileManager implements LibrisConstants {
 		return (databaseFile == null)? "<no database file given>": databaseFile.getParent();
 	}
 
-	public void open(File databaseFile, File auxDir) {
+	public void open(File auxDir) {
 		try {
 			setAuxiliaryFiles(auxDir);
 		} catch (DatabaseException e) {
@@ -184,7 +190,7 @@ public class LibrisFileManager implements LibrisConstants {
 	 */
 	public synchronized void setAuxiliaryFiles(File databaseDir) throws DatabaseException {
 		checkLock();
-		if (null == databaseFile) {
+		if (!fileSet()) {
 			throw new DatabaseException("Database file not set");
 		}
 		journalAccessMgr = new FileAccessManager(new File(auxDirectory, JOURNAL_FILENAME));

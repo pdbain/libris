@@ -67,9 +67,9 @@ public class TestRecordFilter extends TestCase {
 	
 	@After
 	public void tearDown() throws Exception {
-		db.close(true);
+		assertTrue("Could not close database", db.closeDatabase(false));
 		db = null;
 		Utilities.deleteTestDatabaseFiles();
-		}
+	}
 
 }

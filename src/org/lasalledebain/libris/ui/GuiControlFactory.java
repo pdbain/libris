@@ -19,19 +19,30 @@ public abstract class GuiControlFactory {
 		try {
 			String cName = GuiConstants.GUI_TEXTBOX;
 			map.put(cName, new TextboxConstructor());
-			
+
 			cName = GuiConstants.GUI_TEXTFIELD;
 			map.put(cName, new TextfieldConstructor());
-			
+
 			cName = GuiConstants.GUI_PAIRFIELD;
 			map.put(cName, new RangefieldConstructor());
-			
+
 			cName = GuiConstants.GUI_CHECKBOX;
 			map.put(cName, new CheckboxConstructor());
-			
+
 			cName = GuiConstants.GUI_ENUMFIELD;
-			map.put(cName, new EnumfieldConstructor());
-			
+			map.put(cName, new ControlConstructor() {
+				public GuiControl makeControl(String title, int height, int width, boolean editable) {	
+					return new EnumField(height, width, editable);
+				}		
+			});
+
+			cName = GuiConstants.GUI_LOCATIONFIELD;
+			map.put(cName, new ControlConstructor() {
+				public GuiControl makeControl(String title, int height, int width, boolean editable) {	
+					return new LocationField(height, width, editable);
+				}
+			});
+
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		}
@@ -60,10 +71,9 @@ public abstract class GuiControlFactory {
 
 	static GuiControl newControl(FieldPosition fieldPosn,
 			Field recordField, ModificationTracker modTrk, boolean editable) throws FieldDataException {
-		GuiControl control = fieldPosn.getControlContructor().makeControl(fieldPosn, modTrk);
+		GuiControl control = fieldPosn.getControlContructor().makeControl(fieldPosn, modTrk, editable);
 		EnumFieldChoices legalValues = recordField.getLegalValues();
 		control.setLegalValues(legalValues);
-		control.setEditable(editable);
 		control.setRestricted(recordField.isRestricted());
 		control.setSingleValue(recordField.isSingleValue());
 		return control;
@@ -76,18 +86,17 @@ public abstract class GuiControlFactory {
 	
 	
 	public static abstract class ControlConstructor {
-		public abstract GuiControl makeControl(String title, int height, int width);
-		public GuiControl makeControl(FieldInfo fldInfo, ModificationTracker modTrk) {
-			GuiControl ctrl = makeControl(fldInfo.getTitle(), 0, 0);
+		public abstract GuiControl makeControl(String title, int height, int width, boolean editable);
+		public GuiControl makeControl(FieldInfo fldInfo, ModificationTracker modTrk, boolean editable) {
+			GuiControl ctrl = makeControl(fldInfo.getTitle(), 0, 0, editable);
 			ctrl.setFieldInfo(fldInfo);
 			ctrl.setModificationTracker(modTrk);
 			return ctrl;
 		}
 		
-		public GuiControl makeControl(FieldPosition fieldPosn, ModificationTracker modTrk)
-		{
+		public GuiControl makeControl(FieldPosition fieldPosn, ModificationTracker modTrk, boolean editable) {
 			GuiControl ctrl = makeControl(fieldPosn.getTitle(), fieldPosn.getHeight(), 
-					fieldPosn.getWidth());
+					fieldPosn.getWidth(), editable);
 			ctrl.setFieldInfo(fieldPosn);
 			ctrl.setModificationTracker(modTrk);
 			return ctrl;
@@ -98,35 +107,30 @@ public abstract class GuiControlFactory {
 	}
 	
 	static class TextboxConstructor extends ControlConstructor {
-		public GuiControl makeControl(String title, int height, int width) {		
-			return new TextBox(height, width);
+		public GuiControl makeControl(String title, int height, int width, boolean editable) {		
+			return new TextBox(height, width, editable);
 		}		
 	}
 	
 	static class TextfieldConstructor extends ControlConstructor {
-		public GuiControl makeControl(String title, int height, int width) {		
-			return new RecordTextField(height, width);
+		public GuiControl makeControl(String title, int height, int width, boolean editable) {		
+			return new RecordTextField(height, width, editable);
 		}		
 	}
 	
 	static class RangefieldConstructor extends ControlConstructor {
-		public GuiControl makeControl(String title, int height, int width) {		
-			return new RangeField(height, width);
+		public GuiControl makeControl(String title, int height, int width, boolean editable) {		
+			return new RangeField(height, width, editable);
 		}		
 	}
 	
 	static class CheckboxConstructor extends ControlConstructor {
-		public GuiControl makeControl(String title, int height, int width) {	
-			return new CheckBox(title, height, width);
+		public GuiControl makeControl(String title, int height, int width, boolean editable) {	
+			return new CheckBoxControl(title, height, width, editable);
 		}		
 		public boolean labelField() {
 			return false;
 		}
 	}
 
-	static class EnumfieldConstructor extends ControlConstructor {
-		public GuiControl makeControl(String title, int height, int width) {	
-			return new EnumField(height, width);
-		}		
-	}
 	}

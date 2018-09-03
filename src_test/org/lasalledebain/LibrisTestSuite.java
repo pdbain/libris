@@ -1,24 +1,29 @@
 package org.lasalledebain;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
+import org.lasalledebain.group.GroupDefsTests;
 import org.lasalledebain.group.GroupManagerTests;
 import org.lasalledebain.group.InheritanceTest;
-import org.lasalledebain.group.GroupDefsTests;
 import org.lasalledebain.group.MemberTest;
 import org.lasalledebain.hashtable.HashBucketTests;
 import org.lasalledebain.hashtable.HashFileTest;
+import org.lasalledebain.hashtable.TermCountEntryBucketTest;
 import org.lasalledebain.hashtable.VariableSizeEntryHashBucketTest;
+import org.lasalledebain.libris.hashfile.TermCountHashFile;
 import org.lasalledebain.libris.indexes.FileSpaceManagerTests;
 import org.lasalledebain.libris.indexes.LibrisRecordMapTest;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManagerTest;
+import org.lasalledebain.libris.indexes.TermcountHashfileTests;
 import org.lasalledebain.libris.indexes.TestFileRecordMap;
 import org.lasalledebain.libris.indexes.TestKeyIntegerTuple;
 import org.lasalledebain.libris.search.BloomFilterTest;
 import org.lasalledebain.libris.ui.ImportTests;
 import org.lasalledebain.libris.ui.RecordEditTests;
 import org.lasalledebain.recordimport.CsvImportTest;
+import org.lasalledebain.recordimport.TestPDF;
+import org.lasalledebain.repository.RepositoryTest;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 public class LibrisTestSuite {
 
@@ -26,6 +31,11 @@ public class LibrisTestSuite {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.lasalledebain");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(TermcountHashfileTests.class);
+		suite.addTestSuite(TermCountEntryBucketTest.class);
+		suite.addTestSuite(UtilitiesTest.class);
+		suite.addTestSuite(TestPDF.class);
+		suite.addTestSuite(RepositoryTest.class);
 		suite.addTestSuite(BloomFilterTest.class);
 		suite.addTestSuite(FieldTest.class);
 		suite.addTestSuite(HashFileTest.class);

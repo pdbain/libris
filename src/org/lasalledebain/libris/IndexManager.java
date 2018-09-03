@@ -14,6 +14,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.BloomFilterSection;
 import org.lasalledebain.libris.indexes.BloomFilterSectionEditor;
@@ -99,6 +100,7 @@ public class IndexManager implements LibrisConstants {
 				signatureEditors[sigLevel] = new BloomFilterSectionEditor(raf, sigLevel);
 			}
 			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
+			final IndexField[] indexFields = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
 			for (Record r : recs) {
 				String name = r.getName();
 				int id = r.getRecordId();
@@ -123,7 +125,7 @@ public class IndexManager implements LibrisConstants {
 
 				}
 				final int rId = r.getRecordId();
-				r.getKeywords(db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS), keywordList);
+				r.getKeywords(indexFields, keywordList);
 				for (BloomFilterSectionEditor b:signatureEditors) {
 					b.switchTo(rId);
 					b.addTerms(keywordList.getKeywords());

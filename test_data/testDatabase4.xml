@@ -20,6 +20,7 @@
 			<fielddef id="ID_publisher" datatype="enum" enumset="ENUM_enum1" valueseparator=":" default="NS_e6" />
 			<fielddef id="ID_keywords" datatype="string" />
 			<fielddef id="ID_abstract" datatype="string" />
+			<fielddef id="ID_location" datatype="location" />
 			<fielddef id="ID_hardcopy" datatype="boolean" />
 		</fielddefs>
 		<indexdefs>
@@ -41,6 +42,7 @@
 			<layoutfield title="Hardcopy" id="ID_hardcopy" control="checkbox" />
 			<layoutfield title="Keywords" id="ID_keywords" control="textbox" return="true" />
 			<layoutfield title="Abstract" id="ID_abstract" control="textbox" return="true" />
+			<layoutfield title="Location" id="ID_location" control="locationfield" return="true" />
 		</layout>
 		<layout id="LO_paragraphDisplay" title="Paragraph layout" type="paragraph" height="400"
 			width="700">
@@ -69,6 +71,7 @@
 			<field id="ID_publisher" value="NS_e1" />
 			<field id="ID_keywords" value="k1 k2 k3" />
 			<field id="ID_hardcopy" value="true" />
+			<field id="ID_location" value="https://httpbin.org/html" extravalue="Random text"/>
 		</record>
 		<record id="2">
 			<field id="ID_auth" value="Rec2Fld1Val1" />
@@ -76,6 +79,7 @@
 			<field id="ID_pages" value="365" />
 			<field id="ID_keywords" value="Ulysses Odysseus Trojan war" />
 			<field id="ID_hardcopy" value="true" />
+			<field id="ID_location" value="https://httpbin.org/html"/>
 		</record>
 		<record id="3">
 			<field id="ID_auth" value="Rec3Fld1Val1" />

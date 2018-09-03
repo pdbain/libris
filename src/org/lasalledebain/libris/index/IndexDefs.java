@@ -1,14 +1,11 @@
 package org.lasalledebain.libris.index;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
-import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -22,6 +19,11 @@ public class IndexDefs implements XMLElement {
 	public IndexDefs(Schema schem) {
 		databaseSchema = schem;
 		indexList = new LinkedHashMap<>();
+	}
+
+	public IndexDefs(Schema schem, ElementManager mgr) throws InputException {
+		this(schem);
+		fromXml(mgr);
 	}
 
 	public void fromXml(Schema schem, ElementManager mgr) throws InputException {

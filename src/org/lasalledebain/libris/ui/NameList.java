@@ -23,10 +23,9 @@ import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 
 public class NameList extends GuiControl {
 
-	private  JList control;
+	private final JList<KeyIntegerTuple> control;
 	private final GroupDef grpDef;
 	private final LibrisDatabase dBase;
-	private boolean isEditable;
 	Vector <KeyIntegerTuple> affiliateInfo;
 	private final LibrisWindowedUi windowedUi;
 	final Record currentRecord;
@@ -40,12 +39,14 @@ public class NameList extends GuiControl {
 		}
 	}
 
-	public NameList(LibrisWindowedUi ui, LibrisDatabase db, Record rec, GroupDef gd) throws InputException {
+	public NameList(LibrisWindowedUi ui, LibrisDatabase db, Record rec, GroupDef gd, boolean editable) throws InputException {
+		super(0, 0, editable);
 		grpDef = gd;
 		windowedUi = ui;
 		dBase = db;
 		currentRecord = rec;
-		isEditable = true;
+		affiliateInfo = new Vector<KeyIntegerTuple>(0);
+		control = displayControls();
 		setValues(rec, gd);
 	}
 
@@ -56,7 +57,7 @@ public class NameList extends GuiControl {
 
 	private void setFieldValues(int[] affiliates) throws InputException {
 		int affLen = affiliates.length;
-		affiliateInfo = new Vector<KeyIntegerTuple>(affLen);
+		affiliateInfo.setSize(affLen);
 		if (0 == affLen) {
 			affiliateInfo.add(NULL_ID_TUPLE);
 		} else {
@@ -65,14 +66,19 @@ public class NameList extends GuiControl {
 				affiliateInfo.add(new KeyIntegerTuple(dBase.getRecordName(recordNumber), recordNumber));
 			}
 		}
-		control = new JList(affiliateInfo);
-		if (affLen > 0) {
-			control.setSelectedIndex(0);
+	}
+
+	@Override
+	protected JList <KeyIntegerTuple> displayControls() {
+		JList<KeyIntegerTuple> tempControl = new JList<KeyIntegerTuple>(affiliateInfo);
+		if (affiliateInfo.size() > 0) {
+			tempControl.setSelectedIndex(0);
 			// TODO add menu item to edit affiliate list
 		}
-		control.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tempControl.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		GroupMouseListener listener = new GroupMouseListener();
-		control.addMouseListener(listener);
+		tempControl.addMouseListener(listener);
+		return tempControl;
 	}
 
 	@Override
@@ -106,16 +112,7 @@ public class NameList extends GuiControl {
 			throw new FieldDataException("Error reading record ID: ", e);
 			}
 	}
-	@Override
-	public void setEditable(boolean edtble) {
-		isEditable = edtble;
-	}
 
-	@Override
-	public boolean isEditable() {
-		return isEditable;
-	}
-	
 	@Override
 	public int getNumValues() {
 		return affiliateInfo.size();
@@ -156,8 +153,7 @@ public class NameList extends GuiControl {
 					@Override
 					public void remove() {
 						return;
-					}
-					
+					}					
 				};
 			}
 			
@@ -206,4 +202,18 @@ public class NameList extends GuiControl {
 
 	}
 
+	@Override
+	public boolean isEmpty() {
+		return affiliateInfo.size() > 0;
+	}
+
+	@Override
+	public void setEmpty(boolean empty) {
+		affiliateInfo.setSize(0);
+	}
+
+	@Override
+	protected void copyValuesFromControls() {
+		return;
+	}
 }

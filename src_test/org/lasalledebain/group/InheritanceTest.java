@@ -15,7 +15,6 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -228,7 +227,7 @@ public class InheritanceTest extends TestCase {
 			addChildren(numRecs, lastId, expectedChildren);
 			File builtDatabaseFile = db.getDatabaseFile();
 			db.save();
-			db.close();
+			db.closeDatabase(false);
 			db = Libris.openDatabase(builtDatabaseFile, null);
 			lastId = db.getLastRecordId();
 			assertEquals("database has wrong number of records",numRecs, lastId);
@@ -260,7 +259,7 @@ public class InheritanceTest extends TestCase {
 			}
 			File builtDatabaseFile = db.getDatabaseFile();
 			db.save();
-			db.close();
+			db.closeDatabase(false);
 			db = Libris.openDatabase(builtDatabaseFile, null);
 			lastId = db.getLastRecordId();
 			assertEquals("database has wrong number of records",numRecs, lastId);

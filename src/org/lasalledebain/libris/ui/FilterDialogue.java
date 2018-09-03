@@ -6,7 +6,6 @@ import static org.lasalledebain.libris.Field.FieldType.T_FIELD_STRING;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_TEXT;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

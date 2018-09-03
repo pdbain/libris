@@ -1,9 +1,10 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
+
 import java.awt.Dimension;
 import java.io.File;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
@@ -17,20 +18,12 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	private int confirmValue;
 	private boolean accessible; 
 
+	public HeadlessUi(File databaseFile, boolean readOnly) throws LibrisException {
+		super(databaseFile, readOnly);
+	}
+
 	public HeadlessUi() {
 		super();
-	}
-
-	public HeadlessUi(File dbFile) throws LibrisException {
-		super(dbFile);
-	}
-
-	public Logger getuiLogger() {
-		return uiLogger;
-	}
-
-	public void setuiLogger(Logger uiLogger) {
-		this.uiLogger = uiLogger;
 	}
 
 	// TODO write headless UI
@@ -46,12 +39,12 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void alert(String msg, Exception e) {
-		uiLogger.log(Level.WARNING, msg, e);
+		librisLogger.log(Level.WARNING, msg, e);
 	}
 
 	@Override
 	public void alert(String msg) {
-		uiLogger.log(Level.WARNING, msg);
+		librisLogger.log(Level.WARNING, msg);
 	}
 
 	@Override
@@ -66,7 +59,7 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void displayRecord(int recordId) throws LibrisException {
-		uiLogger.log(Level.FINE, RecordId.toString(recordId));
+		librisLogger.log(Level.FINE, RecordId.toString(recordId));
 	}
 
 	@Override
@@ -77,14 +70,6 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	@Override
 	public void recordsAccessible(boolean accessible) {
 		this.accessible = accessible;
-	}
-
-	public void setReadOnly(boolean readOnly) {
-		return;
-	}
-
-	public boolean isReadOnly() {
-		return false;
 	}
 
 	public int getConfirmValue() {
@@ -105,17 +90,12 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void put(Record newRecord) throws DatabaseException {
-		uiLogger.log(Level.FINE, newRecord.toString());
+		librisLogger.log(Level.FINE, newRecord.toString());
 	}
 
 	public void repaint() {
 	}
 
-	@Override
-	public void exit() {
-		// TODO write headlessUI.exit()
-		
-	}
 	@Override
 	public void setRecordName(NamedRecordList namedRecs) throws InputException {
 		// TODO write setRecordName
@@ -123,17 +103,31 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	}
 
 	@Override
-	public void close(boolean allWindows, boolean closeGui) {
+	public boolean quit(boolean force) {
+		// TODO Implement quit
+		return false;
+	}
+
+	@Override
+	public void closeWindow(boolean allWindows) {
 		return;
 	}
 
 	@Override
+	protected void destroyWindow(boolean b) {
+		return;
+		}
+
+	@Override
 	public Record newChildRecord(Record currentRecord, int groupNum) {
+		// TODO Implement newChildRecord
 		return null;
 	}
 
 	@Override
 	public Dimension getDisplayPanelSize() {
+		// TODO Implement getDisplayPanelSize
 		return null;
 	}
+
 }

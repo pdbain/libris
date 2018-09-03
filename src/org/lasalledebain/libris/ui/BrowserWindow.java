@@ -9,7 +9,6 @@ import java.awt.event.MouseListener;
 import java.net.URL;
 import java.util.Iterator;
 
-import javax.activation.FileTypeMap;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -27,9 +25,7 @@ import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.SingleRecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.search.KeywordFilter;
 import org.lasalledebain.libris.search.RecordFilter;
-import org.lasalledebain.libris.search.RecordNameFilter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class BrowserWindow extends JPanel {
@@ -42,7 +38,7 @@ public class BrowserWindow extends JPanel {
 	private static final int VISIBLE_LIMIT = 64;
 
 	private LibrisDatabase database;
-	private JList chooser;
+	private JList<?> chooser;
 	private final LibrisGui gui;
 	private JPanel filterView;
 	private JButton moreButton;

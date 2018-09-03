@@ -3,7 +3,6 @@ package org.lasalledebain.libris.ui;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,8 +34,7 @@ import org.lasalledebain.libris.exception.LibrisException;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class LibrisMenu {
-	private static final String OPEN_DATABASE = "Open database...";
+public class LibrisMenu extends AbstractLibrisMenu {
 
 	public class DuplicateRecordListener implements ActionListener {
 
@@ -44,10 +42,6 @@ public class LibrisMenu {
 			guiMain.duplicateRecord();
 		}
 		
-	}
-
-	public void setDatabase(LibrisDatabase database) {
-		this.database = database;
 	}
 
 	public class PasteListener implements ActionListener {
@@ -62,10 +56,6 @@ public class LibrisMenu {
 
 	}
 	public static final int BROWSE_RECORD_POSITION = 3;
-	private LibrisDatabase database;
-	private LibrisGui guiMain;
-	private JMenu fileMenu;
-	private JMenu editMenu;
 	private DatabaseMenu dbMenu;
 	private JMenu recordMenu;
 	private JMenu searchMenu;
@@ -93,10 +83,7 @@ public class LibrisMenu {
 		editMenuRecordCommands = new ArrayList<JMenuItem>(2);
 	}
 	
-	private boolean isEditable() {
-		return (null != database)  && !database.isReadOnly();
-	}
-
+	@Override
 	protected JMenuBar createMenus() {
 		JMenuBar menu = new JMenuBar();
 		
@@ -121,7 +108,8 @@ public class LibrisMenu {
 	 * @param menu
 	 * @return 
 	 */
-	private JMenu createFileMenu() {
+ @Override
+	protected JMenu createFileMenu() {
 		JMenu menu = new JMenu("File");
 		fileMenuModifyCommands = new HashSet<JMenuItem>();
 		databaseAccessCommands = new HashSet<JMenuItem>();
@@ -195,7 +183,8 @@ public class LibrisMenu {
 	 * @param menu
 	 * @return 
 	 */
-	private JMenu createEditMenu() {
+	@Override
+	protected JMenu createEditMenu() {
 		/* edit menu */
 		JMenu edMenu = new JMenu("Edit");
 		edMenu.add("Cut");
@@ -300,7 +289,7 @@ public class LibrisMenu {
 		editRecordListener = new EditRecordListenerImpl();
 		editRecord.addActionListener(editRecordListener);
 		recMenu.add(editRecord);
-		editRecord.setEnabled(!guiMain.isReadOnly());
+		editRecord.setEnabled(!guiMain.isDatabaseReadOnly());
 		editRecord.setState(false);
 		
 		enterRecord = new JMenuItem("Enter record");
@@ -403,6 +392,7 @@ public class LibrisMenu {
 				java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | modifier, false);
 	}
 	
+	@Override
 	public boolean openDatabaseDialogue() {
 		// TODO keep a list of recent databases
 		boolean result = false;
@@ -471,19 +461,7 @@ public class LibrisMenu {
 		guiMain.getMainFrame().toFront();
 	}
 
-	public class OpenDatabaseListener implements ActionListener {
-
-		public OpenDatabaseListener() {
-		}
-
-		public void actionPerformed(ActionEvent arg0) {
-			openDatabaseDialogue();
-		}
-
-	}
-
 	private class SaveListener implements ActionListener {
-	// TODO 1 set database unmodified when saving
 		boolean saveToOtherFile;
 		SaveListener(boolean saveAs) {
 			saveToOtherFile = saveAs;
@@ -495,45 +473,10 @@ public class LibrisMenu {
 					database.getUi().alert("save as not implemented");
 				} else {
 					database.save();
+					guiMain.updateUITitle(false);
 				}
 			}
 		}
-	}
-
-	public class CloseWindowListener implements ActionListener {
-		boolean closeAllWindows;
-		public CloseWindowListener(boolean allWindows) {
-			closeAllWindows = allWindows;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			guiMain.close(closeAllWindows, false);
-		}
-
-	}
-
-	public class CloseDatabaseListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			if (null != database) {
-				database.close();
-			}
-		}
-		
-	}
-
-	public class QuitListener implements ActionListener {
-	
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			if (null != database) {
-				database.quit();
-				// TODO check if there are new, modified records
-			}
-		}
-	
 	}
 
 	class NewRecordListener implements ActionListener {
@@ -585,12 +528,9 @@ public class LibrisMenu {
 	
 	class RebuildIndexListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			if (null != database) {
-				File dbFile = database.getDatabaseFile();
-
-				if (!database.close()) {
-					guiMain.alert("Please save database before rebuildiing");
-				}
+			if (guiMain.isDatabaseOpen()) {
+				guiMain.alert("Please save database before rebuildiing");
+			} else {
 				try {
 					guiMain.rebuildDatabase();
 				} catch (LibrisException e) {
@@ -619,7 +559,6 @@ public class LibrisMenu {
 	}
 
 	private EditRecordListenerImpl editRecordListener;
-	private JMenuItem openDatabase;
 	private JMenuItem recordWindowItems[];
 	public void enableFieldValueOperations(boolean selected) {
 		for (JMenuItem m: editMenuFieldValueCommands) {
@@ -629,15 +568,6 @@ public class LibrisMenu {
 
 	public void setRecordDuplicateRecordEnabled(boolean enabled) {
 		duplicateRecord.setEnabled(enabled);
-	}
-
-	public void sendChooseDatabase() {
-		for (ComponentListener a: openDatabase.getComponentListeners()) {
-			ActionEvent theEvent = new ActionEvent(a, ActionEvent.ACTION_PERFORMED, OPEN_DATABASE);
-			java.awt.Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(
-					theEvent);
-		
-		}
 	}
 }
 

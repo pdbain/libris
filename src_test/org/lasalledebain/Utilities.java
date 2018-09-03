@@ -20,9 +20,8 @@ import java.util.logging.Logger;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
-import junit.framework.TestCase;
-
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -30,7 +29,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -46,6 +45,8 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
+
+import junit.framework.TestCase;
 
 public class Utilities extends TestCase {
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
@@ -73,6 +74,8 @@ public class Utilities extends TestCase {
 	public static final String DATABASE_WITH_GROUPS_XML = "DatabaseWithGroups.xml";
 	public static final String DATABASE_WITH_GROUPS_AND_RECORDS_XML = "DatabaseWithGroupsAndRecords.xml";
 	public static final String TEST_DATABASE_UNORDERED_XML = "testDatabaseUnordered.xml";
+	public static final String EXAMPLE_ARTIFACT_PDF = "example_artifact.pdf";
+	public static final String EXAMPLE_LARGE_PDF = "mesa.pdf";
 	
 	static RecordTemplate makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {
@@ -97,6 +100,7 @@ public class Utilities extends TestCase {
 		return testDir;
 	}
 
+	// TODO rename getTestDatabase to getTestFile()
 	public static File getTestDatabase(String dbName) {
 		File testDir = getTestDataDirectory();
 		return new File(testDir, dbName);
@@ -110,14 +114,13 @@ public class Utilities extends TestCase {
 		return testDirectory;
 	}
 	
-	public static Schema loadSchema(File schemaFile) throws InputException, DatabaseException  {
+	public static Schema loadSchema(File schemaFile) throws LibrisException  {
 		FileReader rdr;
 		try {
 			rdr = new FileReader(schemaFile);
 			LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 			ElementReader xmlReader = xmlFactory.makeReader(rdr, schemaFile.getPath());
-			Schema s = new Schema();
-			s.fromXml(xmlReader);
+			Schema s = new XmlSchema(xmlReader);
 			return s;
 		} catch (FileNotFoundException e) {
 			throw new InputException("Cannot open "+schemaFile.getPath(), e);
@@ -231,6 +234,7 @@ public class Utilities extends TestCase {
 		FileChannel original = null; 
 		FileChannel copy = null; 
 		try {
+			// TODO close FileInputStream
 			original = (new FileInputStream(originalFile)).getChannel();
 			copy = (new FileOutputStream(copyFile)).getChannel();
 			copy.transferFrom(original, 0, original.size());
@@ -375,7 +379,7 @@ public class Utilities extends TestCase {
 		try {
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			LibrisUi ui = db.getUi();
-			db.close();
+			ui.closeDatabase(false);
 			db = ui.openDatabase();
 		} catch (LibrisException e) {
 			e.printStackTrace();
@@ -434,6 +438,19 @@ public class Utilities extends TestCase {
 				fail("unexpected exception "+e.getMessage());
 			}
 		}
+	}
+
+	/**
+	 * @param dirName 
+	 * 
+	 */
+	public static File makeTestFileObject(String dirName) {
+		File workingDirectory = new File(getTempTestDirectory(), dirName);
+		deleteRecursively(workingDirectory);
+		workingDirectory.mkdirs();
+		File tf = new File(workingDirectory, "testIndexFile");
+		tf.deleteOnExit();
+		return tf;
 	}
 
 }

@@ -7,50 +7,56 @@ import java.util.TreeMap;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-@SuppressWarnings("unchecked")
-public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends HashBucket {
+@SuppressWarnings({ "unchecked", "rawtypes" })
+public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> extends NumericKeyHashBucket<EntryType> {
 
-	protected TreeMap<Integer, T> entries;
-	protected EntryFactory<T> entryFact;
+	protected TreeMap<Integer, EntryType> entries;
+	protected EntryFactory<EntryType> entryFact;
 	private FixedSizeEntryHashBucket(RandomAccessFile backingStore,
 			int bucketNum, EntryFactory eFact) {
 		super(backingStore, bucketNum);
 		entryFact = eFact;
-		entries = new TreeMap<Integer, T>();
+		entries = new TreeMap<Integer, EntryType>();
 
 		occupancy = 4;
 	}
 
-	public static HashBucketFactory getFactory() {
+	public static FixedSizeEntryHashBucketFactory getFactory() {
 		return new FixedSizeEntryHashBucketFactory();
 	}
-	private static class FixedSizeEntryHashBucketFactory implements HashBucketFactory {
+	public static class FixedSizeEntryHashBucketFactory implements NumericKeyHashBucketFactory {
 
 		@Override
-		public HashBucket<HashEntry> createBucket(RandomAccessFile backingStore,
+		public NumericKeyHashBucket<NumericKeyHashEntry> createBucket(RandomAccessFile backingStore,
 				int bucketNum, EntryFactory fact) {
 			return new FixedSizeEntryHashBucket(backingStore, bucketNum, fact);
 		}
 
+		@Override
+		public NumericKeyHashBucket createBucket(RandomAccessFile backingStore, int bucketNum,
+				NumericKeyEntryFactory fact) {
+			return new FixedSizeEntryHashBucket(backingStore, bucketNum, fact);
+			}
+
 	}
 	
-	public T getEntry(int key) {
-		T result = entries.get(key);
+	public EntryType getEntry(int key) {
+		EntryType result = entries.get(key);
 		return result;
 	}
 
 	@Override
-	protected void addToBucket(int key, HashEntry newEntry) {
-		entries.put(key, (T) newEntry);		
+	protected void addToBucket(int key, EntryType newEntry) {
+		entries.put(key, (EntryType) newEntry);		
 	}
 	
 	@Override
-	protected T removeFromBucket(int key) {
+	protected EntryType removeFromBucket(int key) {
 		return entries.remove(key);
 	}
 
 	@Override
-	public Iterator<T> iterator() {
+	public Iterator<EntryType> iterator() {
 		return entries.values().iterator();
 	}
 
@@ -59,7 +65,8 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 		if (null != entries) {
 			entries.clear();
 		}
-		super.clear();
+		occupancy = 4;
+		dirty = true;		
 	}
 
 	public void read() throws IOException, DatabaseException {
@@ -71,7 +78,7 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 		backingStore.seek(filePosition);
 		int numEntries = backingStore.readInt();
 		for (int i = 0; i < numEntries; ++i) {
-			T newEntry = entryFact.makeEntry(backingStore);
+			EntryType newEntry = entryFact.makeEntry(backingStore);
 			addEntry(newEntry);
 		}
 		dirty = false;
@@ -91,7 +98,7 @@ public class FixedSizeEntryHashBucket <T extends FixedSizeHashEntry> extends Has
 			if (null != entries) {
 				int numEntries = entries.size();
 				backingStore.writeInt(numEntries);
-				for (T e: entries.values()) {
+				for (EntryType e: entries.values()) {
 					e.writeData(backingStore);
 				}
 			} else {

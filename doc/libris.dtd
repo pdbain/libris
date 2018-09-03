@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ENTITY % boolean "(true|false)">
-<!ENTITY % controltype "(radiobutton|checkbox|textbox|textfield|rangefield|enumfield|names)">
+<!ENTITY % controltype "(radiobutton|checkbox|textbox|textfield|rangefield|enumfield|names|locationfield)">
 <!ENTITY % usagetype "(newrecord|formdisplay|summarydisplay|formentry|tabledisplay)">
 <!ENTITY % groupstructure "(flat|hierarchical)">
 
@@ -37,7 +37,7 @@
 <!ATTLIST fielddef
 	id ID #REQUIRED 
 	title CDATA #IMPLIED
-	datatype (string|boolean|integer|valuepair|INDEXENTRY|enum) "string"
+	datatype (string|boolean|integer|valuepair|INDEXENTRY|enum|location) "string"
 	enumset IDREF #IMPLIED
 	default CDATA #IMPLIED
 	valueseparator CDATA #IMPLIED

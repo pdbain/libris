@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
@@ -46,6 +47,7 @@ public class RecordWindow extends JPanel {
 		recordPanel.setVisible(true);
 		ui.fieldSelected(false);
 		ui.setSelectedField(null);
+		modTracker.setModified(false);
 	}
 
 	public void refresh() throws LibrisException {
@@ -113,14 +115,11 @@ public class RecordWindow extends JPanel {
 	}
 
 	public boolean setEditable(boolean isEditable) {
-		if (isEditable && ui.isReadOnly()) {
+		if (isEditable && ui.isDatabaseReadOnly()) {
 			return false;
 		}
 		modTracker.setModifiable(isEditable);
 		record.setEditable(isEditable);
-		for (UiField f: guiFields) {
-			f.setEditable(isEditable);
-		}
 		if (!isEditable) {
 			modTracker.unselect();
 		}

@@ -42,7 +42,7 @@ public class ImportTests extends TestCase {
 			for (Record rec: recList) {
 				System.out.print(rec.toString());
 			}
-			db.close();
+			db.getUi().quit(true);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 			fail("Unexpected exception");

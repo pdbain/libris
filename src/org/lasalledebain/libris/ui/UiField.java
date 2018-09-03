@@ -30,8 +30,6 @@ public abstract class UiField  implements Iterable<FieldValue> {
 		modificationTrack = modTrk;
 	}
 
-	public abstract void setEditable(boolean edit);
-
 	public Field getRecordField() {
 		return recordField;
 	}

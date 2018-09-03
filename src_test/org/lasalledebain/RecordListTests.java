@@ -37,7 +37,7 @@ public class RecordListTests extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		if (null != testDb) {
-			testDb.close();
+			testDb.getUi().quit(true);
 		}
 		Utilities.deleteTestDatabaseFiles();
 	}
@@ -101,7 +101,7 @@ public class RecordListTests extends TestCase {
 			rec.addFieldValue(ID_AUTH, "new record");
 			int id = testDb.put(rec);
 			testDb.save();
-			testDb.close();
+			testDb.getUi().quit(true);
 			testDb = myUi.openDatabase();
 			Record newRec = testDb.getRecord(id);
 			assertEquals("New record does not match original", rec, newRec);
@@ -124,7 +124,7 @@ public class RecordListTests extends TestCase {
 			testDb.save();
 			testDb.save();
 			testDb.save();
-			testDb.close();
+			testDb.getUi().quit(true);
 			testDb = myUi.openDatabase();
 			RecordList list = testDb.getRecords();
 			int recordCount = 0;
@@ -150,7 +150,7 @@ public class RecordListTests extends TestCase {
 		try {
 			testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
-			testDb.close();
+			testDb.getUi().quit(true);
 			final LibrisUi myUi = testDb.getUi();
 			for (int r=1; r <= expectedIds.length; ++r) {
 				int oldId = r;
@@ -160,11 +160,11 @@ public class RecordListTests extends TestCase {
 				int newId = testDb.put(rec);
 				assertEquals("new ID != oldId", newId, oldId);
 				testDb.save();
-				testDb.close();
+				testDb.getUi().quit(true);
 				testDb = myUi.openDatabase();
 				Record newRec = testDb.getRecord(newId);
 				assertEquals("New record does not match original", rec, newRec);
-				testDb.close();
+				testDb.getUi().quit(true);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -188,15 +188,14 @@ public class RecordListTests extends TestCase {
 			expectedData[3] += ", "+EXTRA_DATA;
 			testDb.put(r);
 			testDb.save();
-			testDb.close();
+			testDb.getUi().quit(true);
 			
-			HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy);
-			testDb = new LibrisDatabase(testDatabaseFileCopy, null, ui, false);
-			testDb.open();
-			checkRecordOrder(testDb, expectedData);
+			HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy, false);
+			ui.openDatabase();
+			checkRecordOrder(ui.getDatabase(), expectedData);
 			
 			testDb.exportDatabaseXml(new FileOutputStream(testDatabaseFileCopy), true, true, false);
-			testDb.close();
+			ui.quit(true);
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			checkRecordOrder(testDb, expectedData);
 			/*
@@ -209,9 +208,10 @@ public class RecordListTests extends TestCase {
 			 * export database and rebuild
 			 * check records
 			 */
+			testDb.getUi().quit(true);
 		} catch (Exception e) {
-			fail("unexpected exception "+e.getMessage());
 			e.printStackTrace();
+			fail("unexpected exception "+e.getMessage());
 		}			
 	}
 

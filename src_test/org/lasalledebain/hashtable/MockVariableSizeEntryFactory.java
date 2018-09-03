@@ -1,12 +1,9 @@
 package org.lasalledebain.hashtable;
 
 import java.io.DataInput;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.lasalledebain.libris.hashfile.HashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
-import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 
 public class MockVariableSizeEntryFactory implements VariableSizeEntryFactory<MockVariableSizeHashEntry> {
 
@@ -48,17 +45,17 @@ public class MockVariableSizeEntryFactory implements VariableSizeEntryFactory<Mo
 	}
 
 	@Override
-	public HashEntry makeEntry(int key, ByteBuffer src, int len) {
+	public MockVariableSizeHashEntry makeEntry(int key, ByteBuffer src, int len) {
 		return new MockVariableSizeHashEntry(key, src, len);
 
 	}
 
 	@Override
-	public HashEntry makeEntry(DataInput backingStore) {
+	public MockVariableSizeHashEntry makeEntry(DataInput backingStore) {
 		throw new UnsupportedOperationException();
 	}
 
-	public VariableSizeHashEntry makeVariableSizeEntry(int key, int len) {
+	public MockVariableSizeHashEntry makeVariableSizeEntry(int key, int len) {
 		byte[] dat = new byte[len];
 		for (int i = 0; i < len; ++i) {
 			dat[i] = (byte) (key + i);

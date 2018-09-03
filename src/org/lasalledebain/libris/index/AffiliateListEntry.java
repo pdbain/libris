@@ -4,10 +4,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.lasalledebain.libris.hashfile.HashEntry;
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
 
 /**
@@ -128,12 +127,12 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 		}
 
 		@Override
-		public HashEntry makeEntry(int key, byte[] dat) {
+		public AffiliateListEntry makeEntry(int key, byte[] dat) {
 			return makeEntry(key, ByteBuffer.wrap(dat, 0, dat.length), dat.length);
 		}
 
 		@Override
-		public HashEntry makeEntry(int key, ByteBuffer src, int len) {
+		public AffiliateListEntry makeEntry(int key, ByteBuffer src, int len) {
 			int nChildren = src.getInt();
 			int[] tempChildren = new int[nChildren];
 			for (int i = 0; i < nChildren; i++) {
@@ -153,7 +152,7 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 		 * @see org.lasalledebain.libris.hashfile.EntryFactory#makeEntry(java.io.DataInput)
 		 */
 		@Override
-		public HashEntry makeEntry(DataInput src) throws IOException {
+		public AffiliateListEntry makeEntry(DataInput src) throws IOException {
 			int key = src.readInt();
 			int nChildren = src.readInt();
 			int[] tempChildren = new int[nChildren];
@@ -180,5 +179,16 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 
 	public int[] getAffiliates() {
 		return affiliates;
+	}
+
+	@Override
+	public int compareTo(NumericKeyHashEntry comparand) {
+		if (this == comparand) {
+			return 0;
+		} else if (this.getClass().isInstance(comparand)) {
+			return Integer.compare(((AbstractNumericKeyHashEntry)comparand).key, key);
+		} else {
+			return -1;
+		}
 	}
 }

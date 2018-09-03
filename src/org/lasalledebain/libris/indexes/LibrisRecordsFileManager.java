@@ -314,12 +314,14 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 					case T_FIELD_TEXT:
 						try {
 							indexStream.writeInt(oldValueEnd);
-							valuesStream.writeUTF(fv.getValueAsString());
+							final String valueString = fv.getValueAsString();
+							valuesStream.writeUTF(valueString);
 						} catch (UTFDataFormatException e) {
 							throw new DatabaseException("UTF format exception in "+getRecordIdString(recData)+" field "+fieldNum);
 						}
 						break;
 					case T_FIELD_PAIR:
+					case T_FIELD_LOCATION:
 						try {
 							String mainValue = fv.getMainValueAsString();
 							valuesStream.writeUTF(mainValue);
