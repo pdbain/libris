@@ -105,6 +105,7 @@ public class CsvImportTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		testDatabase = new DiagnosticDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE));
+		testDatabase.openDatabase();
 		valueTranslations = new HashMap<String, String>();
 		valueTranslations.put("ACM", "NS_acm");
 		valueTranslations.put("IEEE", "NS_ieee");

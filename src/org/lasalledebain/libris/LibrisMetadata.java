@@ -10,12 +10,9 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LastFilterSettings;
 import org.lasalledebain.libris.ui.Layouts;
-import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -39,11 +36,15 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	private static SimpleDateFormat dateAndTimeFormatter = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
 	private static SimpleDateFormat compactDateFormatter = new SimpleDateFormat(LibrisConstants.YMD);
 
-	public LibrisMetadata(LibrisDatabase database) {
-		this.database = database;
+	public LibrisMetadata() {
 		usageProperties = new Properties();
 		lastFiltSettings = new LastFilterSettings();
 		signatureLevels = 0;
+	}
+
+	public LibrisMetadata(LibrisDatabase database) {
+		this();
+		this.database = database;
 	}
 
 	public LibrisMetadata(LibrisDatabase database, Layouts myLayouts) {
@@ -200,9 +201,13 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	}
 	public void toXml(ElementWriter output, boolean addInstanceInfo) throws LibrisException {
 		output.writeStartElement(XML_METADATA_TAG, getAttributes(), false);
-		database.getSchema().toXml(output);
-		database.getLayouts().toXml(output);
+		writeContents(output);
 		output.writeEndElement();
+	}
+
+	protected void writeContents(ElementWriter output) throws LibrisException {
+		database.getSchema().toXml(output);
+		uiLayouts.toXml(output);
 	}
 
 	@Override

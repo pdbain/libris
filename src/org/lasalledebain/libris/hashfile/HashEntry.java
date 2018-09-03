@@ -3,21 +3,12 @@ package org.lasalledebain.libris.hashfile;
 import java.io.DataOutput;
 import java.io.IOException;
 
-/**
- * HashEntry objects are immutable.
- *
- * @param <T> subtype
- */
-@SuppressWarnings("rawtypes")
-public interface HashEntry<T extends HashEntry> extends Comparable<HashEntry> {
-
+public interface HashEntry {
 	void writeData(DataOutput backingStore) throws IOException;
-	int getKey();
 	/**
 	 * @return Size of the hash entry, including overhead in bucket
 	 */
 	int getTotalLength();
-	
 	
 	/**
 	 * @return Bucket overhead for this entry
@@ -42,4 +33,5 @@ public interface HashEntry<T extends HashEntry> extends Comparable<HashEntry> {
 	 * @return Size of the data.
 	 */
 	int getDataLength();
+
 }

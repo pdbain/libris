@@ -1,6 +1,5 @@
 package org.lasalledebain.libris.hashfile;
 
-public interface VariableSizeEntryFactory<T extends VariableSizeHashEntry> extends EntryFactory {
-	public T makeEntry(int key);
-
+public interface VariableSizeEntryFactory<EntryType extends VariableSizeHashEntry> extends NumericKeyEntryFactory<EntryType> {
+	public EntryType makeEntry(int key);
 }

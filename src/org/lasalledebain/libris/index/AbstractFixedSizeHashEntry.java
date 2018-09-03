@@ -1,9 +1,9 @@
 package org.lasalledebain.libris.index;
 
 import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
-import org.lasalledebain.libris.hashfile.HashEntry;
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 
-public abstract class AbstractFixedSizeHashEntry extends AbstractHashEntry implements FixedSizeHashEntry {
+public abstract class AbstractFixedSizeHashEntry extends AbstractNumericKeyHashEntry implements FixedSizeHashEntry {
 
 	public AbstractFixedSizeHashEntry(int theKey) {
 		super(theKey);
@@ -13,19 +13,8 @@ public abstract class AbstractFixedSizeHashEntry extends AbstractHashEntry imple
 		this.oversize = oversize;
 	}
 
-	public boolean keyEquals(HashEntry other) {
+	public boolean keyEquals(NumericKeyHashEntry other) {
 		return key == other.getKey();
-	}
-
-	@Override
-	public int compareTo(Object comparand) {
-		if (this == comparand) {
-			return 0;
-		} else if (this.getClass().isInstance(comparand)) {
-			return Integer.compare(((AbstractHashEntry)comparand).key, key);
-		} else {
-			return -1;
-		}
 	}
 
 }

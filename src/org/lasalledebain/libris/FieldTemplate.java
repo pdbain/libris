@@ -14,6 +14,7 @@ import org.lasalledebain.libris.field.IntegerField;
 import org.lasalledebain.libris.field.PairField;
 import org.lasalledebain.libris.field.StringField;
 import org.lasalledebain.libris.index.GroupDef;
+import org.lasalledebain.libris.ui.LocationField;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -253,6 +254,7 @@ public class FieldTemplate implements XMLElement {
 		temp.put(Field.FieldType.T_FIELD_TEXT, new StringFieldFactory());
 		temp.put(Field.FieldType.T_FIELD_INTEGER, new IntegerFieldFactory());
 		temp.put(Field.FieldType.T_FIELD_PAIR, new PairFieldFactory());
+		temp.put(Field.FieldType.T_FIELD_LOCATION, new PairFieldFactory());
 		temp.put(Field.FieldType.T_FIELD_INDEXENTRY, new IndexEntryFieldFactory());
 		temp.put(Field.FieldType.T_FIELD_ENUM, new FieldFactory() {
 			public GenericField newField(FieldTemplate template) {

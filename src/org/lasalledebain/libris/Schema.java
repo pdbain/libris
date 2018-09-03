@@ -6,28 +6,20 @@ import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
-import javax.xml.namespace.QName;
-
 import org.lasalledebain.libris.Field.FieldType;
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexDefs;
 import org.lasalledebain.libris.index.IndexField;
-import org.lasalledebain.libris.xmlUtils.ElementManager;
-import org.lasalledebain.libris.xmlUtils.ElementReader;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-import org.lasalledebain.libris.xmlUtils.XmlShapes;
-import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
 public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	protected static final IndexField[] emptyIndexFieldList = new IndexField[0];
+	public static String currentVersion = "1.0";
 	protected TreeMap<String, EnumFieldChoices> enumSets;
 	protected ArrayList<FieldTemplate> fieldList;
 	HashMap <String, Short> fieldNumById;
@@ -80,12 +72,14 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 		return enumSets.put(enumSetId, enumSet);
 	}
 
-	public void addField(FieldTemplate field) {
+	public int addField(FieldTemplate field) {
 		String fieldId = field.getFieldId();
 		fieldIds.add(fieldId);
 		fieldTitles.add(field.getFieldTitle());
 		fieldNumById.put(fieldId, (short) (fieldIds.size()-1));
-		fieldList.add((fieldIds.size()-1), field);
+		final int index = fieldIds.size()-1;
+		fieldList.add(index, field);
+		return index;
 	}
 
 	public EnumFieldChoices getEnumSet(String id) {

@@ -74,6 +74,8 @@ public class Utilities extends TestCase {
 	public static final String DATABASE_WITH_GROUPS_XML = "DatabaseWithGroups.xml";
 	public static final String DATABASE_WITH_GROUPS_AND_RECORDS_XML = "DatabaseWithGroupsAndRecords.xml";
 	public static final String TEST_DATABASE_UNORDERED_XML = "testDatabaseUnordered.xml";
+	public static final String EXAMPLE_ARTIFACT_PDF = "example_artifact.pdf";
+	public static final String EXAMPLE_LARGE_PDF = "mesa.pdf";
 	
 	static RecordTemplate makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {
@@ -98,6 +100,7 @@ public class Utilities extends TestCase {
 		return testDir;
 	}
 
+	// TODO rename getTestDatabase to getTestFile()
 	public static File getTestDatabase(String dbName) {
 		File testDir = getTestDataDirectory();
 		return new File(testDir, dbName);
@@ -231,6 +234,7 @@ public class Utilities extends TestCase {
 		FileChannel original = null; 
 		FileChannel copy = null; 
 		try {
+			// TODO close FileInputStream
 			original = (new FileInputStream(originalFile)).getChannel();
 			copy = (new FileOutputStream(copyFile)).getChannel();
 			copy.transferFrom(original, 0, original.size());
@@ -434,6 +438,19 @@ public class Utilities extends TestCase {
 				fail("unexpected exception "+e.getMessage());
 			}
 		}
+	}
+
+	/**
+	 * @param dirName 
+	 * 
+	 */
+	public static File makeTestFileObject(String dirName) {
+		File workingDirectory = new File(getTempTestDirectory(), dirName);
+		deleteRecursively(workingDirectory);
+		workingDirectory.mkdirs();
+		File tf = new File(workingDirectory, "testIndexFile");
+		tf.deleteOnExit();
+		return tf;
 	}
 
 }

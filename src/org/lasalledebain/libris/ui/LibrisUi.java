@@ -3,14 +3,18 @@ package org.lasalledebain.libris.ui;
 import java.io.File;
 
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.LibrisDatabaseParameter;
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 public interface LibrisUi {
 
+	public LibrisDatabaseParameter getParameters();
+	public void setSchema(XmlSchema mySchema);
 	public LibrisDatabase openDatabase() throws DatabaseException;
 	public boolean closeDatabase(boolean force);
 	public boolean quit(boolean force);
@@ -18,9 +22,9 @@ public interface LibrisUi {
 	public void rebuildDatabase() throws LibrisException;
 	public boolean isDatabaseSelected();
 	public boolean isDatabaseOpen();
+	public boolean isDatabaseReadOnly();
 	public LibrisDatabase getDatabase();
 	void setDatabaseFile(File dbFile);
-	void setAuxiliaryDirectory(File auxDir);
 	public abstract String SelectSchemaFile(String schemaName) throws DatabaseException;
 	public void setTitle(String title);
 

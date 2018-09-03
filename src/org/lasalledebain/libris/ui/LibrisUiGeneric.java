@@ -10,7 +10,9 @@ import java.util.prefs.Preferences;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.LibrisDatabaseParameter;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -26,34 +28,87 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	protected LibrisDatabase currentDatabase;
 	protected File databaseFile;
 	protected File auxDirectory;
+	private XmlSchema mySchema;
+	LibrisDatabaseParameter params;
 
-	public LibrisUiGeneric(File dbFile, File auxDir,
-			boolean readOnly) throws LibrisException {
+	public LibrisUiGeneric(File dbFile, boolean readOnly) throws LibrisException {
 		this();
-		databaseFile = dbFile;
-		auxDirectory = auxDir;
+		params = new LibrisDatabaseParameter(this, dbFile);
+		params.readOnly = readOnly;
+		setDatabaseFile(dbFile);
 	}
 	public LibrisUiGeneric() {
 		databaseOpen = false;
 		fieldSelected(false);
 		setSelectedField(null);
 	}
+
+	/**
+	 * @return the params
+	 */
+	public LibrisDatabaseParameter getParameters() {
+		return params;
+	}
 	@Override
 	public LibrisDatabase getDatabase() {
 		return currentDatabase;
 	}
+	/**
+	 * @return the uiTitle
+	 */
+	public String getUiTitle() {
+		return uiTitle;
+	}
+	/**
+	 * @param uiTitle the uiTitle to set
+	 */
+	public void setUiTitle(String uiTitle) {
+		this.uiTitle = uiTitle;
+	}
+	/**
+	 * @return the mySchema
+	 */
+	public XmlSchema getSchema() {
+		return mySchema;
+	}
+	/**
+	 * @param mySchema the mySchema to set
+	 */
+	public void setSchema(XmlSchema mySchema) {
+		this.mySchema = mySchema;
+	}
+
+	/**
+	 * @param openReadOnly the openReadOnly to set
+	 */
+	public void setOpenReadOnly(boolean openReadOnly) {
+		params.readOnly = openReadOnly;
+	}
+	/**
+	 * @return the databaseFile
+	 */
+	public File getDatabaseFile() {
+		return databaseFile;
+	}
+	/**
+	 * @param databaseOpen the databaseOpen to set
+	 */
+	public void setDatabaseOpen(boolean databaseOpen) {
+		this.databaseOpen = databaseOpen;
+	}
 	public LibrisDatabase openDatabase() throws DatabaseException {
-		if (null != currentDatabase) {
+		if (isDatabaseOpen()) {
 			alert("Cannot open "+databaseFile.getAbsolutePath()+" because "+currentDatabase.getDatabaseFile().getAbsolutePath()+" is open");
 		}
 		try {
 			// TODO add option to open read-write
-			currentDatabase = new LibrisDatabase(databaseFile, auxDirectory, this, false);
+			currentDatabase = new LibrisDatabase(params);
 			if (!currentDatabase.isIndexed()) {
 				alert("database "+databaseFile.getAbsolutePath()+" is not indexed.  Please re-index.");
 				return null;
 			}
-			currentDatabase.openDatabase();
+			currentDatabase.openDatabase(mySchema);
+			setDatabaseOpen(true);
 		} catch (Exception e) {
 			alert("Error opening database", e);
 			return currentDatabase;
@@ -65,14 +120,16 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	public boolean closeDatabase(boolean force) {
 		boolean result = false;
 		if (Objects.nonNull(currentDatabase)) {
-			result = currentDatabase.closeDatabase(force);
+			result = checkAndCloseDatabase(force);
 		}
 		if (result) {
 			currentDatabase = null;
 			setTitle(NO_DATABASE_OPENED);
+			setDatabaseOpen(false);
 		}
 		return result;
 	}
+	protected abstract boolean checkAndCloseDatabase(boolean force);
 	
 	public boolean isDatabaseSelected() {
 		return (null != databaseFile);
@@ -144,9 +201,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		return null;
 	}
 
-	public void setAuxiliaryDirectory(File auxDir) {
-		 auxDirectory = auxDir;
-	}
 	 @Override
 	public void recordsAccessible(boolean accessible) {
 	}
@@ -182,7 +236,10 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	public void repaint() {
 	}
 
-	public abstract boolean isReadOnly();
+	public boolean isDatabaseReadOnly() {
+		return Objects.nonNull(currentDatabase)? currentDatabase.isReadOnly(): false;
+	}
+
 	
 	public static void cmdlineError(String msg) {
 		System.err.println(msg);

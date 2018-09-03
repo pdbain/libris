@@ -51,8 +51,8 @@ public class LibrisGui extends LibrisWindowedUi {
 	private JPanel layoutEditPane;
 	private Clipboard systemClipboard;
 	private Component mainframeContents;
-	public LibrisGui(File databaseFile, File auxDirectory, boolean readOnly) throws LibrisException {
-		super(databaseFile, auxDirectory, readOnly);
+	public LibrisGui(File databaseFile, boolean readOnly) throws LibrisException {
+		super(databaseFile, readOnly);
 		System.setProperty("apple.laf.useScreenMenuBar","true");
 		System.setProperty("apple.eawt.quitStrategy system property", "CLOSE_ALL_WINDOWS");
 		initializeGui();
@@ -73,7 +73,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		System.setProperty("Title", "Libris");
 		menu = new LibrisMenu(this);
 		menuBar = menu.createMenus();
-		boolean readOnly = isReadOnly();
+		boolean readOnly = isDatabaseReadOnly();
 		recordsAccessible(databaseSelected && !readOnly);
 		databaseModifiable(databaseSelected && !readOnly);
 		createPanes(!databaseSelected);
@@ -175,7 +175,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	@Override
 	 protected void destroyWindow(boolean retain) {
 		if (null != mainWindow) {
-			if (!isReadOnly()) {
+			if (!isDatabaseReadOnly()) {
 				Preferences prefs = getLibrisPrefs();
 				int temp = contentPane.getWidth();
 				prefs.putInt(CONTENT_PANE_WIDTH, temp);
@@ -321,7 +321,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		return true;
 	}
 
-	public boolean isReadOnly() {
+	public boolean isDatabaseReadOnly() {
 		return (null == currentDatabase) || currentDatabase.isReadOnly();
 	}
 
@@ -480,12 +480,6 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	public void setRecordEnterRecordEnabled(boolean enabled) {
 		menu.setRecordEnterRecordEnabled(enabled);
-		
-	}
-
-	@Override
-	public void setAuxiliaryDirectory(File auxDir) {
-		// TODO implement or remove setAuxiliaryDirectory
 		
 	}
 

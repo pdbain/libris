@@ -7,7 +7,10 @@ import java.io.RandomAccessFile;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
-import org.lasalledebain.libris.hashfile.HashFile;
+import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket.FixedSizeEntryHashBucketFactory;
+import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
+import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
 import org.lasalledebain.libris.index.RecordPositionEntry;
 import org.lasalledebain.libris.index.RecordPositionEntryFactory;
 import org.lasalledebain.libris.ui.Messages;
@@ -18,7 +21,8 @@ public class FileRecordMap extends LibrisRecordMap {
 	RandomAccessFile backingStore;
 	private boolean readOnly;
 	private RecordPositionEntryFactory eFactory;
-	private HashFile<RecordPositionEntry> indexHashFile;
+	private NumericKeyHashFile<RecordPositionEntry, NumericKeyHashBucket<RecordPositionEntry>, NumericKeyEntryFactory<RecordPositionEntry>> 
+	indexHashFile;
 
 	/**
 	 * @param positionFileMgr hash file of record positions
@@ -35,7 +39,10 @@ public class FileRecordMap extends LibrisRecordMap {
 		}
 		eFactory = new RecordPositionEntryFactory();
 		try {
-			indexHashFile = new HashFile<RecordPositionEntry>(backingStore, FixedSizeEntryHashBucket.getFactory(), eFactory);
+			final FixedSizeEntryHashBucketFactory factory = FixedSizeEntryHashBucket.getFactory();
+			indexHashFile = new NumericKeyHashFile
+					<RecordPositionEntry, NumericKeyHashBucket<RecordPositionEntry>, NumericKeyEntryFactory<RecordPositionEntry>>
+			(backingStore, factory, eFactory);
 		} catch (IOException e) {
 			throw new DatabaseException(e);
 		}
