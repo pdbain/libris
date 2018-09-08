@@ -172,15 +172,13 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		return true;
 	}
 
-	// TODO remove recursion level
-	protected int expandAndRehash(BucketType oldOverflowBucket) throws IOException, DatabaseException {
+	protected void expandAndRehash(BucketType oldOverflowBucket) throws IOException, DatabaseException {
 		ArrayList<EntryType> splitEntries = new ArrayList<EntryType>();
 		ArrayList<EntryType> oldOverflowNativeEntries = new ArrayList<EntryType>();
 		ArrayList<EntryType> newOverflowEntries = new ArrayList<EntryType>();
 		int oldOverflowBucketNum = numBuckets-1;
 		final int splitBucketNum = (2*bucketModulus == numBuckets)? 0: (numBuckets - bucketModulus);
 		setNumBuckets(numBuckets+1);
-		int recursionLevel = 0;
 		for (EntryType entry: oldOverflowBucket) {
 			int homeBucket = findHomeBucket(entry);
 			if (homeBucket == oldOverflowBucketNum) {
@@ -226,13 +224,12 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 
 			if (lastIndex >= 0) { /* overflow bucket overflowed */
 				List<EntryType> remainder = newOverflowEntries.subList(lastIndex, newOverflowEntries.size());
-				recursionLevel = 1 + expandAndRehash(newOverflowBucket);
+				expandAndRehash(newOverflowBucket);
 				for (EntryType e: remainder) {
 					addEntry(e);
 				}
 			}
 		}
-		return recursionLevel;
 	}
 
 	protected abstract int findHomeBucket(EntryType entry);
@@ -243,7 +240,7 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		if (!homeBucket.addEntry(entry)) {
 			BucketType overflowBucket = getBucket(numBuckets-1);
 			if (!overflowBucket.addEntry(entry)) {
-				int recursionLevel = expandAndRehash(overflowBucket);
+				expandAndRehash(overflowBucket);
 				homeBucket = overflowBucket = null;
 				addEntry(entry);
 			}

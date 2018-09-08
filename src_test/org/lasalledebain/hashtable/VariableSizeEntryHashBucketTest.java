@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.hashfile.AffiliateHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucketFactory;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
@@ -99,7 +100,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			int entryCount = 0;
 			Random r = new Random(314126535);
 			HashMap<Integer, int[][]> entries= new HashMap<Integer, int[][]>(numEntries);
-			AffiliateListEntryFactory eFactory = AffiliateListEntry.getFactory();
+			AffiliateListEntryFactory eFactory = AffiliateHashBucket.getFactory();
 			VariableSizeEntryHashBucket<AffiliateListEntry> buck = new VariableSizeEntryHashBucket<>(null, 0, null, null);
 // TODO remove duplicate from expected
 			for (int key = 1; key < numEntries; key++ ) {

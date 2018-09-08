@@ -676,6 +676,14 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		}
 		return result;
 	}
+	
+	public void setTermCount(String term, boolean normalize, int termCount) throws DatabaseException {
+		indexMgr.setTermCount(term, normalize, termCount);
+	}
+
+	public int getTermCount(String term, boolean normalize) throws DatabaseException {
+		return indexMgr.getTermCount(term, normalize);
+	}
 
 	/**
 	 * Save a record in the list of modified records

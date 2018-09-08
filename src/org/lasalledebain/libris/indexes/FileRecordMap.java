@@ -17,8 +17,8 @@ import org.lasalledebain.libris.ui.Messages;
 
 public class FileRecordMap extends LibrisRecordMap {
 
-	FileAccessManager backingStoreFileMgr = null;
-	RandomAccessFile backingStore;
+	private final FileAccessManager backingStoreFileMgr;
+	private final RandomAccessFile backingStore;
 	private boolean readOnly;
 	private RecordPositionEntryFactory eFactory;
 	private NumericKeyHashFile<RecordPositionEntry, NumericKeyHashBucket<RecordPositionEntry>, NumericKeyEntryFactory<RecordPositionEntry>> 

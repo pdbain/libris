@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
+import org.lasalledebain.libris.hashfile.AffiliateHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
 
@@ -27,7 +28,7 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 	private final int children[];
 	private final int affiliates[];
 	static int oversizeThreashold = 255;
-	static final int[] emptyList = new int[0];  
+	public static final int[] emptyList = new int[0];  
 	
 	public AffiliateListEntry(int key) {
 		super(key);
@@ -115,10 +116,6 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 		return 4 * (1 + children.length + affiliates.length);
 	}
 
-	public static AffiliateListEntryFactory getFactory() {
-		return new AffiliateListEntryFactory();
-	}
-	
 	public static class AffiliateListEntryFactory implements VariableSizeEntryFactory<AffiliateListEntry> {
 
 		public AffiliateListEntry makeEntry(int key) {
@@ -128,7 +125,20 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 
 		@Override
 		public AffiliateListEntry makeEntry(int key, byte[] dat) {
-			return makeEntry(key, ByteBuffer.wrap(dat, 0, dat.length), dat.length);
+			ByteBuffer src = ByteBuffer.wrap(dat, 0, dat.length);
+			int nChildren = src.getInt();
+			int[] tempChildren = new int[nChildren];
+			for (int i = 0; i < nChildren; i++) {
+				tempChildren[i] = src.getInt();
+			}
+			Arrays.sort(tempChildren);
+			int nAffiliates = (dat.length/4) - 1 - nChildren;
+			int[] tempAffiliates = new int[nAffiliates];
+			for (int i = 0; i < nAffiliates; i++) {
+				tempAffiliates[i] = src.getInt();
+			}
+			Arrays.sort(tempAffiliates);
+			return new AffiliateListEntry(key, tempChildren, tempAffiliates);
 		}
 
 		@Override
@@ -160,8 +170,8 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 				tempChildren[i] = src.readInt();
 			}
 			Arrays.sort(tempChildren);
-
-			return new AffiliateListEntry(key, tempChildren, emptyList);
+			
+			return new AffiliateListEntry(key, tempChildren, AffiliateListEntry.emptyList);
 		}
 
 		public AffiliateListEntry makeEntry(int parent, int affiliate, boolean addChild) {

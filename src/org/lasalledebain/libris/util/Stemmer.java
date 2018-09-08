@@ -55,7 +55,7 @@ public class Stemmer {
 			   if (Character.isUpperCase(c)) {
 				   word = new char[word.length];
 				   for (int i = 0; i < word.length; ++i) {
-					   b[i] = Character.toLowerCase(word[i]);
+					   word[i] = Character.toLowerCase(word[i]);
 				   }
 			   }
 		   }

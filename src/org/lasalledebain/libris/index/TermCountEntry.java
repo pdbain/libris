@@ -23,7 +23,6 @@ public class TermCountEntry extends StringKeyHashEntry{
 		termCount = src.getInt(src.getLength() - 4);
 		keyBytes = src;
 		keyBytes.setLength(src.getLength() - 4);
-		termCount = 0;
 	}
 
 	public TermCountEntry(String term, int initialCount) {
