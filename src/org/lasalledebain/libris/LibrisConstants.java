@@ -1,5 +1,11 @@
 package org.lasalledebain.libris;
 
+import java.io.DataInput;
+import java.io.IOException;
+import java.util.Arrays;
+
+import org.lasalledebain.libris.index.AffiliateListEntry;
+
 public interface LibrisConstants {
 
 	public static final int LONG_LEN = 8;
@@ -47,6 +53,7 @@ public interface LibrisConstants {
 	String DATABASE_OR_RECORD_ARE_READ_ONLY = "Database or record are read-only";
 	String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
 	int MINIMUM_TERM_LENGTH = 2;
+	int[] emptyIntList = new int[0];
 	public static final String SCHEMA_NAME = "SCHEMA";
 	public static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
 	public static final String POSITION_FILENAME = "positions";
@@ -60,6 +67,7 @@ public interface LibrisConstants {
 	public static final String AFFILIATES_FILENAME_HASHTABLE_ROOT = AFFILIATES_FILENAME_ROOT+"hashstable_";
 	public static final String AFFILIATES_FILENAME_OVERFLOW_ROOT = AFFILIATES_FILENAME_ROOT+"overflow_";
 	public static final String KEYWORDS_FILTER_FILENAME_ROOT = "keywords_filter_";
+	public static final String TERM_COUNT_FILENAME_ROOT = "termcounts";
 	static final String TEMP_ROOT = "_TEMP_";
 	static final String TEMP_CHILD_FILE = TEMP_ROOT+"child_";
 	static final String TEMP_AFFILIATE_FILE = TEMP_ROOT+"affiliate_";

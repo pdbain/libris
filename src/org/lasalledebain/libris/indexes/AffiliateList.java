@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseError;
@@ -23,17 +24,15 @@ import org.lasalledebain.libris.ui.Messages;
 
 public class AffiliateList {
 
-	private FileAccessManager overflowFileMgr = null;
-	FileAccessManager hashTableFileMgr = null;
-	RandomAccessFile hashTableFile;
-	RandomAccessFile overflowFile;
-	FileSpaceManager overflowSpaceMgr;
-	private AffiliateListEntryFactory eFactory;
-	private NumericKeyHashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, NumericKeyEntryFactory<AffiliateListEntry>> 
+	private final FileAccessManager overflowFileMgr;
+	private final FileAccessManager hashTableFileMgr;
+	private final RandomAccessFile hashTableFile;
+	private final RandomAccessFile overflowFile;
+	private final FileSpaceManager overflowSpaceMgr;
+	private final  AffiliateListEntryFactory eFactory;
+	private final  NumericKeyHashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, NumericKeyEntryFactory<AffiliateListEntry>> 
 	affiliateHashFile;
-	private BucketOverflowFileManager bucketOverflowMgr;
-	private static int[] empty = new int[0];
-
+	private final  BucketOverflowFileManager bucketOverflowMgr;
 	public AffiliateList(FileAccessManager hashTableFileMgr,
 			FileAccessManager overflowFileMgr, boolean readOnly) throws DatabaseException {
 		this.hashTableFileMgr = hashTableFileMgr;
@@ -121,7 +120,7 @@ public class AffiliateList {
 		AffiliateListEntry entry;
 		entry = getEntry(recordId);
 		if (null == entry) {
-			return empty;
+			return LibrisConstants.emptyIntList;
 		} else {
 			return entry.getAffiliates();
 		}
@@ -131,8 +130,8 @@ public class AffiliateList {
 		try {
 			AffiliateListEntry oldEntry = getEntry(parent);
 			AffiliateListEntry newEntry;
-			int newChildren[]  = isChildren? affiliates: empty;
-			int newAffiliates[]  = isChildren? empty: affiliates;
+			int newChildren[]  = isChildren? affiliates: LibrisConstants.emptyIntList;
+			int newAffiliates[]  = isChildren? LibrisConstants.emptyIntList: affiliates;
 			if (null == oldEntry) {
 				newEntry = new AffiliateListEntry(parent, newChildren, newAffiliates);
 			} else {
@@ -158,11 +157,11 @@ public class AffiliateList {
 		AffiliateListEntry entry;
 		entry = getEntry(recordId);
 		if (null == entry) {
-			return empty;
+			return LibrisConstants.emptyIntList;
 		} else {
 			int[] result = entry.getChildren();
 			if (null == result) {
-				return empty;
+				return LibrisConstants.emptyIntList;
 			} else {
 				return result;
 			}

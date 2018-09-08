@@ -24,6 +24,7 @@ import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.indexes.SortedKeyIntegerBucket;
 import org.lasalledebain.libris.indexes.SortedKeyValueBucketFactory;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
+import org.lasalledebain.libris.indexes.TermCountIndex;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
@@ -43,6 +44,8 @@ public class IndexManager implements LibrisConstants {
 	private int numGroups;
 
 	private LibrisRecordsFileManager recordsFile;
+	
+	private TermCountIndex termCounts;
 
 	static final int NAMED_RECORDS_INDEX_LEVELS = Integer.getInteger("org.lasalledebain.libris.namedrecsindexlevels",
 			2);
@@ -99,6 +102,9 @@ public class IndexManager implements LibrisConstants {
 				RandomAccessFile raf = sigFileMgr.getReadWriteRandomAccessFile();
 				signatureEditors[sigLevel] = new BloomFilterSectionEditor(raf, sigLevel);
 			}
+
+			termCounts = new TermCountIndex(fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT), false);
+
 			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
 			final IndexField[] indexFields = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
 			for (Record r : recs) {
@@ -126,9 +132,13 @@ public class IndexManager implements LibrisConstants {
 				}
 				final int rId = r.getRecordId();
 				r.getKeywords(indexFields, keywordList);
+				final Iterable<String> keywords = keywordList.getKeywords();
 				for (BloomFilterSectionEditor b:signatureEditors) {
 					b.switchTo(rId);
-					b.addTerms(keywordList.getKeywords());
+					b.addTerms(keywords);
+				}
+				for (String term: keywords) {
+					termCounts.incrementTermCount(term, true);
 				}
 			}
 			for (int i = 0; i < sigLevels; ++i) {
@@ -208,7 +218,8 @@ public class IndexManager implements LibrisConstants {
 				affList[i] = new AffiliateList(fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_HASHTABLE_ROOT + i),
 						fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT), readOnly);
 			}
-		} catch (InputException e) {
+			termCounts = new TermCountIndex(fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT), false);
+		} catch (InputException | IOException e) {
 			throw new DatabaseException("error opening namedRecordIndex", e);
 		}
 	}
@@ -223,6 +234,7 @@ public class IndexManager implements LibrisConstants {
 
 	public void flush() throws InputException, DatabaseException {
 		namedRecordIndex.flush();
+		termCounts.flush();
 		for (AffiliateList aff: affList) {
 			aff.flush();
 		}
@@ -241,6 +253,14 @@ public class IndexManager implements LibrisConstants {
 			recordsFile = new LibrisRecordsFileManager(db, db.isReadOnly(), db.getSchema(), fileMgr);
 		}
 		return recordsFile;
+	}
+
+	public int getTermCount(String term, boolean normalize) throws DatabaseException {
+		return termCounts.getTermCount(term, normalize);
+	}
+
+	public void setTermCount(String term, boolean normalize, int termCount) throws DatabaseException {
+		termCounts.setTermCount(term, normalize, termCount);
 	}
 
 	public void addChild(int groupNum, int parent, int child) throws DatabaseException {

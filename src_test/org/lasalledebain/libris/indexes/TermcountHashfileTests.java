@@ -11,15 +11,25 @@ import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.hashtable.HashUtils;
+import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.Libris;
+import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.hashfile.StringKeyHashFile;
 import org.lasalledebain.libris.hashfile.TermCountHashBucket;
 import org.lasalledebain.libris.hashfile.TermCountHashBucket.TermCountBucketFactory;
 import org.lasalledebain.libris.hashfile.TermCountHashFile;
+import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.index.TermCountEntry;
 import org.lasalledebain.libris.index.TermCountEntry.TermCountEntryFactory;
+import org.lasalledebain.libris.records.Records;
+import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.util.ByteArraySlice;
+import org.lasalledebain.libris.util.DiagnosticDatabase;
 import org.lasalledebain.libris.util.Lorem;
+import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import junit.framework.TestCase;
 
@@ -116,4 +126,52 @@ public class TermcountHashfileTests extends TestCase {
 			assertEquals("key "+key+" wrong value", count.intValue(), entry.getTermCount());
 		}
 	}
+	
+	@Test
+	public void testTermCountIndex() throws DatabaseException, LibrisException, IOException {
+		Utilities.deleteWorkingDirectory();
+		File workDir = Utilities.getTempTestDirectory();
+		if (null == workDir) {
+			fail("could not create working directory ");
+		}
+		File tcFile = new File(workDir, "TermCountTest");
+		tcFile.createNewFile();
+		FileAccessManager mgr = new FileAccessManager(tcFile);
+		TermCountIndex index = new TermCountIndex(mgr, true);
+		final String[] terms = new String[] {"One", "Two", "three", "four", "one", "two", "three"};
+		final int termCounts[] = new int[] {2, 2, 2, 1, 2, 2, 2};
+		for (int i = 0; i < terms.length; ++i) {
+			index.incrementTermCount(terms[i], true);
+		}
+		for (int i = 0; i < terms.length; ++i) {
+			int tc = index.getTermCount(terms[i], true);
+			assertEquals("wrong count for "+terms[i],  termCounts[i], tc);
+		}
+	}
+
+	public void testBuildIndex() {
+		try {
+			File testDatabaseFile = Utilities.getTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
+			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
+			IndexField[] indexFieldList = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
+			final LibrisUi myUi = db.getUi();
+			
+			assertTrue("Could not close database", myUi.closeDatabase(false));
+			db = myUi.openDatabase();
+			Records recs = db.getDatabaseRecords();	
+			for (Record r: recs) {
+				RecordKeywords kw = new ExactKeywordList(true);
+				r.getKeywords(indexFieldList, kw);
+				for (String term: kw.getKeywords()) {
+					int count = db.getTermCount(term, true);
+					assertTrue("Missing count for "+term, count > 0);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("unexpected exception");
+		}
+	}
+	
+
 }

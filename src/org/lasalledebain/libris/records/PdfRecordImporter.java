@@ -13,7 +13,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.Repository.ArtifactParameters;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.util.Stemmer;
+import org.lasalledebain.libris.util.LibrisStemmer;
 
 public class PdfRecordImporter {
 	private static final int MIN_ABSTRACT_LENGTH = 1000;
@@ -83,7 +83,7 @@ public class PdfRecordImporter {
         HashSet<String> termSet = new HashSet<>(Arrays.asList(docString.toLowerCase().split("[\\p{Space}\\p{Punct}]+")));
         HashSet<String> stems = new HashSet<>(termSet.size()/2);
         for (String word: termSet) {
-        	Stemmer wordStemmer = new Stemmer(word.toCharArray());
+        	LibrisStemmer wordStemmer = new LibrisStemmer(word, false);
         	stems.add(wordStemmer.toString());
         }
         termSet.addAll(stems);

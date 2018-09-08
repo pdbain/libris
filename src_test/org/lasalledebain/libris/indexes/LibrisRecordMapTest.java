@@ -23,7 +23,6 @@ public class LibrisRecordMapTest extends TestCase {
 			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
 			final LibrisUi myUi = db.getUi();
 			
-			MockLibrisRecordMap recPositions = new MockLibrisRecordMap();
 			assertTrue("Could not close database", myUi.closeDatabase(false));
 			db = myUi.openDatabase();
 			Records recs = db.getDatabaseRecords();	
@@ -36,7 +35,6 @@ public class LibrisRecordMapTest extends TestCase {
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("unexpected exception");
-		} finally {
 		}
 	}
 	
