@@ -63,7 +63,7 @@ public class PdfRecordImporter {
 			StringBuilder keywordsString = new StringBuilder(5 * terms.size());
 			for (String s: terms) {
 				keywordsString.append(' ');
-				keywordsString.append(s);
+				keywordsString.append(s.toLowerCase());
 			}
 			rec.addFieldValue(keywordsField, keywordsString.toString());
 		}
@@ -78,15 +78,9 @@ public class PdfRecordImporter {
 				rec.addFieldValue(abstractField, docString.substring(0, endOfAbstract));
 		}
 	}
-// TODO limit strings based on term frequency/inverse document frequency
+
 	private Set<String> getTerms(String docString) {
-        HashSet<String> termSet = new HashSet<>(Arrays.asList(docString.toLowerCase().split("[\\p{Space}\\p{Punct}]+")));
-        HashSet<String> stems = new HashSet<>(termSet.size()/2);
-        for (String word: termSet) {
-        	LibrisStemmer wordStemmer = new LibrisStemmer(word, false);
-        	stems.add(wordStemmer.toString());
-        }
-        termSet.addAll(stems);
+        HashSet<String> termSet = new HashSet<>(Arrays.asList(docString.split("[\\p{Space}\\p{Punct}]+")));
 		return termSet;
 	}
 }
