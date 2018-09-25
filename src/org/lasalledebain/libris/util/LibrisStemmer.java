@@ -1,16 +1,21 @@
 package org.lasalledebain.libris.util;
 
+/**
+ * This adds convenience methods for the original code.
+ *
+ */
 public class LibrisStemmer extends Stemmer {
 	public LibrisStemmer(char[] word) {
-		super(word);
+		super();
+		add(word, word.length);
 	}
 
 	public LibrisStemmer(String word, boolean convertToLower) {
-		super(toLower(word, convertToLower));
+		this(toLower(word, convertToLower));
 	}
 
 	public LibrisStemmer(String word) {
-		super(word.toCharArray());
+		this(word.toCharArray());
 	}
 
 	private static char [] toLower(String word, boolean convertToLower) {
