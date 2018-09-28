@@ -169,7 +169,7 @@ public class TermcountHashfileTests extends TestCase {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail("unexpected exception");
+			fail("unexpected exception "+e.getMessage());
 		}
 	}
 	
