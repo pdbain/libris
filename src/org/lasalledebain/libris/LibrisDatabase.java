@@ -78,6 +78,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 
 	public LibrisDatabase(LibrisDatabaseParameter parameterObject) throws LibrisException  {
 		fileMgr = new LibrisFileManager(parameterObject.databaseFile, parameterObject.auxDir);
+		metadata = new XmlMetadata(this);
 		indexMgr = new IndexManager(this, metadata, fileMgr);
 		ui = parameterObject.ui;
 		isModified = false;
@@ -86,7 +87,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		if (!parameterObject.readOnly) {
 			modifiedRecords = new ModifiedRecordList();			
 		}
-		metadata = new XmlMetadata(this);
 		groupMgr = new GroupManager(this);
 	}
 

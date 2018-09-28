@@ -2,6 +2,7 @@ package org.lasalledebain.libris;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -50,6 +51,12 @@ public class IndexManager implements LibrisConstants {
 	static final int NAMED_RECORDS_INDEX_LEVELS = Integer.getInteger("org.lasalledebain.libris.namedrecsindexlevels",
 			2);
 
+	private BloomFilterSectionEditor signatureEditors[];
+
+	private int sigLevels;
+
+	private FileAccessManager signatureFileManagers[];
+
 	/**
 	 * @param librisDatabase
 	 *            database metadata
@@ -64,6 +71,24 @@ public class IndexManager implements LibrisConstants {
 		db = librisDatabase;
 		this.fileMgr = fileMgr;
 		this.metadata = metadata;
+		sigLevels = BloomFilterSection.calculateSignatureLevels(metadata.getLastRecordId());
+		metadata.setSignatureLevels(sigLevels);
+		signatureEditors = new BloomFilterSectionEditor[sigLevels];
+		signatureFileManagers = new FileAccessManager[sigLevels];
+	}
+
+	public void setSignatureEditors() throws DatabaseException {
+		for (int sigLevel = 0; sigLevel < sigLevels; ++sigLevel) {
+			final FileAccessManager sigFileMgr = db.getFileMgr().getAuxiliaryFileMgr(SIGNATURE_FILENAME_ROOT+sigLevel);
+			signatureFileManagers[sigLevel] = sigFileMgr;
+			RandomAccessFile raf;
+			try {
+				raf = sigFileMgr.getReadWriteRandomAccessFile();
+			} catch (FileNotFoundException e) {
+				throw new DatabaseException("Error opening "+sigFileMgr.getPath(), e);
+			}
+			signatureEditors[sigLevel] = new BloomFilterSectionEditor(raf, sigLevel);
+		}
 	}
 
 	public boolean isIndexed() {
@@ -81,11 +106,6 @@ public class IndexManager implements LibrisConstants {
 		DataOutputStream affiliateOpStreams[] = new DataOutputStream[numGroups];
 		int numChildren[] = new int[numGroups];
 		int numAffiliates[] = new int[numGroups];
-		LibrisMetadata metadata = db.getMetadata();
-		int sigLevels = BloomFilterSection.calculateSignatureLevels(metadata.getLastRecordId());
-		metadata.setSignatureLevels(sigLevels);
-		FileAccessManager signatureFileManagers[] = new FileAccessManager[sigLevels];
-		BloomFilterSectionEditor signatureEditors[] = new BloomFilterSectionEditor[sigLevels];
 		try {
 			for (int g = 0; g < numGroups; ++g) {
 				childTempFiles[g] = fileMgr.getAuxiliaryFileMgr(TEMP_CHILD_FILE + g);
@@ -95,12 +115,6 @@ public class IndexManager implements LibrisConstants {
 				affiliateOpStreams[g] = new DataOutputStream(affiliateTempFiles[g].getOpStream());
 				childTempFiles[g].setDeleteOnExit();
 				affiliateTempFiles[g].setDeleteOnExit();
-			}
-			for (int sigLevel = 0; sigLevel < sigLevels; ++sigLevel) {
-				final FileAccessManager sigFileMgr = db.getFileMgr().getAuxiliaryFileMgr(SIGNATURE_FILENAME_ROOT+sigLevel);
-				signatureFileManagers[sigLevel] = sigFileMgr;
-				RandomAccessFile raf = sigFileMgr.getReadWriteRandomAccessFile();
-				signatureEditors[sigLevel] = new BloomFilterSectionEditor(raf, sigLevel);
 			}
 
 			termCounts = new TermCountIndex(fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT), false);
@@ -133,10 +147,7 @@ public class IndexManager implements LibrisConstants {
 				final int rId = r.getRecordId();
 				r.getKeywords(indexFields, keywordList);
 				final Iterable<String> keywords = keywordList.getKeywords();
-				for (BloomFilterSectionEditor b:signatureEditors) {
-					b.switchTo(rId);
-					b.addTerms(keywords);
-				}
+				addKeywords(rId, keywords);
 				for (String term: keywords) {
 					termCounts.incrementTermCount(term, true);
 				}
@@ -158,6 +169,13 @@ public class IndexManager implements LibrisConstants {
 			setIndexed(true);
 		} catch (IOException e) {
 			throw new InputException("Error rebuilding indexes", e);
+		}
+	}
+
+	public void addKeywords(final int rId, final Iterable<String> keywords) throws IOException {
+		for (BloomFilterSectionEditor b:signatureEditors) {
+			b.switchTo(rId);
+			b.addTerms(keywords);
 		}
 	}
 
@@ -219,6 +237,7 @@ public class IndexManager implements LibrisConstants {
 						fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT), readOnly);
 			}
 			termCounts = new TermCountIndex(fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT), false);
+			setSignatureEditors();
 		} catch (InputException | IOException e) {
 			throw new DatabaseException("error opening namedRecordIndex", e);
 		}
