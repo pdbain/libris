@@ -71,5 +71,6 @@ public interface LibrisUi {
 	 */
 	public abstract int confirm(String msg);
 	public abstract int confirmWithCancel(String msg);
+	public File getDatabaseFile();
 	public String promptAndReadReply(String prompt) throws DatabaseException;
 }

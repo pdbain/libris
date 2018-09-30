@@ -22,10 +22,6 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 		super(databaseFile, readOnly);
 	}
 
-	public HeadlessUi() {
-		super();
-	}
-
 	// TODO write headless UI
 	// use logging interface for messages, store results
 	@Override
@@ -127,6 +123,10 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	@Override
 	public Dimension getDisplayPanelSize() {
 		// TODO Implement getDisplayPanelSize
+		return null;
+	}
+
+	public File getDatabaseFile() {
 		return null;
 	}
 

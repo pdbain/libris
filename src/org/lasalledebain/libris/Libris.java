@@ -59,7 +59,7 @@ public class Libris {
 				}
 				LibrisGui ui = new LibrisGui(dbFile, readOnly);
 				LibrisDatabaseParameter params = ui.getParameters();
-				params.auxDir = auxDir;
+				params.setAuxDir(auxDir);
 				if (null != dbFile) {
 					ui.openDatabase();
 				} else {
@@ -92,7 +92,7 @@ public class Libris {
 	public static boolean buildIndexes(File databaseFile, LibrisUi ui)
 			throws UserErrorException, DatabaseException, InputException,
 			LibrisException {
-		LibrisDatabase db = new LibrisDatabase(new LibrisDatabaseParameter(ui, databaseFile));
+		LibrisDatabase db = new LibrisDatabase(new LibrisDatabaseParameter(ui));
 		if (!db.isDatabaseReserved()) {
 			if (!db.buildIndexes(true)) {
 				return false;

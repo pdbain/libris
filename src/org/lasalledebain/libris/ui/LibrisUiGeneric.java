@@ -26,16 +26,16 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	private UiField selectedField;
 	protected String uiTitle;
 	protected LibrisDatabase currentDatabase;
-	protected File databaseFile;
-	protected File auxDirectory;
 	private XmlSchema mySchema;
 	LibrisDatabaseParameter params;
+	File databaseFile;
+	private boolean readOnly;
 
 	public LibrisUiGeneric(File dbFile, boolean readOnly) throws LibrisException {
 		this();
-		params = new LibrisDatabaseParameter(this, dbFile);
-		params.readOnly = readOnly;
 		setDatabaseFile(dbFile);
+		params = new LibrisDatabaseParameter(this);
+		this.readOnly = readOnly;
 	}
 	public LibrisUiGeneric() {
 		databaseOpen = false;
@@ -82,11 +82,12 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	 * @param openReadOnly the openReadOnly to set
 	 */
 	public void setOpenReadOnly(boolean openReadOnly) {
-		params.readOnly = openReadOnly;
+		readOnly = openReadOnly;
 	}
 	/**
 	 * @return the databaseFile
 	 */
+	@Override
 	public File getDatabaseFile() {
 		return databaseFile;
 	}
@@ -181,7 +182,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	}
 
 	public void rebuildDatabase() throws LibrisException {
-		Libris.buildIndexes(databaseFile, new HeadlessUi());
+		Libris.buildIndexes(databaseFile, new HeadlessUi(databaseFile, false));
 	}
 
 	@Override

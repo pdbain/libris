@@ -11,6 +11,8 @@ import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
+import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -47,6 +49,23 @@ public class TestRecordFilter extends TestCase {
 			assertEquals("Wrong record returned", expectedId, r.getRecordId());
 		}
 		assertFalse("too few records found", expectedIds.hasNext());
+	}
+	
+	public void testAddRecord() throws LibrisException {
+		Record rec = db.newRecord();
+		rec.addFieldValue("ID_keywords", "k2 k4 k1 k3");
+		int newId = db.put(rec);
+		KeywordFilter filter = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {0, 1}, new String[] {"k1", "k3"});
+		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);
+		Integer[] ids = new Integer[] {1,4, newId};
+		Iterator<Integer> expectedIds = Arrays.asList(ids).iterator();
+		for (Record r: filteredList) {
+			assertTrue("too many records found", expectedIds.hasNext());
+			int expectedId = expectedIds.next();
+			assertEquals("Wrong record returned", expectedId, r.getRecordId());
+		}
+		assertFalse("too few records found", expectedIds.hasNext());
+		db.closeDatabase(true);
 	}
 	
 	public void testGetIndexFields() {
