@@ -158,17 +158,11 @@ public class BrowserWindow extends JPanel {
 		chooser.setModel(recList);
 	}
 
-	public void doRefresh(RecordList src) {
-		recordsIterator = src.iterator();
-		recList = getRecords();
-		chooser.setModel(recList);
-	}
-
 	public void doRefresh(Iterable<Record> src) {
 		recordsIterator = src.iterator();
 		recList = getRecords();
 		chooser.setModel(recList);
-}
+	}
 
 	public void setFilter(RecordFilter filter) {
 		this.filter = filter;

@@ -75,7 +75,6 @@ class FilterDialogue {
 				createSearchDialogue(searchTypeSelector.getSelectedIndex());
 			}
 		});	
-;
 		searchTypeSelector.setSelectedIndex(lastSettings.lastSearchType);
 		createSearchDialogue(searchTypeSelector.getSelectedIndex());
 	}

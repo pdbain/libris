@@ -77,14 +77,14 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public static final String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
 
 	public LibrisDatabase(LibrisDatabaseParameter parameterObject) throws LibrisException  {
-		fileMgr = new LibrisFileManager(parameterObject.databaseFile, parameterObject.auxDir);
+		fileMgr = new LibrisFileManager(parameterObject.getDatabaseFile(), parameterObject.getAuxDir());
 		metadata = new XmlMetadata(this);
 		indexMgr = new IndexManager(this, metadata, fileMgr);
-		ui = parameterObject.ui;
+		ui = parameterObject.getUi();
 		isModified = false;
-		readOnly = parameterObject.readOnly;
+		readOnly = parameterObject.isReadOnly();
 		mySchema = null;
-		if (!parameterObject.readOnly) {
+		if (readOnly) {
 			modifiedRecords = new ModifiedRecordList();			
 		}
 		groupMgr = new GroupManager(this);
@@ -266,16 +266,16 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	
 	public static boolean newDatabase(LibrisDatabaseParameter params, LibrisMetadata metadata) 
 			throws XMLStreamException, IOException, LibrisException {
-		File databaseFile = params.databaseFile;
+		File databaseFile = params.getDatabaseFile();
 		if (!databaseFile .createNewFile()) {
-			params.ui.alert("Database file "+databaseFile.getAbsolutePath()+" already exisits");
+			params.getUi().alert("Database file "+databaseFile.getAbsolutePath()+" already exisits");
 			return false;
 		}
 		FileOutputStream databaseStream = new FileOutputStream(databaseFile);
 		ElementWriter databaseWriter = ElementWriter.eventWriterFactory(databaseStream, 0);
 		{
 			LibrisAttributes attrs = new LibrisAttributes();
-			attrs.setAttribute(XML_DATABASE_SCHEMA_NAME_ATTR, params.schemaName);
+			attrs.setAttribute(XML_DATABASE_SCHEMA_NAME_ATTR, params.getSchemaName());
 			attrs.setAttribute(XML_SCHEMA_VERSION_ATTR, Schema.currentVersion);
 			attrs.setAttribute(XML_DATABASE_DATE_ATTR, LibrisMetadata.getCurrentDateAndTimeString());
 			databaseWriter.writeStartElement(XML_LIBRIS_TAG, attrs, false);
@@ -290,7 +290,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		databaseWriter.flush();
 		databaseStream.close();
 		
-		return Libris.buildIndexes(databaseFile, params.ui);
+		return Libris.buildIndexes(databaseFile, params.getUi());
 	}
 
 	boolean buildIndexes(boolean doLoadMetadata) throws LibrisException {
@@ -422,6 +422,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		fileMgr.getDatabaseFileMgr().close();
 	}
 
+	@Deprecated
 	private void destroy() {
 		databaseRecords = null;
 		metadata = null;
@@ -775,9 +776,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return new DatabaseRecordList(this);	
 	}
 
-	public RecordList getKeywordFilteredRecordList(KeywordFilter filter) {
-		return null;
-	}
 	public int getModifiedRecordCount() {
 		return metadata.getModifiedRecords();
 	}

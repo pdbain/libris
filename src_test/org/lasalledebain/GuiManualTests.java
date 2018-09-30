@@ -40,11 +40,19 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 
 public class GuiManualTests extends TestCase {
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception {
+		myUi = new HeadlessUi(null, false);
+	}
+
 	private static final String LAYOUT1 = "layout1";
 	private static final String LAYOUT1A = "layout1a";
 	private Schema mySchema;
 	private Layout myGuiLayout;
-	private static LibrisWindowedUi myUi = new HeadlessUi();
+	private LibrisWindowedUi myUi;
 
 	public void testWindowSanity() {
 		JFrame frame = new JFrame("testWindowSanity");

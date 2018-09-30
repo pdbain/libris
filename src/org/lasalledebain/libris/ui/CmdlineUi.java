@@ -131,4 +131,8 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 		return currentDatabase.closeDatabase(force);
 	}
 
+	public File getDatabaseFile() {
+		return null;
+	}
+
 }
