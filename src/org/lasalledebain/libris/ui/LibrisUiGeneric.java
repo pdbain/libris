@@ -10,7 +10,6 @@ import java.util.prefs.Preferences;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisDatabaseParameter;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -27,14 +26,12 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	protected String uiTitle;
 	protected LibrisDatabase currentDatabase;
 	private XmlSchema mySchema;
-	LibrisDatabaseParameter params;
 	File databaseFile;
 	private boolean readOnly;
 
 	public LibrisUiGeneric(File dbFile, boolean readOnly) throws LibrisException {
 		this();
 		setDatabaseFile(dbFile);
-		params = new LibrisDatabaseParameter(this);
 		this.readOnly = readOnly;
 	}
 	public LibrisUiGeneric() {
@@ -43,12 +40,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		setSelectedField(null);
 	}
 
-	/**
-	 * @return the params
-	 */
-	public LibrisDatabaseParameter getParameters() {
-		return params;
-	}
 	@Override
 	public LibrisDatabase getDatabase() {
 		return currentDatabase;
@@ -103,12 +94,12 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		}
 		try {
 			// TODO add option to open read-write
-			currentDatabase = new LibrisDatabase(params);
+			currentDatabase = new LibrisDatabase(databaseFile,readOnly, this, mySchema);
 			if (!currentDatabase.isIndexed()) {
 				alert("database "+databaseFile.getAbsolutePath()+" is not indexed.  Please re-index.");
 				return null;
 			}
-			currentDatabase.openDatabase(mySchema);
+			currentDatabase.openDatabase();
 			setDatabaseOpen(true);
 		} catch (Exception e) {
 			alert("Error opening database", e);

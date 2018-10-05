@@ -3,7 +3,6 @@ package org.lasalledebain.libris.ui;
 import java.io.File;
 
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisDatabaseParameter;
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XmlSchema;
@@ -13,7 +12,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 public interface LibrisUi {
 
-	public LibrisDatabaseParameter getParameters();
 	public void setSchema(XmlSchema mySchema);
 	public LibrisDatabase openDatabase() throws DatabaseException;
 	public boolean closeDatabase(boolean force);

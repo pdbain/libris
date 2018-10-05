@@ -87,12 +87,10 @@ static final int FANOUT = 100;
 
 	public static boolean initialize(File databaseFile) throws LibrisException, XMLStreamException, IOException {
 		HeadlessUi theUi = new HeadlessUi(databaseFile, false);
-		LibrisDatabaseParameter params = new LibrisDatabaseParameter(theUi);
-		params.setDatabaseSchema(mySchema);
-		params.setSchemaName(REPOSITORY);
 		Layouts theLayouts = new Layouts(mySchema);
 		MetadataHolder metadata = new MetadataHolder(mySchema, theLayouts);
-		return LibrisDatabase.newDatabase(params, metadata);
+		boolean success = LibrisDatabase.newDatabase(databaseFile, REPOSITORY, false, theUi, metadata);
+		return success;
 	}
 
 	public static Repository open(File databaseFile, File theRoot, boolean readOnly) throws FactoryConfigurationError, LibrisException {

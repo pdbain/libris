@@ -11,7 +11,6 @@ import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
