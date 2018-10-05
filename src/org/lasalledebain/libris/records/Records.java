@@ -7,8 +7,8 @@ import java.util.Iterator;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
-import org.lasalledebain.libris.ModifiedRecordList;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -32,7 +32,7 @@ public class Records implements Iterable<Record>{
 		throw new DatabaseException("not implemented");
 	}
 
-	public void putRecords(ModifiedRecordList modifiedRecords) throws InputException, DatabaseException {
+	public void putRecords(RecordList modifiedRecords) throws InputException, DatabaseException {
 		for (Record r: modifiedRecords) {
 			recMgr.putRecord(r);
 		}

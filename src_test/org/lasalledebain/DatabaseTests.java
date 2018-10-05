@@ -36,6 +36,7 @@ public class DatabaseTests extends TestCase {
 	private final static String[] authors = {"", "John le Carre", "Homer", "Louise Creighton"};
 	private LibrisDatabase rootDb;
 	private LibrisDatabase forkDb;
+	private LibrisUi ui;
 	// TODO override auxiliary directory
 	public void testReadRecordsFromSingleFile() {
 		try {
@@ -637,8 +638,10 @@ public class DatabaseTests extends TestCase {
 
 	private LibrisDatabase buildTestDatabase(File testDatabaseFileCopy) throws IOException {			
 		rootDb = null;
+		ui = null;
 		try {
 			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			ui = rootDb.getUi();
 		} catch (Throwable e) {
 			e.printStackTrace();
 			fail("Cannot open database");
