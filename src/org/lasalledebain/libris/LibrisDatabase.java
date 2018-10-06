@@ -106,9 +106,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	}
 
 	private void openDatabaseImpl() throws DatabaseNotIndexedException, DatabaseException, LibrisException {
-		if (isDatabaseReserved()) { 
-			throw new DatabaseException("Database already opened");
-		}
 		mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 		if (!isIndexed()) {
 			throw new DatabaseNotIndexedException();
@@ -145,7 +142,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	}
 
 	public boolean isDatabaseReserved() {
-		return fileMgr.isDatabaseReserved();
+		return Objects.nonNull(fileMgr) && fileMgr.isDatabaseReserved();
 	}
 
 	public void save()  {
@@ -172,6 +169,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	 * @return true if database is not modified or force is true.
 	 */
 	public boolean closeDatabase(boolean force) {
+		if (isDatabaseReserved()) {
+			freeDatabase();
+		}
 		if (!dbOpen) {
 			return true;
 		}
@@ -193,15 +193,15 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 				fileMgr.freeDatabase();
 				fileMgr.close();
 			}
+			freeDatabase();
 			fileMgr = null;
 			databaseRecords = null;
 			dbOpen = false;
-			freeDatabase();
 			return true;
 		}
 	}
 
-	public boolean isDbOpen() {
+	public boolean isDatabaseOpen() {
 		return dbOpen;
 	}
 	private void loadDatabaseInfo(boolean doLoadMetadata) throws LibrisException {

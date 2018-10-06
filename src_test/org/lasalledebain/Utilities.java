@@ -383,7 +383,7 @@ public class Utilities extends TestCase {
 			db = ui.openDatabase();
 		} catch (LibrisException e) {
 			e.printStackTrace();
-			fail("Error rebuilding database");
+			fail("Error rebuilding database: "+e.getMessage());
 		}
 		return db;
 	}
