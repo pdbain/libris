@@ -19,7 +19,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	
 	private static final String NO_DATABASE_OPENED = "No database opened";
-	protected boolean databaseOpen;
 	protected static Preferences librisPrefs;
 	protected static Object prefsSync = new Object();
 	private UiField selectedField;
@@ -35,7 +34,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		this.readOnly = readOnly;
 	}
 	public LibrisUiGeneric() {
-		databaseOpen = false;
 		fieldSelected(false);
 		setSelectedField(null);
 	}
@@ -82,12 +80,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	public File getDatabaseFile() {
 		return databaseFile;
 	}
-	/**
-	 * @param databaseOpen the databaseOpen to set
-	 */
-	public void setDatabaseOpen(boolean databaseOpen) {
-		this.databaseOpen = databaseOpen;
-	}
+
 	public LibrisDatabase openDatabase() throws DatabaseException {
 		if (isDatabaseOpen()) {
 			alert("Cannot open "+databaseFile.getAbsolutePath()+" because "+currentDatabase.getDatabaseFile().getAbsolutePath()+" is open");
@@ -100,7 +93,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 				return null;
 			}
 			currentDatabase.openDatabase();
-			setDatabaseOpen(true);
 		} catch (Exception e) {
 			alert("Error opening database", e);
 			return currentDatabase;
@@ -117,7 +109,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		if (result) {
 			currentDatabase = null;
 			setTitle(NO_DATABASE_OPENED);
-			setDatabaseOpen(false);
 		}
 		return result;
 	}
@@ -126,10 +117,12 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	public boolean isDatabaseSelected() {
 		return (null != databaseFile);
 	}
+	
 	@Override
 	public boolean isDatabaseOpen() {
-		return databaseOpen;
+		return Objects.nonNull(currentDatabase) && currentDatabase.isDatabaseOpen();
 	}
+	
 	protected boolean isDatabaseModified() {
 		return (null != currentDatabase) && currentDatabase.isModified();
 	}

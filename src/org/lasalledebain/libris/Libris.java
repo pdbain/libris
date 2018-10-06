@@ -96,7 +96,7 @@ public class Libris {
 			if (!db.buildIndexes(true)) {
 				return false;
 			};
-			return ui.closeDatabase(false);
+			return db.closeDatabase(false);
 		} else {
 			return false;
 		}

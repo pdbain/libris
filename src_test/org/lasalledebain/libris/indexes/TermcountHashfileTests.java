@@ -19,7 +19,6 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.hashfile.StringKeyHashFile;
 import org.lasalledebain.libris.hashfile.TermCountHashBucket;
-import org.lasalledebain.libris.hashfile.TermCountHashBucket.TermCountBucketFactory;
 import org.lasalledebain.libris.hashfile.TermCountHashFile;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.index.TermCountEntry;
@@ -27,7 +26,6 @@ import org.lasalledebain.libris.index.TermCountEntry.TermCountEntryFactory;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.util.ByteArraySlice;
-import org.lasalledebain.libris.util.DiagnosticDatabase;
 import org.lasalledebain.libris.util.Lorem;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
@@ -167,6 +165,7 @@ public class TermcountHashfileTests extends TestCase {
 					assertTrue("Missing count for "+term, count > 0);
 				}
 			}
+			assertTrue("could not close database", db.closeDatabase(false));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("unexpected exception "+e.getMessage());
