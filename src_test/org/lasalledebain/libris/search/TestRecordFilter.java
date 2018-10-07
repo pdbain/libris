@@ -50,6 +50,21 @@ public class TestRecordFilter extends TestCase {
 		assertFalse("too few records found", expectedIds.hasNext());
 	}
 	
+	public void testCascadeWordFilter() {
+		KeywordFilter filter1 = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {0, 1}, new String[] {"k1"});
+		FilteredRecordList filteredList1 = new FilteredRecordList(recList, filter1);
+		KeywordFilter filter2 = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {0, 1}, new String[] {"k3"});
+		FilteredRecordList filteredList2 = new FilteredRecordList(filteredList1, filter2);
+		Integer[] ids = new Integer[] {1,4};
+		 Iterator<Integer> expectedIds = Arrays.asList(ids).iterator();
+		for (Record r: filteredList2) {
+			assertTrue("too many records found", expectedIds.hasNext());
+			int expectedId = expectedIds.next();
+			assertEquals("Wrong record returned", expectedId, r.getRecordId());
+		}
+		assertFalse("too few records found", expectedIds.hasNext());
+	}
+	
 	public void testAddRecord() throws LibrisException {
 		Record rec = db.newRecord();
 		rec.addFieldValue("ID_keywords", "k2 k4 k1 k3");
@@ -81,7 +96,18 @@ public class TestRecordFilter extends TestCase {
 	
 	public void testKeywordAndBloomFilter() {
 		fail("not implememted");
-	}
+
+		KeywordFilter filter = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {0, 1}, new String[] {"k1", "k3"});
+		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);
+		Integer[] ids = new Integer[] {1,4};
+		 Iterator<Integer> expectedIds = Arrays.asList(ids).iterator();
+		for (Record r: filteredList) {
+			assertTrue("too many records found", expectedIds.hasNext());
+			int expectedId = expectedIds.next();
+			assertEquals("Wrong record returned", expectedId, r.getRecordId());
+		}
+		assertFalse("too few records found", expectedIds.hasNext());
+		}
 	
 	@After
 	public void tearDown() throws Exception {

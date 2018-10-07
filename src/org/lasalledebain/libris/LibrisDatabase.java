@@ -15,6 +15,7 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -34,6 +35,7 @@ import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
+import org.lasalledebain.libris.indexes.KeywordFilteredRecordIterator;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
@@ -827,6 +829,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 
 	public void exportDatabaseXml(OutputStream destination, boolean includeSchema, boolean includeRecords, boolean addInstanceInfo) throws LibrisException {
 		ElementWriter outWriter;
+		if (!isDatabaseOpen()) {
+			throw new UserErrorException("exportDatabaseXml: database not open");
+		}
 
 		try {
 			outWriter = ElementWriter.eventWriterFactory(destination);
@@ -918,6 +923,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 
 	public void setDatabaseDate(Date databaseDate) {
 		this.databaseDate = databaseDate;
+	}
+	public KeywordFilteredRecordIterator makeKeywordFilteredIterator(Iterable<String> terms) throws UserErrorException, IOException {
+		return indexMgr.makeKeywordFilteredIterator(terms);
 	}
 }
 

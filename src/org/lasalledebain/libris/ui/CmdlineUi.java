@@ -121,11 +121,6 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 	}
 
 	@Override
-	public boolean quit(boolean force) {
-		return closeDatabase(force);
-	}
-
-	@Override
 	protected boolean checkAndCloseDatabase(boolean force) {
 		// TODO write checkAndCloseDatabase
 		return currentDatabase.closeDatabase(force);

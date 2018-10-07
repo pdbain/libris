@@ -188,7 +188,7 @@ public class LibrisFileManager implements LibrisConstants {
 	 * @param databaseDir base directory into which to put the auxiliary files directory
 	 * @throws DatabaseException 
 	 */
-	public synchronized void setAuxiliaryFiles(File databaseDir) throws DatabaseException {
+	private synchronized void setAuxiliaryFiles(File databaseDir) throws DatabaseException {
 		checkLock();
 		if (!fileSet()) {
 			throw new DatabaseException("Database file not set");

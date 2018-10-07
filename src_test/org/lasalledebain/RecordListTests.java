@@ -189,9 +189,10 @@ public class RecordListTests extends TestCase {
 			testDb.put(r);
 			testDb.save();
 			testDb.getUi().quit(true);
+			testDb = null;
 			
 			HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy, false);
-			ui.openDatabase();
+			testDb = ui.openDatabase();
 			checkRecordOrder(ui.getDatabase(), expectedData);
 			
 			testDb.exportDatabaseXml(new FileOutputStream(testDatabaseFileCopy), true, true, false);
