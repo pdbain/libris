@@ -125,7 +125,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	@Override
 	public boolean quit(boolean force) {
 		destroyWindow(false);
-		return closeDatabase(force);
+		return super.quit(force);
 	}
 
 	protected abstract void destroyWindow(boolean b);

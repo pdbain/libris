@@ -99,12 +99,6 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	}
 
 	@Override
-	public boolean quit(boolean force) {
-		// TODO Implement quit
-		return false;
-	}
-
-	@Override
 	public void closeWindow(boolean allWindows) {
 		return;
 	}

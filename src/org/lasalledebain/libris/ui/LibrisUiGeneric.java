@@ -113,7 +113,12 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		return result;
 	}
 	protected abstract boolean checkAndCloseDatabase(boolean force);
-	
+
+	@Override
+	public boolean quit(boolean force) {
+		return closeDatabase(force);
+	}
+
 	public boolean isDatabaseSelected() {
 		return (null != databaseFile);
 	}
