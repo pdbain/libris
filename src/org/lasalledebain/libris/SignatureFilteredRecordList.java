@@ -2,20 +2,21 @@ package org.lasalledebain.libris;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.UserErrorException;
-import org.lasalledebain.libris.indexes.KeywordFilteredRecordIterator;
+import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 
-public class KeywordRecordList extends RecordList {
+public class SignatureFilteredRecordList extends RecordList {
 
 	LibrisDatabase dataBase;
 	private Iterable<String> terms;
 	int limit;
 
-	private KeywordRecordList(LibrisDatabase dataBase, Iterable<String> terms) throws UserErrorException, IOException {
+	public SignatureFilteredRecordList(LibrisDatabase dataBase, Iterable<String> terms) throws UserErrorException, IOException {
 		this.dataBase = dataBase;
 		this.terms = terms;
 		limit = dataBase.getLastRecordId();
@@ -37,9 +38,9 @@ public class KeywordRecordList extends RecordList {
 
 	private class RecordIterator implements Iterator<Record> {
 		Record currentRecord;
-		private KeywordFilteredRecordIterator filteredIdSource;
+		private SignatureFilteredIdList filteredIdSource;
 		public RecordIterator() throws UserErrorException, IOException {
-			filteredIdSource = dataBase.makeKeywordFilteredIterator(terms);
+			filteredIdSource = dataBase.makeSignatureFilteredIdIterator(terms);
 			currentRecord = null;
 		}
 
@@ -62,8 +63,13 @@ public class KeywordRecordList extends RecordList {
 
 		@Override
 		public Record next() {
-			//if (!hasNext())
-			return null;
+			if (hasNext()) {
+				Record temp = currentRecord;
+				currentRecord = null;
+				return temp;
+			} else {
+				throw new NoSuchElementException();
+			}
 		}
 
 	}

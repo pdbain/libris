@@ -8,19 +8,19 @@ import java.util.Objects;
 
 import org.lasalledebain.libris.exception.UserErrorException;;
 
-public class KeywordFilteredRecordIterator {
+public class SignatureFilteredIdList {
 
 	/*
 	 * This filters at a given level.  It calls lower levels recursively.
 	 */
-	protected final KeywordFilteredRecordIterator subFilter;
+	protected final SignatureFilteredIdList subFilter;
 	int cursor = NULL_RECORD_ID;
 	protected final BloomFilterSectionQuery bloomFilter;
 	private final int recordsPerSet;
 	private boolean first;
 
-	public KeywordFilteredRecordIterator(RandomAccessFile signatureFile, int level, Iterable<String> terms,
-			KeywordFilteredRecordIterator subFilter) throws UserErrorException, IOException {
+	public SignatureFilteredIdList(RandomAccessFile signatureFile, int level, Iterable<String> terms,
+			SignatureFilteredIdList subFilter) throws UserErrorException, IOException {
 		this.subFilter = subFilter;
 		cursor = NULL_RECORD_ID;
 		first = true;

@@ -26,14 +26,11 @@ public abstract class BloomFilterSection {
 	protected int bytesPerRange;
 	protected RandomAccessFile signatureFile;
 	protected final int recordsPerSet;
-	public int getRecordsPerSet() {
-		return recordsPerSet;
-	}
-
 	protected int currentBaseId;
 	protected BitSet recordSignature;
 	public final static int MAX_LEVEL = 4;
 	public static final int bytesPerLevel[] = getLevels(MAX_LEVEL);
+
 	static int[] getLevels(int max) {
 		int size = 1;
 		int result[] = new int[max + 1];
@@ -43,6 +40,7 @@ public abstract class BloomFilterSection {
 		}
 		return result;
 	}
+	
 	public BloomFilterSection(RandomAccessFile sigFile, int baseId, Iterable<String> terms, int level) throws IOException {
 		this(sigFile, level);
 	}
@@ -52,6 +50,10 @@ public abstract class BloomFilterSection {
 		recordsPerSet = bytesPerLevel[level];
 		setSize = BASIC_SET_SIZE_BITS * recordsPerSet;
 		bytesPerRange = BASIC_SET_SIZE_BYTES * recordsPerSet;
+	}
+
+	public int getRecordsPerSet() {
+		return recordsPerSet;
 	}
 
 	public int nextBit(SignatureBitList bitList) {

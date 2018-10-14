@@ -21,7 +21,7 @@ import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.BloomFilterSection;
 import org.lasalledebain.libris.indexes.BloomFilterSectionEditor;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
-import org.lasalledebain.libris.indexes.KeywordFilteredRecordIterator;
+import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.indexes.SortedKeyIntegerBucket;
@@ -233,12 +233,12 @@ public class IndexManager implements LibrisConstants {
 			throw new InternalError("Error building index for group ", e);
 		}
 	}
-	public KeywordFilteredRecordIterator makeKeywordFilteredIterator(Iterable<String> terms) throws UserErrorException, IOException {
-		KeywordFilteredRecordIterator mainKfri = null;
+	public SignatureFilteredIdList makeSignatureFilteredIdIterator(Iterable<String> terms) throws UserErrorException, IOException {
+		SignatureFilteredIdList mainKfri = null;
 		for (int level = 0; level < sigLevels; ++level) {
-			mainKfri = new KeywordFilteredRecordIterator(sigQueryFiles[level], level, terms, mainKfri);
+			mainKfri = new SignatureFilteredIdList(sigQueryFiles[level], level, terms, mainKfri);
 		}
-		return null;
+		return mainKfri;
 	}
 
 	public void open() throws DatabaseException {

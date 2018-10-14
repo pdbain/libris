@@ -35,13 +35,15 @@ import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
-import org.lasalledebain.libris.indexes.KeywordFilteredRecordIterator;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
+import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.records.XmlRecordsReader;
+import org.lasalledebain.libris.search.KeywordFilter;
+import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.ui.Messages;
@@ -924,8 +926,17 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public void setDatabaseDate(Date databaseDate) {
 		this.databaseDate = databaseDate;
 	}
-	public KeywordFilteredRecordIterator makeKeywordFilteredIterator(Iterable<String> terms) throws UserErrorException, IOException {
-		return indexMgr.makeKeywordFilteredIterator(terms);
+	public SignatureFilteredIdList makeSignatureFilteredIdIterator(Iterable<String> terms) throws UserErrorException, IOException {
+		return indexMgr.makeSignatureFilteredIdIterator(terms);
+	}
+	
+	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
+			int searchList[], Iterable<String> searchTerms) throws UserErrorException, IOException {
+		RecordList recList = new SignatureFilteredRecordList(this, searchTerms);
+		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, searchList, searchTerms);
+		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);
+		return filteredList;
+
 	}
 }
 
