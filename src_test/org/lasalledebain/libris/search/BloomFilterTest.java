@@ -17,7 +17,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.indexes.BloomFilterSection;
 import org.lasalledebain.libris.indexes.BloomFilterSectionEditor;
 import org.lasalledebain.libris.indexes.BloomFilterSectionQuery;
-import org.lasalledebain.libris.indexes.KeywordFilteredRecordIterator;
+import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 import org.lasalledebain.libris.util.Lorem;
 
 import junit.framework.TestCase;
@@ -235,7 +235,7 @@ public class BloomFilterTest extends TestCase {
 				for (int length = 2; length <= 3; ++length) {
 					for (int recId = 1; recId <= numRecords; recId *= 3) {
 						final String searchTerm = makeTerm(recId, length);
-						KeywordFilteredRecordIterator mainKfri = new KeywordFilteredRecordIterator(sigFile, level, 
+						SignatureFilteredIdList mainKfri = new SignatureFilteredIdList(sigFile, level, 
 								Arrays.asList(searchTerm), null);
 						final int recordsPerRange = mainKfri.getRecordsPerRange();
 						int result;
@@ -298,9 +298,9 @@ public class BloomFilterTest extends TestCase {
 			for (int length = 1; length <= 3; ++length) {
 				for (int recId = 1; recId <= numRecords; recId *= 3) {
 					final String searchTerm = makeTerm(recId, length);
-					KeywordFilteredRecordIterator mainKfri = null;
+					SignatureFilteredIdList mainKfri = null;
 					for (int level = 0; level < numLevels; ++level) {
-						mainKfri = new KeywordFilteredRecordIterator(sigFiles[level], level, Arrays.asList(searchTerm), mainKfri);
+						mainKfri = new SignatureFilteredIdList(sigFiles[level], level, Arrays.asList(searchTerm), mainKfri);
 					}
 					int result;
 					for (int expectedId: generateExpectedNumericIds(recId, numRecords, modulus, 1)) {
@@ -319,7 +319,7 @@ public class BloomFilterTest extends TestCase {
 
 	public void iterateAndCheckFilter(final int numRecords, RandomAccessFile sigFile, int recId,
 			final String searchTerm, int modulus) throws UserErrorException, IOException {
-		KeywordFilteredRecordIterator kfri = new KeywordFilteredRecordIterator(sigFile, 0, 
+		SignatureFilteredIdList kfri = new SignatureFilteredIdList(sigFile, 0, 
 				Arrays.asList(searchTerm), null);
 		int result;
 		do {
