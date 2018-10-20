@@ -18,7 +18,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.AffiliateList;
-import org.lasalledebain.libris.indexes.BloomFilterSection;
+import org.lasalledebain.libris.indexes.SignatureManager;
 import org.lasalledebain.libris.indexes.BloomFilterSectionEditor;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
@@ -38,27 +38,19 @@ public class IndexManager implements LibrisConstants {
 	private Boolean indexed = null;
 	@SuppressWarnings("unused")
 	private LibrisMetadata metadata;
-	private LibrisDatabase db;
+	private LibrisDatabase database;
 	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
 	private AffiliateList affList[];
 
 	private ArrayList<FileAccessManager> namedRecsFileMgrs;
-
 	private int numGroups;
-
 	private LibrisRecordsFileManager recordsFile;
-	
 	private TermCountIndex termCounts;
-
-	static final int NAMED_RECORDS_INDEX_LEVELS = Integer.getInteger("org.lasalledebain.libris.namedrecsindexlevels",
-			2);
-
-	private BloomFilterSectionEditor signatureEditors[];
-
-	private int sigLevels;
-
-	private FileAccessManager signatureFileManagers[];
-	RandomAccessFile sigQueryFiles[];
+	static final int NAMED_RECORDS_INDEX_LEVELS = Integer.getInteger("org.lasalledebain.libris.namedrecsindexlevels", 2);
+	private final SignatureManager sigMgr;
+	public SignatureManager getSignatureFilter() {
+		return sigMgr;
+	}
 
 	private final FileAccessManager termCountFileMgr;
 	
@@ -73,7 +65,7 @@ public class IndexManager implements LibrisConstants {
 	 */
 	public IndexManager(LibrisDatabase librisDatabase, LibrisMetadata metadata, LibrisFileManager fileMgr)
 			throws DatabaseException {
-		db = librisDatabase;
+		database = librisDatabase;
 		this.fileMgr = fileMgr;
 		this.metadata = metadata;
 
@@ -84,38 +76,21 @@ public class IndexManager implements LibrisConstants {
 					fileMgr.getAuxiliaryFileMgr(LibrisFileManager.NAMEDRECORDS_FILENAME_ROOT + "index" + (i + 1)));
 		}
 
-		sigLevels = BloomFilterSection.calculateSignatureLevels(metadata.getLastRecordId());
-		metadata.setSignatureLevels(sigLevels);
-		signatureEditors = new BloomFilterSectionEditor[sigLevels];
-		signatureFileManagers = new FileAccessManager[sigLevels];
-		for (int sigLevel = 0; sigLevel < sigLevels; ++sigLevel) {
-			final FileAccessManager sigFileMgr = fileMgr.getAuxiliaryFileMgr(SIGNATURE_FILENAME_ROOT+sigLevel);
-			signatureFileManagers[sigLevel] = sigFileMgr;
-		}
-		termCountFileMgr = fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT);
-	}
+		sigMgr = new SignatureManager(database, this);
 
-	public void setSignatureEditors() throws DatabaseException {
-		for (int sigLevel = 0; sigLevel < sigLevels; ++sigLevel) {
-			RandomAccessFile raf;
-			try {
-				raf = signatureFileManagers[sigLevel].getReadWriteRandomAccessFile();
-			} catch (FileNotFoundException e) {
-				throw new DatabaseException("Error opening "+signatureFileManagers[sigLevel].getPath(), e);
-			}
-			signatureEditors[sigLevel] = new BloomFilterSectionEditor(raf, sigLevel);
-		}
+		termCountFileMgr = fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT);
 	}
 
 	public boolean isIndexed() {
 		if ((null == indexed) || (!indexed)) {
-			indexed = fileMgr.checkAuxFiles();
+			indexed = fileMgr.checkAuxFiles() &&
+					sigMgr.isIndexed();
 		}
 		return indexed;
 	}
 
 	public void buildIndexes(Records recs) throws LibrisException {
-		int numGroups = db.getSchema().getNumGroups();
+		int numGroups = database.getSchema().getNumGroups();
 		FileAccessManager childTempFiles[] = new FileAccessManager[numGroups];
 		FileAccessManager affiliateTempFiles[] = new FileAccessManager[numGroups];
 		DataOutputStream childOpStreams[] = new DataOutputStream[numGroups];
@@ -123,6 +98,8 @@ public class IndexManager implements LibrisConstants {
 		int numChildren[] = new int[numGroups];
 		int numAffiliates[] = new int[numGroups];
 		try {
+			openInternal(false);
+			sigMgr.createFiles();
 			for (int g = 0; g < numGroups; ++g) {
 				childTempFiles[g] = fileMgr.getAuxiliaryFileMgr(TEMP_CHILD_FILE + g);
 				childTempFiles[g].createNewFile();
@@ -136,8 +113,7 @@ public class IndexManager implements LibrisConstants {
 			termCounts = new TermCountIndex(termCountFileMgr, false);
 
 			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
-			final IndexField[] indexFields = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
-			setSignatureEditors();
+			final IndexField[] indexFields = database.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
 			for (Record r : recs) {
 				String name = r.getName();
 				int id = r.getRecordId();
@@ -169,9 +145,7 @@ public class IndexManager implements LibrisConstants {
 					termCounts.incrementTermCount(term, true);
 				}
 			}
-			for (int i = 0; i < sigLevels; ++i) {
-				signatureEditors[i].store();
-			}
+
 			for (int g = 0; g < numGroups; ++g) {
 				childTempFiles[g].close();
 				affiliateTempFiles[g].close();
@@ -182,20 +156,32 @@ public class IndexManager implements LibrisConstants {
 				buildAffiliateIndex(l, childTempFiles[g], hashTableFileMgr, overflowFileMgr, numChildren[g], true);
 				buildAffiliateIndex(l, affiliateTempFiles[g], hashTableFileMgr, overflowFileMgr, numAffiliates[g], false);
 			}
+			database.getMetadata().setSignatureLevels(sigMgr.getSigLevels());
+
 			setIndexed(true);
 		} catch (IOException e) {
 			throw new InputException("Error rebuilding indexes", e);
 		}
 	}
 
-	public void addKeywords(final int rId, final Iterable<String> keywords) throws IOException {
-		for (BloomFilterSectionEditor b:signatureEditors) {
-			b.switchTo(rId);
-			b.addTerms(keywords);
+	void addKeywords(final int rId, final Iterable<String> keywords) throws IOException {
+		sigMgr.addKeywords(rId, keywords);
+	}
+
+	void addNamedRecord(int id, String recordName) throws InputException, UserErrorException {
+		if ((null != recordName) && !recordName.isEmpty()) {
+			KeyIntegerTuple query = namedRecordIndex.getByName(recordName);
+			if (null != query) {
+				if (query.getValue() != id) {
+					throw new UserErrorException("Duplicate record name "+recordName);
+				}
+			} else {
+				namedRecordIndex.addElement(new KeyIntegerTuple(recordName, id));
+			}
 		}
 	}
 
-	private void buildAffiliateIndex(AffiliateList l, FileAccessManager affiliateTempFMgr, 
+	 private void buildAffiliateIndex(AffiliateList l, FileAccessManager affiliateTempFMgr, 
 			FileAccessManager hashTableFileMgr, FileAccessManager overflowFileMgr, int numAffiliates, boolean isChildren)
 					throws DatabaseException {
 		try {
@@ -233,47 +219,36 @@ public class IndexManager implements LibrisConstants {
 			throw new InternalError("Error building index for group ", e);
 		}
 	}
+	
 	public SignatureFilteredIdList makeSignatureFilteredIdIterator(Iterable<String> terms) throws UserErrorException, IOException {
-		SignatureFilteredIdList mainKfri = null;
-		for (int level = 0; level < sigLevels; ++level) {
-			mainKfri = new SignatureFilteredIdList(sigQueryFiles[level], level, terms, mainKfri);
-		}
-		return mainKfri;
+		return sigMgr.makeSignatureFilteredIdIterator(terms);
 	}
 
-	public void open() throws DatabaseException {
+	public void open(boolean readOnly) throws DatabaseException {
 		try {
-			SortedKeyValueBucketFactory<KeyIntegerTuple> bucketFactory = SortedKeyIntegerBucket.getFactory();
-			namedRecordIndex = new SortedKeyValueFileManager<KeyIntegerTuple>(namedRecsFileMgrs, bucketFactory);
-			numGroups = db.getSchema().getNumGroups();
-			affList = new AffiliateList[numGroups];
-			boolean readOnly = db.isReadOnly();
-			for (int i = 0; i < numGroups; ++i) {
-				affList[i] = new AffiliateList(fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_HASHTABLE_ROOT + i),
-						fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT), readOnly);
-			}
-			termCounts = new TermCountIndex(fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT), false);
-			sigQueryFiles = new RandomAccessFile[sigLevels];
-			for (int sigLevel = 0; sigLevel < sigLevels; ++sigLevel) {
-				try {
-					sigQueryFiles[sigLevel] = signatureFileManagers[sigLevel].getReadOnlyRandomAccessFile();
-				} catch (FileNotFoundException e) {
-					throw new DatabaseException("Error opening "+signatureFileManagers[sigLevel].getPath(), e);
-				}
-			}
+			openInternal(readOnly);
+			sigMgr.open(readOnly);
 		} catch (InputException | IOException e) {
 			throw new DatabaseException("error opening namedRecordIndex", e);
 		}
 	}
 
+	private void openInternal(boolean readOnly) throws InputException, DatabaseException, IOException {
+		SortedKeyValueBucketFactory<KeyIntegerTuple> bucketFactory = SortedKeyIntegerBucket.getFactory();
+		namedRecordIndex = new SortedKeyValueFileManager<KeyIntegerTuple>(namedRecsFileMgrs, bucketFactory);
+		numGroups = database.getSchema().getNumGroups();
+		affList = new AffiliateList[numGroups];
+		for (int i = 0; i < numGroups; ++i) {
+			affList[i] = new AffiliateList(fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_HASHTABLE_ROOT + i),
+					fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT), readOnly);
+		}
+		termCounts = new TermCountIndex(fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT), false);
+	}
+
 	public void close() throws InputException, DatabaseException, IOException {
 		flush();
-
-		for (int i = 0; i < sigLevels; ++i) {
-			signatureFileManagers[i].releaseRaRoFile(sigQueryFiles[i]);
-			signatureFileManagers[i].close();
-		}
-for (FileAccessManager m : namedRecsFileMgrs) {
+		sigMgr.close();
+		for (FileAccessManager m : namedRecsFileMgrs) {
 			m.close();
 		}
 		recordsFile.close();
@@ -285,6 +260,7 @@ for (FileAccessManager m : namedRecsFileMgrs) {
 		for (AffiliateList aff: affList) {
 			aff.flush();
 		}
+		sigMgr.flush();
 	}
 
 	public void setIndexed(boolean indexed) {
@@ -297,7 +273,7 @@ for (FileAccessManager m : namedRecsFileMgrs) {
 
 	public LibrisRecordsFileManager getRecordsFileMgr() throws LibrisException {
 		if (null == recordsFile) {
-			recordsFile = new LibrisRecordsFileManager(db, db.isReadOnly(), db.getSchema(), fileMgr);
+			recordsFile = new LibrisRecordsFileManager(database, database.isReadOnly(), database.getSchema(), fileMgr);
 		}
 		return recordsFile;
 	}

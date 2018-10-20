@@ -15,7 +15,6 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -37,7 +36,6 @@ import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
-import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
@@ -61,7 +59,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	}
 	public  LibrisException rebuildException;
 	private LibrisFileManager fileMgr;
-	private IndexManager indexMgr;
+	IndexManager indexMgr;
 	private GroupManager groupMgr;
 	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 	private Schema mySchema;
@@ -114,8 +112,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		if (!isIndexed()) {
 			throw new DatabaseNotIndexedException();
 		} else {
-			indexMgr.open();
-			setRecordsAccessible(true);
 			FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisFileManager.PROPERTIES_FILENAME);
 			synchronized (propsMgr) {
 				try {
@@ -130,6 +126,8 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 					throw new DatabaseException("Exception reading properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
 				}
 			}
+			indexMgr.open(readOnly);
+			setRecordsAccessible(true);
 			if (!metadata.isMetadataOkay()) {
 				throw new DatabaseException("Error in metadata");
 			}
@@ -311,7 +309,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			metadata.setSavedRecords(0);
 			XmlRecordsReader.importXmlRecords(this, databaseFile);
 			Records recs = getDatabaseRecords();
-			indexMgr.open();
 			indexMgr.buildIndexes(recs);
 			save();
 			freeDatabase();
@@ -696,17 +693,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		librisLogger.log(Level.FINE, "LibrisDatabase.put "+rec.getRecordId()); //$NON-NLS-1$
 		getJournalFileMgr().put(rec);
 		String recordName = rec.getName();
-		if ((null != recordName) && !recordName.isEmpty()) {
-			SortedKeyValueFileManager<KeyIntegerTuple> nri = getNamedRecordIndex();
-			KeyIntegerTuple query = nri.getByName(recordName);
-			if (null != query) {
-				if (query.getValue() != id) {
-					throw new UserErrorException("Duplicate record name "+recordName);
-				}
-			} else {
-				nri.addElement(new KeyIntegerTuple(recordName, id));
-			}
-		}
+		indexMgr.addNamedRecord(id, recordName);
 		for (int g = 0; g < mySchema.getNumGroups(); ++g) {
 			int[] affiliations = rec.getAffiliates(g);
 			if (affiliations.length != 0) {
@@ -926,10 +913,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public void setDatabaseDate(Date databaseDate) {
 		this.databaseDate = databaseDate;
 	}
-	public SignatureFilteredIdList makeSignatureFilteredIdIterator(Iterable<String> terms) throws UserErrorException, IOException {
-		return indexMgr.makeSignatureFilteredIdIterator(terms);
-	}
-	
 	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int searchList[], Iterable<String> searchTerms) throws UserErrorException, IOException {
 		RecordList recList = new SignatureFilteredRecordList(this, searchTerms);
