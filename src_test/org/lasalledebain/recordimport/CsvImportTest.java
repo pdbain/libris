@@ -11,6 +11,8 @@ import junit.framework.TestCase;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.Libris;
+import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -21,6 +23,7 @@ import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.DirectRecordImporter;
 import org.lasalledebain.libris.records.FilteringRecordImporter;
 import org.lasalledebain.libris.records.RecordImporter;
+import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.util.DiagnosticDatabase;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
@@ -104,7 +107,10 @@ public class CsvImportTest extends TestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
-		testDatabase = new DiagnosticDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE));
+		final File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE);
+		testDatabase = new DiagnosticDatabase(testDatabaseFile);
+		HeadlessUi ui = new HeadlessUi(testDatabaseFile, false);
+		Libris.buildIndexes(testDatabaseFile, ui);
 		testDatabase.openDatabase();
 		valueTranslations = new HashMap<String, String>();
 		valueTranslations.put("ACM", "NS_acm");

@@ -40,7 +40,7 @@ public class SignatureFilteredRecordList extends RecordList {
 		Record currentRecord;
 		private SignatureFilteredIdList filteredIdSource;
 		public RecordIterator() throws UserErrorException, IOException {
-			filteredIdSource = dataBase.makeSignatureFilteredIdIterator(terms);
+			filteredIdSource = dataBase.indexMgr.makeSignatureFilteredIdIterator(terms);
 			currentRecord = null;
 		}
 
