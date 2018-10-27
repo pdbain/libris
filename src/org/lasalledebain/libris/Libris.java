@@ -2,10 +2,8 @@ package org.lasalledebain.libris;
 
 import java.io.File;
 
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.UserErrorException;
+import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -80,6 +78,13 @@ public class Libris {
 		return result;
 	}
 
+	public static LibrisDatabase buildAndOpenDatabase(IndexConfiguration config) throws LibrisException {
+		buildIndexes(config);
+		
+		LibrisDatabase result = config.getDatabaseUi().openDatabase();
+		return result;
+	}
+
 	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi ui) throws LibrisException {
 		if (null == ui) {
 			ui = new HeadlessUi(databaseFile, false);
@@ -88,18 +93,21 @@ public class Libris {
 		return db;
 	}
 
-	public static boolean buildIndexes(File databaseFile, LibrisUi ui)
-			throws UserErrorException, DatabaseException, InputException,
-			LibrisException {
-		LibrisDatabase db = new LibrisDatabase(databaseFile, false, ui);
+	public static boolean buildIndexes(File databaseFile, LibrisUi ui) throws LibrisException {
+		IndexConfiguration config = new IndexConfiguration(databaseFile, ui);
+		return buildIndexes(config);
+	}
+
+	public static boolean buildIndexes(IndexConfiguration config) throws LibrisException {
+		LibrisDatabase db = new LibrisDatabase(config.getDatabaseFile(), false, config.getDatabaseUi());
+		config.setLoadMetadata(true);
 		if (!db.isDatabaseReserved()) {
-			if (!db.buildIndexes(true)) {
+			if (!db.buildIndexes(config)) {
 				return false;
-			};
+			}
 			return db.closeDatabase(false);
 		} else {
 			return false;
 		}
 	}
-
 }

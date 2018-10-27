@@ -113,7 +113,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		selectedGroupDef = null;
 	}
 
-	public LibrisWindowedUi(File databaseFile, boolean readOnly) throws LibrisException {
+	public LibrisWindowedUi(File databaseFile, boolean readOnly) {
 		super(databaseFile, readOnly);
 		initializeUi();
 	}

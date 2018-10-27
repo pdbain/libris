@@ -28,7 +28,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	File databaseFile;
 	private boolean readOnly;
 
-	public LibrisUiGeneric(File dbFile, boolean readOnly) throws LibrisException {
+	public LibrisUiGeneric(File dbFile, boolean readOnly) {
 		this();
 		setDatabaseFile(dbFile);
 		this.readOnly = readOnly;

@@ -503,10 +503,11 @@ public void removeRecord(int rid) throws DatabaseException {
 		private RecordHeader currentHeader;
 		private ModifiedRecordList modifiedRecords;
 		int nextId;
-		final int lastId = database.getLastRecordId();
+		final int lastId;
 		private int currentId;
 
 		private RecordIterator() {
+			lastId = database.getLastRecordId();
 			currentHeader = null;
 			nextId = 1;
 			currentId = RecordId.getNullId();
