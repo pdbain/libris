@@ -5,27 +5,22 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.FileAccessManager;
-import org.lasalledebain.libris.IndexManager;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.UserErrorException;
 
-import com.apple.eio.FileManager;
-
 public class SignatureManager implements LibrisConstants {
 	private LibrisDatabase database;
-	private IndexManager indexMgr;
 	private BloomFilterSectionEditor signatureEditors[];
 	private int sigLevels;
 	private FileAccessManager signatureFileManagers[];
 	private RandomAccessFile sigQueryFiles[];
 
-	public SignatureManager(LibrisDatabase database, IndexManager indexMgr) {
+	public SignatureManager(LibrisDatabase database) {
 		super();
 		this.database = database;
-		this.indexMgr = indexMgr;
 		sigLevels = 0;
 	}
 	
@@ -60,8 +55,11 @@ public class SignatureManager implements LibrisConstants {
 		}
 	}
 	
-	public void createFiles() throws FileNotFoundException {
-		sigLevels = calculateSignatureLevels(database.getLastRecordId());
+	public void createFiles(IndexConfiguration config) throws FileNotFoundException {
+		sigLevels = config.getSignatureLevels();
+		if (0 == sigLevels) {
+			sigLevels = calculateSignatureLevels(database.getLastRecordId());
+		}
 		initializeFiles();
 		for (int i = 0; i < sigLevels; ++i) {
 			FileAccessManager m = signatureFileManagers[i];

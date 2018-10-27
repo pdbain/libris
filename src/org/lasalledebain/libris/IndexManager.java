@@ -2,9 +2,7 @@ package org.lasalledebain.libris;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -18,12 +16,12 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.AffiliateList;
-import org.lasalledebain.libris.indexes.SignatureManager;
-import org.lasalledebain.libris.indexes.BloomFilterSectionEditor;
+import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
-import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.RecordKeywords;
+import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
+import org.lasalledebain.libris.indexes.SignatureManager;
 import org.lasalledebain.libris.indexes.SortedKeyIntegerBucket;
 import org.lasalledebain.libris.indexes.SortedKeyValueBucketFactory;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
@@ -76,7 +74,7 @@ public class IndexManager implements LibrisConstants {
 					fileMgr.getAuxiliaryFileMgr(LibrisFileManager.NAMEDRECORDS_FILENAME_ROOT + "index" + (i + 1)));
 		}
 
-		sigMgr = new SignatureManager(database, this);
+		sigMgr = new SignatureManager(database);
 
 		termCountFileMgr = fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT);
 	}
@@ -89,7 +87,7 @@ public class IndexManager implements LibrisConstants {
 		return indexed;
 	}
 
-	public void buildIndexes(Records recs) throws LibrisException {
+	public void buildIndexes(IndexConfiguration config, Records recs) throws LibrisException {
 		int numGroups = database.getSchema().getNumGroups();
 		FileAccessManager childTempFiles[] = new FileAccessManager[numGroups];
 		FileAccessManager affiliateTempFiles[] = new FileAccessManager[numGroups];
@@ -99,7 +97,7 @@ public class IndexManager implements LibrisConstants {
 		int numAffiliates[] = new int[numGroups];
 		try {
 			openInternal(false);
-			sigMgr.createFiles();
+			sigMgr.createFiles(config);
 			for (int g = 0; g < numGroups; ++g) {
 				childTempFiles[g] = fileMgr.getAuxiliaryFileMgr(TEMP_CHILD_FILE + g);
 				childTempFiles[g].createNewFile();

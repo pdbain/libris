@@ -18,7 +18,7 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	private int confirmValue;
 	private boolean accessible; 
 
-	public HeadlessUi(File databaseFile, boolean readOnly) throws LibrisException {
+	public HeadlessUi(File databaseFile, boolean readOnly) {
 		super(databaseFile, readOnly);
 	}
 

@@ -33,6 +33,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.GroupManager;
+import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
@@ -300,16 +301,16 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return Libris.buildIndexes(databaseFile, ui);
 	}
 
-	boolean buildIndexes(boolean doLoadMetadata) throws LibrisException {
+	boolean buildIndexes(IndexConfiguration config) throws LibrisException {
 		fileMgr.createAuxFiles(true);
 		if (reserveDatabase()) {
-			loadDatabaseInfo(doLoadMetadata);
+			loadDatabaseInfo(config.isLoadMetadata());
 			mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 			final File databaseFile = fileMgr.getDatabaseFile();
 			metadata.setSavedRecords(0);
 			XmlRecordsReader.importXmlRecords(this, databaseFile);
 			Records recs = getDatabaseRecords();
-			indexMgr.buildIndexes(recs);
+			indexMgr.buildIndexes(config, recs);
 			save();
 			freeDatabase();
 			return true;

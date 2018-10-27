@@ -50,6 +50,7 @@ import junit.framework.TestCase;
 
 public class Utilities extends TestCase {
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
+	public static final String KEYWORD_DATABASE0_XML = "KeywordDatabase0.xml";
 	static final String LAYOUT_DECLARATIONS_XML_FILE = "layoutDeclarations.xml";
 	public static final String TEST_RECORD1_XML_FILE = "TestRecord1.xml";
 	public static final String TEST_RECORD2_XML_FILE = "TestRecord2.xml";
@@ -231,17 +232,11 @@ public class Utilities extends TestCase {
 		}
 		copyFile.createNewFile();
 		copyFile.setWritable(true);
-		FileChannel original = null; 
-		FileChannel copy = null; 
-		try {
-			// TODO close FileInputStream
-			original = (new FileInputStream(originalFile)).getChannel();
-			copy = (new FileOutputStream(copyFile)).getChannel();
+		try (final FileInputStream originalStream = new FileInputStream(originalFile);
+				final FileOutputStream copyStream = new FileOutputStream(copyFile)){
+			FileChannel original = originalStream.getChannel();
+			FileChannel copy = copyStream.getChannel();
 			copy.transferFrom(original, 0, original.size());
-		} finally {
-			if (null != original) {
-				original.close();
-			}
 		}
 	}
 	/**
@@ -354,6 +349,16 @@ public class Utilities extends TestCase {
 		return tup;
 	}
 
+	public static String makeRandomWord(Random r, int minLen, int maxLen) {
+		int wordSize = minLen + r.nextInt(maxLen - minLen);
+		StringBuilder b = new StringBuilder(wordSize);
+		while (wordSize > 0) {
+			b.append(alphanumChars[r.nextInt(alphanumChars.length)]);
+			--wordSize;
+		}
+		return b.toString();
+	}
+	
 	static String getRecordIdString(Record recData) {
 		return RecordId.toString(recData.getRecordId());
 	}

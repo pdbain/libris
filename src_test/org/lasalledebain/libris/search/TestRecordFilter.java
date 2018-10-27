@@ -1,9 +1,15 @@
 package org.lasalledebain.libris.search;
 
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Random;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,10 +17,12 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
+import org.lasalledebain.libris.util.RandomFieldGenerator;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import junit.framework.TestCase;
@@ -107,6 +115,52 @@ public class TestRecordFilter extends TestCase {
 		}
 		assertFalse("too few records found", expectedIds.hasNext());
 	}
+	
+	public void testSearch () throws FileNotFoundException, IOException, LibrisException {
+		Random rand = new Random(314159);
+		final int numRecs = 100;
+		LibrisDatabase database = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE0_XML);
+		int fieldNums[] = new int[] {0, 1, 3};
+		RandomFieldGenerator generators[] = new RandomFieldGenerator[fieldNums.length];
+		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, 4 * numRecs);
+		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, 8 * numRecs);
+		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, 25 * numRecs);
+		HashMap<String, ArrayList<Integer>> keyWordsAndRecords = makeRandomDatabase(database, numRecs, generators, fieldNums);
+		database.getDatabaseFile();
+		database.exportDatabaseXml(new FileOutputStream(database.getDatabaseFile()), true, true, true);
+		database.getUi().closeDatabase(false);
+
+		fail("not implemented");
+	}
+	
+	 Record makeRandomRecord (LibrisDatabase database, RandomFieldGenerator[] fieldGenerators, int fieldNums[], HashSet<String> keyWords) throws InputException {
+		Record rec = database.newRecord();
+		keyWords.clear();
+		for (int i = 0; i < fieldNums.length; ++i) {
+			String fieldText = fieldGenerators[i].makeFieldString(keyWords);
+			rec.addFieldValue(fieldNums[i], fieldText);
+		}
+		return rec;
+	}
+	
+	 HashMap<String, ArrayList<Integer>> makeRandomDatabase(LibrisDatabase database, int numRecs, RandomFieldGenerator[] fieldGenerators, int fieldNums[]) throws LibrisException {
+		 HashMap<String, ArrayList<Integer>> keyWordsAndRecords = new HashMap<>();
+		 HashSet<String> keyWords = new HashSet<>();
+		 for(int i = 1; i <= numRecs; i++) {
+			 Record rec = makeRandomRecord(database, fieldGenerators, fieldNums, keyWords);
+			 int recNum = database.put(rec);
+			 for (String s: keyWords) {
+				 ArrayList<Integer> list = keyWordsAndRecords.get(s);
+				 if (null == list) {
+					 list = new ArrayList<>();
+					 keyWordsAndRecords.put(s, list);
+				 }
+				 list.add(recNum);
+			 }
+		 }
+		 database.save();
+		 return keyWordsAndRecords;
+	 }
 
 	@After
 	public void tearDown() throws Exception {

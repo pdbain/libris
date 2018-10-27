@@ -25,7 +25,7 @@ public class IndexDef implements XMLElement {
 
 	@Override
 	public LibrisAttributes getAttributes() {
-		return new LibrisAttributes(new String[][]{{XML_INDEXDEF_ID_ATTR}, {indexId}});
+		return new LibrisAttributes(new String[][]{{XML_INDEXDEF_ID_ATTR, indexId}});
 	}
 
 	public static String getXmlTag() {
