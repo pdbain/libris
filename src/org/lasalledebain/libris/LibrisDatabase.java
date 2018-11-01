@@ -15,6 +15,7 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -66,7 +67,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private Schema mySchema;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisMetadata metadata;
-	private LibrisUi ui;
+	private final LibrisUi ui;
 	DatabaseUsageMode usageMode = DatabaseUsageMode.USAGE_BATCH;
 	private boolean isModified;
 	private boolean dbOpen;
@@ -907,20 +908,29 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return (null == rec) ? null: rec.getName();
 	}
 
-	public Date getDatabaseDate() {
+	public Date getDatabaseDate() { // TODO move to metadata
 		return databaseDate;
 	}
 
-	public void setDatabaseDate(Date databaseDate) {
+	public void setDatabaseDate(Date databaseDate) { // TODO move to metadata
 		this.databaseDate = databaseDate;
 	}
+	
 	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int searchList[], Iterable<String> searchTerms) throws UserErrorException, IOException {
 		RecordList recList = new SignatureFilteredRecordList(this, searchTerms);
 		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, searchList, searchTerms);
 		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);
 		return filteredList;
-
+	}
+	
+	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
+			int searchList[], String searchTerm) throws UserErrorException, IOException {
+		Iterable<String> searchTerms = Collections.singleton(searchTerm);
+		RecordList recList = new SignatureFilteredRecordList(this, searchTerms);
+		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, searchList, searchTerms);
+		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);
+		return filteredList;
 	}
 }
 

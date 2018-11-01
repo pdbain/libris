@@ -15,6 +15,7 @@ import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.indexes.IndexConfiguration;
 
 public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	
@@ -172,6 +173,10 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 	public void rebuildDatabase() throws LibrisException {
 		Libris.buildIndexes(databaseFile, new HeadlessUi(databaseFile, false));
+	}
+
+	public void rebuildDatabase(IndexConfiguration config) throws LibrisException {
+		Libris.buildIndexes(config);
 	}
 
 	@Override

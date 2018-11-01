@@ -9,6 +9,7 @@ import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.indexes.IndexConfiguration;
 
 public interface LibrisUi {
 
@@ -18,6 +19,7 @@ public interface LibrisUi {
 	public boolean quit(boolean force);
 
 	public void rebuildDatabase() throws LibrisException;
+	public void rebuildDatabase(IndexConfiguration config) throws LibrisException;
 	public boolean isDatabaseSelected();
 	public boolean isDatabaseOpen();
 	public boolean isDatabaseReadOnly();

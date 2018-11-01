@@ -36,6 +36,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.RecordDataException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
+import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -384,6 +385,21 @@ public class Utilities extends TestCase {
 		try {
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			LibrisUi ui = db.getUi();
+			ui.closeDatabase(false);
+			db = ui.openDatabase();
+		} catch (LibrisException e) {
+			e.printStackTrace();
+			fail("Error rebuilding database: "+e.getMessage());
+		}
+		return db;
+	}
+
+	public static LibrisDatabase buildTestDatabase(IndexConfiguration config)
+			throws FileNotFoundException, IOException {
+		LibrisDatabase db = null;
+		try {
+			db = Libris.buildAndOpenDatabase(config);
+			LibrisUi ui = config.getDatabaseUi();
 			ui.closeDatabase(false);
 			db = ui.openDatabase();
 		} catch (LibrisException e) {

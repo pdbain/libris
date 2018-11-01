@@ -38,7 +38,7 @@ public class IndexDef implements XMLElement {
 
 	@Override
 	public void toXml(ElementWriter xmlWriter) throws LibrisException {
-		xmlWriter.writeStartElement(XML_INDEXDEFS_TAG, getAttributes(), false);	
+		xmlWriter.writeStartElement(XML_INDEXDEF_TAG, getAttributes(), false);	
 		for (IndexField f: fieldList) {
 			f.toXml(xmlWriter);
 		}
