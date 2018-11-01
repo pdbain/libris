@@ -9,6 +9,7 @@ import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 public class IndexField extends EmptyXmlElement {
 
@@ -49,5 +50,11 @@ public class IndexField extends EmptyXmlElement {
 	public int getFieldNum() {
 		return fieldNum;
 	}
+	
+	@Override
+	public LibrisAttributes getAttributes() {
+		return new LibrisAttributes(new String[][]{{XML_INDEXFIELD_ID_ATTR, databaseSchema.getFieldId(fieldNum)}});
+	}
+
 
 }

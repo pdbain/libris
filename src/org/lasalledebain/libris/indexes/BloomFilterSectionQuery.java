@@ -22,7 +22,8 @@ public class BloomFilterSectionQuery extends BloomFilterSection {
 	}
 
 	public boolean match() {
-		return matchSignature.stream().allMatch(i -> recordSignature.get(i));
+		final boolean found = matchSignature.stream().allMatch(i -> recordSignature.get(i));
+		return found;
 	}
 
 }

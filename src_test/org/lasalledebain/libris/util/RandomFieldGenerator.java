@@ -23,7 +23,7 @@ public class RandomFieldGenerator {
 	};
 
 	public String makeFieldString(HashSet<String> keyWords) {
-		int fieldSize = minFieldLength + rand.nextInt(MaxFieldLength - minFieldLength);
+		int fieldSize = minFieldLength + rand.nextInt(MaxFieldLength - minFieldLength + 1);
 		StringBuilder b = new StringBuilder(fieldSize * ((minWordLength + maxWordLength)/2));
 		while (fieldSize > 0) {
 			final String randomWord = Utilities.makeRandomWord(rand, minWordLength, maxWordLength);
