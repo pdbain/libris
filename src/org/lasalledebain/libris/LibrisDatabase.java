@@ -15,6 +15,7 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -695,7 +696,10 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		librisLogger.log(Level.FINE, "LibrisDatabase.put "+rec.getRecordId()); //$NON-NLS-1$
 		getJournalFileMgr().put(rec);
 		String recordName = rec.getName();
-		indexMgr.addNamedRecord(id, recordName);
+		if (Objects.nonNull(recordName)) {
+			indexMgr.addNamedRecord(id, recordName);
+		}
+		indexMgr.addRecordKeywords(rec);
 		for (int g = 0; g < mySchema.getNumGroups(); ++g) {
 			int[] affiliations = rec.getAffiliates(g);
 			if (affiliations.length != 0) {
@@ -917,7 +921,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	}
 	
 	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
-			int searchList[], Iterable<String> searchTerms) throws UserErrorException, IOException {
+			int searchList[], Collection<String> searchTerms) throws UserErrorException, IOException {
 		RecordList recList = new SignatureFilteredRecordList(this, searchTerms);
 		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, searchList, searchTerms);
 		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);
