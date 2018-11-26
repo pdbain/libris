@@ -5,7 +5,7 @@ import java.util.Random;
 
 import org.lasalledebain.Utilities;
 
-public class RandomFieldGenerator {
+public class RandomFieldGenerator implements FieldGenerator {
 	int minWordLength, maxWordLength, minFieldLength, MaxFieldLength;
 	Random rand;
 	int keywordRatio;
@@ -22,6 +22,7 @@ public class RandomFieldGenerator {
 		addKeywords = keywordRatio > 0;
 	};
 
+	@Override
 	public String makeFieldString(HashSet<String> keyWords) {
 		int fieldSize = minFieldLength + rand.nextInt(MaxFieldLength - minFieldLength + 1);
 		StringBuilder b = new StringBuilder(fieldSize * ((minWordLength + maxWordLength)/2));

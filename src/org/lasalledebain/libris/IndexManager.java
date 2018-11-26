@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.Objects;
 
+import org.hamcrest.core.IsNull;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -51,7 +53,16 @@ public class IndexManager implements LibrisConstants {
 	}
 
 	private final FileAccessManager termCountFileMgr;
+
+	private IndexField[] indexFields = null;
 	
+	public IndexField[] getIndexFields() {
+		if (Objects.isNull(indexFields)) {
+			indexFields = database.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
+		}
+		return indexFields;
+	}
+
 	/**
 	 * @param librisDatabase
 	 *            database metadata
@@ -111,7 +122,7 @@ public class IndexManager implements LibrisConstants {
 			termCounts = new TermCountIndex(termCountFileMgr, false);
 
 			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
-			final IndexField[] indexFields = database.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
+			IndexField[] ixFields = getIndexFields();
 			for (Record r : recs) {
 				String name = r.getName();
 				int id = r.getRecordId();
@@ -135,13 +146,14 @@ public class IndexManager implements LibrisConstants {
 					}
 
 				}
-				final int rId = r.getRecordId();
-				r.getKeywords(indexFields, keywordList);
+				r.getKeywords(ixFields, keywordList);
 				final Iterable<String> keywords = keywordList.getKeywords();
-				addKeywords(rId, keywords);
+				addKeywords(id, keywords);
+			if (false) { // TODO DEBUG
 				for (String term: keywords) {
 					termCounts.incrementTermCount(term, true);
 				}
+			}
 			}
 
 			for (int g = 0; g < numGroups; ++g) {
@@ -164,6 +176,18 @@ public class IndexManager implements LibrisConstants {
 
 	void addKeywords(final int rId, final Iterable<String> keywords) throws IOException {
 		sigMgr.addKeywords(rId, keywords);
+	}
+
+	public void addRecordKeywords(Record rec) {
+		try {
+			int rId = rec.getRecordId();
+			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
+			rec.getKeywords(getIndexFields(), keywordList);
+			addKeywords(rId, keywordList.getKeywords());
+			sigMgr.flush();
+		} catch (InputException | IOException e) {
+			throw new InternalError("Error adding record "+rec.getRecordId()+" to keyword index", e);
+		}
 	}
 
 	void addNamedRecord(int id, String recordName) throws InputException, UserErrorException {
