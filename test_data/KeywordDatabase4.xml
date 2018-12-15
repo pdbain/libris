@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<libris date="2011-06-03 00:00:00 UTC" schemaname="testDatabase1" databasename="testDatabase1" schemaversion="0.0">
+<libris date="2011-06-03 00:00:00 UTC" schemaname="KeywordDatabase" databasename="KeywordDatabase0" schemaversion="0.0">
 <metadata>
 	<schema>
 		<groupdefs />

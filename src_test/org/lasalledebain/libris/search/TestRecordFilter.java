@@ -318,6 +318,7 @@ public class TestRecordFilter extends TestCase {
 	}
 	
 	public void testIndexStress() throws FileNotFoundException, IOException, LibrisException {
+		fail("Runs too long");
 		IndexConfiguration config = copyAndBuildDatabase();
 		
 		Random rand = new Random(3141592);
@@ -427,4 +428,16 @@ public class TestRecordFilter extends TestCase {
 		Utilities.deleteTestDatabaseFiles();
 	}
 
+	public static void main(String args[]) {
+		
+		TestRecordFilter testObj = new TestRecordFilter();
+		if (true) try {
+			testObj.setUp();
+			testObj.testIndexStress();
+			testObj.tearDown();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
