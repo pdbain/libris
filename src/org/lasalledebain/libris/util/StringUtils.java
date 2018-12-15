@@ -27,12 +27,4 @@ public class StringUtils {
 	public static String changeFileExtension(String original, String newExtension) {
 		return stripSuffix(original)+"."+newExtension;
 	}
-	
-	public static boolean stringEquals(String a, String b) {
-		if (Objects.isNull(a) && Objects.isNull(b)) {
-			return true;
-		} else 	if (Objects.nonNull(a) && Objects.nonNull(b)) {
-			return a.equals(b);
-		} else return false;
-	}
 }

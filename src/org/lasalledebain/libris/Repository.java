@@ -24,7 +24,7 @@ import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
-import static org.lasalledebain.libris.util.StringUtils.stringEquals;
+import static java.util.Objects.equals;
 
 public class Repository extends Libris {
 // TODO 1 Add Repository field to LibrisDatabase and add repository field to record
@@ -225,14 +225,14 @@ static final int FANOUT = 100;
 			if (Objects.nonNull(obj) && getClass().isAssignableFrom(obj.getClass())) {
 				ArtifactParameters other = (ArtifactParameters) obj;
 				return
-						stringEquals(other.comments, comments)
-						&& stringEquals(other.date, date)
-						&& stringEquals(other.doi, doi)
-						&& stringEquals(other.keywords, keywords)
+						Objects.equals(other.comments, comments)
+						&& Objects.equals(other.date, date)
+						&& Objects.equals(other.doi, doi)
+						&& Objects.equals(other.keywords, keywords)
 						&& other.source.equals(source)
-						&& stringEquals(other.recordName, recordName)
-						&& stringEquals(other.recordParentName, recordParentName)
-						&& stringEquals(other.title, title);
+						&& Objects.equals(other.recordName, recordName)
+						&& Objects.equals(other.recordParentName, recordParentName)
+						&& Objects.equals(other.title, title);
 			} else return false;
 		}
 		/* (non-Javadoc)
