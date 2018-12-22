@@ -1,14 +1,20 @@
 package org.lasalledebain.libris.indexes;
 
+import static org.lasalledebain.libris.util.StringUtils.wordsToHashStream;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class BloomFilterSectionEditor extends BloomFilterSection {
-	public BloomFilterSectionEditor(RandomAccessFile sigFile, int baseId, Iterable<String> terms, int level) throws IOException {
+	public BloomFilterSectionEditor(RandomAccessFile sigFile, int baseId, IntStream hashes, int level) throws IOException {
 		super(sigFile, level);
-		setTerms(baseId, terms);
+		recordSignature = new BitSet();
+		setBaseId(baseId);
+		addHashes(hashes);
 	}
 
 	public BloomFilterSectionEditor(RandomAccessFile sigFile, int level) {
@@ -61,12 +67,13 @@ public class BloomFilterSectionEditor extends BloomFilterSection {
 			i += writeLength;
 		}
 	}
-	public void addTerms(Iterable<String> terms) {
-		SignatureBitList bitList = new SignatureBitList(terms);
-		while (bitList.hasNext()) {
-			int n = nextBit(bitList);
-			recordSignature.set(n);
-		}
+	
+	public void addHash(int hash) {
+		recordSignature.set(hashToBitNumber(hashToBitNumber(hash)));
+	}
+
+	public void addHashes(IntStream hashes) {
+		hashes.forEach(hash -> recordSignature.set(hashToBitNumber(hash)));
 	}
 
 	/**
@@ -76,20 +83,27 @@ public class BloomFilterSectionEditor extends BloomFilterSection {
 	 * @param terms
 	 * @throws IOException 
 	 */
-	public void setTerms(int baseId, Iterable<String> terms) throws IOException {
+	public void setTerms(int baseId, IntStream hashes) throws IOException {
 		recordSignature = new BitSet();
 		setBaseId(baseId);
-		addTerms(terms);
+		addHashes(hashes);
 	}
 
-	public boolean match(Iterable<String> matchTerms) {
-		SignatureBitList bitList = new SignatureBitList(matchTerms);
-		while (bitList.hasNext()) {
-			if (!recordSignature.get(nextBit(bitList))) {
-				return false;
-			}
-		}
-		return true;
+	public boolean match(IntStream hashes) {
+		return hashes.allMatch(i -> recordSignature.get(hashToBitNumber(i)));
+	}
+
+	public void addTerms(Collection<String> words) {
+		addHashes(wordsToHashStream(words));
+	}
+
+	public boolean match(Collection<String> words) {
+		match(wordsToHashStream(words));
+		return false;
+	}
+
+	public void setTerms(int recId, Collection<String> terms) throws IOException {
+		setTerms(recId, wordsToHashStream(terms));
 	}
 
 }

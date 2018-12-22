@@ -6,6 +6,7 @@ import java.io.RandomAccessFile;
 import java.util.Objects;
 
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.TermCountHashFile;
 import org.lasalledebain.libris.index.TermCountEntry;
@@ -50,7 +51,7 @@ public class TermCountIndex {
 	}
 
 
-	public void incrementTermCount(String term, boolean normalize) throws DatabaseException {
+	public void incrementTermCount(String term, boolean normalize) {
 
 		String normalizedTerm = normalize(term, normalize);
 		TermCountEntry entry;
@@ -62,8 +63,8 @@ public class TermCountIndex {
 			} else {
 				entry.incrementCount();
 			}
-		} catch (IOException e) {
-			throw new DatabaseException(e);
+		} catch (IOException | DatabaseException e) {
+			throw new DatabaseError("error adding "+term, e);
 		}
 	}
 

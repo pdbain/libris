@@ -322,7 +322,7 @@ public class TestRecordFilter extends TestCase {
 		IndexConfiguration config = copyAndBuildDatabase();
 		
 		Random rand = new Random(3141592);
-		final int numRecs = 10000;
+		final int numRecs = 100000;
 		final FieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
 		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, 4 * numRecs);
 		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, 8 * numRecs);

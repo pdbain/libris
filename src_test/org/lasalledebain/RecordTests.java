@@ -21,6 +21,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.ExactKeywordList;
 import org.lasalledebain.libris.indexes.PrefixKeywords;
 import org.lasalledebain.libris.indexes.RecordKeywords;
+import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
 public class RecordTests extends TestCase {
@@ -376,6 +377,13 @@ public class RecordTests extends TestCase {
 			e.printStackTrace();
 			fail("unexpected exception "+e);
 		}
+	}
+	
+	public void testGetHashes() {
+			RecordKeywords kw = new ExactKeywordList(true);
+			kw.addKeywords(Arrays.asList(new String[] 
+					{"lorem", "ipsum", "dolor", "sit", "ametl", "consectetur", "adipiscing", "elit,", "sed", "do", "eiusmod", "tempor", "incididunt"}));
+			StringUtils.wordStreamToHashStream(kw.wordStream()).forEach(i -> System.out.println("hash = "+i));
 	}
 	
 	public void testGetPrefixKeywords() {

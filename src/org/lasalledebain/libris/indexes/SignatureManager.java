@@ -3,6 +3,10 @@ package org.lasalledebain.libris.indexes;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Collection;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisConstants;
@@ -10,6 +14,7 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.UserErrorException;
+import org.lasalledebain.libris.util.StringUtils;
 
 public class SignatureManager implements LibrisConstants {
 	private LibrisDatabase database;
@@ -24,10 +29,10 @@ public class SignatureManager implements LibrisConstants {
 		sigLevels = 0;
 	}
 	
-	public SignatureFilteredIdList makeSignatureFilteredIdIterator(Iterable<String> terms) throws UserErrorException, IOException {
+	public SignatureFilteredIdList makeSignatureFilteredIdIterator(Collection<String> terms) throws UserErrorException, IOException {
 		SignatureFilteredIdList mainKfri = null;
 		for (int level = 0; level < sigLevels; ++level) {
-			mainKfri = new SignatureFilteredIdList(sigQueryFiles[level], level, terms, mainKfri);
+			mainKfri = new SignatureFilteredIdList(sigQueryFiles[level], level, StringUtils.wordStreamToHashStream(StreamSupport.stream(terms.spliterator(), false)), mainKfri);
 		}
 		return mainKfri;
 	}
@@ -93,11 +98,11 @@ public class SignatureManager implements LibrisConstants {
 		}
 	}
 
-	public void addKeywords(final int rId, final Iterable<String> keywords) throws IOException {
+	public void addKeywords(final int rId, final Stream<String> keywords) throws IOException {
 		for (BloomFilterSectionEditor b:signatureEditors) {
 			b.switchTo(rId);
-			b.addTerms(keywords);
 		}
+		StringUtils.wordStreamToHashStreams(keywords).forEach(hashStream -> hashStream.forEach(hash -> {for (BloomFilterSectionEditor b:signatureEditors) b.addHash(hash);}));
 	}
 
 	public static int calculateSignatureLevels(int numRecords) {
@@ -118,5 +123,11 @@ public class SignatureManager implements LibrisConstants {
 
 	public int getSigLevels() {
 		return sigLevels;
+	}
+
+	public void switchTo(int rId) throws IOException {
+		for (BloomFilterSectionEditor b:signatureEditors) {
+			b.switchTo(rId);
+		}
 	}
 }
