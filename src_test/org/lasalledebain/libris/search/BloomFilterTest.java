@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.search;
 
+import static org.lasalledebain.libris.util.StringUtils.wordsToHashStream;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -9,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 import org.lasalledebain.Utilities;
@@ -19,6 +22,7 @@ import org.lasalledebain.libris.indexes.BloomFilterSectionEditor;
 import org.lasalledebain.libris.indexes.BloomFilterSectionQuery;
 import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 import org.lasalledebain.libris.util.Lorem;
+import org.lasalledebain.libris.util.StringUtils;
 
 import junit.framework.TestCase;
 
@@ -40,7 +44,7 @@ public class BloomFilterTest extends TestCase {
 		BloomFilterSectionEditor bf = addAndCheckTerms(term);
 		term.clear();
 		term.add("unexpectedword");
-		assertFalse("Unexpected term found", bf.match(term));
+		assertFalse("Unexpected term found", bf.match(StringUtils.wordsToHashStream(term)));
 	}
 
 	@Test
@@ -54,11 +58,11 @@ public class BloomFilterTest extends TestCase {
 		BloomFilterSectionEditor bf = null;
 		try {
 			RandomAccessFile sigFile = new RandomAccessFile(sigFileFile, "rw");
-			bf = new BloomFilterSectionEditor(sigFile, 1, terms, 0);
+			bf = new BloomFilterSectionEditor(sigFile, 1, StringUtils.wordStreamToHashStream(terms.stream()), 0);
 			for (String t: terms) {
 				for (int i = LibrisConstants.MINIMUM_TERM_LENGTH; i <= t.length(); ++i) {
 					String s = t.substring(0, i);
-					assertTrue("substring "+s+" of "+t+" not found", bf.match(Arrays.asList(s)));
+					assertTrue("substring "+s+" of "+t+" not found", bf.match(StringUtils.wordToHashStream(s)));
 				}
 			}
 		} catch (IOException e) {
@@ -72,7 +76,7 @@ public class BloomFilterTest extends TestCase {
 		BloomFilterSectionEditor bf = addAndCheckTerms(term);
 		term.clear();
 		term.add("unexpectedword");
-		assertFalse("Unexpected term found", bf.match(term));
+		assertFalse("Unexpected term found", bf.match(wordsToHashStream(term)));
 	}
 
 	@Test
@@ -88,7 +92,7 @@ public class BloomFilterTest extends TestCase {
 				bf.load(recId);
 				for (int setId = 0; setId < recordTermSets.size(); ++setId) {
 					Set<String> s = recordTermSets.get(setId);
-					boolean found = bf.match(s);
+					boolean found = bf.match(wordsToHashStream(s));
 					if (setId == recId - 1) {
 						assertTrue("missing match", found);
 					} else {
@@ -119,7 +123,7 @@ public class BloomFilterTest extends TestCase {
 			BloomFilterSectionEditor bf = new BloomFilterSectionEditor(sigFile, 0);
 			addSearchTerm(recordTermSets, bf);
 			String searchTerm = "volutpat";
-			BloomFilterSectionQuery bfq = new BloomFilterSectionQuery(sigFile, 1, Arrays.asList(searchTerm), 0);
+			BloomFilterSectionQuery bfq = new BloomFilterSectionQuery(sigFile, 1, StringUtils.wordStreamToHashStream(Stream.of(searchTerm)), 0);
 			for (int recId = 1; recId<= recordTermSets.size(); ++recId) {
 				bfq.load(recId);
 				if (recordTermSets.get(recId-1).contains(searchTerm)) {
@@ -149,7 +153,7 @@ public class BloomFilterTest extends TestCase {
 					for (Set<String> s: recordTermSets) {
 						bf.load(recId);
 						bf.addTerms(s);
-						assertTrue("check immediately", bf.match(s));
+						assertTrue("check immediately", bf.match(wordsToHashStream(s)));
 						recId++;
 						if ((recId % recsPerSig) == 0) {
 							bf.store();
@@ -167,7 +171,7 @@ public class BloomFilterTest extends TestCase {
 					int searchLimit = Math.min(recId + recsPerSig, maxRecordId);
 					while (searchId < searchLimit) {
 						Set<String> s = recordTermSets.get(searchId - 1);
-						assertTrue("missing match", bf.match(s));
+						assertTrue("missing match", bf.match(wordsToHashStream(s)));
 						searchId++;
 					}
 					int otherSet = recId - recsPerSig;
@@ -195,7 +199,7 @@ public class BloomFilterTest extends TestCase {
 			BloomFilterSectionEditor bf = new BloomFilterSectionEditor(sigFile, 0);
 			for (int i = 1; i <= numRecords; ++i) {
 				Set<String> partWords = makeNumericWord(i);
-				bf.setTerms(i, partWords);
+				bf.setTerms(i, StringUtils.wordStreamToHashStream(partWords.stream()));
 				bf.store();
 			}
 			int modulus = numParts;
@@ -347,7 +351,7 @@ public class BloomFilterTest extends TestCase {
 		BloomFilterSectionEditor bf = null;
 		try {
 			RandomAccessFile sigFile = new RandomAccessFile(sigFileFile, "rw");
-			bf = new BloomFilterSectionEditor(sigFile, 1, terms, 0);
+			bf = new BloomFilterSectionEditor(sigFile, 1, StringUtils.wordStreamToHashStream(terms.stream().map(s -> s.toLowerCase())), 0);
 			bf.store();
 			sigFile.close();
 		} catch (IOException e) {

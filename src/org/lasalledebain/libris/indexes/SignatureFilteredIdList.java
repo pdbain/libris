@@ -4,9 +4,12 @@ import static org.lasalledebain.libris.LibrisConstants.NULL_RECORD_ID;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Collection;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
-import org.lasalledebain.libris.exception.UserErrorException;;
+import org.lasalledebain.libris.exception.UserErrorException;
+import static org.lasalledebain.libris.util.StringUtils.wordsToHashStream;
 
 public class SignatureFilteredIdList {
 
@@ -19,12 +22,21 @@ public class SignatureFilteredIdList {
 	private final int recordsPerSet;
 	private boolean first;
 
-	public SignatureFilteredIdList(RandomAccessFile signatureFile, int level, Iterable<String> terms,
+	public SignatureFilteredIdList(RandomAccessFile signatureFile, int level, IntStream hashes,
 			SignatureFilteredIdList subFilter) throws UserErrorException, IOException {
 		this.subFilter = subFilter;
 		cursor = NULL_RECORD_ID;
 		first = true;
-		bloomFilter = new BloomFilterSectionQuery(signatureFile, cursor, terms, level);
+		bloomFilter = new BloomFilterSectionQuery(signatureFile, cursor, hashes, level);
+		recordsPerSet = bloomFilter.getRecordsPerSet();
+	}
+
+	public SignatureFilteredIdList(RandomAccessFile signatureFile, int level, Collection<String> terms,
+			SignatureFilteredIdList subFilter) throws UserErrorException, IOException {
+		this.subFilter = subFilter;
+		cursor = NULL_RECORD_ID;
+		first = true;
+		bloomFilter = new BloomFilterSectionQuery(signatureFile, cursor, wordsToHashStream(terms), level);
 		recordsPerSet = bloomFilter.getRecordsPerSet();
 	}
 

@@ -5,9 +5,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.hamcrest.core.IsNull;
 import org.lasalledebain.libris.exception.DatabaseError;
@@ -29,7 +32,10 @@ import org.lasalledebain.libris.indexes.SortedKeyValueBucketFactory;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.indexes.TermCountIndex;
 import org.lasalledebain.libris.records.Records;
+import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
+
+import sun.swing.StringUIClientPropertyKey;
 
 public class IndexManager implements LibrisConstants {
 
@@ -56,13 +62,6 @@ public class IndexManager implements LibrisConstants {
 
 	private IndexField[] indexFields = null;
 	
-	public IndexField[] getIndexFields() {
-		if (Objects.isNull(indexFields)) {
-			indexFields = database.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
-		}
-		return indexFields;
-	}
-
 	/**
 	 * @param librisDatabase
 	 *            database metadata
@@ -122,7 +121,7 @@ public class IndexManager implements LibrisConstants {
 			termCounts = new TermCountIndex(termCountFileMgr, false);
 
 			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
-			IndexField[] ixFields = getIndexFields();
+			IndexField[] ixFields = indexFields;
 			for (Record r : recs) {
 				String name = r.getName();
 				int id = r.getRecordId();
@@ -146,14 +145,10 @@ public class IndexManager implements LibrisConstants {
 					}
 
 				}
+				keywordList.clear();
 				r.getKeywords(ixFields, keywordList);
-				final Iterable<String> keywords = keywordList.getKeywords();
-				addKeywords(id, keywords);
-			if (false) { // TODO DEBUG
-				for (String term: keywords) {
-					termCounts.incrementTermCount(term, true);
-				}
-			}
+				addKeywords(id, keywordList.wordStream());
+				// TODO re-include keywordList.wordStream().forEach(t -> termCounts.incrementTermCount(t, true));
 			}
 
 			for (int g = 0; g < numGroups; ++g) {
@@ -174,16 +169,17 @@ public class IndexManager implements LibrisConstants {
 		}
 	}
 
-	void addKeywords(final int rId, final Iterable<String> keywords) throws IOException {
-		sigMgr.addKeywords(rId, keywords);
+	void addKeywords(final int rId, final Stream<String> keyWords) throws IOException {
+		sigMgr.addKeywords(rId, keyWords);
 	}
 
 	public void addRecordKeywords(Record rec) {
 		try {
 			int rId = rec.getRecordId();
+			sigMgr.switchTo(rId);
 			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
-			rec.getKeywords(getIndexFields(), keywordList);
-			addKeywords(rId, keywordList.getKeywords());
+			rec.getKeywords(indexFields, keywordList);
+			addKeywords(rId, keywordList.wordStream());
 			sigMgr.flush();
 		} catch (InputException | IOException e) {
 			throw new InternalError("Error adding record "+rec.getRecordId()+" to keyword index", e);
@@ -242,7 +238,7 @@ public class IndexManager implements LibrisConstants {
 		}
 	}
 	
-	public SignatureFilteredIdList makeSignatureFilteredIdIterator(Iterable<String> terms) throws UserErrorException, IOException {
+	public SignatureFilteredIdList makeSignatureFilteredIdIterator(Collection<String> terms) throws UserErrorException, IOException {
 		return sigMgr.makeSignatureFilteredIdIterator(terms);
 	}
 
@@ -265,6 +261,7 @@ public class IndexManager implements LibrisConstants {
 					fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT), readOnly);
 		}
 		termCounts = new TermCountIndex(fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT), false);
+		indexFields = database.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
 	}
 
 	public void close() throws InputException, DatabaseException, IOException {

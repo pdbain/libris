@@ -930,7 +930,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	
 	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int searchList[], String searchTerm) throws UserErrorException, IOException {
-		Iterable<String> searchTerms = Collections.singleton(searchTerm);
+		Collection<String> searchTerms = Collections.singleton(searchTerm);
 		RecordList recList = new SignatureFilteredRecordList(this, searchTerms);
 		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, searchList, searchTerms);
 		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);

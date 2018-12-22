@@ -2,6 +2,7 @@ package org.lasalledebain.libris.indexes;
 
 import java.util.AbstractSet;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 
@@ -33,6 +34,16 @@ public class PrefixKeywords extends RecordKeywords {
 	@Override
 	public MATCH_TYPE getMatchType() {
 		return MATCH_TYPE.MATCH_PREFIX;
+	}
+
+	@Override
+	public Stream<String> wordStream() {
+		return keywordList.stream();
+	}
+
+	@Override
+	public int estimateSize() {
+		return keywordList.size();
 	}
 
 }

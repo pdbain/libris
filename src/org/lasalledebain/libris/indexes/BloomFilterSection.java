@@ -5,6 +5,7 @@ import java.io.RandomAccessFile;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.util.Murmur3;
@@ -45,6 +46,10 @@ public abstract class BloomFilterSection {
 		this(sigFile, level);
 	}
 
+	public BloomFilterSection(RandomAccessFile sigFile, int baseId, int level) throws IOException {
+		this(sigFile, level);
+	}
+
 	public BloomFilterSection(RandomAccessFile sigFile, int level) {
 		signatureFile = sigFile;
 		recordsPerSet = bytesPerLevel[level];
@@ -54,10 +59,6 @@ public abstract class BloomFilterSection {
 
 	public int getRecordsPerSet() {
 		return recordsPerSet;
-	}
-
-	public int nextBit(SignatureBitList bitList) {
-		return bitList.next() & (setSize - 1);
 	}
 
 	public boolean isLoaded(int id) {
@@ -95,39 +96,7 @@ public abstract class BloomFilterSection {
 		}
 	}
 
-	static class SignatureBitList {
-		private byte[] currentTerm;
-		private int currentLength;
-		private Iterator<String> termList;
-		SignatureBitList(Iterable<String> terms) {
-			termList = terms.iterator();
-			startNextTerm();
-		}
-
-		boolean hasNext() {
-			return null != currentTerm;
-		}
-
-		int next() {
-			int result = Murmur3.hash32(currentTerm, currentLength);
-			if (currentLength < currentTerm.length) {
-				++currentLength;
-			} else {
-				startNextTerm();
-			}
-			return result;
-		}
-
-		public void startNextTerm() {
-			currentTerm = null;
-			while ((null == currentTerm) && termList.hasNext()) {
-				String nextTerm = termList.next();
-				if (nextTerm.length() < LibrisConstants.MINIMUM_TERM_LENGTH) {
-					continue;
-				}
-				currentTerm = StringUtils.toCanonicalBytes(nextTerm);
-				currentLength = LibrisConstants.MINIMUM_TERM_LENGTH;
-			}
-		}		
+	protected int hashToBitNumber(int hash) {
+		return hash & (setSize - 1);
 	}
 }
