@@ -148,7 +148,7 @@ public class IndexManager implements LibrisConstants {
 				keywordList.clear();
 				r.getKeywords(ixFields, keywordList);
 				addKeywords(id, keywordList.wordStream());
-				// TODO re-include keywordList.wordStream().forEach(t -> termCounts.incrementTermCount(t, true));
+				keywordList.wordStream().forEach(t -> termCounts.incrementTermCount(t, true));
 			}
 
 			for (int g = 0; g < numGroups; ++g) {
