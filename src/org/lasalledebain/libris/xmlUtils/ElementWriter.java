@@ -44,7 +44,7 @@ public class ElementWriter implements LibrisXMLConstants {
 			}
 			if (null != attributes) {
 				for (String[] pair: attributes) {
-					elemWriter.writeAttribute(pair[0], pair[1]);			
+					elemWriter.writeAttribute(pair[0], pair[1]);
 				}
 			}
 			elemWriter.writeCharacters("\n");

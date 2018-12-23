@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.search;
 
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,6 +33,7 @@ import org.lasalledebain.libris.util.DeterministicFieldGenerator;
 import org.lasalledebain.libris.util.FieldGenerator;
 import org.lasalledebain.libris.util.Lorem;
 import org.lasalledebain.libris.util.RandomFieldGenerator;
+import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import junit.framework.TestCase;
@@ -318,17 +320,16 @@ public class TestRecordFilter extends TestCase {
 	}
 	
 	public void testIndexStress() throws FileNotFoundException, IOException, LibrisException {
-		fail("Runs too long");
 		IndexConfiguration config = copyAndBuildDatabase();
 		
 		Random rand = new Random(3141592);
-		final int numRecs = 100000;
+		final int numRecs = 10000;
 		final FieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
 		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, 4 * numRecs);
 		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, 8 * numRecs);
 		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, 25 * numRecs);
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators, keywordFieldNums);
-		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
+		database.exportDatabaseXml(new BufferedOutputStream(new FileOutputStream(config.getDatabaseFile())), true, true, true);
 		ui = config.getDatabaseUi();
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
