@@ -36,6 +36,7 @@ import org.lasalledebain.libris.util.RandomFieldGenerator;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 public class TestRecordFilter extends TestCase {
@@ -137,9 +138,10 @@ public class TestRecordFilter extends TestCase {
 		LibrisUi ui = config.getDatabaseUi();
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
 		RandomFieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
-		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, 4 * numRecs);
-		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, 8 * numRecs);
-		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, 25 * numRecs);
+		final int keywordRatio = 15 * numRecs;
+		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
+		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, keywordRatio);
+		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, keywordRatio);
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators, keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(testDatabaseFileCopy), true, true, true);
 		ui.closeDatabase(false);
@@ -325,9 +327,10 @@ public class TestRecordFilter extends TestCase {
 		Random rand = new Random(3141592);
 		final int numRecs = 10000;
 		final FieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
-		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, 4 * numRecs);
-		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, 8 * numRecs);
-		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, 25 * numRecs);
+		final int keywordRatio = 15 * numRecs;
+		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
+		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, keywordRatio);
+		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, keywordRatio);
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators, keywordFieldNums);
 		database.exportDatabaseXml(new BufferedOutputStream(new FileOutputStream(config.getDatabaseFile())), true, true, true);
 		ui = config.getDatabaseUi();
@@ -338,7 +341,13 @@ public class TestRecordFilter extends TestCase {
 		for (String term: keyWordsAndRecords.keySet()) {
 			FilteredRecordList filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
 					keywordFieldNums, term);
-			checkReturnedRecords(filteredList, keyWordsAndRecords.get(term));
+			try{
+				checkReturnedRecords(filteredList, keyWordsAndRecords.get(term));
+			} catch (AssertionFailedError e) {
+				AssertionFailedError afe = new AssertionFailedError("missing term "+term);
+				afe.initCause(e);
+				throw afe;
+			}
 		}
 		
 	}
@@ -382,13 +391,19 @@ public class TestRecordFilter extends TestCase {
 	}
 
 	private void checkReturnedRecords(FilteredRecordList filteredList, Collection<Integer> expectedIdCollection) {
-		Iterator<Integer> expectedIds = expectedIdCollection.iterator();
+		//Iterator<Integer> expectedIds = expectedIdCollection.iterator();
+		Iterator<Integer> expectedIds = expectedIdCollection.stream().sorted().iterator();
+		// int recordCount = 0;
 		for (Record r: filteredList) {
-			assertTrue("too many records found", expectedIds.hasNext());
-			int expectedId = expectedIds.next();
-			assertEquals("Wrong record returned", expectedId, r.getRecordId());
+			// ++recordCount;
+			assertTrue("too few records found", expectedIds.hasNext());
+			int nextExpected = expectedIds.next();
+			final int nextActual = r.getRecordId();
+			assertEquals("missing record ", nextExpected, nextActual);
+			// assertTrue("missing record "+actualId, expectedIdCollection.contains(Integer.valueOf(actualId)));
 		}
-		assertFalse("too few records found", expectedIds.hasNext());
+		assertFalse("too many records found", expectedIds.hasNext());
+		// assertTrue("too few records found", recordCount == expectedIdCollection.size());
 	}
 	
 	 Record makeRecord (LibrisDatabase database, FieldGenerator[] fieldGenerators, int fieldNums[], HashSet<String> keyWords) throws InputException {
@@ -404,7 +419,7 @@ public class TestRecordFilter extends TestCase {
 	 HashMap<String, List<Integer>> makeDatabase(LibrisDatabase database, int numRecs, FieldGenerator[] fieldGenerators, int fieldNums[]) throws LibrisException {
 		 HashMap<String, List<Integer>> keyWordsAndRecords = new HashMap<>();
 		 HashSet<String> keyWords = new HashSet<>();
-		 for(int i = 1; i <= numRecs; i++) {
+		 for (int i = 1; i <= numRecs; i++) {
 			 Record rec = makeRecord(database, fieldGenerators, fieldNums, keyWords);
 			 int recNum = database.put(rec);
 			 for (String s: keyWords) {
