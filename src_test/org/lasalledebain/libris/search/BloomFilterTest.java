@@ -82,6 +82,7 @@ public class BloomFilterTest extends TestCase {
 	@Test
 	public void testMultipleRecords() {
 		try {
+			int falseDropLimit = 10;
 			ArrayList<Set<String>> recordTermSets = new ArrayList<>();
 			File sigFileFile = new File(testDirectory, "signature_file");
 			RandomAccessFile sigFile = new RandomAccessFile(sigFileFile, "rw");
@@ -100,7 +101,11 @@ public class BloomFilterTest extends TestCase {
 							Set<String> orig = recordTermSets.get(recId - 1);
 							for (String str: s) {
 								if (!orig.contains(str)) {
-									assertFalse("false match recId="+recId+" set="+setId, found);
+									if (falseDropLimit <= 0) {
+										assertFalse("false match recId="+recId+" set="+setId, found);
+									} else {
+										--falseDropLimit;
+									}
 								}
 							}
 						}
