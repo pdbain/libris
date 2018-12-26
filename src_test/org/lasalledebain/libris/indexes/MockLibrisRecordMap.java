@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.util.Reporter;
 
 public class MockLibrisRecordMap extends LibrisRecordMap {
 	HashMap<Integer, Long> recMap;
@@ -36,6 +37,10 @@ public class MockLibrisRecordMap extends LibrisRecordMap {
 	@Override
 	public void flush() throws DatabaseException {
 		return;
+	}
+	@Override
+	public void generateReport(Reporter rpt) {
+		/* EMPTY */
 	}
 
 }

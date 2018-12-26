@@ -134,7 +134,7 @@ public class TestRecordFilter extends TestCase {
 		final int numRecs = 100;
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML);
 		IndexConfiguration config = new IndexConfiguration(testDatabaseFileCopy);
-		config.setSignatureLevels(2);
+		config.setAttribute(IndexConfiguration.SIGNATURE_LEVELS, 2);
 		LibrisUi ui = config.getDatabaseUi();
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
 		RandomFieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
@@ -157,7 +157,7 @@ public class TestRecordFilter extends TestCase {
 	public void testSearchMultipleResults() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML);
 		IndexConfiguration config = new IndexConfiguration(testDatabaseFileCopy);
-		config.setSignatureLevels(2);
+		config.setAttribute(IndexConfiguration.SIGNATURE_LEVELS, 2);
 		LibrisUi ui = config.getDatabaseUi();
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
 		String singleKeyword = "singleKeyword";
@@ -325,7 +325,8 @@ public class TestRecordFilter extends TestCase {
 		IndexConfiguration config = copyAndBuildDatabase();
 		
 		Random rand = new Random(3141592);
-		final int numRecs = 10000;
+		final int numRecs = 10000;  // TODO increase to 10^6
+		config.setAttribute(IndexConfiguration.TERMCOUNT_BUCKETS, numRecs/4);
 		final FieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
 		final int keywordRatio = 15 * numRecs;
 		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
@@ -355,7 +356,7 @@ public class TestRecordFilter extends TestCase {
 	private IndexConfiguration copyAndBuildDatabase() throws FileNotFoundException, IOException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML);
 		IndexConfiguration config = new IndexConfiguration(testDatabaseFileCopy);
-		config.setSignatureLevels(2);
+		config.setAttribute(IndexConfiguration.SIGNATURE_LEVELS, 2);
 		database = Utilities.buildTestDatabase(config);
 		return config;
 	}
