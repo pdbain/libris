@@ -98,8 +98,7 @@ public class BloomFilterSectionEditor extends BloomFilterSection {
 	}
 
 	public boolean match(Collection<String> words) {
-		match(wordsToHashStream(words));
-		return false;
+		return match(wordsToHashStream(words));
 	}
 
 	public void setTerms(int recId, Collection<String> terms) throws IOException {

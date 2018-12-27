@@ -97,6 +97,7 @@ public abstract class BloomFilterSection {
 	}
 
 	protected int hashToBitNumber(int hash) {
-		return hash & (setSize - 1);
+		final int bitNum = hash & (setSize - 1);
+		return bitNum;
 	}
 }

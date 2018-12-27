@@ -2,6 +2,7 @@ package org.lasalledebain.libris.indexes;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.RecordDataException;
+import org.lasalledebain.libris.util.Reporter;
 
 public abstract class LibrisRecordMap {
 
@@ -11,6 +12,8 @@ public abstract class LibrisRecordMap {
 	public abstract void flush() throws DatabaseException;
 	public abstract void close() throws DatabaseException;
 	public abstract void putRecordPosition(int recordIdNum, long data) throws DatabaseException;
+	public abstract void generateReport(Reporter rpt);
+
 	
 	/**
 	 * Get the file position of the start of a record element

@@ -2,17 +2,21 @@ package org.lasalledebain.libris.indexes;
 
 import java.io.File;
 import java.util.Objects;
-import java.util.function.Supplier;
+import java.util.Optional;
+import java.util.Properties;
 
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.util.Reporter;
 
 public class IndexConfiguration {
+	public static String SIGNATURE_LEVELS = "signature.levels";
+	public static String TERMCOUNT_BUCKETS = "termcount.buckets";
 	private final File databaseFile;
-	int signatureLevels;
+	final Properties config;
 	LibrisUi databaseUi;
 	boolean loadMetadata;
-
+	public final Reporter indexingReporter;
 	public boolean isLoadMetadata() {
 		return loadMetadata;
 	}
@@ -29,7 +33,8 @@ public class IndexConfiguration {
 	
 	public IndexConfiguration(File databaseFile) {
 		this.databaseFile = databaseFile;
-		signatureLevels = 0;
+		config = new Properties();
+		indexingReporter = new Reporter();
 	}
 
 	public LibrisUi getDatabaseUi() {
@@ -44,12 +49,17 @@ public class IndexConfiguration {
 		this.databaseUi = databaseUi;
 	}
 
-	public int getSignatureLevels() {
-		return signatureLevels;
+	public Optional<Integer> getAttribute(final String attribute) {
+		if (config.containsKey(attribute)) {
+			final Optional<Integer> value = Optional.of(Integer.parseInt(config.getProperty(attribute)));
+			return value;
+		} else {
+			return Optional.empty();
+		}
 	}
 
-	public void setSignatureLevels(int signatureLevels) {
-		this.signatureLevels = signatureLevels;
+	public void setAttribute(String attributeName, int value) {
+		config.setProperty(attributeName, Integer.toString(value));
 	}
 
 	public File getDatabaseFile() {

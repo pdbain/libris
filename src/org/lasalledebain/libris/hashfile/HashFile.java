@@ -21,14 +21,36 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 	int bucketAge = 0;
 	private HashBucketFactory<EntryType, BucketType, FactoryType> bucketFactory;
 	FactoryType entryFact;
+	private int expansionCount, bucketLoadCount, flushCount;
+
+	public int getBucketLoadCount() {
+		return bucketLoadCount;
+	}
+
+	public void resetBucketLoadCount() {
+		bucketLoadCount = 0;
+	}
+
+	public int getExpansionCount() {
+		return expansionCount;
+	}
+
+	public void resetExpansionCount() {
+		this.expansionCount = 0;
+	}
 
 	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact) throws IOException {
 		this.backingStore = backingStore;
 		this.bucketFactory = bFact;
+		expansionCount = bucketLoadCount = flushCount = 0;
 		long fileLength = backingStore.length();
 		bucketSize = NumericKeyHashBucket.getBucketSize();
 		setNumBuckets((int) fileLength/bucketSize + 1);
 		bucketCache = new HashMap<Integer, BucketType>();
+	}
+
+	public int getFlushCount() {
+		return flushCount;
 	}
 
 	/**
@@ -58,6 +80,10 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		}
 	}
 
+	public int getNumBuckets() {
+		return numBuckets;
+	}
+
 	/**
 	 * @param bucketNum
 	 * @return
@@ -77,6 +103,7 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 			}
 			buck = createBucket(bucketNum);
 			buck.read();
+			bucketLoadCount++;
 			bucketCache.put(bucketNum, buck);
 		}
 		buck.setAge(bucketAge);
@@ -110,6 +137,7 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 	}
 
 	private void flush(boolean removeOldest) throws IOException, DatabaseException {
+		++flushCount;
 		HashBucket<EntryType> oldestBucket = null;
 		for (HashBucket<EntryType> b: bucketCache.values()) {
 			if ((null == oldestBucket) || (b.getAge() < oldestBucket.getAge())) {
@@ -190,6 +218,7 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 			}
 		}
 
+		expansionCount++;
 		oldOverflowBucket.clear();
 		for (EntryType e: oldOverflowNativeEntries) {
 			oldOverflowBucket.addEntry(e);

@@ -2,17 +2,15 @@ package org.lasalledebain.libris;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-import org.hamcrest.core.IsNull;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -32,10 +30,8 @@ import org.lasalledebain.libris.indexes.SortedKeyValueBucketFactory;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.indexes.TermCountIndex;
 import org.lasalledebain.libris.records.Records;
-import org.lasalledebain.libris.util.StringUtils;
+import org.lasalledebain.libris.util.Reporter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-
-import sun.swing.StringUIClientPropertyKey;
 
 public class IndexManager implements LibrisConstants {
 
@@ -118,10 +114,12 @@ public class IndexManager implements LibrisConstants {
 				affiliateTempFiles[g].setDeleteOnExit();
 			}
 
-			termCounts = new TermCountIndex(termCountFileMgr, false);
+			termCounts = new TermCountIndex(termCountFileMgr, config.getAttribute(IndexConfiguration.TERMCOUNT_BUCKETS), false);
 
 			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
 			IndexField[] ixFields = indexFields;
+			long keywordCount = 0;
+			long recordCount = 0;
 			for (Record r : recs) {
 				String name = r.getName();
 				int id = r.getRecordId();
@@ -143,13 +141,17 @@ public class IndexManager implements LibrisConstants {
 							}
 						}
 					}
-
 				}
+				++recordCount;
 				keywordList.clear();
 				r.getKeywords(ixFields, keywordList);
+				keywordCount += keywordList.estimateSize();
 				addKeywords(id, keywordList.wordStream());
 				keywordList.wordStream().forEach(t -> termCounts.incrementTermCount(t, true));
 			}
+			config.indexingReporter.reportValue(Reporter.INDEXING_RECORDS_NUM_RECS, recordCount);
+			config.indexingReporter.reportValue(Reporter.INDEXING_KEYWORD_COUNT, keywordCount);
+			termCounts.generateReport(config.indexingReporter);
 
 			for (int g = 0; g < numGroups; ++g) {
 				childTempFiles[g].close();
@@ -164,6 +166,9 @@ public class IndexManager implements LibrisConstants {
 			database.getMetadata().setSignatureLevels(sigMgr.getSigLevels());
 
 			setIndexed(true);
+			try (FileOutputStream reportFile = fileMgr.getUnmanagedOutputFile(INDEXING_REPORT_FILE)) {
+				config.indexingReporter.writeReport(reportFile);
+			};
 		} catch (IOException e) {
 			throw new InputException("Error rebuilding indexes", e);
 		}

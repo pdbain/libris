@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Collection;
-import java.util.stream.IntStream;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -61,8 +61,10 @@ public class SignatureManager implements LibrisConstants {
 	}
 	
 	public void createFiles(IndexConfiguration config) throws FileNotFoundException {
-		sigLevels = config.getSignatureLevels();
-		if (0 == sigLevels) {
+		Optional<Integer> sigLevelsTemp = config.getAttribute(IndexConfiguration.SIGNATURE_LEVELS);
+		if (sigLevelsTemp.isPresent()) {
+			sigLevels = sigLevelsTemp.get();
+		} else {
 			sigLevels = calculateSignatureLevels(database.getLastRecordId());
 		}
 		initializeFiles();

@@ -21,6 +21,10 @@ public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> ext
 		occupancy = 4;
 	}
 
+	public FixedSizeEntryHashBucket(RandomAccessFile backingStore, int bucketNum) {
+		super(backingStore, bucketNum);
+	}
+
 	public static FixedSizeEntryHashBucketFactory getFactory() {
 		return new FixedSizeEntryHashBucketFactory();
 	}
