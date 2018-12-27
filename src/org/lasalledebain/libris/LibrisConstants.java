@@ -68,6 +68,8 @@ public interface LibrisConstants {
 	public static final String AFFILIATES_FILENAME_OVERFLOW_ROOT = AFFILIATES_FILENAME_ROOT+"overflow_";
 	public static final String KEYWORDS_FILTER_FILENAME_ROOT = "keywords_filter_";
 	public static final String TERM_COUNT_FILENAME_ROOT = "termcounts";
+	public static final String INDEXING_REPORT_FILE = "indexReport.txt";
+	public static final String IMPORT_REPORT_FILE = "importReport.txt";
 	static final String TEMP_ROOT = "_TEMP_";
 	static final String TEMP_CHILD_FILE = TEMP_ROOT+"child_";
 	static final String TEMP_AFFILIATE_FILE = TEMP_ROOT+"affiliate_";

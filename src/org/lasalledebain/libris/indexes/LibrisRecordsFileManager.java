@@ -29,6 +29,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.OutputException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
+import org.lasalledebain.libris.util.Reporter;
 
 public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstants {
 
@@ -555,4 +556,9 @@ public void removeRecord(int rid) throws DatabaseException {
 		}
 		return count;
 	}
+	
+	public void generateReport(Reporter rpt) {
+		recPosns.generateReport(rpt);
+	}
+
 }

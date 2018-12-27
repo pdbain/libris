@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.records;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import javax.xml.stream.FactoryConfigurationError;
 
 import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.LibrisMetadata;
@@ -23,6 +25,7 @@ import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.BulkImporter;
 import org.lasalledebain.libris.indexes.RecordPositions;
 import org.lasalledebain.libris.ui.Messages;
+import org.lasalledebain.libris.util.Reporter;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import static org.lasalledebain.libris.exception.DatabaseError.assertTrue; 
@@ -139,6 +142,12 @@ public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,Libr
 				int recId = r.getRecordId();
 				lastId = Math.max(lastId, recId);
 			}
+			try (FileOutputStream reportFile = fileMgr.getUnmanagedOutputFile(LibrisConstants.IMPORT_REPORT_FILE)) {
+				Reporter rpt = new Reporter();
+				recPosns.generateReport(rpt);
+				rpt.writeReport(reportFile);
+			};
+
 			metadata.setSavedRecords(numAdded);
 			importer.finish(nonEmpty);
 			recordsFileMgr.releaseOpStream();

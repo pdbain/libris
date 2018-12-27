@@ -5,7 +5,7 @@ import java.io.RandomAccessFile;
 import java.util.HashMap;
 
 import org.lasalledebain.libris.exception.DatabaseException;
-
+// TODO make consecutive records hash to the same bucket
 public class NumericKeyHashFile<EntryType extends NumericKeyHashEntry, 
 BucketType extends NumericKeyHashBucket<EntryType>, FactoryType extends NumericKeyEntryFactory<EntryType>> 
 extends HashFile<EntryType, BucketType,FactoryType> {

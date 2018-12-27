@@ -243,6 +243,10 @@ public class LibrisFileManager implements LibrisConstants {
 		}
 		return mgr;
 	}
+	
+	public FileOutputStream getUnmanagedOutputFile(String fileName) throws IOException {
+		return new FileOutputStream(new File(auxDirectory, fileName));
+	}
 
 	/**
 	 * Set the database source (XML) file

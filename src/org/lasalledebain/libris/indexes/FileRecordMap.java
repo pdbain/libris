@@ -11,9 +11,11 @@ import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket.FixedSizeEntry
 import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
+import org.lasalledebain.libris.hashfile.RecordPositionHashFile;
 import org.lasalledebain.libris.index.RecordPositionEntry;
 import org.lasalledebain.libris.index.RecordPositionEntryFactory;
 import org.lasalledebain.libris.ui.Messages;
+import org.lasalledebain.libris.util.Reporter;
 
 public class FileRecordMap extends LibrisRecordMap {
 
@@ -40,9 +42,7 @@ public class FileRecordMap extends LibrisRecordMap {
 		eFactory = new RecordPositionEntryFactory();
 		try {
 			final FixedSizeEntryHashBucketFactory factory = FixedSizeEntryHashBucket.getFactory();
-			indexHashFile = new NumericKeyHashFile
-					<RecordPositionEntry, NumericKeyHashBucket<RecordPositionEntry>, NumericKeyEntryFactory<RecordPositionEntry>>
-			(backingStore, factory, eFactory);
+			indexHashFile = new RecordPositionHashFile(backingStore, factory, eFactory);
 		} catch (IOException e) {
 			throw new DatabaseException(e);
 		}
@@ -109,6 +109,10 @@ public class FileRecordMap extends LibrisRecordMap {
 				throw new DatabaseException(e);
 			}
 		}
+	}
+	public void generateReport(Reporter rpt) {
+		rpt.reportValue(Reporter.INDEXING_RECPOS_BUCKETS_FLUSHES, indexHashFile.getFlushCount());
+		rpt.reportValue(Reporter.INDEXING_RECPOS_BUCKETS_EXPANSION, indexHashFile.getExpansionCount());
 	}
 
 }
