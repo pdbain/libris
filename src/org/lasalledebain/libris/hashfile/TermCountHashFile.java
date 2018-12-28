@@ -15,4 +15,8 @@ public class TermCountHashFile extends StringKeyHashFile<TermCountEntry, TermCou
 
 	}
 
+	@Override
+	protected TermCountHashBucket createBucket(int bucketNum) {
+		return new TermCountHashBucket(backingStore, bucketNum);
+	}
 }

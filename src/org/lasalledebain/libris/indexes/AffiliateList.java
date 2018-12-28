@@ -12,6 +12,7 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.hashfile.AffiliateHashFile;
 import org.lasalledebain.libris.hashfile.HashFile;
 import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
@@ -30,8 +31,7 @@ public class AffiliateList {
 	private final RandomAccessFile overflowFile;
 	private final FileSpaceManager overflowSpaceMgr;
 	private final  AffiliateListEntryFactory eFactory;
-	private final  NumericKeyHashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, NumericKeyEntryFactory<AffiliateListEntry>> 
-	affiliateHashFile;
+	private final  AffiliateHashFile myHashFile;
 	private final  BucketOverflowFileManager bucketOverflowMgr;
 	public AffiliateList(FileAccessManager hashTableFileMgr,
 			FileAccessManager overflowFileMgr, boolean readOnly) throws DatabaseException {
@@ -51,9 +51,7 @@ public class AffiliateList {
 		}
 		eFactory = new AffiliateListEntry.AffiliateListEntryFactory();
 		try {
-			affiliateHashFile = new NumericKeyHashFile
-					<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, NumericKeyEntryFactory<AffiliateListEntry>>
-			(hashTableFile, 
+			myHashFile = new AffiliateHashFile(hashTableFile, 
 					VariableSizeEntryHashBucket.getFactory(bucketOverflowMgr), eFactory);
 		} catch (IOException e) {
 			throw new DatabaseException(e);
@@ -63,7 +61,7 @@ public class AffiliateList {
 	public void setSize(long expectedEntries) throws DatabaseException {
 		long totalExpectedSize = 6 * expectedEntries; /* 4 bytes per entry + 5% overhead for length and parent */
 		int requestedBuckets = (int) (totalExpectedSize/NumericKeyHashBucket.BUCKET_SIZE);
-		affiliateHashFile.resize(requestedBuckets);
+		myHashFile.resize(requestedBuckets);
 	}
 
 	public void close() throws DatabaseException {
@@ -77,9 +75,9 @@ public class AffiliateList {
 	}
 
 	public void flush() throws DatabaseException {
-		if (null != affiliateHashFile) {
+		if (null != myHashFile) {
 			try {
-				affiliateHashFile.flush();
+				myHashFile.flush();
 			} catch (IOException e) {
 				throw new DatabaseException(e);
 			}
@@ -95,7 +93,7 @@ public class AffiliateList {
 			} else {
 				newEntry = eFactory.makeEntry(oldEntry, child, true);
 			}
-			affiliateHashFile.addEntry(newEntry);
+			myHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {
 			throw new InternalError("Error adding affiliates entry for record "+parent, e);
 		}
@@ -110,7 +108,7 @@ public class AffiliateList {
 			} else {
 				newEntry = eFactory.makeEntry(oldEntry, src, false);
 			}
-			affiliateHashFile.addEntry(newEntry);
+			myHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {
 			throw new InternalError("Error adding affiliates entry for record "+dest, e);
 		}
@@ -137,7 +135,7 @@ public class AffiliateList {
 			} else {
 				newEntry = new AffiliateListEntry(oldEntry, affiliates, false);
 			}
-			affiliateHashFile.addEntry(newEntry);
+			myHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {
 			throw new InternalError("Error adding affiliates entry for record "+parent, e);
 		}
@@ -146,7 +144,7 @@ public class AffiliateList {
 	private AffiliateListEntry getEntry(int recordId) {
 		AffiliateListEntry entry;
 		try {
-			entry = affiliateHashFile.getEntry(recordId);
+			entry = myHashFile.getEntry(recordId);
 		} catch (DatabaseException | IOException e) {
 			throw new DatabaseError("Error getting affiliates for record "+recordId, e);
 		}

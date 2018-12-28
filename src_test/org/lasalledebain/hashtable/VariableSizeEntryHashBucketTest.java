@@ -9,31 +9,29 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
 
-import junit.framework.TestCase;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.hashfile.AffiliateHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucketFactory;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 import org.lasalledebain.libris.index.AffiliateListEntry;
-import org.lasalledebain.libris.index.AffiliateListEntry.AffiliateListEntryFactory;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
+
+import junit.framework.TestCase;
 
 public class VariableSizeEntryHashBucketTest extends TestCase{
 
 	private File testFile;
-	private NumericKeyHashBucketFactory bfact;
 	private MockVariableSizeEntryFactory entryFactory;
-	private NumericKeyHashBucket<VariableSizeHashEntry> buck;
+	private VariableSizeEntryHashBucket<VariableSizeHashEntry> buck;
 	private RandomAccessFile backingStore;
 	boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
 	FileSpaceManager mgr;
 	private MockOverflowManager oversizeEntryManager;
+	private int oversizeThreshold;
 
 	@Test
 	public void testAddElement() {
@@ -72,7 +70,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			int expectedOccupancy = 2;
 			for (int key = 1; key < numEntries; key++ ) {
 				int length = entryCount + 1;
-				VariableSizeHashEntry newEntry = entryFactory.makeVariableSizeEntry(key, length);
+				VariableSizeHashEntry newEntry = makeVariableSizeEntry(key, length);
 				entries.put(new Integer(key), newEntry);
 				boolean result = buck.addEntry(newEntry);
 				++entryCount;
@@ -100,12 +98,11 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			int entryCount = 0;
 			Random r = new Random(314126535);
 			HashMap<Integer, int[][]> entries= new HashMap<Integer, int[][]>(numEntries);
-			AffiliateListEntryFactory eFactory = AffiliateHashBucket.getFactory();
 			VariableSizeEntryHashBucket<AffiliateListEntry> buck = new VariableSizeEntryHashBucket<>(null, 0, null, null);
 // TODO remove duplicate from expected
 			for (int key = 1; key < numEntries; key++ ) {
 				int childrenAndAffiliates[][] = new int[2][];
-				AffiliateListEntry newEntry = eFactory.makeEntry(key);
+				AffiliateListEntry newEntry = new AffiliateListEntry(key);
 				double ng = r.nextGaussian();
 				int numChildren = Math.abs((int) (ng * affiliateScale));
 				HashSet<Integer> affiliateList = new HashSet<>(numChildren);
@@ -153,7 +150,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			int expectedOccupancy = 2;
 			for (int key = 1; key < numEntries; key++ ) {
 				int length = Math.min(32, NumericKeyHashBucket.getBucketSize()-(expectedOccupancy + 6));
-				VariableSizeHashEntry newEntry = entryFactory.makeVariableSizeEntry(key, length);
+				VariableSizeHashEntry newEntry = makeVariableSizeEntry(key, length);
 				entries.put(new Integer(key), newEntry);
 				boolean result = buck.addEntry(newEntry);
 				++entryCount;
@@ -174,6 +171,16 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 		}
 	}
 
+	private MockVariableSizeHashEntry makeVariableSizeEntry(int key, int length) {
+		byte[] dat = new byte[length];
+		for (int i = 0; i < length; ++i) {
+			dat[i] = (byte) (key + i);
+		}
+		MockVariableSizeHashEntry newEntry = new MockVariableSizeHashEntry(key, dat);
+		newEntry.setOversize((oversizeThreshold > 0) && (length >= oversizeThreshold));
+		return newEntry;
+	}
+
 	@Test
 	public void testUpdate() {
 		try {
@@ -184,7 +191,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			final int numEntries = (bucketSize - expectedOccupancy)/totalLength;
 			VariableSizeHashEntry newEntry;
 			for (int key = 1; key <= numEntries; key++ ) {
-				newEntry = entryFactory.makeVariableSizeEntry(key, initialSize);
+				newEntry = makeVariableSizeEntry(key, initialSize);
 				boolean result = buck.addEntry(newEntry);
 				assertTrue("unexpected overflow", result);
 			}
@@ -226,7 +233,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			populateBucket(numEntries, entries);
 			buck.write();
 			checkEntries(buck, numEntries, entries);
-			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = makeBucket();
 			newBuck.read();
 			checkEntries(newBuck, numEntries, entries);
 		} catch (Exception e) {
@@ -241,7 +248,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			final int numEntries = 16;
 			HashMap<Integer, VariableSizeHashEntry> entries= new HashMap<Integer, VariableSizeHashEntry>(numEntries);
 
-			entryFactory.setOversizeThreshold(64);
+			oversizeThreshold = 64;
 			int length = 2;
 			for (int key = 1; key <= numEntries; key++ ) {
 				VariableSizeHashEntry newEntry = createEntry(key, length);
@@ -253,7 +260,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			}			
 			buck.write();
 			checkEntries(buck, numEntries, entries);
-			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = makeBucket();
 			newBuck.read();
 			checkEntries(newBuck, numEntries, entries);
 		} catch (Exception e) {
@@ -268,7 +275,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			int numEntries = 0;
 			HashMap<Integer, VariableSizeHashEntry> entries= new HashMap<Integer, VariableSizeHashEntry>(numEntries);
 
-			entryFactory.setOversizeThreshold(64);
+			oversizeThreshold = 64;
 			Random lengthGen = new Random(271828);
 			boolean addMore = true;
 			for (int key = 1; addMore; key++ ) {
@@ -284,7 +291,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			}			
 			buck.write();
 			checkEntries(buck, numEntries, entries);
-			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = makeBucket();
 			newBuck.read();
 			checkEntries(newBuck, numEntries, entries);
 		} catch (Exception e) {
@@ -301,7 +308,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			populateBucket(numEntries, entries);
 			buck.write();
 			checkEntries(buck, numEntries, entries);
-			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			VariableSizeEntryHashBucket newBuck = makeBucket();
 			newBuck.read();
 			int actualCount = 0;
 			Iterator<VariableSizeHashEntry> iter = newBuck.iterator();
@@ -319,7 +326,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			iter = newBuck.iterator();
 			assertFalse("remove didn't work", iter.hasNext());
 			newBuck.write();
-			newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			newBuck = makeBucket();
 			newBuck.read();
 			iter = newBuck.iterator();
 			assertFalse("remove didn't work", iter.hasNext());
@@ -335,29 +342,28 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			final int numEntries = 8;
 			HashMap<Integer, VariableSizeHashEntry> entries= new HashMap<Integer, VariableSizeHashEntry>(numEntries);
 
-			entryFactory.setOversizeThreshold(64);
+			oversizeThreshold = 64;
 			int length = 4;
 			for (int key = 1; key <= numEntries; key++ ) {
 				VariableSizeHashEntry newEntry = createEntry(key, length);
 				entries.put(key, newEntry);
 				boolean result = buck.addEntry(newEntry);
-				int occupancy = buck.getOccupancy();
 				assertTrue("bucket add failed on key "+key, result);
 				length *= 2;
 			}			
 			buck.write();
 
 			checkEntries(buck, numEntries, entries);
-			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = makeBucket();
 			newBuck.read();
 			Iterator<VariableSizeHashEntry> iter = newBuck.iterator();
 			while (iter.hasNext()) { /* remove half the entries */
-				VariableSizeHashEntry e = iter.next();
+				iter.next();
 				iter.remove();
 				iter.next();
 			}
 			newBuck.write();
-			newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			newBuck = makeBucket();
 			newBuck.read();
 			countOversize(2);
 		} catch (Exception e) {
@@ -388,7 +394,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			checkEntries(buck, numEntries, entries);
 			buck.write();
 			{
-				NumericKeyHashBucket<VariableSizeHashEntry> tempBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+				NumericKeyHashBucket<VariableSizeHashEntry> tempBuck = makeBucket();
 				tempBuck.read();
 				checkEntries(tempBuck, numEntries, entries);
 				VariableSizeHashEntry e = tempBuck.getEntry(3);
@@ -415,11 +421,11 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 	public void testResizeEntries() {
 		try {
 			final int numEntries = 16;
-			entryFactory.setOversizeThreshold(64);
+			oversizeThreshold = 64;
 			HashMap<Integer, VariableSizeHashEntry> entries= new HashMap<Integer, VariableSizeHashEntry>(numEntries);
 
 			{
-				NumericKeyHashBucket<VariableSizeHashEntry> tempBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+				NumericKeyHashBucket<VariableSizeHashEntry> tempBuck = makeBucket();
 
 
 				int length = 2;
@@ -436,7 +442,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			countOversize(numEntries - 5);
 
 			{
-				NumericKeyHashBucket<VariableSizeHashEntry> tempBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+				NumericKeyHashBucket<VariableSizeHashEntry> tempBuck = makeBucket();
 				tempBuck.read();
 				checkEntries(tempBuck, numEntries, entries);
 
@@ -456,7 +462,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 				}			
 				tempBuck.write();
 			}
-			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+			NumericKeyHashBucket<VariableSizeHashEntry> newBuck = makeBucket();
 			newBuck.read();
 			checkEntries(newBuck, numEntries, entries);
 		} catch (Exception e) {
@@ -473,9 +479,9 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 		backingStore = HashUtils.MakeHashFile(testFile);
 		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 		oversizeEntryManager = new MockOverflowManager(mgr);
-		bfact = VariableSizeEntryHashBucket.getFactory(oversizeEntryManager);
 		entryFactory = new MockVariableSizeEntryFactory();
-		buck = (NumericKeyHashBucket<VariableSizeHashEntry>) bfact.createBucket(backingStore, 0, entryFactory);
+		buck = makeBucket();
+		oversizeThreshold = -1;
 	}
 
 	@Override
@@ -484,6 +490,10 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			backingStore.close();
 		}
 		Utilities.destroyFileSpaceManager(mgr);
+	}
+
+	private VariableSizeEntryHashBucket<VariableSizeHashEntry> makeBucket() {
+		return new VariableSizeEntryHashBucket(backingStore, 0, oversizeEntryManager, entryFactory);
 	}
 
 	private int populateBucket(final int numEntries,
@@ -509,7 +519,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 	}
 
 	private VariableSizeHashEntry createEntry(int key, int length) throws IOException {
-		VariableSizeHashEntry newEntry = entryFactory.makeVariableSizeEntry(key, length);
+		VariableSizeHashEntry newEntry = makeVariableSizeEntry(key, length);
 		byte[] eData = newEntry.getData();
 		byte cdata = (byte) Character.getNumericValue('a');
 		int limit = Character.getNumericValue('z') + 1;

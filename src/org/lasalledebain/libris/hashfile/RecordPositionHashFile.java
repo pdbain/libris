@@ -9,8 +9,12 @@ public class RecordPositionHashFile extends NumericKeyHashFile<RecordPositionEnt
 
 	public RecordPositionHashFile(RandomAccessFile backingStore, NumericKeyHashBucketFactory bFact,
 			NumericKeyEntryFactory eFact) throws IOException {
-		super(backingStore, bFact, eFact);
-		// TODO Auto-generated constructor stub
+		super(backingStore,bFact, eFact);
+	}
+
+	@Override
+	protected RecordPositionHashBucket createBucket(int bucketNum) {
+		return new RecordPositionHashBucket(backingStore, bucketNum);
 	}
 
 }
