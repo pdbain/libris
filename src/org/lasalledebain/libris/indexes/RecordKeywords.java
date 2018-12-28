@@ -1,11 +1,9 @@
 package org.lasalledebain.libris.indexes;
 
 import java.util.AbstractSet;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
-import org.lasalledebain.libris.util.StringUtils;
 
 public abstract class RecordKeywords {
 	

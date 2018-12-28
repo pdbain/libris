@@ -55,26 +55,6 @@ public class RecordPositionEntry extends AbstractFixedSizeHashEntry {
 		return 12;
 	}
 
-	/*
-	@Override
-	public void readData(DataInput backingStore) throws IOException {
-		key = backingStore.readInt();
-		recordPosition = backingStore.readLong();
-	}
-
-	@Override
-	public void readData(ByteBuffer buff, int length) {
-		key = buff.getInt();
-		recordPosition = buff.getLong();
-	}
-
-	@Override
-	public void setData(byte[] dat) {
-		if (dat.length != getRecordPositionEntryLength()) {
-			throw new InternalError("wrong length "+dat.length);
-		}
-	}
-*/
 	@Override
 	public void writeData(DataOutput backingStore) throws IOException {
 		backingStore.writeInt(key);

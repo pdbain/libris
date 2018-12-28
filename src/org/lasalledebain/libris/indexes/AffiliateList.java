@@ -13,14 +13,8 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.hashfile.AffiliateHashFile;
-import org.lasalledebain.libris.hashfile.HashFile;
-import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
-import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
-import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
-import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.index.AffiliateListEntry;
-import org.lasalledebain.libris.index.AffiliateListEntry.AffiliateListEntryFactory;
 import org.lasalledebain.libris.ui.Messages;
 
 public class AffiliateList {
@@ -30,7 +24,6 @@ public class AffiliateList {
 	private final RandomAccessFile hashTableFile;
 	private final RandomAccessFile overflowFile;
 	private final FileSpaceManager overflowSpaceMgr;
-	private final  AffiliateListEntryFactory eFactory;
 	private final  AffiliateHashFile myHashFile;
 	private final  BucketOverflowFileManager bucketOverflowMgr;
 	public AffiliateList(FileAccessManager hashTableFileMgr,
@@ -49,10 +42,8 @@ public class AffiliateList {
 		} catch (FileNotFoundException | LibrisException exc) {
 			throw new DatabaseException(Messages.getString("AffiliateList.0")+hashTableFileMgr.getPath(), exc); //$NON-NLS-1$
 		}
-		eFactory = new AffiliateListEntry.AffiliateListEntryFactory();
 		try {
-			myHashFile = new AffiliateHashFile(hashTableFile, 
-					VariableSizeEntryHashBucket.getFactory(bucketOverflowMgr), eFactory);
+			myHashFile = new AffiliateHashFile(hashTableFile,bucketOverflowMgr);
 		} catch (IOException e) {
 			throw new DatabaseException(e);
 		}
@@ -89,9 +80,9 @@ public class AffiliateList {
 			AffiliateListEntry oldEntry = getEntry(parent);
 			AffiliateListEntry newEntry;
 			if (null == oldEntry) {
-				newEntry = eFactory.makeEntry(parent, child, true);
+				newEntry = new AffiliateListEntry(parent, child, true);
 			} else {
-				newEntry = eFactory.makeEntry(oldEntry, child, true);
+				newEntry = new AffiliateListEntry(oldEntry, child, true);
 			}
 			myHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {
@@ -104,9 +95,9 @@ public class AffiliateList {
 			AffiliateListEntry oldEntry = getEntry(dest);
 			AffiliateListEntry newEntry;
 			if (null == oldEntry) {
-				newEntry = eFactory.makeEntry(dest, src, false);
+				newEntry = new AffiliateListEntry(dest, src, false);
 			} else {
-				newEntry = eFactory.makeEntry(oldEntry, src, false);
+				newEntry = new AffiliateListEntry(oldEntry, src, false);
 			}
 			myHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {

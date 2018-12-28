@@ -12,9 +12,7 @@ import java.util.TreeMap;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.BucketOverflowFileManager;
 
-// TODO make this abstract
-@SuppressWarnings("unchecked")
-public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntry> extends NumericKeyHashBucket<EntryType> {
+public abstract class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntry> extends NumericKeyHashBucket<EntryType> {
 
 	static final int MAX_VARIABLE_HASH_ENTRY=256;
 	/**
@@ -24,17 +22,11 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 	 * - offset to the last byte of each entry (2 bytes each), same number and order of keys, from the start of the first entry
 	 * If entry is longer than MAX_VARIABLE_HASH_ENTRY, offset is negated.  The entry is a 8-byte offset in the overflow file
 	 */
+	protected TreeMap<Integer, EntryInfo> entries;
+	EntryInfo lastEntry;
+	private ByteBuffer bucketEntryData;
+	private ArrayList<EntryInfo> victimList;
 	private BucketOverflowFileManager overflowManager;
-	public VariableSizeEntryHashBucket(RandomAccessFile backingStore,
-			int bucketNum, BucketOverflowFileManager overflowManager,
-			EntryFactory<EntryType> eFact) {
-		super(backingStore, bucketNum);
-		occupancy = 2;
-		this.overflowManager = overflowManager;
-		entries = new TreeMap<Integer, EntryInfo>();
-		lastEntry = null;
-		entryFact = eFact;
-	}
 
 	public VariableSizeEntryHashBucket(RandomAccessFile backingStore,
 			int bucketNum, BucketOverflowFileManager overflowManager) {
@@ -45,19 +37,9 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		lastEntry = null;
 	}
 
-	protected TreeMap<Integer, EntryInfo> entries;
-	EntryInfo lastEntry;
-	private ByteBuffer bucketEntryData;
-	private ArrayList<EntryInfo> victimList;
-	protected EntryFactory<EntryType> entryFact;
+	protected abstract EntryType makeEntry(int entryId, byte[] dat);
 
-	protected EntryType makeEntry(int entryId, byte[] dat) {
-		return entryFact.makeEntry(entryId, dat);
-	}
-
-	protected EntryType makeEntry(int entryId, ByteBuffer dat, int length) {
-		return entryFact.makeEntry(entryId, dat, length);
-	}
+	protected abstract EntryType makeEntry(int entryId, ByteBuffer dat, int length);
 
 	@Override
 	protected void addToBucket(int key, EntryType newEntry) {
@@ -181,28 +163,6 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		victimList.add(victim);
 	}
 
-	public static NumericKeyHashBucketFactory getFactory(BucketOverflowFileManager overflowManager) {
-		return new VariableSizeBucketHashBucketFactory(overflowManager);
-	}
-
-	private static class VariableSizeBucketHashBucketFactory
-	<EntryType extends VariableSizeHashEntry, 
-	FactoryType extends VariableSizeEntryFactory<EntryType> > 
-	implements NumericKeyHashBucketFactory<EntryType, VariableSizeEntryHashBucket<EntryType>, FactoryType> {
-		BucketOverflowFileManager overflowManager;
-		public VariableSizeBucketHashBucketFactory(
-				BucketOverflowFileManager overflowManager) {
-			super();
-			this.overflowManager = overflowManager;
-		}
-
-		@Override
-		public VariableSizeEntryHashBucket<EntryType> createBucket(RandomAccessFile backingStore, int bucketNum, FactoryType fact) {
-			return new VariableSizeEntryHashBucket<EntryType>(backingStore, bucketNum, overflowManager, fact);
-		}
-
-	}
-
 	@Override
 	public Iterator<EntryType> iterator() {
 		return new EntryIterator();
@@ -233,6 +193,11 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		return entries.size();
 	}
 
+	@Override
+	protected EntryType removeFromBucket(int key) {
+		return entries.remove(key).getEntry();
+	}
+	
 	protected class EntryInfo {
 		int id;
 		protected final EntryType entry;
@@ -314,11 +279,6 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 			ki.remove();
 			dirty = true;
 		}
-
 	}
 
-	@Override
-	protected EntryType removeFromBucket(int key) {
-		return entries.remove(key).getEntry();
-	}
 }

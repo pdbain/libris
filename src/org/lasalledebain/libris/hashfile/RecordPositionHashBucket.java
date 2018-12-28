@@ -18,5 +18,10 @@ public class RecordPositionHashBucket extends FixedSizeEntryHashBucket<RecordPos
 		long position = src.readLong();
 		return new RecordPositionEntry(key, position);
 	}
+	
+	public static int entriesPerBucket() {
+		int entrySize = RecordPositionEntry.getRecordPositionEntryLength();
+		return getBucketSize()/entrySize;
+	}
 
 }

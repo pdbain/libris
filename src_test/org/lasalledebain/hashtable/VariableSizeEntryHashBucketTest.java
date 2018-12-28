@@ -13,9 +13,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.hashfile.AffiliateHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
-import org.lasalledebain.libris.hashfile.NumericKeyHashBucketFactory;
-import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 import org.lasalledebain.libris.index.AffiliateListEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
@@ -25,7 +24,6 @@ import junit.framework.TestCase;
 public class VariableSizeEntryHashBucketTest extends TestCase{
 
 	private File testFile;
-	private MockVariableSizeEntryFactory entryFactory;
 	private MockVariableSizeEntryBucket buck;
 	private RandomAccessFile backingStore;
 	boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
@@ -98,7 +96,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			int entryCount = 0;
 			Random r = new Random(314126535);
 			HashMap<Integer, int[][]> entries= new HashMap<Integer, int[][]>(numEntries);
-			VariableSizeEntryHashBucket<AffiliateListEntry> buck = new VariableSizeEntryHashBucket<>(null, 0, null, null);
+			AffiliateHashBucket affiliateBucket = new AffiliateHashBucket(null, 0, null);
 // TODO remove duplicate from expected
 			for (int key = 1; key < numEntries; key++ ) {
 				int childrenAndAffiliates[][] = new int[2][];
@@ -125,10 +123,10 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 				childrenAndAffiliates[1] = Utilities.toIntList(affiliateList);
 				Arrays.sort(childrenAndAffiliates[1]);
 				entries.put(key, childrenAndAffiliates);
-				buck.addEntry(newEntry);
+				affiliateBucket.addEntry(newEntry);
 			}
 			for (int key = 1; key < numEntries; key++ ) {
-				AffiliateListEntry e = buck.getEntry(key);
+				AffiliateListEntry e = affiliateBucket.getEntry(key);
 				int[][] expectedData = entries.get(key);
 				assertTrue("Lists do not match", Utilities.compareIntLists("children", expectedData[0], e.getChildren()));
 				assertTrue("Lists do not match", 
@@ -187,7 +185,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			int expectedOccupancy = 2;
 			int initialSize = 128;
 			final int bucketSize = NumericKeyHashBucket.getBucketSize();
-			int totalLength = entryFactory.makeVariableSizeEntry(1, initialSize).getTotalLength();
+			int totalLength = makeVariableSizeEntry(1, initialSize).getTotalLength();
 			final int numEntries = (bucketSize - expectedOccupancy)/totalLength;
 			VariableSizeHashEntry newEntry;
 			for (int key = 1; key <= numEntries; key++ ) {
@@ -198,7 +196,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			int testKey = numEntries/2;
 			byte newData[] = new byte[initialSize];
 			Arrays.fill(newData, (byte) 0x11);
-			VariableSizeHashEntry testEntry = entryFactory.makeEntry(testKey, newData);
+			VariableSizeHashEntry testEntry = makeEntry(testKey, newData);
 
 			boolean result = buck.addEntry(testEntry);
 			assertTrue("unexpected overflow", result);
@@ -207,13 +205,13 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 
 			newData = new byte[2*initialSize];
 			Arrays.fill(newData, (byte) 0x22);
-			testEntry = entryFactory.makeEntry(testKey, newData);
+			testEntry = makeEntry(testKey, newData);
 			result = buck.addEntry(testEntry);
 			assertFalse("missing overflow", result);	
 
 			newData = new byte[initialSize];
 			Arrays.fill(newData, (byte) 0x33);
-			testEntry = entryFactory.makeEntry(testKey, newData);
+			testEntry = makeEntry(testKey, newData);
 			result = buck.addEntry(testEntry);
 			assertTrue("unexpected overflow", result);
 			testEntry = buck.getEntry(testKey);
@@ -223,6 +221,10 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			e.printStackTrace();
 			fail("unexpected exception:"+e.getMessage());
 		}
+	}
+
+	private MockVariableSizeHashEntry makeEntry(int testKey, byte[] newData) {
+		return new MockVariableSizeHashEntry(testKey, newData);
 	}
 
 	@Test
@@ -308,7 +310,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			populateBucket(numEntries, entries);
 			buck.write();
 			checkEntries(buck, numEntries, entries);
-			VariableSizeEntryHashBucket newBuck = makeBucket();
+			 MockVariableSizeEntryBucket newBuck = makeBucket();
 			newBuck.read();
 			int actualCount = 0;
 			Iterator<VariableSizeHashEntry> iter = newBuck.iterator();
@@ -479,7 +481,6 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 		backingStore = HashUtils.MakeHashFile(testFile);
 		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 		oversizeEntryManager = new MockOverflowManager(mgr);
-		entryFactory = new MockVariableSizeEntryFactory();
 		buck = makeBucket();
 		oversizeThreshold = -1;
 	}
@@ -493,7 +494,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 	}
 
 	private MockVariableSizeEntryBucket makeBucket() {
-		return new MockVariableSizeEntryBucket(backingStore, 0, oversizeEntryManager, entryFactory);
+		return new MockVariableSizeEntryBucket(backingStore, 0, oversizeEntryManager);
 	}
 
 	private int populateBucket(final int numEntries,

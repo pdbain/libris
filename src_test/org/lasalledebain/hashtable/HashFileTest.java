@@ -17,22 +17,16 @@ import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.hashfile.FixedSizeEntryFactory;
-import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
+import org.lasalledebain.libris.hashfile.AffiliateHashFile;
 import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
-import org.lasalledebain.libris.hashfile.HashBucket;
-import org.lasalledebain.libris.hashfile.HashFile;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
-import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
 import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
-import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
-import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
-import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 import org.lasalledebain.libris.index.AffiliateListEntry;
-import org.lasalledebain.libris.index.AffiliateListEntry.AffiliateListEntryFactory;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
+import org.lasalledebain.libris.indexes.MockFixedSizedEntryHashFile;
+import org.lasalledebain.libris.indexes.MockVariableSizeEntryNumericKeyHashFile;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
@@ -47,15 +41,13 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testAddAndGet() {
 		try {
-			NumericKeyHashFile
-			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, 
-			VariableSizeEntryFactory<VariableSizeHashEntry>> htable = makeVHashTable();
+			MockVariableSizeEntryNumericKeyHashFile htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			addVariableSizeEntries(htable, entries, 32, 0, true);
 
 			for (VariableSizeHashEntry e: entries) {
-				VariableSizeHashEntry f = htable.getEntry(e.getKey());
+				NumericKeyHashEntry f = htable.getEntry(e.getKey());
 				assertNotNull("Could not find entry", f);
 				assertEquals("Entry mismatch", e, f);
 			}
@@ -71,9 +63,7 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testOverflow() {
 		try {
-			NumericKeyHashFile
-			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
-			htable = makeVHashTable();
+			MockVariableSizeEntryNumericKeyHashFile htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int currentKey = 1;
@@ -82,7 +72,7 @@ public class HashFileTest extends TestCase {
 				LibrisDatabase.log(Level.INFO, currentKey+" entries added.  Checking...\n");
 				for (VariableSizeHashEntry e: entries) {
 					int key = e.getKey();
-					VariableSizeHashEntry f = htable.getEntry(key);
+					NumericKeyHashEntry f = htable.getEntry(key);
 					if (null == f) {
 						LibrisDatabase.log(Level.INFO, "key="+key+" not found; ");
 						printHashBuckets(key);
@@ -109,9 +99,7 @@ public class HashFileTest extends TestCase {
 	public void testExpand() {
 		int searchKey=0;
 		try {
-			NumericKeyHashFile
-			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
-			htable = makeVHashTable();
+			MockVariableSizeEntryNumericKeyHashFile htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			LibrisDatabase.log(Level.INFO, "add first batch of entries\n");
@@ -122,7 +110,7 @@ public class HashFileTest extends TestCase {
 			LibrisDatabase.log(Level.INFO, "Check file\n");
 			for (VariableSizeHashEntry e: entries) {
 				searchKey = e.getKey();
-				VariableSizeHashEntry f = htable.getEntry(searchKey);
+				 NumericKeyHashEntry f = htable.getEntry(searchKey);
 				assertNotNull("Coud not find entry "+e.getKey(), f);
 			}
 			LibrisDatabase.log(Level.INFO, "add second batch of entries\n");
@@ -130,7 +118,7 @@ public class HashFileTest extends TestCase {
 			LibrisDatabase.log(Level.INFO, "Check file again\n");
 			for (VariableSizeHashEntry e: entries) {
 				searchKey = e.getKey();
-				VariableSizeHashEntry f = htable.getEntry(searchKey);
+				 NumericKeyHashEntry f = htable.getEntry(searchKey);
 				assertNotNull("Coud not find entry\n", f);
 			}
 		} catch (IOException e) {
@@ -148,13 +136,12 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testMissing() {
 		try {
-			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
-			htable = makeVHashTable();
+			MockVariableSizeEntryNumericKeyHashFile htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int nextKey = addVariableSizeEntries(htable, entries, 400, 1, true);
 			for (int key = nextKey; key < 1000000000; key *= 5) {
-				VariableSizeHashEntry f = htable.getEntry(key);
+				NumericKeyHashEntry f = htable.getEntry(key);
 				assertNull("Found spurious entry "+key, f);
 			}
 		} catch (IOException e) {
@@ -169,8 +156,7 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testReplace() {
 		try {
-			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
-			htable = makeVHashTable();
+			MockVariableSizeEntryNumericKeyHashFile htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int nextKey = addVariableSizeEntries(htable, entries, 400, 1, true);
@@ -183,7 +169,7 @@ public class HashFileTest extends TestCase {
 				htable.addEntry(e);
 				htable.flush();
 				int key = e.getKey();
-				VariableSizeHashEntry f = htable.getEntry(key);
+				NumericKeyHashEntry f = htable.getEntry(key);
 				assertNotNull("Could not find entry "+key, f);
 				assertEquals("Entry mismatch", e, f);
 			}
@@ -199,14 +185,13 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testAddDecreasing() {
 		try {
-			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
-			htable = makeVHashTable();
+			MockVariableSizeEntryNumericKeyHashFile htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			addVariableSizeEntries(htable, entries, 1000, 0, false);
 
 			for (VariableSizeHashEntry e: entries) {
-				VariableSizeHashEntry f = htable.getEntry(e.getKey());
+				NumericKeyHashEntry f = htable.getEntry(e.getKey());
 				assertNotNull("Coud not find entry", f);
 				assertEquals("Entry mismatch", e, f);
 			}
@@ -222,8 +207,7 @@ public class HashFileTest extends TestCase {
 	@Test
 	public void testAddRandom() {
 		try {
-			NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
-			htable = makeVHashTable();
+			MockVariableSizeEntryNumericKeyHashFile htable = makeVHashTable();
 			ArrayList<MockVariableSizeHashEntry> entries = new ArrayList<MockVariableSizeHashEntry>();
 			int seed = 1234567;
 			Random key = new Random(seed);
@@ -235,7 +219,7 @@ public class HashFileTest extends TestCase {
 
 			htable.flush();
 			for (VariableSizeHashEntry e: entries) {
-				VariableSizeHashEntry f = htable.getEntry(e.getKey());
+				NumericKeyHashEntry f = htable.getEntry(e.getKey());
 				assertNotNull("Coud not find entry", f);
 				assertEquals("Entry mismatch", e, f);
 			}
@@ -250,10 +234,7 @@ public class HashFileTest extends TestCase {
 
 	public void testNumEntries() {
 		try {
-			NumericKeyEntryFactory f = fFactory;
-			NumericKeyHashFile<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>, FixedSizeEntryFactory<FixedSizeHashEntry>> htable 
-			= new NumericKeyHashFile
-			(backingStore, FixedSizeEntryHashBucket.getFactory(), f);
+			MockFixedSizedEntryHashFile htable = new MockFixedSizedEntryHashFile(backingStore);
 			ArrayList<FixedSizeHashEntry> entries = new ArrayList<FixedSizeHashEntry>();
 
 			final int NUM_ENTRIES_INCREMENT = 400;
@@ -278,13 +259,7 @@ public class HashFileTest extends TestCase {
 		try {
 			FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
 			MockOverflowManager oversizeEntryManager = new MockOverflowManager(mgr);
-			AffiliateListEntryFactory aFact = new AffiliateListEntryFactory();
-			NumericKeyHashFile<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, VariableSizeEntryFactory<AffiliateListEntry>> 
-			htable 
-			= new NumericKeyHashFile
-			<AffiliateListEntry, VariableSizeEntryHashBucket<AffiliateListEntry>, VariableSizeEntryFactory<AffiliateListEntry>>
-			(backingStore, 
-					VariableSizeEntryHashBucket.getFactory(oversizeEntryManager), aFact);
+			AffiliateHashFile htable = new AffiliateHashFile(backingStore, oversizeEntryManager);
 
 			try {
 				final int numEntries = 2000;
@@ -293,7 +268,7 @@ public class HashFileTest extends TestCase {
 				HashMap<Integer, int[][]> entries= new HashMap<Integer, int[][]>(numEntries);
 				for (int key = 1; key < numEntries; key++ ) {
 					int childrenAndAffiliates[][] = new int[2][];
-					AffiliateListEntry newEntry = aFact.makeEntry(key);
+					AffiliateListEntry newEntry = new AffiliateListEntry(key);
 					double ng = r.nextGaussian();
 					int numChildren = Math.abs((int) (ng * affiliateScale));
 					HashSet<Integer> buffer = new HashSet<Integer>(numChildren);
@@ -349,9 +324,7 @@ public class HashFileTest extends TestCase {
 	public void testHugeFile() {
 		try {
 			final int NUM_ENTRIES=100000;
-			NumericKeyHashFile
-			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> 
-			htable = makeVHashTable();
+			MockVariableSizeEntryNumericKeyHashFile htable = makeVHashTable();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int recordsPerBucket = NumericKeyHashBucket.BUCKET_SIZE/vFactory.getEntrySize();
@@ -364,7 +337,7 @@ public class HashFileTest extends TestCase {
 			LibrisDatabase.log(Level.INFO, "check entries");
 
 			for (VariableSizeHashEntry e: entries) {
-				VariableSizeHashEntry f = htable.getEntry(e.getKey());
+				NumericKeyHashEntry f = htable.getEntry(e.getKey());
 				assertNotNull("Coud not find entry", f);
 			}
 			LibrisDatabase.log(Level.INFO, "checkED entries");
@@ -386,8 +359,7 @@ public class HashFileTest extends TestCase {
 	 * @throws IOException
 	 * @throws DatabaseException 
 	 */
-	private int addVariableSizeEntries(HashFile
-			<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>> htable,
+	private int addVariableSizeEntries(MockVariableSizeEntryNumericKeyHashFile htable,
 			ArrayList<VariableSizeHashEntry> entries, int numEntries, int keyBase, boolean countUp)
 					throws IOException, DatabaseException {
 
@@ -403,8 +375,7 @@ public class HashFileTest extends TestCase {
 		return keyBase+numEntries;
 	}
 
-	private int addFixedSizeEntries(HashFile
-			<FixedSizeHashEntry, NumericKeyHashBucket<FixedSizeHashEntry>, FixedSizeEntryFactory<FixedSizeHashEntry>> htable,
+	private int addFixedSizeEntries(MockFixedSizedEntryHashFile htable,
 			ArrayList<FixedSizeHashEntry> entries, int numEntries, int keyBase, boolean countUp)
 					throws IOException, DatabaseException {
 		LibrisDatabase.log(Level.INFO, "Add "+numEntries);
@@ -419,13 +390,10 @@ public class HashFileTest extends TestCase {
 		return keyBase+numEntries;
 	}
 
-	private NumericKeyHashFile<VariableSizeHashEntry, VariableSizeEntryHashBucket<VariableSizeHashEntry>, VariableSizeEntryFactory<VariableSizeHashEntry>>
-	makeVHashTable() throws IOException {
+	private MockVariableSizeEntryNumericKeyHashFile makeVHashTable() throws IOException {
 		FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
-		MockOverflowManager oversizeEntryManager = new MockOverflowManager(mgr);
-		NumericKeyHashFile htable = 
-				new NumericKeyHashFile(backingStore, 
-						VariableSizeEntryHashBucket.getFactory(oversizeEntryManager), vFactory);
+		MockOverflowManager overflowMgr = new MockOverflowManager(mgr);
+		MockVariableSizeEntryNumericKeyHashFile htable = new MockVariableSizeEntryNumericKeyHashFile(backingStore, overflowMgr);
 		return htable;
 	}
 
