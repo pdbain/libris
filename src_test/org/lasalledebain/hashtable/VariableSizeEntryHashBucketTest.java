@@ -26,7 +26,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 
 	private File testFile;
 	private MockVariableSizeEntryFactory entryFactory;
-	private VariableSizeEntryHashBucket<VariableSizeHashEntry> buck;
+	private MockVariableSizeEntryBucket buck;
 	private RandomAccessFile backingStore;
 	boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
 	FileSpaceManager mgr;
@@ -492,8 +492,8 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 		Utilities.destroyFileSpaceManager(mgr);
 	}
 
-	private VariableSizeEntryHashBucket<VariableSizeHashEntry> makeBucket() {
-		return new VariableSizeEntryHashBucket(backingStore, 0, oversizeEntryManager, entryFactory);
+	private MockVariableSizeEntryBucket makeBucket() {
+		return new MockVariableSizeEntryBucket(backingStore, 0, oversizeEntryManager, entryFactory);
 	}
 
 	private int populateBucket(final int numEntries,
