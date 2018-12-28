@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.BucketOverflowFileManager;
 
+// TODO make this abstract
 @SuppressWarnings("unchecked")
 public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntry> extends NumericKeyHashBucket<EntryType> {
 
@@ -34,11 +35,29 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 		lastEntry = null;
 		entryFact = eFact;
 	}
+
+	public VariableSizeEntryHashBucket(RandomAccessFile backingStore,
+			int bucketNum, BucketOverflowFileManager overflowManager) {
+		super(backingStore, bucketNum);
+		occupancy = 2;
+		this.overflowManager = overflowManager;
+		entries = new TreeMap<Integer, EntryInfo>();
+		lastEntry = null;
+	}
+
 	protected TreeMap<Integer, EntryInfo> entries;
 	EntryInfo lastEntry;
 	private ByteBuffer bucketEntryData;
 	private ArrayList<EntryInfo> victimList;
 	protected EntryFactory<EntryType> entryFact;
+
+	protected EntryType makeEntry(int entryId, byte[] dat) {
+		return entryFact.makeEntry(entryId, dat);
+	}
+
+	protected EntryType makeEntry(int entryId, ByteBuffer dat, int length) {
+		return entryFact.makeEntry(entryId, dat, length);
+	}
 
 	@Override
 	protected void addToBucket(int key, EntryType newEntry) {
@@ -238,10 +257,10 @@ public class VariableSizeEntryHashBucket <EntryType extends VariableSizeHashEntr
 				long position = bucketEntryData.getLong();
 				oversizeFilePosition = position;
 				byte[] dat = overflowManager.get(position);
-				entry = entryFact.makeEntry(entryId, dat);
+				entry = makeEntry(entryId, dat);
 			} else {
 				oversizeFilePosition = -1;
-				entry = entryFact.makeEntry(entryId, bucketEntryData, length);
+				entry = makeEntry(entryId, bucketEntryData, length);
 			}
 			entry.setOversize(oversize);
 		}
