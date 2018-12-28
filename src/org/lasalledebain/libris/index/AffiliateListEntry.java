@@ -1,14 +1,10 @@
 package org.lasalledebain.libris.index;
 
-import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import org.lasalledebain.libris.hashfile.AffiliateHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
-import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
 
 /**
  * Entry comprises:
@@ -114,73 +110,6 @@ public class AffiliateListEntry extends AbstractVariableSizeHashEntry {
 	@Override
 	public int getDataLength() {
 		return 4 * (1 + children.length + affiliates.length);
-	}
-
-	public static class AffiliateListEntryFactory implements VariableSizeEntryFactory<AffiliateListEntry> {
-
-		public AffiliateListEntry makeEntry(int key) {
-			AffiliateListEntry entry = new AffiliateListEntry(key);
-			return entry;
-		}
-
-		@Override
-		public AffiliateListEntry makeEntry(int key, byte[] dat) {
-			ByteBuffer src = ByteBuffer.wrap(dat, 0, dat.length);
-			int nChildren = src.getInt();
-			int[] tempChildren = new int[nChildren];
-			for (int i = 0; i < nChildren; i++) {
-				tempChildren[i] = src.getInt();
-			}
-			Arrays.sort(tempChildren);
-			int nAffiliates = (dat.length/4) - 1 - nChildren;
-			int[] tempAffiliates = new int[nAffiliates];
-			for (int i = 0; i < nAffiliates; i++) {
-				tempAffiliates[i] = src.getInt();
-			}
-			Arrays.sort(tempAffiliates);
-			return new AffiliateListEntry(key, tempChildren, tempAffiliates);
-		}
-
-		@Override
-		public AffiliateListEntry makeEntry(int key, ByteBuffer src, int len) {
-			int nChildren = src.getInt();
-			int[] tempChildren = new int[nChildren];
-			for (int i = 0; i < nChildren; i++) {
-				tempChildren[i] = src.getInt();
-			}
-			Arrays.sort(tempChildren);
-			int nAffiliates = (len/4) - 1 - nChildren;
-			int[] tempAffiliates = new int[nAffiliates];
-			for (int i = 0; i < nAffiliates; i++) {
-				tempAffiliates[i] = src.getInt();
-			}
-			Arrays.sort(tempAffiliates);
-			return new AffiliateListEntry(key, tempChildren, tempAffiliates);
-		}
-
-		/* Reads the key, number of children, and the list of children.
-		 * @see org.lasalledebain.libris.hashfile.EntryFactory#makeEntry(java.io.DataInput)
-		 */
-		@Override
-		public AffiliateListEntry makeEntry(DataInput src) throws IOException {
-			int key = src.readInt();
-			int nChildren = src.readInt();
-			int[] tempChildren = new int[nChildren];
-			for (int i = 0; i < nChildren; i++) {
-				tempChildren[i] = src.readInt();
-			}
-			Arrays.sort(tempChildren);
-			
-			return new AffiliateListEntry(key, tempChildren, AffiliateListEntry.emptyList);
-		}
-
-		public AffiliateListEntry makeEntry(int parent, int affiliate, boolean addChild) {
-			return new AffiliateListEntry(parent, affiliate, addChild);
-		}
-
-		public AffiliateListEntry makeEntry(AffiliateListEntry original, int newAffiliate, boolean addChild) {
-			return new AffiliateListEntry(original, newAffiliate, addChild);
-		}
 	}
 
 	public int[] getChildren() {

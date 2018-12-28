@@ -10,7 +10,7 @@ import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.index.AbstractFixedSizeHashEntry;
 
-class MockFixedSizeHashEntry<T extends FixedSizeHashEntry> extends AbstractFixedSizeHashEntry {
+public class MockFixedSizeHashEntry<T extends FixedSizeHashEntry> extends AbstractFixedSizeHashEntry {
 
 	final byte data[];
 	/**

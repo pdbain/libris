@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.TermCountHashBucket;
-import org.lasalledebain.libris.hashfile.TermCountHashBucket.TermCountBucketFactory;
 import org.lasalledebain.libris.index.TermCountEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 
@@ -30,9 +29,7 @@ public class TermCountEntryBucketTest extends TestCase {
 		}
 		backingStore = HashUtils.MakeHashFile(testFile);
 		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
-		TermCountBucketFactory bfact = new TermCountBucketFactory();
-		new TermCountEntry.TermCountEntryFactory();
-		buck = bfact.createBucket(backingStore, 0);
+		buck = new TermCountHashBucket(backingStore, 0);
 	}
 
 	@After

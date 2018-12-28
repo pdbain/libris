@@ -3,13 +3,7 @@ package org.lasalledebain.libris.indexes;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.BitSet;
-import java.util.Iterator;
 import java.util.Objects;
-import java.util.function.Function;
-
-import org.lasalledebain.libris.LibrisConstants;
-import org.lasalledebain.libris.util.Murmur3;
-import org.lasalledebain.libris.util.StringUtils;
 
 /**
  * This class implements keyword searching using a Bloom filter  There is one filter for 

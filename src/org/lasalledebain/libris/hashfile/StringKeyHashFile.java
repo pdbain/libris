@@ -7,12 +7,12 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.util.ByteArraySlice;
 
 public abstract class StringKeyHashFile<EntryType extends StringKeyHashEntry, 
-BucketType extends StringKeyHashBucket<EntryType>, FactoryType extends EntryFactory<EntryType>> 
-extends HashFile<EntryType, BucketType, FactoryType> {
+BucketType extends StringKeyHashBucket<EntryType>> 
+extends HashFile<EntryType, BucketType> {
 
-	public StringKeyHashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact)
+	public StringKeyHashFile(RandomAccessFile backingStore)
 			throws IOException {
-		super(backingStore, bFact);
+		super(backingStore);
 	}
 
 	@Override

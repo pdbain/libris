@@ -6,16 +6,15 @@ import java.util.HashMap;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 // TODO make consecutive records hash to the same bucket
-public class NumericKeyHashFile<EntryType extends NumericKeyHashEntry, 
-BucketType extends NumericKeyHashBucket<EntryType>, FactoryType extends NumericKeyEntryFactory<EntryType>> 
-extends HashFile<EntryType, BucketType,FactoryType> {
+public abstract class NumericKeyHashFile<EntryType extends NumericKeyHashEntry, 
+BucketType extends NumericKeyHashBucket<EntryType>> 
+extends HashFile<EntryType, BucketType> {
 
 	HashMap<Integer, NumericKeyHashBucket<EntryType>> bucketCache;
-	public NumericKeyHashFile(RandomAccessFile backingStore, 
-			NumericKeyHashBucketFactory<EntryType, BucketType, FactoryType> bFact, FactoryType eFact)
+
+	public NumericKeyHashFile(RandomAccessFile backingStore)
 			throws IOException {
-		super(backingStore, bFact);
-		this.entryFact = eFact;
+		super(backingStore);
 		bucketCache = new HashMap<Integer, NumericKeyHashBucket<EntryType>>();
 	}
 	

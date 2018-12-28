@@ -22,7 +22,6 @@ import org.lasalledebain.libris.hashfile.TermCountHashBucket;
 import org.lasalledebain.libris.hashfile.TermCountHashFile;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.index.TermCountEntry;
-import org.lasalledebain.libris.index.TermCountEntry.TermCountEntryFactory;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.util.ByteArraySlice;
@@ -35,7 +34,7 @@ public class TermcountHashfileTests extends TestCase {
 	private RandomAccessFile backingStore;
 	private File testFile;
 	FileSpaceManager mgr;
-	StringKeyHashFile<TermCountEntry, TermCountHashBucket, TermCountEntryFactory> hashFile;
+	StringKeyHashFile<TermCountEntry, TermCountHashBucket> hashFile;
 
 	@Before
 	protected void setUp() throws Exception {

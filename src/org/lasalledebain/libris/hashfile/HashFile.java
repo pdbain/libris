@@ -8,20 +8,28 @@ import java.util.List;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-public abstract class HashFile<EntryType extends HashEntry, 
-BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<EntryType>> {
+public abstract class HashFile<EntryType extends HashEntry, BucketType extends HashBucket<EntryType>> {
 
 	protected RandomAccessFile backingStore;
 	int numBuckets;
-	int bucketModulus = 0;
+	int bucketAge;
+	int bucketModulus;
 	private int bucketSize;
 	static final int CACHESIZE=8;
 	HashMap<Integer, BucketType> bucketCache;
 
-	int bucketAge = 0;
-	private HashBucketFactory<EntryType, BucketType, FactoryType> bucketFactory;
-	FactoryType entryFact;
 	private int expansionCount, bucketLoadCount, flushCount;
+
+	public HashFile(RandomAccessFile backingStore) throws IOException {
+		bucketAge = 0;
+		bucketModulus = 0;
+		this.backingStore = backingStore;
+		expansionCount = bucketLoadCount = flushCount = 0;
+		long fileLength = backingStore.length();
+		bucketSize = NumericKeyHashBucket.getBucketSize();
+		setNumBuckets((int) fileLength/bucketSize + 1);
+		bucketCache = new HashMap<Integer, BucketType>();
+	}
 
 	public int getBucketLoadCount() {
 		return bucketLoadCount;
@@ -39,26 +47,8 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		this.expansionCount = 0;
 	}
 
-	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact) throws IOException {
-		this.backingStore = backingStore;
-		this.bucketFactory = bFact;
-		expansionCount = bucketLoadCount = flushCount = 0;
-		long fileLength = backingStore.length();
-		bucketSize = NumericKeyHashBucket.getBucketSize();
-		setNumBuckets((int) fileLength/bucketSize + 1);
-		bucketCache = new HashMap<Integer, BucketType>();
-	}
-
 	public int getFlushCount() {
 		return flushCount;
-	}
-
-	/**
-	 * @param backingStore
-	 * @throws IOException accessing backing store
-	 */
-	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact, EntryFactory<EntryType> eFact) throws IOException {
-		this(backingStore, bFact);
 	}
 
 	/**
@@ -110,10 +100,8 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		return buck;
 	}
 
-	protected BucketType createBucket(int bucketNum) {
-		return bucketFactory.createBucket(backingStore, bucketNum, entryFact);
-	}
-	
+	protected abstract  BucketType createBucket(int bucketNum);
+
 	protected abstract int findHomeBucket(long key);
 	
 	public static int hash(long key) {

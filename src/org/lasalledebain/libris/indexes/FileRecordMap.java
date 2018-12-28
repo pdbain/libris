@@ -6,14 +6,9 @@ import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
-import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket.FixedSizeEntryHashBucketFactory;
-import org.lasalledebain.libris.hashfile.NumericKeyEntryFactory;
-import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
-import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
+import org.lasalledebain.libris.hashfile.RecordPositionHashBucket;
 import org.lasalledebain.libris.hashfile.RecordPositionHashFile;
 import org.lasalledebain.libris.index.RecordPositionEntry;
-import org.lasalledebain.libris.index.RecordPositionEntryFactory;
 import org.lasalledebain.libris.ui.Messages;
 import org.lasalledebain.libris.util.Reporter;
 
@@ -22,9 +17,7 @@ public class FileRecordMap extends LibrisRecordMap {
 	private final FileAccessManager backingStoreFileMgr;
 	private final RandomAccessFile backingStore;
 	private boolean readOnly;
-	private RecordPositionEntryFactory eFactory;
-	private NumericKeyHashFile<RecordPositionEntry, NumericKeyHashBucket<RecordPositionEntry>, NumericKeyEntryFactory<RecordPositionEntry>> 
-	indexHashFile;
+	private RecordPositionHashFile indexHashFile;
 
 	/**
 	 * @param positionFileMgr hash file of record positions
@@ -39,10 +32,8 @@ public class FileRecordMap extends LibrisRecordMap {
 		} catch (FileNotFoundException exc) {
 			throw new DatabaseException(Messages.getString("FileRecordMap.0")+positionFileMgr.getPath(), exc); //$NON-NLS-1$
 		}
-		eFactory = new RecordPositionEntryFactory();
 		try {
-			final FixedSizeEntryHashBucketFactory factory = FixedSizeEntryHashBucket.getFactory();
-			indexHashFile = new RecordPositionHashFile(backingStore, factory, eFactory);
+			indexHashFile = new RecordPositionHashFile(backingStore);
 		} catch (IOException e) {
 			throw new DatabaseException(e);
 		}
@@ -67,7 +58,7 @@ public class FileRecordMap extends LibrisRecordMap {
 			throw new DatabaseException(Messages.getString("FileRecordMap.2")); //$NON-NLS-1$
 		}
 		try {
-			indexHashFile.addEntry(eFactory.makeEntry(recordIdNum, recordPosition));
+			indexHashFile.addEntry(recordIdNum, recordPosition);
 		} catch (IOException e) {
 			throw new DatabaseException(e);
 		}
@@ -77,7 +68,7 @@ public class FileRecordMap extends LibrisRecordMap {
 	@Override
 	public boolean setSize(int numRecords) {
 		try {
-			int recordsPerBucket = FixedSizeEntryHashBucket.entriesPerBucket(eFactory);
+			int recordsPerBucket = RecordPositionHashBucket.entriesPerBucket();
 			int requestedBuckets = (numRecords+recordsPerBucket-1)/recordsPerBucket;
 			return indexHashFile.resize(requestedBuckets);
 		} catch (DatabaseException e) {
