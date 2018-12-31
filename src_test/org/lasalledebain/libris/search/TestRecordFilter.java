@@ -453,7 +453,6 @@ public class TestRecordFilter extends TestCase {
 			testObj.testIndexStress();
 			testObj.tearDown();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

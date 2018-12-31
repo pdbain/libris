@@ -25,6 +25,7 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	private int savedRecords;
 	private int modifiedRecords;
 	private DatabaseInstance instanceInfo;
+	private Date databaseDate;
 	/**
 	 * Dynamic attributes of the database
 	 */
@@ -235,5 +236,13 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 
 	public int getSignatureLevels() {
 		return signatureLevels;
+	}
+
+	public Date getDatabaseDate() {
+		return databaseDate;
+	}
+
+	public void setDatabaseDate(Date databaseDate) {
+		this.databaseDate = databaseDate;
 	}	
 }

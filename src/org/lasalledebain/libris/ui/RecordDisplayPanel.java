@@ -139,6 +139,11 @@ public class RecordDisplayPanel extends JPanel {
 		return null;
 	}
 	
+	public void setCurrentRecordName(String newName) {
+		int currentRecordIndex = openRecordPanes.getSelectedIndex();
+		openRecordPanes.setTitleAt(currentRecordIndex, newName);
+	}
+
 	/**
 	 * @param mainGui
 	 */

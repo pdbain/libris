@@ -78,7 +78,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public static Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());
 	protected DatabaseAttributes xmlAttributes;
 	private boolean readOnly;
-	private Date databaseDate;
 	public static final String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
 
 	public LibrisDatabase(File databaseFile, boolean readOnly, LibrisUi ui) throws LibrisException  {
@@ -236,10 +235,10 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
 		String dateString = dbElementAttrs.get(XML_DATABASE_DATE_ATTR);
 		if ((null == dateString) || dateString.isEmpty()) {
-			databaseDate = new Date();
+			metadata.setDatabaseDate(new Date());
 		} else {
 			try {
-				databaseDate = LibrisMetadata.parseDateString(dateString);
+				metadata.setDatabaseDate(LibrisMetadata.parseDateString(dateString));
 			} catch (ParseException e) {
 				throw new InputException("illegal date format: "+dateString, e);
 			}
@@ -912,14 +911,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		return (null == rec) ? null: rec.getName();
 	}
 
-	public Date getDatabaseDate() { // TODO move to metadata
-		return databaseDate;
-	}
-
-	public void setDatabaseDate(Date databaseDate) { // TODO move to metadata
-		this.databaseDate = databaseDate;
-	}
-	
 	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int searchList[], Collection<String> searchTerms) throws UserErrorException, IOException {
 		RecordList recList = new SignatureFilteredRecordList(this, searchTerms);

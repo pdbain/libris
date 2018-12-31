@@ -24,9 +24,6 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class RecordInstance extends Record implements  LibrisXMLConstants {
-	// TODO move this to parent class
-	private int id;
-	private String name;
 
 	Field[] recordData;
 	GroupMember affiliations[];

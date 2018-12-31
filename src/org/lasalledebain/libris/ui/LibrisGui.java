@@ -506,7 +506,8 @@ public class LibrisGui extends LibrisWindowedUi {
 						rec.setName(newName);
 						resultsPanel.removeRecord(rec);
 						}
-						// TODO change name in record browser and tab
+						displayPanel.setCurrentRecordName(newName);
+						repaint();
 					}
 				}
 			}
