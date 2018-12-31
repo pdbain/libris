@@ -14,6 +14,8 @@ import org.lasalledebain.libris.xmlUtils.ElementShape;
 
 
 public abstract class Record implements Comparable<Record>, XMLElement {
+	protected int id;
+	protected String name;
 	static final String elementTag = XML_RECORD_TAG;
 	protected static final int NULL_ID = RecordId.getNullId();
 	public static String getXmlTag() {
