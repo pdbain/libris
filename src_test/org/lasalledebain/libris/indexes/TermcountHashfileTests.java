@@ -27,8 +27,9 @@ import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.util.ByteArraySlice;
 import org.lasalledebain.libris.util.Lorem;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-
 import junit.framework.TestCase;
+
+import static org.lasalledebain.libris.util.StringUtils.normalize;
 
 public class TermcountHashfileTests extends TestCase {
 	private RandomAccessFile backingStore;
@@ -138,10 +139,10 @@ public class TermcountHashfileTests extends TestCase {
 		final String[] terms = new String[] {"One", "Two", "three", "four", "one", "two", "three"};
 		final int termCounts[] = new int[] {2, 2, 2, 1, 2, 2, 2};
 		for (int i = 0; i < terms.length; ++i) {
-			index.incrementTermCount(terms[i], true);
+			index.incrementTermCount(normalize(terms[i]));
 		}
 		for (int i = 0; i < terms.length; ++i) {
-			int tc = index.getTermCount(terms[i], true);
+			int tc = index.getTermCount(normalize(terms[i]));
 			assertEquals("wrong count for "+terms[i],  termCounts[i], tc);
 		}
 	}
@@ -160,7 +161,7 @@ public class TermcountHashfileTests extends TestCase {
 				RecordKeywords kw = new ExactKeywordList(true);
 				r.getKeywords(indexFieldList, kw);
 				for (String term: kw.getKeywords()) {
-					int count = db.getTermCount(term, true);
+					int count = db.getTermCount(term);
 					assertTrue("Missing count for "+term, count > 0);
 				}
 			}

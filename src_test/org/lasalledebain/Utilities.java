@@ -287,8 +287,19 @@ public class Utilities extends TestCase {
 			auxFiles.delete();
 		}
 	}
+	
 	public static File getTempTestDirectory() {
 		File tempTestDirectory = new File(System.getProperty("java.io.tmpdir"), "libristest");
+		if (!tempTestDirectory.exists() && !tempTestDirectory.mkdir()) {
+			return null;
+		} else {
+			return tempTestDirectory;
+		}
+	}
+
+	public static File makeTempTestDirectory() {
+		File tempTestDirectory = new File(System.getProperty("java.io.tmpdir"), "libristest");
+		deleteRecursively(tempTestDirectory);
 		if (!tempTestDirectory.exists() && !tempTestDirectory.mkdir()) {
 			return null;
 		} else {

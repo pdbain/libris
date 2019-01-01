@@ -147,7 +147,7 @@ public class IndexManager implements LibrisConstants {
 				r.getKeywords(ixFields, keywordList);
 				keywordCount += keywordList.estimateSize();
 				addKeywords(id, keywordList.wordStream());
-				keywordList.wordStream().forEach(t -> termCounts.incrementTermCount(t, true));
+				keywordList.wordStream().forEach(t -> termCounts.incrementTermCount(t));
 			}
 			config.indexingReporter.reportValue(Reporter.INDEXING_RECORDS_NUM_RECS, recordCount);
 			config.indexingReporter.reportValue(Reporter.INDEXING_KEYWORD_COUNT, keywordCount);
@@ -302,12 +302,16 @@ public class IndexManager implements LibrisConstants {
 		return recordsFile;
 	}
 
-	public int getTermCount(String term, boolean normalize) throws DatabaseException {
-		return termCounts.getTermCount(term, normalize);
+	public int getTermCount(String term) {
+		return termCounts.getTermCount(term);
 	}
 
 	public void setTermCount(String term, boolean normalize, int termCount) throws DatabaseException {
-		termCounts.setTermCount(term, normalize, termCount);
+		termCounts.setTermCount(term, termCount);
+	}
+
+	public void incrementTermCount(String term) {
+		termCounts.incrementTermCount(term);
 	}
 
 	public void addChild(int groupNum, int parent, int child) throws DatabaseException {
