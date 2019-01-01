@@ -64,9 +64,9 @@ public class TermCountIndex {
 	}
 
 
-	public void incrementTermCount(String term, boolean normalize) {
+	public void incrementTermCount(String term) {
 
-		String normalizedTerm = normalize(term, normalize);
+		String normalizedTerm = normalize(term);
 		TermCountEntry entry;
 		++numTerms;
 		try {
@@ -83,9 +83,9 @@ public class TermCountIndex {
 		}
 	}
 
-	public void setTermCount(String term, boolean normalize, int termCount) throws DatabaseException {
+	public void setTermCount(String term, int termCount) throws DatabaseException {
 
-		String normalizedTerm = normalize(term, normalize);
+		String normalizedTerm = normalize(term);
 		TermCountEntry entry;
 		++termCount;
 		try {
@@ -110,29 +110,23 @@ public class TermCountIndex {
 		this.numUniqueTerms = 0;
 	}
 
-	private static String normalize(String term, boolean normalize) {
-		String normalizedTerm;
-		if (normalize) {
-			LibrisStemmer s = new LibrisStemmer(term, true);
-			s.stem();
-			normalizedTerm = s.toString();
-		} else {
-			normalizedTerm = term;
-		}
-		return normalizedTerm;
+	private static String normalize(String term) {
+		LibrisStemmer s = new LibrisStemmer(term, true);
+		s.stem();
+		return s.toString();
 	}
 
-	public int getTermCount(String term, boolean normalize) throws DatabaseException {
+	public int getTermCount(String term) {
 		try {
-			String normalizedTerm = normalize(term, normalize);
+			String normalizedTerm = normalize(term);
 			TermCountEntry entry = termHashFile.getEntry(normalizedTerm);
 			if (Objects.isNull(entry)) {
 				return 0;
 			} else {
 				return entry.getTermCount();
 			}
-		} catch (IOException e) {
-			throw new DatabaseException(e);
+		} catch (IOException | DatabaseException e) {
+			throw new DatabaseError("Error getting term count for "+term, e);
 		}
 	}
 

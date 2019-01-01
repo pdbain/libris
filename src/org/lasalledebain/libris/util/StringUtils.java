@@ -1,17 +1,21 @@
 package org.lasalledebain.libris.util;
 
+import static org.lasalledebain.libris.util.LibrisStemmer.stem;
+
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
+import java.util.HashMap;
 import java.util.Spliterator;
-import java.util.Spliterator.OfInt;
+import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.lasalledebain.libris.LibrisConstants;
+import org.lasalledebain.libris.exception.DatabaseException;
 
 public class StringUtils {
 	public static class StringHashSpliterator implements Spliterator.OfInt {
@@ -61,6 +65,19 @@ public class StringUtils {
 		
 	}
 
+	static class TermAndFrequency implements Comparable<TermAndFrequency> {
+		String term;
+		Float frequency;
+		@Override
+		public int compareTo(TermAndFrequency o) {
+			return frequency.compareTo(o.frequency);
+		}
+		public TermAndFrequency(String term, Float frequency) {
+			this.term = term;
+			this.frequency = frequency;
+		}	
+	}
+
 	public static final Charset standardCharset = Charset.forName("ISO-8859-1");
 	
 	/**
@@ -103,5 +120,31 @@ public class StringUtils {
 	
 	public static IntStream wordsToHashStream(final Collection<String> words) {
 		return wordStreamToHashStream(words.stream());
+	}
+
+	public static Stream<String> getTerms(String docString, boolean stem) {
+		final String[] words = docString.split("[\\p{Space}\\p{Punct}]+");
+		final Stream<String> wordStream = Arrays.stream(words);
+		if (stem) {
+			return wordStream.map(w -> w.toLowerCase()).map(w -> stem(w));
+		} else {
+			return wordStream;
+		}
+	}
+	
+	public static String normalize(String term) {
+		return term.toLowerCase();
+	}
+
+	public static Stream<String> chooseTerms(Stream<String> terms, Function<String, Integer> documentFrequency, int limit) throws DatabaseException {
+		HashMap<String, Float> termCounts = new HashMap<>();
+		terms.forEach(term -> termCounts.merge(term, (float) 1.0, (t,f) -> t + f));
+		Stream<TermAndFrequency> tAndFStream = termCounts.keySet().stream().map(term -> 
+		{
+			Float docFrequency = documentFrequency.apply(term) + (float) 1.0;
+			final float adjustedFrequency = termCounts.get(term)/docFrequency;
+			return new TermAndFrequency(term, adjustedFrequency);
+		});
+		return tAndFStream.sorted().limit(limit).map(tf -> tf.term);
 	}
 }

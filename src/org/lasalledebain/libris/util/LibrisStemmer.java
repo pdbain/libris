@@ -26,4 +26,9 @@ public class LibrisStemmer extends Stemmer {
 			return normalizedWord;
 		}
 	}
+	public static String stem(String word) {
+		LibrisStemmer stemmer = new LibrisStemmer(word.toLowerCase());
+		stemmer.stem();
+		return stemmer.toString();
+	}
 }

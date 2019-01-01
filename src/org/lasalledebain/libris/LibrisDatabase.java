@@ -20,8 +20,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -670,8 +672,12 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		indexMgr.setTermCount(term, normalize, termCount);
 	}
 
-	public int getTermCount(String term, boolean normalize) throws DatabaseException {
-		return indexMgr.getTermCount(term, normalize);
+	public int getTermCount(String term) throws DatabaseException {
+		return indexMgr.getTermCount(term);
+	}
+
+	public Function<String, Integer> getDocumentFrequencyFunction() {
+		return t -> indexMgr.getTermCount(t);
 	}
 
 	/**
@@ -927,6 +933,16 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);
 		return filteredList;
 	}
+	public void incrementTermCount(String term) {
+		indexMgr.incrementTermCount(term);
+	}
+	
+	public void incrementTermCounts(final Stream<String> terms) {
+		terms.sorted().distinct()
+		.forEach(term -> indexMgr.incrementTermCount(term));
+	}
+	
+
 }
 
 

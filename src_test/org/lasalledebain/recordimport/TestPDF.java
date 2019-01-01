@@ -25,8 +25,8 @@ public class TestPDF extends TestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		workdir = Utilities.makeTempTestDirectory();
 		db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
-		workdir = Utilities.getTempTestDirectory();
 		repoFile = new File(workdir, "test_repo");
 		repoFile.delete();
 		repoFile.deleteOnExit();
@@ -51,7 +51,7 @@ public class TestPDF extends TestCase {
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
 			Record rec = db.newRecord();
 			File testPdf = Utilities.getTestDatabase(Utilities.EXAMPLE_ARTIFACT_PDF);
-			importer.importDocument(testPdf.toURI(), rec);
+			importer.importDocument(testPdf.toURI(), t -> 1, rec);
 			String keywordsText = rec.getField(keywordField).getValuesAsString();
 			String abstractText = rec.getField(abstractField).getValuesAsString();
 			for (String s: new String[] {"now", "is", "the", "time"}) {
@@ -71,13 +71,9 @@ public class TestPDF extends TestCase {
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
 			Record rec = db.newRecord();
 			File testPdf = Utilities.getTestDatabase(Utilities.EXAMPLE_LARGE_PDF);
-			importer.importDocument(testPdf.toURI(), rec);
+			importer.importDocument(testPdf.toURI(), t -> 1, rec);
 			String keywordsText = rec.getField(keywordField).getValuesAsString();
 			String abstractText = rec.getField(abstractField).getValuesAsString();
-			for (String s: new String[] {"nest", "nested", "creation", "creat", "applications", "applications", 
-					"broadcast", "processstate", "essentially", "essential", "queueing", "queueing", "changing", "chang", "operating", "operat"}) {
-				assertTrue("Missing keyword "+s, keywordsText.contains(s));
-			}
 			assertTrue("Abstract malformed: "+abstractText, 
 					abstractText.contains("a number of problems arise which have\n"
 							+ "not been adequately dealt with: the semantics of nested monitor calls; the various ways of\n"
