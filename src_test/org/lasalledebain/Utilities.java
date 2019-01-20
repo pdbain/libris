@@ -51,6 +51,7 @@ import junit.framework.TestCase;
 
 public class Utilities extends TestCase {
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
+	public static final String KEYWORD_DATABASE1_XML = "KeywordDatabase1.xml";
 	public static final String KEYWORD_DATABASE0_XML = "KeywordDatabase0.xml";
 	static final String LAYOUT_DECLARATIONS_XML_FILE = "layoutDeclarations.xml";
 	public static final String TEST_RECORD1_XML_FILE = "TestRecord1.xml";
@@ -78,6 +79,7 @@ public class Utilities extends TestCase {
 	public static final String TEST_DATABASE_UNORDERED_XML = "testDatabaseUnordered.xml";
 	public static final String EXAMPLE_ARTIFACT_PDF = "example_artifact.pdf";
 	public static final String EXAMPLE_LARGE_PDF = "mesa.pdf";
+	public static final String EXAMPLE_DOCS_ZIP = "example_docs.zip";
 	
 	static RecordTemplate makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {

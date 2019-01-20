@@ -24,7 +24,6 @@ import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
-import static java.util.Objects.equals;
 
 public class Repository extends Libris {
 // TODO 1 Add Repository field to LibrisDatabase and add repository field to record

@@ -28,14 +28,6 @@ public interface LibrisConstants {
 	public static final int MAX_RECORD_ID = Integer.MAX_VALUE;
 	public static String LIBRIS_LOGGING_LEVEL = "libris.logging.level";
 
-	/**
-	 * describe how the database is being used: GUI, command line, batch
-	 *
-	 */
-	public enum DatabaseUsageMode {
-		USAGE_BATCH, USAGE_CMDLINE, USAGE_GUI
-	}
-
 	enum DatabaseFormat {DBFMT_XML, DBFMT_CSV, DBFMT_NATIVE}
 
 	public static final short NULL_FIELD_NUM = -1;
@@ -54,6 +46,7 @@ public interface LibrisConstants {
 	String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
 	int MINIMUM_TERM_LENGTH = 2;
 	int[] emptyIntList = new int[0];
+	String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
 	public static final String SCHEMA_NAME = "SCHEMA";
 	public static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
 	public static final String POSITION_FILENAME = "positions";

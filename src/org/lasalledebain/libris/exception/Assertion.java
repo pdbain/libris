@@ -13,6 +13,13 @@ public class Assertion {
 		return test;
 	}
 
+	public static boolean assertTrueError(String message, boolean test) {
+		if (!test) {
+			throw new DatabaseError("Error: "+message);
+		}
+		return test;
+	}
+
 	public static boolean assertEquals(LibrisUi ui, String message, Object expected, Object actual) {
 		boolean result = actual.equals(expected);
 		if (!result) {

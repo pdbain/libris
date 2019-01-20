@@ -22,7 +22,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.InternalError;
@@ -400,7 +399,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		File dbLocation = null;
 		String userDir = System.getProperty("user.dir");
 		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
-		String lastDbFileName = librisPrefs.get(LibrisDatabase.DATABASE_FILE, userDir);
+		String lastDbFileName = librisPrefs.get(LibrisConstants.DATABASE_FILE, userDir);
 		 dbLocation = new File(lastDbFileName);
 		if (!dbLocation.exists()) {
 			dbLocation = new File(userDir);
@@ -457,7 +456,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 			return;
 		}
 		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
-		librisPrefs.put(LibrisDatabase.DATABASE_FILE, dbFile.getAbsolutePath());
+		librisPrefs.put(LibrisConstants.DATABASE_FILE, dbFile.getAbsolutePath());
 		guiMain.getMainFrame().toFront();
 	}
 
