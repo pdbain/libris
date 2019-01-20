@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
@@ -700,6 +701,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		if (null == affiliations) {
 			affiliations = new GroupMember[template.getNumGroups()];
 		}
+		Assertion.assertTrueError("wrong group index", groupNum < affiliations.length);
 		if (null == affiliations[groupNum]) {
 			GroupDefs grpDefs = template.getGroupDefs();
 			affiliations[groupNum] = new GroupMember(grpDefs, grpDefs.getGroupDef(groupNum));

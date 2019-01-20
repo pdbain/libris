@@ -15,6 +15,7 @@ public interface LibrisUi {
 
 	public void setSchema(XmlSchema mySchema);
 	public LibrisDatabase openDatabase() throws DatabaseException;
+	public void saveDatabase();
 	public boolean closeDatabase(boolean force);
 	public boolean quit(boolean force);
 

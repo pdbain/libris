@@ -66,22 +66,21 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private LibrisFileManager fileMgr;
 	IndexManager indexMgr;
 	private GroupManager groupMgr;
+	Repository documentRepository;
 	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 	private Schema mySchema;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisMetadata metadata;
 	private final LibrisUi ui;
-	DatabaseUsageMode usageMode = DatabaseUsageMode.USAGE_BATCH;
-	private boolean isModified;
-	private boolean dbOpen;
 	private ModifiedRecordList modifiedRecords;
 	private LibrisJournalFileManager journalFile;
 	private Records databaseRecords;
 	public static Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());
 	protected DatabaseAttributes xmlAttributes;
 	private boolean readOnly;
-	public static final String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
-
+	private boolean isModified;
+	private boolean dbOpen;
+	
 	public LibrisDatabase(File databaseFile, boolean readOnly, LibrisUi ui) throws LibrisException  {
 		this(databaseFile, readOnly, ui, null);
 	}
@@ -96,6 +95,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		mySchema = schem;
 		modifiedRecords = readOnly? ModifiedRecordList.getEmptyList(): new ModifiedRecordList();			
 		groupMgr = new GroupManager(this);
+		documentRepository = null;
 	}
 
 	public void openDatabase() throws LibrisException {
@@ -617,17 +617,13 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	}
 
 	public void viewRecord(int recordId) {
-		if (DatabaseUsageMode.USAGE_CMDLINE == usageMode) {
-			System.err.println("cmdline not implemented"); //$NON-NLS-1$
-			// TODO implement cmdline display record
-		} else {
-			try {
-				ui.displayRecord(recordId);
-			} catch (LibrisException e) {
-				ui.alert(Messages.getString("LibrisDatabase.error_display_record")+recordId, e); //$NON-NLS-1$
-			}
+		try {
+			ui.displayRecord(recordId);
+		} catch (LibrisException e) {
+			ui.alert(Messages.getString("LibrisDatabase.error_display_record")+recordId, e); //$NON-NLS-1$
 		}
 	}
+	
 	public synchronized Record newRecord() throws InputException {
 		return mainRecordTemplate.makeRecord(true);
 	}
@@ -768,10 +764,6 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	}
 	public synchronized ModifiedRecordList getModifiedRecords() {
 		return modifiedRecords;
-	}
-
-	public DatabaseUsageMode getUsageMode() {
-		return usageMode;
 	}
 
 	public void alert(String msg, Exception e) {

@@ -98,7 +98,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 			alert("Error opening database", e);
 			return currentDatabase;
 		}
-		getLibrisPrefs().put(LibrisDatabase.DATABASE_FILE, databaseFile.getAbsolutePath());
+		getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
 		return currentDatabase;
 	}
 	@Override
@@ -275,6 +275,10 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 				handler.setLevel(logLevel);
 			}
 		}
+	}
+	@Override
+	public void saveDatabase() {
+		currentDatabase.save();
 	}
 
 }
