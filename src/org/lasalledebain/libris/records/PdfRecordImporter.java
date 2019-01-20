@@ -5,13 +5,7 @@ import static org.lasalledebain.libris.util.LibrisStemmer.stem;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -21,8 +15,6 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.Repository.ArtifactParameters;
-import org.lasalledebain.libris.exception.DatabaseError;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.util.StringUtils;;
 
@@ -73,7 +65,7 @@ public class PdfRecordImporter {
 				endOfAbstract = MIN_ABSTRACT_LENGTH;
 			}
 				endOfAbstract = Math.min(endOfAbstract, docString.length());
-				rec.addFieldValue(abstractField, docString.substring(0, endOfAbstract));
+				rec.addFieldValue(abstractField, StringUtils.replaceNonwordOrSpaceChars(docString.substring(0, endOfAbstract), " "));
 		}
 	}
 
@@ -83,12 +75,13 @@ public class PdfRecordImporter {
 		Function<String, Integer> documentFrequency = recordDatabase.getDocumentFrequencyFunction();
 		for (URI sourceFileUri: sourceFiles) {
 			final String documentText = pdfToText(sourceFileUri);
-			recordDatabase.incrementTermCounts(StringUtils.getTerms(documentText, true));
+			recordDatabase.incrementTermCounts(StringUtils.getTerms(documentText, true).map(w -> stem(w)));
 		}
 		for (URI sourceFileUri: sourceFiles) {
 			Record rec = recordDatabase.newRecord();
 			importDocument(sourceFileUri, documentFrequency, rec);
 			rec.setParent(0, parentId);
+			recordDatabase.put(rec);
 		}
 	}
 

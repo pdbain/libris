@@ -15,8 +15,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 
 	BufferedReader cmdlineInput;
-	private boolean doIndexing;
-
 	@Override
 	public void displayRecord(int recordId) throws LibrisException {
 		alert("displayRecord not implemented");
