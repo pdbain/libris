@@ -21,6 +21,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_GROUPDEF_STRUCTURE_FLAT = "flat";
 	public static final String XML_RECORD_ID_ATTR = "id";
 	public static final String XML_RECORD_NAME_ATTR = "name";
+	public static final String XML_RECORD_ARTIFACT_ATTR = "artifact";
 	public static final String XML_MEMBER_GROUP_ATTR = "group";
 	public static final String XML_MEMBER_PARENT_ATTR = "parent";
 	public static final String XML_INDEXDEF_ID_ATTR = "id";

@@ -128,6 +128,7 @@ Represents a document or a index item
 	revision CDATA #IMPLIED
 	replaces IDREF #IMPLIED
 	name CDATA
+	artifact ID #IMPLIED
 >
 
 <!ELEMENT member (affiliation*) >

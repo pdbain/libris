@@ -37,7 +37,7 @@
 			<layout id="LO_browserDisplay" title="Summary" type="list"
 				height="400" width="700">
 				<layoutusage usedby="summarydisplay" />
-				<layoutfield title="Author" id="ID_auth" control="textfield" />
+				<layoutfield title="Text" id="ID_text" control="textfield" />
 			</layout>
 		</layouts>
 	</metadata>

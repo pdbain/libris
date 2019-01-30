@@ -28,4 +28,7 @@ public class RecordId {
 	public static boolean isNull(int id) {
 		return 0 == id;
 	}
+	public static boolean isNull(Record rec) {
+		return 0 == rec.id;
+	}
 }

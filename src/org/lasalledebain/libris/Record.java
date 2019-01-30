@@ -11,6 +11,7 @@ import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
+import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
 
 public abstract class Record implements Comparable<Record>, XMLElement {
@@ -99,6 +100,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract String generateTitle(String[] titleFieldIds);
 	public abstract long getDataLength();
 	public abstract void fromXml(ElementManager recMgr) throws LibrisException;
+	public abstract void toXml(ElementWriter output) throws LibrisException;
 	
 	/* Group management */
 	public abstract boolean hasAffiliations();
