@@ -311,10 +311,12 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		
 	}
 	public void fromXml(ElementManager mgr) throws LibrisException  {
-		HashMap<String, String> attrs = mgr.parseOpenTag();
-		this.attributes = new LibrisAttributes(attrs);
+		this.attributes = new LibrisAttributes(mgr.parseOpenTag());
 		setRecordId(RecordId.toId(attributes.get(XML_RECORD_ID_ATTR)));
 		setName(attributes.get(XML_RECORD_NAME_ATTR));
+		if (attributes.contains(XML_RECORD_ARTIFACT_ATTR)) {
+			setArtifactId(attributes.getInt(XML_RECORD_ARTIFACT_ATTR));
+		}
 		while (mgr.hasNext()) {
 			String nextId = mgr.getNextId();
 			if (XML_MEMBER_TAG != nextId) {
@@ -342,6 +344,10 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 		attrs.setAttribute(XML_RECORD_ID_ATTR, recordNumberString);
 		if (null != name) {
 			attrs.setAttribute(XML_RECORD_NAME_ATTR, name);
+		}
+		final int myArtifactId = getArtifactId();
+		if (!RecordId.isNull(myArtifactId)) {
+			attrs.setAttribute(XML_RECORD_ARTIFACT_ATTR, myArtifactId);
 		}
 		output.writeStartElement(XML_RECORD_TAG, attrs, false);
 		if (null != affiliations) {

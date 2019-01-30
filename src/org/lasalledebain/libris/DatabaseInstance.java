@@ -47,13 +47,7 @@ public class DatabaseInstance extends LibrisElement {
 		LibrisAttributes attrs = mgr.getElementAttributes();
 		forkDate = LibrisAttributes.parseDate(attrs.get(XML_INSTANCE_FORKDATE_ATTR));
 		joinDate = LibrisAttributes.parseDate(attrs.get(XML_INSTANCE_JOINDATE_ATTR));
-		String startingRecordIdString = attrs.get(XML_INSTANCE_BASERECID_ATTR);
-		if (null == startingRecordIdString) {
-			recordIdBase = LibrisConstants.NULL_RECORD_ID;
-		} else {
-			recordIdBase = Integer.parseInt(startingRecordIdString);
-		}
-
+		recordIdBase = attrs.getInt(XML_INSTANCE_BASERECID_ATTR, LibrisConstants.NULL_RECORD_ID);
 		mgr.parseClosingTag();
 	}
 

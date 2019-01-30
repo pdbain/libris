@@ -72,7 +72,7 @@ public class TestPDF extends TestCase {
 			importer.importDocument(testPdf.toURI(), t -> 1, rec);
 			String keywordsText = rec.getField(keywordField).getValuesAsString();
 			String abstractText = rec.getField(abstractField).getValuesAsString();
-			for (String s: new String[] {"now", "is", "the", "time"}) {
+			for (String s: new String[] {"now", "the", "time"}) {
 				assertTrue("Missing keyword "+s, keywordsText.contains(s));
 			}
 			assertTrue("Abstract malformed: "+abstractText, 
@@ -93,11 +93,12 @@ public class TestPDF extends TestCase {
 			importer.importDocument(testPdf.toURI(), t -> 1, rec);
 			String keywordsText = rec.getField(keywordField).getValuesAsString();
 			String abstractText = rec.getField(abstractField).getValuesAsString();
-			assertTrue("Abstract malformed: "+abstractText, 
-					abstractText.contains("a number of problems arise which have\n"
-							+ "not been adequately dealt with: the semantics of nested monitor calls; the various ways of\n"
-							+ "defining the meaning of WAIT; priority scheduling; handling of timeouts, aborts and other\n"
-							+ "exceptional conditions"
+			final String expectedAbstractContents = "a number of problems arise which have "
+					+ "not been adequately dealt with: the semantics of nested monitor calls; the various ways of "
+					+ "defining the meaning of WAIT; priority scheduling; handling of timeouts, aborts and other "
+					+ "exceptional conditions";
+			assertTrue("Expect abstract contains:\n"+abstractText+"\nactual:\n"+abstractText, 
+					abstractText.contains(expectedAbstractContents
 							));
 		} catch (LibrisException | IOException e) {
 			fail("unexpected exception"+e.getMessage());
@@ -114,6 +115,7 @@ public class TestPDF extends TestCase {
 			short abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
 			Record parentRec = db.newRecord();
+			db.put(parentRec);
 			parentRec.setName("Parent_record");
 			URI exampleDocs = URI.create("jar:file:"+(Utilities.getTestDatabase(Utilities.EXAMPLE_DOCS_ZIP).getAbsolutePath()));
 			File docDir = new File(workdir, "docs");
