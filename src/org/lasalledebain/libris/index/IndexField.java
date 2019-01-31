@@ -42,7 +42,7 @@ public class IndexField extends EmptyXmlElement {
 			IndexField otherDef = (IndexField) comparand;
 			return otherDef.getAttributes().equals(getAttributes());
 		} catch (ClassCastException e) {
-			LibrisDatabase.librisLogger.log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
+			LibrisDatabase.log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
 			return false;
 		}
 	}

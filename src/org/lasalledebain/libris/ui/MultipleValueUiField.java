@@ -104,7 +104,7 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 				nextControl = null;
 				return fieldValue;
 			} catch (FieldDataException e) {
-				LibrisDatabase.librisLogger.log(Level.SEVERE, e.getMessage());
+				LibrisDatabase.logException("Error retrieving field value", e);
 				return null;
 			}
 		}

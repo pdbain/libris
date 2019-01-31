@@ -1,7 +1,5 @@
 package org.lasalledebain.libris.ui;
 
-import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
-
 import java.awt.Dimension;
 import java.io.File;
 import java.util.logging.Level;
@@ -12,6 +10,8 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+
+import static org.lasalledebain.libris.LibrisDatabase.log;
 
 public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	private String schemaPath;
@@ -35,12 +35,12 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void alert(String msg, Exception e) {
-		librisLogger.log(Level.WARNING, msg, e);
+		log(Level.WARNING, msg, e);
 	}
 
 	@Override
 	public void alert(String msg) {
-		librisLogger.log(Level.WARNING, msg);
+		log(Level.WARNING, msg);
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void displayRecord(int recordId) throws LibrisException {
-		librisLogger.log(Level.FINE, RecordId.toString(recordId));
+		log(Level.FINE, RecordId.toString(recordId));
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void put(Record newRecord) throws DatabaseException {
-		librisLogger.log(Level.FINE, newRecord.toString());
+	log(Level.FINE, newRecord.toString());
 	}
 
 	public void repaint() {

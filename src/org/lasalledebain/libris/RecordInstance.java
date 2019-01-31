@@ -2,7 +2,6 @@ package org.lasalledebain.libris;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.logging.Level;

@@ -1,7 +1,5 @@
 package org.lasalledebain.libris.ui;
 
-import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -186,7 +184,7 @@ public class LibrisGui extends LibrisWindowedUi {
 				try {
 					prefs.flush();
 				} catch (BackingStoreException e) {
-					librisLogger.log(Level.WARNING, "exception in destroyWindow", e);
+					LibrisDatabase.log(Level.WARNING, "exception in destroyWindow", e);
 				}
 			}
 			for (Component c: mainWindow.getComponents()) {

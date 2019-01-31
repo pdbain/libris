@@ -23,7 +23,6 @@ import javax.swing.JPanel;
 import org.lasalledebain.libris.DatabaseAttributes;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 
 public abstract class LibrisWindowedUi extends LibrisUiGeneric {	
@@ -81,7 +80,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		e.printStackTrace(new PrintStream(bos));
 		try {
-			LibrisDatabase.librisLogger.log(Level.WARNING, bos.toString(Charset.defaultCharset().name()));
+			LibrisDatabase.log(Level.WARNING, bos.toString(Charset.defaultCharset().name()));
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 		}
@@ -90,7 +89,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		while (null != ( c = c.getCause())) {
 			errorString += '\n'+c.getMessage();
 		}
-		LibrisDatabase.librisLogger.log(Level.FINE, emessage, e);
+		LibrisDatabase.log(Level.FINE, emessage, e);
 		return errorString;
 	}
 

@@ -271,7 +271,7 @@ public class SortedKeyValueFileManager <T extends KeyValueTuple> implements Iter
 					tupleIterator = (null == prefix)? currentBucket.iterator(): currentBucket.iterator(prefix);
 					result = tupleIterator.hasNext();
 				} catch (Exception e) {
-					LibrisDatabase.librisLogger.log(Level.SEVERE, "error reading key-value file", e);
+					LibrisDatabase.logException("error reading key-value file", e);
 					break;
 				}
 			}

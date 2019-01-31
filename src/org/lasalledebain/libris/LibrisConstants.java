@@ -1,11 +1,5 @@
 package org.lasalledebain.libris;
 
-import java.io.DataInput;
-import java.io.IOException;
-import java.util.Arrays;
-
-import org.lasalledebain.libris.index.AffiliateListEntry;
-
 public interface LibrisConstants {
 
 	public static final int LONG_LEN = 8;
@@ -47,6 +41,7 @@ public interface LibrisConstants {
 	int MINIMUM_TERM_LENGTH = 2;
 	int[] emptyIntList = new int[0];
 	String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
+	String REPO_DB = "repo_db";
 	public static final String SCHEMA_NAME = "SCHEMA";
 	public static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
 	public static final String POSITION_FILENAME = "positions";

@@ -1,9 +1,10 @@
 package org.lasalledebain.libris.index;
 
+import static org.lasalledebain.libris.LibrisDatabase.log;
+
 import java.util.LinkedHashMap;
 import java.util.logging.Level;
 
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.InputException;
@@ -78,7 +79,7 @@ public class IndexDefs implements XMLElement {
 			}
 			return true;
 		} catch (ClassCastException e) {
-			LibrisDatabase.librisLogger.log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
+			log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
 			return false;
 		
 		}

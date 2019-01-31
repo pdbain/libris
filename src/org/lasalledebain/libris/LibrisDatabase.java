@@ -75,7 +75,7 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	private ModifiedRecordList modifiedRecords;
 	private LibrisJournalFileManager journalFile;
 	private Records databaseRecords;
-	public static Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());
+	private static final Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());
 	protected DatabaseAttributes xmlAttributes;
 	private boolean readOnly;
 	private boolean isModified;
@@ -136,7 +136,13 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 				throw new DatabaseException("Error in metadata");
 			}
 			getDatabaseRecords();
+			if (hasRepository()) {
+				 documentRepository = Repository.open(getUi(), new File(xmlAttributes.getRepositoryLocation()));
+			}
 		}
+	}
+	public boolean hasRepository() {
+		return xmlAttributes.hasRepository();
 	}
 
 	public boolean reserveDatabase() {
@@ -235,17 +241,16 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	@Override
 	public void fromXml(ElementManager librisMgr) throws LibrisException {
 		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
-		String dateString = dbElementAttrs.get(XML_DATABASE_DATE_ATTR);
+		LibrisAttributes attrs = new LibrisAttributes(dbElementAttrs);
+		String dateString = attrs.get(XML_DATABASE_DATE_ATTR);
 		if ((null == dateString) || dateString.isEmpty()) {
 			metadata.setDatabaseDate(new Date());
-		} else {
-			try {
-				metadata.setDatabaseDate(LibrisMetadata.parseDateString(dateString));
-			} catch (ParseException e) {
-				throw new InputException("illegal date format: "+dateString, e);
-			}
+		} else try {
+			metadata.setDatabaseDate(LibrisMetadata.parseDateString(dateString));
+		} catch (ParseException e) {
+			throw new InputException("illegal date format: "+dateString, e);
 		}
-
+		
 		String nextElement = librisMgr.getNextId();
 		DatabaseInstance instanceInfo = null;
 		if (XML_INSTANCE_TAG.equals(nextElement)) {
@@ -802,6 +807,9 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public static void log(Level severity, String msg, Throwable e) {
 		librisLogger.log(severity, msg, e);
 	}
+	public static void logException(String msg, Throwable e) {
+		librisLogger.log(Level.SEVERE, msg, e);
+	}
 	public static void log(Level severity, String msg) {
 		librisLogger.log(severity, msg);
 	}
@@ -908,6 +916,22 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		Record rec = getRecord(recordNum);
 		return (null == rec) ? null: rec.getName();
 	}
+	
+	public File getArtifactFile(int artifact) {
+		if (hasRepository() && !RecordId.isNull(artifact)) {
+			return documentRepository.getArtifactFile(artifact);
+		} else {
+			return null;
+		}
+	}
+
+	public ArtifactParameters getArtifactInfo(int artifact) {
+		if (hasRepository() && !RecordId.isNull(artifact)) {
+			return documentRepository.getArtifactInfo(artifact);
+		} else {
+			return null;
+		}
+	}
 
 	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int searchList[], Collection<String> searchTerms) throws UserErrorException, IOException {
@@ -933,8 +957,15 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 		terms.sorted().distinct()
 		.forEach(term -> indexMgr.incrementTermCount(term));
 	}
+	public Repository getDocumentRepository() {
+		return documentRepository;
+	}
 	
-
+	// TODO is this required?
+	public void setDocumentRepository(Repository documentRepository) {
+		this.documentRepository = documentRepository;
+	}
+	
 }
 
 

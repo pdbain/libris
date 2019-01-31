@@ -13,6 +13,8 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
+import static org.lasalledebain.libris.LibrisDatabase.log;
+
 public class IndexDef implements XMLElement {
 
 	private Schema databaseSchema;
@@ -69,7 +71,7 @@ public class IndexDef implements XMLElement {
 			IndexDef otherDef = (IndexDef) comparand;
 			return otherDef.getAttributes().equals(getAttributes());
 		} catch (ClassCastException e) {
-			LibrisDatabase.librisLogger.log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
+			log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
 			return false;
 		}
 	}

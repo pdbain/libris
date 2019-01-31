@@ -93,7 +93,7 @@ public class LibrisFileManager implements LibrisConstants {
 				dbLockFile.close();
 			}
 		} catch (IOException e) {
-			LibrisDatabase.librisLogger.log(Level.SEVERE, "Error creating lock file", e);
+			LibrisDatabase.log(Level.SEVERE, "Error creating lock file", e);
 		}
 		return false;
 	}
@@ -111,7 +111,7 @@ public class LibrisFileManager implements LibrisConstants {
 				lckFile.close();
 				databaseReserved = false;
 			} catch (IOException e) {
-				LibrisDatabase.librisLogger.log(Level.SEVERE, "Error unlocking file", e);
+				LibrisDatabase.log(Level.SEVERE, "Error unlocking file", e);
 			}
 		}
 	}

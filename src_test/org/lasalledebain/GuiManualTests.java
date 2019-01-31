@@ -38,7 +38,7 @@ import org.lasalledebain.libris.ui.RecordWindow;
 import org.lasalledebain.libris.ui.TextBox;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
-
+import static org.lasalledebain.Utilities.testLogger;
 public class GuiManualTests extends TestCase {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -275,10 +275,10 @@ public class GuiManualTests extends TestCase {
 			try {
 				Thread.sleep(delay);
 			} catch (InterruptedException e) {
-				System.err.println("testcase interrupted");
+				testLogger.info("testcase interrupted");
 			}
 		} else {
-			System.out.print("waiting...");
+			testLogger.info("waiting...");
 			try {
 				System.in.read();
 			} catch (IOException e) {

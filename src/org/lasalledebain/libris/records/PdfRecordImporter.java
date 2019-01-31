@@ -11,10 +11,10 @@ import java.util.stream.Stream;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
+import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
-import org.lasalledebain.libris.Repository.ArtifactParameters;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.util.StringUtils;;
 

@@ -4,19 +4,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.FileStore;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +19,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.PdfRecordImporter;
+import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.util.ZipUtils;
 
@@ -43,12 +36,12 @@ public class TestPDF extends TestCase {
 	@Before
 	public void setUp() throws Exception {
 		workdir = Utilities.makeTempTestDirectory();
-		repoFile = new File(workdir, "test_repo");
-		repoFile.delete();
-		repoFile.deleteOnExit();
-		repoRoot = new File(workdir, "root");
-		assertTrue("could not create database", Repository.initialize(repoFile));
-		repo = Repository.open(repoFile, repoRoot, false);
+		repoRoot = new File(workdir, "repo_root");
+		assertTrue("Could not create "+repoRoot.getPath(), repoRoot.mkdir());
+		final File repoDbFile = Repository.initialize(repoRoot);
+		assertTrue("could not create database", null != repoDbFile);
+		HeadlessUi ui = new HeadlessUi(repoFile, false);
+		repo = Repository.open(ui, repoRoot);
 		db = null;
 	}
 
@@ -120,7 +113,7 @@ public class TestPDF extends TestCase {
 			URI exampleDocs = URI.create("jar:file:"+(Utilities.getTestDatabase(Utilities.EXAMPLE_DOCS_ZIP).getAbsolutePath()));
 			File docDir = new File(workdir, "docs");
 			ZipUtils.unzipZipFile(exampleDocs, docDir);
-			final List<URI> fileUris = Arrays.stream(docDir.listFiles()).map(f -> f.toURI()).collect(Collectors.toList());
+ 			final List<URI> fileUris = Arrays.stream(docDir.listFiles()).map(f -> f.toURI()).collect(Collectors.toList());
 			importer.importPDFDocuments(fileUris, parentRec);
 			ui.saveDatabase();
 			File dumpFile = new File(workdir, "dump.libr");

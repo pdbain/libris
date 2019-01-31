@@ -1,23 +1,24 @@
 package org.lasalledebain.libris.ui;
 
+import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
+import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 
+@SuppressWarnings("serial")
 public class RecordWindow extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8603864809213149500L;
+	private final JButton leftPointer = new JButton("\u25C4");
+	private final JButton rightPointer = new JButton("\u25BA");
 	LibrisWindowedUi ui;
 	Layout recordLayout;
 	private String title;
@@ -25,6 +26,7 @@ public class RecordWindow extends JPanel {
 	private JPanel recordPanel;
 	private final Record record;
 	ArrayList<UiField> guiFields = new ArrayList<UiField>();
+	private JButton artifactButton;
 	
 	public RecordWindow(LibrisWindowedUi ui, Layout layout, Record rec, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
@@ -41,24 +43,36 @@ public class RecordWindow extends JPanel {
 		this.ui = ui;
 		modTracker = new ModificationTracker(ui, modificationListener, this, "This record has been modified. Do you want to enter it?");
 		modTracker.setModifiable(editable);
-		recordPanel = new JPanel();
-		layOutFields(layout, rec, recordPanel, modTracker);
-		add(recordPanel);
-		recordPanel.setVisible(true);
-		ui.fieldSelected(false);
-		ui.setSelectedField(null);
+		layOutWindow(ui, layout, rec);
 		modTracker.setModified(false);
 	}
 
-	public void refresh() throws LibrisException {
+	private void layOutWindow(LibrisWindowedUi ui, Layout layout, Record rec) throws LibrisException {
+		navPanel = new JPanel(new BorderLayout());
+		add(navPanel);
+		recordPanel = new JPanel();
+		layOutFields(layout, rec, recordPanel, modTracker);
+		navPanel.add(recordPanel, BorderLayout.CENTER);
+		navPanel.add(leftPointer, BorderLayout.WEST);
+		navPanel.add(rightPointer, BorderLayout.EAST);
+		String recordName = rec.getName();
+		if (null != recordName) {
+			navPanel.add(new JLabel(recordName));
+		}
+		ArtifactParameters artifactInfo = ui.currentDatabase.getArtifactInfo(rec.getArtifactId());
+		if (null != artifactInfo) {
+			artifactButton = new JButton(artifactInfo.getTitle());
+			navPanel.add(artifactButton, BorderLayout.SOUTH);
+		}
+		recordPanel.setVisible(true);
 		ui.fieldSelected(false);
 		ui.setSelectedField(null);
+	}
+
+	public void refresh() throws LibrisException {
 		recordPanel.setVisible(false);
-		remove(recordPanel);
-		recordPanel = new JPanel();
-		layOutFields(recordLayout, record, recordPanel, modTracker);
-		 add(recordPanel);
-		recordPanel.setVisible(true);
+		remove(navPanel);
+		layOutWindow(ui, recordLayout, record);
 	}
 	
 	public RecordWindow(LibrisWindowedUi ui, Layout myGuiLayout, Record rec, Point point, 
@@ -67,6 +81,7 @@ public class RecordWindow extends JPanel {
 	}
 
 	ModificationTracker modTracker;
+	private JPanel navPanel;
 	
 	public boolean isEditable() {
 		return modTracker.isModifiable();
