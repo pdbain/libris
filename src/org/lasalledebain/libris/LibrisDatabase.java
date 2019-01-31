@@ -47,6 +47,7 @@ import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.records.XmlRecordsReader;
 import org.lasalledebain.libris.search.KeywordFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
+import org.lasalledebain.libris.ui.ChildUi;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.ui.Messages;
@@ -136,7 +137,13 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 				throw new DatabaseException("Error in metadata");
 			}
 			getDatabaseRecords();
+			if (hasRepository()) {
+				 documentRepository = Repository.open(getUi(), new File(xmlAttributes.getRepositoryLocation()));
+			}
 		}
+	}
+	public boolean hasRepository() {
+		return xmlAttributes.hasRepository();
 	}
 
 	public boolean reserveDatabase() {
@@ -235,17 +242,16 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	@Override
 	public void fromXml(ElementManager librisMgr) throws LibrisException {
 		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
-		String dateString = dbElementAttrs.get(XML_DATABASE_DATE_ATTR);
+		LibrisAttributes attrs = new LibrisAttributes(dbElementAttrs);
+		String dateString = attrs.get(XML_DATABASE_DATE_ATTR);
 		if ((null == dateString) || dateString.isEmpty()) {
 			metadata.setDatabaseDate(new Date());
-		} else {
-			try {
-				metadata.setDatabaseDate(LibrisMetadata.parseDateString(dateString));
-			} catch (ParseException e) {
-				throw new InputException("illegal date format: "+dateString, e);
-			}
+		} else try {
+			metadata.setDatabaseDate(LibrisMetadata.parseDateString(dateString));
+		} catch (ParseException e) {
+			throw new InputException("illegal date format: "+dateString, e);
 		}
-
+		
 		String nextElement = librisMgr.getNextId();
 		DatabaseInstance instanceInfo = null;
 		if (XML_INSTANCE_TAG.equals(nextElement)) {
@@ -932,6 +938,12 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 	public void incrementTermCounts(final Stream<String> terms) {
 		terms.sorted().distinct()
 		.forEach(term -> indexMgr.incrementTermCount(term));
+	}
+	public Repository getDocumentRepository() {
+		return documentRepository;
+	}
+	public void setDocumentRepository(Repository documentRepository) {
+		this.documentRepository = documentRepository;
 	}
 	
 

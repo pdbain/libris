@@ -13,8 +13,10 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	private final LibrisDatabase db;
 	private final String databaseName;
 	private boolean locked;
+	private final boolean hasRepo;
 	private final String schemaName;
 	private final String schemaLocation;
+	private final String repositoryLocation;
 
 	public LibrisDatabase getDatabase() {
 		return db;
@@ -39,6 +41,12 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 		modificationDate = parseDate(dbDateString);
 		String lockedString = attrs.get(XML_DATABASE_LOCKED_ATTR);
 		locked = Boolean.parseBoolean(lockedString);
+		hasRepo = attrs.containsKey(XML_DATABASE_REPOSITORY_LOCATION_ATTR);
+		if (hasRepo) {
+			repositoryLocation = attrs.get(XML_DATABASE_REPOSITORY_LOCATION_ATTR);
+		} else {
+			repositoryLocation = null;
+		}
 	}
 	public String getDatabaseName() {
 		return databaseName;
@@ -78,6 +86,14 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	 */
 	public String getSchemaLocation() {
 		return schemaLocation;
+	}
+
+	public boolean hasRepository() {
+		return hasRepo;
+	}
+
+	public String getRepositoryLocation() {
+		return repositoryLocation;
 	}
 
 }

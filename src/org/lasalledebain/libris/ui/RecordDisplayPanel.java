@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -17,7 +18,10 @@ import javax.swing.event.ChangeListener;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordId;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisMenu.NewRecordListener;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -36,10 +40,11 @@ public class RecordDisplayPanel extends JPanel {
 	private JButton nextButton;
 	private JButton newButton;
 	private JButton enterButton;
+	private JButton openDocumentButton;
 	private LibrisDatabase database;
 	private Layout recLayout;
 	private Layout titleLayout;
-	private JComboBox layoutSelector;
+	private JComboBox<String> layoutSelector;
 	protected String[] layoutIds;
 	private String[] titleFieldIds;
 	private ModificationListener modListener;
@@ -68,7 +73,6 @@ public class RecordDisplayPanel extends JPanel {
 		menu.recordWindowOpened(editable);
 		return rw;
 	}
-// FIXME summary view not shown
 
 	public void displayRecord(int recId) throws LibrisException {
 		for (int i= 0; i < openRecords.size(); ++i) {
@@ -162,7 +166,7 @@ public class RecordDisplayPanel extends JPanel {
 		JLabel layoutLabel = new JLabel("Layout");
 		layoutLabel.setLabelFor(layoutSelector);
 		buttonBar.add(layoutLabel);
-		layoutSelector = new JComboBox();
+		layoutSelector = new JComboBox<String>();
 		buttonBar.add(layoutSelector);
 		layoutSelector.addActionListener(new layoutSelectionListener());
 		add(buttonBar, BorderLayout.NORTH);
@@ -171,6 +175,25 @@ public class RecordDisplayPanel extends JPanel {
 		prevButton.addActionListener(new prevNextListener(false));
 		buttonBar.add(nextButton = new JButton("Next"));
 		nextButton.addActionListener(new prevNextListener(true));
+		buttonBar.add(openDocumentButton = new JButton("Open document"));
+		openDocumentButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int selectedRecordIndex = openRecordPanes.getSelectedIndex();
+				if (selectedRecordIndex >= 0) {
+					Record currentRecord = openRecords.get(selectedRecordIndex).getRecord();
+					int artifactId = currentRecord.getArtifactId();
+					if (!RecordId.isNull(artifactId)) {
+						try {
+							database.getDocumentRepository().getArtifact(artifactId);
+						} catch (InputException | URISyntaxException exc) {
+							throw new DatabaseError("Cannot find document for record "+currentRecord.getRecordId(), exc);
+						}
+					}
+				}
+			}
+		});
 	}
 
 	private class prevNextListener implements ActionListener {

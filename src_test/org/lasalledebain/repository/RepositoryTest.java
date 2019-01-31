@@ -18,6 +18,8 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.Repository.ArtifactParameters;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.ui.LibrisUi;
 
 import junit.framework.TestCase;
 
@@ -31,10 +33,8 @@ public class RepositoryTest  extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		workdir = Utilities.getTempTestDirectory();
-		dbFile = new File(workdir, "test_repo");
-		dbFile.delete();
-		dbFile.deleteOnExit();
 		repoRoot = new File(workdir, "root");
+		repoRoot.mkdir();
 	}
 
 	public void testRepoSanity(){
@@ -147,11 +147,12 @@ public class RepositoryTest  extends TestCase {
 		return result;
 	}
 
-	// TODO make this a common utility
 	private Repository createDatabase()
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
-		assertTrue("could not create database", Repository.initialize(dbFile));
-		Repository repo = Repository.open(dbFile, repoRoot, false);
+		File dbFile = Repository.initialize(repoRoot);
+		assertTrue("could not create database", null != dbFile);
+		LibrisUi ui = new HeadlessUi(dbFile, false);
+		Repository repo = Repository.open(ui, repoRoot);
 		return repo;
 	}
 	@Override
