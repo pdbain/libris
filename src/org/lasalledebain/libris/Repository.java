@@ -65,7 +65,9 @@ static final int FANOUT = 100;
 	private static final DynamicSchema mySchema = makeSchema();
 	File root;
 
+	private final ChildUi myUi;
 	public Repository(ChildUi ui, LibrisDatabase db, File theRoot) {
+		myUi = ui;
 		repoDatabase = db;
 		root = theRoot;
 	}
@@ -134,13 +136,13 @@ static final int FANOUT = 100;
 		return new File(root, path);
 	}
 	
-	public int importFile(ArtifactParameters params) throws LibrisException, IOException {
-		final URI sourceUri = params.source;
+	public int importFile(org.lasalledebain.libris.ArtifactParameters artifactParameters) throws LibrisException, IOException {
+		final URI sourceUri = artifactParameters.source;
 		File sourceFile = new File(sourceUri);
 		if (!sourceFile.isFile()) {
 			throw new UserErrorException(sourceUri.toString()+" is not a file");
 		}
-		int id = putArtifactInfo(params);
+		int id = putArtifactInfo(artifactParameters);
 		copyFileToRepo(sourceFile, id);
 		return id;
 	}
@@ -195,27 +197,27 @@ static final int FANOUT = 100;
 
 	}
 	
-	public int putArtifactInfo(ArtifactParameters params) throws LibrisException {
+	public int putArtifactInfo(ArtifactParameters artifactParameters) throws LibrisException {
 		Record rec = repoDatabase.newRecord();
-		rec.addFieldValue(ID_SOURCE, params.getSourceString());
-		rec.addFieldValue(ID_DATE, params.date);
-		rec.addFieldValue(ID_DOI, params.doi);
-		rec.addFieldValue(ID_KEYWORDS, params.keywords);
-		rec.addFieldValue(ID_COMMENTS, params.comments);
-		String title = params.title;
-		rec.addFieldValue(ID_SOURCE, params.source.toString());
-		if (!params.recordName.isEmpty()) {
-			rec.setName(params.recordName);
+		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
+		rec.addFieldValue(ID_DATE, artifactParameters.date);
+		rec.addFieldValue(ID_DOI, artifactParameters.doi);
+		rec.addFieldValue(ID_KEYWORDS, artifactParameters.keywords);
+		rec.addFieldValue(ID_COMMENTS, artifactParameters.comments);
+		String title = artifactParameters.title;
+		rec.addFieldValue(ID_SOURCE, artifactParameters.source.toString());
+		if (!artifactParameters.recordName.isEmpty()) {
+			rec.setName(artifactParameters.recordName);
 		}
 		if (Objects.isNull(title) || title.isEmpty()) {
-			File sourceFile = new File(params.source);
+			File sourceFile = new File(artifactParameters.source);
 			title = sourceFile.getName();
 		}
 		rec.addFieldValue(ID_TITLE, title);
-		if (!params.recordParentName.isEmpty()) {
-			Record parent = repoDatabase.getRecord(params.recordParentName);
+		if (!artifactParameters.recordParentName.isEmpty()) {
+			Record parent = repoDatabase.getRecord(artifactParameters.recordParentName);
 			if (Objects.isNull(parent)) {
-				throw new InputException("Cannot locate record "+params.recordParentName);
+				throw new InputException("Cannot locate record "+artifactParameters.recordParentName);
 			}
 			rec.setParent(0, parent.getRecordId());
 		}
@@ -225,5 +227,5 @@ static final int FANOUT = 100;
 	
 	public int putArtifactInfo(URI sourceLocation) throws LibrisException {
 		return putArtifactInfo(new ArtifactParameters(sourceLocation));	
-	}
+	}	
 }

@@ -2,12 +2,11 @@ package org.lasalledebain.libris.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,10 +19,7 @@ import javax.swing.event.ChangeListener;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
-import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisMenu.NewRecordListener;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -187,7 +183,8 @@ public class RecordDisplayPanel extends JPanel {
 					Record currentRecord = openRecords.get(selectedRecordIndex).getRecord();
 					int artifactId = currentRecord.getArtifactId();
 					File recordArtifact = database.getArtifactFile(artifactId);
-					if (null != recordArtifact) {
+					if (!Objects.isNull(recordArtifact)) {
+						database.getDocumentRepository().getArtifactFile(artifactId);
 					}
 				}
 			}
