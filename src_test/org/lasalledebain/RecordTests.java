@@ -24,6 +24,8 @@ import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
+import static org.lasalledebain.Utilities.info;
+
 public class RecordTests extends TestCase {
 	private static final String FIELDNAME = "f1";
 
@@ -383,7 +385,7 @@ public class RecordTests extends TestCase {
 			RecordKeywords kw = new ExactKeywordList(true);
 			kw.addKeywords(Arrays.asList(new String[] 
 					{"lorem", "ipsum", "dolor", "sit", "ametl", "consectetur", "adipiscing", "elit,", "sed", "do", "eiusmod", "tempor", "incididunt"}));
-			StringUtils.wordStreamToHashStream(kw.wordStream()).forEach(i -> System.out.println("hash = "+i));
+			StringUtils.wordStreamToHashStream(kw.wordStream()).forEach(i -> info("hash = "+i));
 	}
 	
 	public void testGetPrefixKeywords() {

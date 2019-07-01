@@ -27,7 +27,6 @@ public class RepositoryTest  extends TestCase {
 
 	private static final String RECORD = "record_";
 	private File workdir;
-	private File dbFile;
 	private File repoRoot;
 
 	@Override

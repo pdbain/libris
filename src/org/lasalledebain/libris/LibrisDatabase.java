@@ -137,12 +137,13 @@ public class LibrisDatabase implements LibrisXMLConstants, LibrisConstants, XMLE
 			}
 			getDatabaseRecords();
 			if (hasRepository()) {
-				 documentRepository = Repository.open(getUi(), new File(xmlAttributes.getRepositoryLocation()));
+				// TODO open repo documentRepository = Repository.open(getUi(), new File(xmlAttributes.getRepositoryLocation()));
 			}
 		}
 	}
 	public boolean hasRepository() {
-		return xmlAttributes.hasRepository();
+		// TODO implement hasRepository return xmlAttributes.hasRepository();
+		return false; // placeholder
 	}
 
 	public boolean reserveDatabase() {

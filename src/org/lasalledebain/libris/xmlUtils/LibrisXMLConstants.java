@@ -42,7 +42,6 @@ public interface LibrisXMLConstants {
 	public static final String XML_DATABASE_NAME_ATTR = "databasename";
 	public static final String XML_DATABASE_SCHEMA_NAME_ATTR = "schemaname";
 	public static final String XML_DATABASE_SCHEMA_LOCATION_ATTR = "schemalocation";
-	public static final String XML_DATABASE_REPOSITORY_LOCATION_ATTR = "repositorylocation";
 	
 	public static final String XML_FIELDDEF_ID_ATTR = "id";
 	public static final String XML_FIELDDEF_TITLE_ATTR = "title";

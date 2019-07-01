@@ -17,7 +17,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement {
+public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, LibrisConstants {
 
 	protected LibrisDatabase database;
 	protected Layouts uiLayouts;
@@ -26,6 +26,7 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 	private int modifiedRecords;
 	private DatabaseInstance instanceInfo;
 	private Date databaseDate;
+	private boolean hasRepo;
 	/**
 	 * Dynamic attributes of the database
 	 */
@@ -94,7 +95,7 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 		} else {
 			lastRecordId = RecordId.getNullId();
 		}
-		String sigLevelsString = usageProperties.getProperty(LibrisConstants.PROPERTY_SIGNATURE_LEVELS);
+		String sigLevelsString = usageProperties.getProperty(PROPERTY_SIGNATURE_LEVELS);
 		if (!Objects.isNull(sigLevelsString)) {
 			signatureLevels = Integer.parseInt(sigLevelsString);
 		} else {
@@ -117,6 +118,14 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement {
 
 	public static Date getCurrentDate() {
 		return new Date();
+	}
+
+	public boolean hasRepository() {
+		return hasRepo;
+	}
+
+	public void hasRepository(boolean hasRepo) {
+		this.hasRepo = hasRepo;
 	}
 
 	public static String formatDateAndTime(Date theDate) {
