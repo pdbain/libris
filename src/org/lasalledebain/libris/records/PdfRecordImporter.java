@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.lasalledebain.libris.ArtifactParameters;
@@ -32,7 +34,7 @@ public class PdfRecordImporter {
 		setAbstract = false;
 		setKeywords = false;
 	}
-
+	
 	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository, short keyField, short absField) {
 		this.recordDatabase = recordDatabase;
 		this.artifactRepository = artifactRepository;

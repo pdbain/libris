@@ -3,6 +3,7 @@ package org.lasalledebain.libris;
 import static org.lasalledebain.libris.exception.Assertion.assertEquals;
 import static org.lasalledebain.libris.exception.Assertion.assertNotNull;
 import static org.lasalledebain.libris.exception.Assertion.assertTrue;
+import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +40,7 @@ import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
+import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
@@ -56,7 +58,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
-public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstants, LibrisConstants, XMLElement {
+public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements LibrisXMLConstants, LibrisConstants, XMLElement {
 	public LibrisMetadata getMetadata() {
 		return databaseMetadata;
 	}
@@ -248,7 +250,7 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 			databaseMetadata.setInstanceInfo(instanceInfo);
 			nextElement = librisMgr.getNextId();
 		}
-		xmlAttributes = new DatabaseAttributes(this, dbElementAttrs);
+		xmlAttributes = new DatabaseAttributes(dbElementAttrs);
 		if (xmlAttributes.isLocked()) {
 			readOnly = true;
 		}
@@ -392,7 +394,7 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 			return false;
 		};
 		ElementManager recsMgr = incrementManager.nextElement();
-		XmlRecordsReader recordsReader = new XmlRecordsReader(this, recsMgr);
+		XmlRecordsReader<DatabaseRecord> recordsReader = new XmlRecordsReader(this, recsMgr);
 		for (Record newRec: recordsReader) {
 			if (idAdjustment > 0) {
 				newRec.offsetIds(baseId, idAdjustment);
@@ -594,7 +596,7 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 	 * @return
 	 * @throws LibrisException
 	 */
-	public Records getDatabaseRecords() throws LibrisException {
+	public Records<DatabaseRecord> getDatabaseRecords() throws LibrisException {
 		if (null == databaseRecords) {
 			databaseRecords = new Records(this, fileMgr);
 		}
@@ -615,7 +617,7 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 	}
 	
 	@Override
-	public synchronized Record newRecord() throws InputException {
+	public synchronized DatabaseRecord newRecord() throws InputException {
 		return mainRecordTemplate.makeRecord(true);
 	}
 
@@ -662,7 +664,7 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 		for (int g = 0; g < mySchema.getNumGroups(); ++g) {
 			int[] affiliations = rec.getAffiliates(g);
 			if (affiliations.length != 0) {
-				if (affiliations[0] != RecordId.getNullId()) {
+				if (affiliations[0] != NULL_RECORD_ID) {
 					indexMgr.addChild(g, affiliations[0], id);
 				}
 				for (int i = 1; i < affiliations.length; ++i) {
@@ -681,7 +683,7 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 		}
 		setModified(false);
 		Records recs = getDatabaseRecords();
-		int id = RecordId.getNullId();
+		int id = NULL_RECORD_ID;
 		int lastId = 0;
 		for (Record rec: recList) {
 			id = rec.getRecordId();
@@ -711,7 +713,7 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 		return databaseMetadata.getSavedRecords();
 	}
 
-	public RecordList getRecords() {
+	public RecordList<DatabaseRecord> getRecords() {
 		return new DatabaseRecordList(this);	
 	}
 
@@ -817,7 +819,7 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 		return (null != instanceInfo);
 	}
 
-	public GroupManager getGroupMgr() {
+	public GroupManager<DatabaseRecord> getGroupMgr() {
 		return groupMgr;
 	}
 
@@ -829,8 +831,8 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 		return mainRecordTemplate;
 	}
 
-	public NamedRecordList getNamedRecords() {
-		NamedRecordList l = new NamedRecordList(this);
+	public NamedRecordList<DatabaseRecord> getNamedRecords() {
+		NamedRecordList<DatabaseRecord> l = new NamedRecordList<DatabaseRecord>(this);
 		return l;
 	}
 
@@ -869,6 +871,13 @@ public class LibrisDatabase extends GenericDatabase implements LibrisXMLConstant
 		} else {
 			return null;
 		}
+	}
+
+	public LibrisJournalFileManager<DatabaseRecord> getJournalFileMgr() throws LibrisException {
+		if (null == journalFile) {
+			journalFile = LibrisJournalFileManager.createLibrisJournalFileManager(this, fileMgr.getJournalFileMgr(), RecordTemplate.templateFactory(getSchema(), null));
+		}
+		return journalFile;
 	}
 
 	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 

@@ -5,30 +5,23 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLConstants {
 	private Date modificationDate;
-	private final GenericDatabase db;
 	private final String databaseName;
 	private boolean locked;
 	private final String schemaName;
 	private final String schemaLocation;
 
-	public GenericDatabase getDatabase() {
-		return db;
-	}
-	
 	@Override
 	public void setAttribute(String key, String value) {
 		super.setAttribute(key, value);
 	}
 	
-	public DatabaseAttributes(GenericDatabase db, Map<String, String> attrs) throws DatabaseException {
+	public DatabaseAttributes(Map<String, String> attrs) throws DatabaseException {
 		super(attrs);
-		this.db = db;
 		String schemaversion = attrs.get(XML_SCHEMA_VERSION_ATTR);
 		schemaName = attrs.get(XML_DATABASE_SCHEMA_NAME_ATTR);
 		schemaLocation = attrs.get(XML_DATABASE_SCHEMA_LOCATION_ATTR);
@@ -65,13 +58,6 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 
 	public String getSchemaName() {
 		return schemaName;
-	}
-
-	/**
-	 * @return the db
-	 */
-	public GenericDatabase getDb() {
-		return db;
 	}
 
 	/**

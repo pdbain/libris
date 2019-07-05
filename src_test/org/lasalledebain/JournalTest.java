@@ -10,7 +10,7 @@ import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordTemplate;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -55,8 +55,9 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 			String recData[][] = {{"true", "1", "foo"}, {"false", "2", "bar"}};
 			int numTestRecords = 2;
 
-			LibrisJournalFileManager journal = LibrisJournalFileManager.createLibrisJournalFileManager(testDatabase, journalFileMgr);
-			RecordTemplate rt = makeTestRecords(recData, numTestRecords, journal);
+			LibrisJournalFileManager<Record> journal = Utilities.createLibrisJournalFileManager(testDatabase, journalFileMgr);
+			
+			RecordFactory<Record> rt = makeTestRecords(recData, numTestRecords, journal);
 			
 			journal.close();
 			
@@ -87,7 +88,7 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 			String recData[][] = {{"true", "1", "foo"}, {"false", "2", "bar"}};
 			int numTestRecords = 2;
 
-			LibrisJournalFileManager journal = LibrisJournalFileManager.createLibrisJournalFileManager(testDatabase, journalFileMgr);
+			LibrisJournalFileManager journal = Utilities.createLibrisJournalFileManager(testDatabase, journalFileMgr);
 			makeTestRecords(recData, numTestRecords, journal);
 			Iterator<Record> journalRecords = journal.iterator();
 			Iterator<Record> expectedRecords = testRecords.iterator();
@@ -107,7 +108,7 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 			String recData[][] = {{"true", "1", "foo"}, {"false", "2", "bar"}};
 			int numTestRecords = 2;
 
-			LibrisJournalFileManager journal = LibrisJournalFileManager.createLibrisJournalFileManager(testDatabase, journalFileMgr);
+			LibrisJournalFileManager journal = Utilities.createLibrisJournalFileManager(testDatabase, journalFileMgr);
 			makeTestRecords(recData, numTestRecords, journal);
 			Record r = testRecords.get(0);
 			Field f = r.getField(fieldNames[2]);
@@ -131,7 +132,7 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 			String recData[][] = {{"true", "1", "short"}, {"false", "2", "bar"}};
 			int numTestRecords = 2;
 
-			LibrisJournalFileManager journal = LibrisJournalFileManager.createLibrisJournalFileManager(testDatabase, journalFileMgr);
+			LibrisJournalFileManager journal = Utilities.createLibrisJournalFileManager(testDatabase, journalFileMgr);
 			makeTestRecords(recData, numTestRecords, journal);
 			Record r = testRecords.get(0);
 			r.addFieldValue(fieldNames[2], "some really long data");
@@ -154,7 +155,7 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 			String recData[][] = {{"true", "1", "short"}, {"false", "2", "bar"}, {"true", "99", "toe"}};
 			int numTestRecords = 3;
 
-			LibrisJournalFileManager journal = LibrisJournalFileManager.createLibrisJournalFileManager(testDatabase, journalFileMgr);
+			LibrisJournalFileManager journal = Utilities.createLibrisJournalFileManager(testDatabase, journalFileMgr);
 			makeTestRecords(recData, numTestRecords, journal);
 			ArrayList<Record>  expectedRecordList = (ArrayList<Record>) testRecords.clone();
 			for (Record r: testRecords) {
@@ -182,10 +183,10 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 			int numTestRecords = 2;
 			
 
-			LibrisJournalFileManager journal = LibrisJournalFileManager.createLibrisJournalFileManager(testDatabase, journalFileMgr);
+			LibrisJournalFileManager journal = Utilities.createLibrisJournalFileManager(testDatabase, journalFileMgr);
 			makeTestRecords(recData, numTestRecords, journal);
 			journal.close();
-			journal = LibrisJournalFileManager.createLibrisJournalFileManager(testDatabase, journalFileMgr);
+			journal = Utilities.createLibrisJournalFileManager(testDatabase, journalFileMgr);
 			makeTestRecords(recData2, numTestRecords, journal);
 			
 			Iterator<Record> journalRecords = journal.iterator();
@@ -201,11 +202,11 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 		}
 			
 	}
-	private RecordTemplate makeTestRecords(String[][] recData,
+	private RecordFactory makeTestRecords(String[][] recData,
 			int numTestRecords, LibrisJournalFileManager journal)
 			throws RecordDataException, DatabaseException, FieldDataException,
 			LibrisException {
-		RecordTemplate rt = Utilities.makeRecordTemplate(fieldNames, fts);
+		RecordFactory rt = Utilities.makeRecordTemplate(fieldNames, fts);
 		if (null == testRecords) {
 			testRecords = new ArrayList<Record>(numTestRecords);
 		}

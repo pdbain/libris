@@ -7,12 +7,12 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.search.RecordFilter;
 
-public class FilteredRecordList extends RecordList implements Iterable<Record> {
+public class FilteredRecordList<RecordType extends Record> extends RecordList<RecordType> {
 
-	RecordList recordSource;
+	RecordList<RecordType> recordSource;
 	RecordFilter filter;
 
-	public FilteredRecordList(RecordList src, RecordFilter f) {
+	public FilteredRecordList(RecordList<RecordType> src, RecordFilter f) {
 		recordSource = src;
 		filter = f;
 	}

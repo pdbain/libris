@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.hashtable.HashUtils;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -156,7 +157,7 @@ public class TermcountHashfileTests extends TestCase {
 			
 			assertTrue("Could not close database", myUi.closeDatabase(false));
 			db = myUi.openDatabase();
-			Records recs = db.getDatabaseRecords();	
+			Records<DatabaseRecord> recs = db.getDatabaseRecords();	
 			for (Record r: recs) {
 				RecordKeywords kw = new ExactKeywordList(true);
 				r.getKeywords(indexFieldList, kw);

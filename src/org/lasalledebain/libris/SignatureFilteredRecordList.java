@@ -11,13 +11,13 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 
-public class SignatureFilteredRecordList extends RecordList {
+public class SignatureFilteredRecordList<RecordType extends Record> extends RecordList<RecordType> {
 
-	GenericDatabase dataBase;
+	GenericDatabase<RecordType> dataBase;
 	private Collection<String> terms;
 	int limit;
 
-	public SignatureFilteredRecordList(GenericDatabase dataBase, Collection<String> terms) throws UserErrorException, IOException {
+	public SignatureFilteredRecordList(GenericDatabase<RecordType> dataBase, Collection<String> terms) throws UserErrorException, IOException {
 		this.dataBase = dataBase;
 		this.terms = terms;
 		limit = dataBase.getLastRecordId();

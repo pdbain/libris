@@ -39,7 +39,7 @@ public class DatabaseStressTests extends TestCase {
 				expectedRecords.add(rec);
 				if (0 == (i % 64)) {
 					db.save();
-					out.print('.');
+					Utilities.trace(".");
 				}
 			}
 			long endTime = System.currentTimeMillis();
@@ -49,7 +49,7 @@ public class DatabaseStressTests extends TestCase {
 				Record expected = expectedRecords.get(i);
 				assertEquals("recovered record does not match", expected, actual);
 				if (0 == (i % 64)) {
-					out.print('.');
+					Utilities.trace(".");
 				}
 			}
 		} catch (Exception e) {

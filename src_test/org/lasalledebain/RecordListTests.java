@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import org.junit.Before;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -45,7 +46,7 @@ public class RecordListTests extends TestCase {
 	public void testDatabaseRecordList () {
 		try {
 			testDb = Libris.buildAndOpenDatabase(Utilities.getTestDatabase(Utilities.TEST_DB1_XML_FILE));
-			RecordList list = testDb.getRecords();
+			RecordList<DatabaseRecord> list = testDb.getRecords();
 			int recordCount = 0;
 			for (Record r: list) {
 				String id = getRecordIdString(r);
@@ -65,7 +66,7 @@ public class RecordListTests extends TestCase {
 	public void testModifiedList () {
 		try {
 			testDb = Libris.buildAndOpenDatabase(Utilities.getTestDatabase(Utilities.TEST_DB1_XML_FILE));
-			RecordList list = testDb.getRecords();
+			RecordList<DatabaseRecord> list = testDb.getRecords();
 			ModifiedRecordList modList = new ModifiedRecordList();
 			ArrayList<Record> foundRecords = new ArrayList<Record>();
 
@@ -126,7 +127,7 @@ public class RecordListTests extends TestCase {
 			testDb.save();
 			testDb.getUi().quit(true);
 			testDb = myUi.openDatabase();
-			RecordList list = testDb.getRecords();
+			RecordList<DatabaseRecord> list = testDb.getRecords();
 			int recordCount = 0;
 			for (@SuppressWarnings("unused") Record r: list) {
 				recordCount++;

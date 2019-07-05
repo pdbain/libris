@@ -236,7 +236,7 @@ public class SortedKeyValueFileManagerTest extends TestCase {
 			enterTuples(tupleList);
 			String prefix = "";
 			char[] prefixChars = "a10234".toCharArray();
-			System.out.println("test prefix \""+prefix+"\"");
+			Utilities.trace("test prefix \""+prefix+"\"");
 			for (char c: prefixChars) {
 				ArrayList<KeyIntegerTuple> expectedTuples = new ArrayList<KeyIntegerTuple>();
 				for (KeyIntegerTuple t: tupleList) {

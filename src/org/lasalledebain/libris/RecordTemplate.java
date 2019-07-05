@@ -8,7 +8,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.index.GroupDefs;
 
 
-public class RecordTemplate {
+public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 	/**
 	 * Array of the field templates in the order listed in the schema
 	 */
@@ -90,12 +90,13 @@ public class RecordTemplate {
 		++numFields;
 	}
 
-	public Record makeRecord() {
+	public DatabaseRecord makeRecord() {
 		return new DatabaseRecord(this);
 	}
 
-	public Record makeRecord(boolean editable) throws FieldDataException {
-		Record rec = makeRecord();
+	@Override
+	public DatabaseRecord makeRecord(boolean editable) throws FieldDataException {
+		DatabaseRecord rec = makeRecord();
 		rec.setEditable(editable);
 		return rec;
 	}

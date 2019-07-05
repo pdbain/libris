@@ -6,6 +6,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -23,7 +24,7 @@ public class GroupManagerTests extends TestCase {
 
 	@Test
 	public void testGetRecord() {
-		GroupManager mgr = db.getGroupMgr();
+		GroupManager<DatabaseRecord> mgr = db.getGroupMgr();
 		try {
 			Record dbRec = db.getRecord(3);
 			Record gmRec = mgr.getRecord(3);

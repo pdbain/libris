@@ -6,7 +6,7 @@ import java.util.TreeMap;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.UserErrorException;
 
-public class ModifiedRecordList extends RecordList {
+public class ModifiedRecordList<RecordType extends Record> extends RecordList<RecordType> {
 
 	TreeMap<Integer, Record> modifiedRecords;
 	private static EmptyRecordList emptyList = new EmptyRecordList();

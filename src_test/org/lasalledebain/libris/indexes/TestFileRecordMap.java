@@ -184,10 +184,9 @@ public class TestFileRecordMap extends TestCase {
 			posn = index.getRecordPosition(id);
 			assertEquals("incorrect position returned for record "+id, expectedPosn, posn);
 			if ((i % (numEntries/64)) == 0) {
-				System.out.print("<");
+				Utilities.trace("<");
 			}
 		}
-		System.out.print('\n');
 	}
 
 	/**
@@ -207,7 +206,7 @@ public class TestFileRecordMap extends TestCase {
 				fail("unexpected exception: "+exc);
 			}
 			if ((i % (numEntries/64)) == 0) {
-				System.out.print(">");
+				Utilities.trace(">");
 			}
 		}
 		trace("\nindex populated");

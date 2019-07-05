@@ -5,10 +5,10 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValueStringList;
 
-public abstract class RecordImporter {
-	GenericDatabase db;
+public abstract class RecordImporter<RecordType extends Record> {
+	GenericDatabase<RecordType> db;
 
-	public RecordImporter(GenericDatabase db) {
+	public RecordImporter(GenericDatabase<RecordType> db) {
 		this.db = db;
 	}
 	

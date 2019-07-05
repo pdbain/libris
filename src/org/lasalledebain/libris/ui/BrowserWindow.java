@@ -17,6 +17,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -47,7 +48,7 @@ public class BrowserWindow extends JPanel {
 	private Iterator<Record> recordsIterator;
 	private ImageIcon searchIcon;
 
-	private RecordList recordsSource;
+	private RecordList<DatabaseRecord> recordsSource;
 
 	private RecordFilter filter;
 
@@ -150,9 +151,9 @@ public class BrowserWindow extends JPanel {
 		chooser.setModel(recList);
 	}			
 
-	public void doRefresh(RecordList src, RecordFilter filter) {
+	public void doRefresh(RecordList<DatabaseRecord> src, RecordFilter filter) {
 		setFilter(filter);
-		FilteredRecordList filteredList = new FilteredRecordList(src, filter);
+		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(src, filter);
 		recordsIterator = filteredList.iterator();
 		recList = getRecords();
 		chooser.setModel(recList);

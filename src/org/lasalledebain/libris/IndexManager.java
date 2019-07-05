@@ -90,7 +90,7 @@ public class IndexManager implements LibrisConstants {
 		return indexed;
 	}
 
-	public void buildIndexes(IndexConfiguration config, Records recs) throws LibrisException {
+	public void buildIndexes(IndexConfiguration config, Records<Record> recs) throws LibrisException {
 		int numGroups = database.getSchema().getNumGroups();
 		FileAccessManager childTempFiles[] = new FileAccessManager[numGroups];
 		FileAccessManager affiliateTempFiles[] = new FileAccessManager[numGroups];
@@ -292,9 +292,9 @@ public class IndexManager implements LibrisConstants {
 		return namedRecordIndex;
 	}
 
-	public LibrisRecordsFileManager getRecordsFileMgr() throws LibrisException {
+	public LibrisRecordsFileManager<DatabaseRecord> getRecordsFileMgr() throws LibrisException {
 		if (null == recordsFile) {
-			recordsFile = new LibrisRecordsFileManager(database, database.isReadOnly(), database.getSchema(), fileMgr);
+			recordsFile = new LibrisRecordsFileManager<DatabaseRecord>(database, database.isReadOnly(), database.getSchema(), fileMgr);
 		}
 		return recordsFile;
 	}

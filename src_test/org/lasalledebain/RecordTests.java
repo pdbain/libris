@@ -13,6 +13,7 @@ import junit.framework.TestCase;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.Field.FieldType;
@@ -34,7 +35,7 @@ public class RecordTests extends TestCase {
 		try {
 			MockSchema dbSchema = new MockSchema();
 			dbSchema.addField(booleanTemplate);
-			RecordTemplate rt = RecordTemplate.templateFactory(dbSchema, null);
+			RecordFactory rt = RecordTemplate.templateFactory(dbSchema, null);
 			Record ri = rt.makeRecord(false);
 			Field f = ri.getField(FIELDNAME);
 			assertNull("non-default field not null", f);
@@ -53,7 +54,7 @@ public class RecordTests extends TestCase {
 			String fieldNames[] = {"bool", "int", "string"};
 			FieldType fts[] = {FieldType.T_FIELD_BOOLEAN, FieldType.T_FIELD_INTEGER, FieldType.T_FIELD_STRING};
 
-			RecordTemplate rt = Utilities.makeRecordTemplate(fieldNames, fts);
+			RecordFactory rt = Utilities.makeRecordTemplate(fieldNames, fts);
 			Record r1 = rt.makeRecord(false);
 			Record r2 = rt.makeRecord(false);
 			String r1Data[] = {"true", "1", "foo"};
@@ -87,7 +88,7 @@ public class RecordTests extends TestCase {
 			String fieldNames[] = {"bool", "int", "string"};
 			FieldType fts[] = {FieldType.T_FIELD_BOOLEAN, FieldType.T_FIELD_INTEGER, FieldType.T_FIELD_STRING};
 
-			RecordTemplate rt = Utilities.makeRecordTemplate(fieldNames, fts);
+			RecordFactory rt = Utilities.makeRecordTemplate(fieldNames, fts);
 			Record r1 = rt.makeRecord(true);
 			boolean excThrown = false;
 			String r1Data[] = {"1", "foo", "true"};
@@ -363,7 +364,7 @@ public class RecordTests extends TestCase {
 			String fieldNames[] = {"s1", "s2", "s3"};
 			FieldType fts[] = {FieldType.T_FIELD_STRING, FieldType.T_FIELD_STRING, FieldType.T_FIELD_STRING};
 
-			RecordTemplate rt = Utilities.makeRecordTemplate(fieldNames, fts);
+			RecordFactory rt = Utilities.makeRecordTemplate(fieldNames, fts);
 			Record rec = rt.makeRecord(true);
 			String recData[] = {"The quick brown fox", "jumps over", "the lazy dog"};
 			rec.setAllFields(recData);
@@ -393,7 +394,7 @@ public class RecordTests extends TestCase {
 			String fieldNames[] = {"s1", "s2", "s3"};
 			FieldType fts[] = {FieldType.T_FIELD_STRING, FieldType.T_FIELD_STRING, FieldType.T_FIELD_STRING};
 
-			RecordTemplate rt = Utilities.makeRecordTemplate(fieldNames, fts);
+			RecordFactory rt = Utilities.makeRecordTemplate(fieldNames, fts);
 			Record rec = rt.makeRecord(true);
 			String recData[] = {"The quick brown fox", "jumps over", "the lazy dog"};
 			rec.setAllFields(recData);

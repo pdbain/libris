@@ -391,7 +391,7 @@ public class TestRecordFilter extends TestCase {
 		checkReturnedRecords(filteredList, recordSet);
 	}
 
-	private void checkReturnedRecords(FilteredRecordList filteredList, Collection<Integer> expectedIdCollection) {
+	private void checkReturnedRecords(FilteredRecordList<Record> filteredList, Collection<Integer> expectedIdCollection) {
 		//Iterator<Integer> expectedIds = expectedIdCollection.iterator();
 		Iterator<Integer> expectedIds = expectedIdCollection.stream().sorted().iterator();
 		// int recordCount = 0;

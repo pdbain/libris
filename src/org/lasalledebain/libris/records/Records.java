@@ -14,7 +14,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 
-public class Records implements Iterable<Record>{
+public class Records<RecordType extends Record> implements Iterable<Record>{
 
 	private LibrisRecordsFileManager recMgr;
 	LibrisDatabase db;
@@ -32,7 +32,7 @@ public class Records implements Iterable<Record>{
 		throw new DatabaseException("not implemented");
 	}
 
-	public void putRecords(RecordList modifiedRecords) throws InputException, DatabaseException {
+	public void putRecords(RecordList<Record> modifiedRecords) throws InputException, DatabaseException {
 		for (Record r: modifiedRecords) {
 			recMgr.putRecord(r);
 		}

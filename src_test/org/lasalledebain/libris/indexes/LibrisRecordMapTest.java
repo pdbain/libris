@@ -7,6 +7,7 @@ import java.util.HashSet;
 import junit.framework.TestCase;
 
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -25,9 +26,9 @@ public class LibrisRecordMapTest extends TestCase {
 			
 			assertTrue("Could not close database", myUi.closeDatabase(false));
 			db = myUi.openDatabase();
-			Records recs = db.getDatabaseRecords();	
+			Records<DatabaseRecord> recs = db.getDatabaseRecords();	
 			int numRecs = 0;
-			for (Record r: recs) {
+			for (@SuppressWarnings("unused") Record r: recs) {
 				++numRecs;
 			}
 			assertEquals("number of records", 4, numRecs);

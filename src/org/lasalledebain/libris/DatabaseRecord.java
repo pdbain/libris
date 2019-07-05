@@ -23,16 +23,15 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
+import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 
 	Field[] recordData;
 	GroupMember affiliations[];
-	boolean editable = false;
 	private RecordTemplate template;
 	private long dataLength = -1;
-	private LibrisAttributes attributes;
-	
 	private static final GroupMember[] dummyAffiliations = new GroupMember[0];
+	private int artifactId;
 
 	public DatabaseRecord(RecordTemplate recordTemplate) {
 		super();
@@ -43,8 +42,22 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		for (int i = 0; i < recordData.length; ++i) {
 			recordData[i] = null;
 		}
+		artifactId = RecordId.NULL_RECORD_ID;
 	}
 	
+	/**
+	 * @return id of the related file in the artifact database
+	 */
+	public int getArtifactId() {
+		return artifactId;
+	}
+	/**
+	 * @param artifactId id of the related file in the artifact database
+	 */
+	public void setArtifactId(int artifactId) {
+		this.artifactId = artifactId;
+	}
+
 	@Override
 	public void setAllFields(String[] fieldData) throws InputException {
 		int i = 0;
@@ -396,10 +409,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		return buff.toString();
 	}
 	
-	public int getRecordId() {
-		return id;
-	}
-	
 	@Override
 	public void setName(String newName) throws InputException {
 		if ((null != newName) && newName.isEmpty()) {
@@ -413,19 +422,8 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	}
 
 	@Override
-	public void setEditable(boolean newValue) {
-		editable = newValue;
-	}
-	public boolean isEditable() {
-		return editable;
-	}
-	@Override
 	public boolean valuesEqual(Record comparand) {
-		try {
-			if (!getAttributes().equals(comparand.getAttributes())) {
-				return false;
-			}
-		} catch (LibrisException e) {
+		if (!getAttributes().equals(comparand.getAttributes())) {
 			return false;
 		}
 		for (Field f: recordData) {
@@ -447,7 +445,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		final int MAX_WORD_LENGTH = 8;
 		final char ELLIPSIS_CHAR = '\u2026';
 		final String ELLIPSIS_STRING = "\u2026";
-		String idString = (NULL_ID == id)? "<unknown>": RecordId.toString(id);
+		String idString = (NULL_RECORD_ID == id)? "<unknown>": RecordId.toString(id);
 		buff.append(idString);
 		buff.append("]: ");
 		if (null != name) {
@@ -601,13 +599,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		int result = Integer.signum(id - comparand.getRecordId());
 		return result;
 	}
-	@Override
-	public LibrisAttributes getAttributes() {
-		if (null == attributes) {
-			attributes = new LibrisAttributes();
-		}
-		return attributes;
-	}
+	
 	
 	/* Group management */
 	
@@ -658,8 +650,8 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 
 	@Override
 	public void addAffiliate(int groupNum, int affiliate) throws FieldDataException {
-		if (NULL_ID == getParent(groupNum)) {
-			setParent(groupNum, NULL_ID);
+		if (NULL_RECORD_ID == getParent(groupNum)) {
+			setParent(groupNum, NULL_RECORD_ID);
 		}
 		addGroupMember(groupNum, affiliate, false);
 	}
@@ -676,9 +668,9 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	@Override
 	public int getParent(int groupNum) {
 		if (groupNum < 0) {
-			return NULL_ID;
+			return NULL_RECORD_ID;
 		} else if ((null == affiliations) || (null == affiliations[groupNum])) {
-			return NULL_ID;
+			return NULL_RECORD_ID;
 		} else {
 			return affiliations[groupNum].getParent();
 		}
@@ -706,11 +698,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 			GroupDefs grpDefs = template.getGroupDefs();
 			affiliations[groupNum] = new GroupMember(grpDefs, grpDefs.getGroupDef(groupNum));
 		}
-	}
-
-	@Override
-	public void setRecordId(int recId) {
-		id = recId;
 	}
 
 	@Override
@@ -748,8 +735,4 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		affiliations[groupNum] = newMember;
 	}
 
-	@Override
-	public String getElementTag() {
-		return getXmlTag();
-	}
 }

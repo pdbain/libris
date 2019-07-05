@@ -20,6 +20,7 @@ import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -42,7 +43,7 @@ public class DatabaseTests extends TestCase {
 		try {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE);
 			rootDb =  Libris.buildAndOpenDatabase(testDatabaseFile);
-			RecordTemplate rt = RecordTemplate.templateFactory(rootDb.getSchema(), null);
+			RecordFactory rt = RecordTemplate.templateFactory(rootDb.getSchema(), null);
 			Vector<Record> recordList = new Vector<Record>();
 			ElementManager librisMgr = Utilities.makeElementManagerFromFile(testDatabaseFile, "libris");
 			librisMgr.parseOpenTag();

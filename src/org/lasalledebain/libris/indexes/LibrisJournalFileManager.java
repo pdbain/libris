@@ -2,8 +2,6 @@ package org.lasalledebain.libris.indexes;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,38 +11,35 @@ import javax.xml.stream.XMLStreamException;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.records.RecordsWriter;
-import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
-import org.lasalledebain.libris.xmlUtils.XmlShapes;
-import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
-public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter, LibrisXMLConstants {
+public class LibrisJournalFileManager<RecordType extends Record> implements Iterable<RecordType>, RecordsWriter, LibrisXMLConstants {
 	HashMap<Integer, RecordIdAndLength> journalIndex;
-
-	public static LibrisJournalFileManager createLibrisJournalFileManager(
-			GenericDatabase database, FileAccessManager journalFileMr) throws LibrisException {
-		return new LibrisJournalFileManager(database, journalFileMr);
-	}
-
-	private GenericDatabase database;
+	private GenericDatabase<RecordType> database;
 	private FileAccessManager journalFileMgr;
 	private RandomAccessFile journalFile;
 	private ByteArrayOutputStream xmlBuffer;
 	private ElementWriter xmlWriter;
 	private LibrisAttributes databaseProperties;
+	private RecordFactory<RecordType> myRecordFactory;
 
-	private LibrisJournalFileManager(GenericDatabase database, FileAccessManager journalFileMr) throws LibrisException  {
+	public static LibrisJournalFileManager createLibrisJournalFileManager(GenericDatabase database, FileAccessManager journalFileMr,
+			RecordFactory recordFact) throws LibrisException {
+		return new LibrisJournalFileManager(database, journalFileMr, recordFact);
+	}
+
+	private LibrisJournalFileManager(GenericDatabase<RecordType> database, FileAccessManager journalFileMr, RecordFactory<RecordType> recFact) throws LibrisException  {
 		this.database = database;
+		myRecordFactory = recFact;
 		databaseProperties = database.getAttributes();
 		journalIndex = new HashMap<Integer, RecordIdAndLength>();
 		try {
@@ -190,10 +185,10 @@ public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
-		JournalFileRecordIterator iter;
+	public Iterator<RecordType> iterator() {
+		JournalFileRecordIterator<RecordType> iter;
 		try {
-			iter = new JournalFileRecordIterator();
+			iter = new JournalFileRecordIterator<RecordType>(journalFileMgr, myRecordFactory);
 		} catch (Exception e) {
 			database.alert("Error constructing iterator", e);
 			return null;
@@ -211,57 +206,5 @@ public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter
 
 	public String getTitle() {
 		return null;
-	}
-
-	private class JournalFileRecordIterator implements Iterator<Record> {
-
-		private ElementManager dbMgr, recsMgr;
-		RecordTemplate recTemplate;
-		private InputStream ipStream;
-
-		public JournalFileRecordIterator() throws InputException, DatabaseException {
-			LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
-			try {
-				ipStream = journalFileMgr.getIpStream();
-				dbMgr = xmlFactory.makeLibrisElementManager(new InputStreamReader(ipStream), 
-						journalFileMgr.getPath(), XML_LIBRIS_TAG, new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
-				dbMgr.parseOpenTag(); /* database */
-				recsMgr = dbMgr.nextElement();
-				recsMgr.parseOpenTag();
-				recTemplate = RecordTemplate.templateFactory(database.getSchema(), null);
-			} catch (IOException e) {
-				throw new InputException("exception opening journal file", e);
-			}
-		}
-
-		@Override
-		public boolean hasNext() {
-			boolean tempHasNext = recsMgr.hasNext();
-			if (!tempHasNext) {
-				try {
-					journalFileMgr.releaseIpStream(ipStream);
-				} catch (IOException e) {}
-			}
-			return tempHasNext;
-		}
-
-		@Override
-		public Record next() {
-			try {
-				ElementManager recMgr = recsMgr.nextElement();
-				Record rec = recTemplate.makeRecord(true);
-				rec.fromXml(recMgr);
-				return rec;
-			} catch (LibrisException e) {
-				database.alert("exception in journal iterator", e);
-				return null;
-			}
-		}
-
-		@Override
-		public void remove() {
-			return;
-		}
-
 	}
 }

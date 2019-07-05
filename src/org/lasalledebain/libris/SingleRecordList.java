@@ -2,7 +2,7 @@ package org.lasalledebain.libris;
 
 import java.util.Iterator;
 
-public class SingleRecordList extends RecordList implements Iterator<Record>, Iterable<Record> {
+public class SingleRecordList<RecordType extends Record> extends RecordList<RecordType> implements Iterator<Record> {
 	Record rec;
 	int position;
 	public SingleRecordList(Record rec) {

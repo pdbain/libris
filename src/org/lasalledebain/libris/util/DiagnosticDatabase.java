@@ -19,7 +19,7 @@ public class DiagnosticDatabase extends LibrisDatabase {
 		attrs.put(XML_DATABASE_NAME_ATTR, "unknown");
 		attrs.put(XML_DATABASE_SCHEMA_NAME_ATTR, "unknown");
 		attrs.put(XML_SCHEMA_VERSION_ATTR, "unknown");
-		xmlAttributes = new DatabaseAttributes(this, attrs);
+		xmlAttributes = new DatabaseAttributes(attrs);
 	}
 
 	/* (non-Javadoc)

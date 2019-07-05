@@ -6,8 +6,8 @@ import java.util.Vector;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-class DatabaseRecordList extends RecordList {
-	Vector <Record> recordList;
+class DatabaseRecordList extends RecordList<DatabaseRecord> {
+	Vector <DatabaseRecord> recordList;
 	private LibrisDatabase database;
 	public DatabaseRecordList(LibrisDatabase db) {
 		database = db;

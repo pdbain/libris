@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamReader;
 import junit.framework.TestCase;
 
 import org.lasalledebain.libris.EnumFieldChoices;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
 
@@ -33,10 +34,7 @@ public class SchemaTests extends TestCase{
 			int line = loc.getLineNumber();
 			@SuppressWarnings("unused")
 			int co = loc.getCharacterOffset();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			fail("Unexpected exception");
-		} catch (XMLStreamException e) {
+		} catch (FileNotFoundException | XMLStreamException e) {
 			e.printStackTrace();
 			fail("Unexpected exception");
 		}
@@ -62,11 +60,10 @@ public class SchemaTests extends TestCase{
 			EnumFieldChoices efc = s.getEnumSet(ENUM_NUMBER_STRINGS);
 			assertNotNull(ENUM_NUMBER_STRINGS+" not found in schema", efc);
 			String[] choices = efc.getChoices();
-			System.out.print(ENUM_NUMBER_STRINGS+" elements: ");
+			Utilities.trace(ENUM_NUMBER_STRINGS+" elements: ");
 			for (String c: choices) {
-				System.out.print("\""+c+"\", ");
+				Utilities.trace("\""+c+"\", ");
 			}
-			System.out.print('\n');
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
@@ -80,7 +77,7 @@ public class SchemaTests extends TestCase{
 		boolean exceptionThrown = false;
 		try {
 			Schema s = Utilities.loadSchema(inputFile);
-			RecordTemplate rt = RecordTemplate.templateFactory(s);
+			RecordFactory rt = RecordTemplate.templateFactory(s);
 		} catch (Exception e) {
 			assertTrue(e.getMessage().contains("line 4 element \"fielddef\" : fielddef missing attribute: id"));
 			exceptionThrown = true;

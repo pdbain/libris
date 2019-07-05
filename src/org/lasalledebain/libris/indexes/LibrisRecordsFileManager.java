@@ -31,7 +31,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.util.Reporter;
 
-public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstants {
+public class LibrisRecordsFileManager<RecordType extends Record> implements Iterable<Record>, LibrisConstants {
 
 	private static final long MINIMUM_RECORDS_FILE_LENGTH = 2*RecordHeader.getHeaderLength(); /* head & tail, record and free */
 // TODO test oversize records
@@ -47,8 +47,11 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 	 * 	1 byte flags
 	 * 		bit 0: isGroupMember: set if there is parent/affiliate data
 	 * 		bit 1: hasName: set if the record has a name
+	 * 		bit 2: hasArtifact
 	 * 	if record has name
 	 * 		name
+	 *  if hasArtifact
+	 *  	artifact ID (4 bytes)
 	 *  if record has groups
 	 * 		Group data:
 	 * 		for each group:
@@ -335,6 +338,10 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 							throw new DatabaseException("Invalid data in "+getRecordIdString(recData)+" field "+fieldNum);
 							}
 						break;
+					case T_FIELD_AFFILIATES:
+					case T_FIELD_UNKNOWN:
+					default:
+						throw new DatabaseException("Invalid field "+fieldNum);
 					}
 				}
 			} catch (IOException e) {
@@ -478,6 +485,7 @@ public void removeRecord(int rid) throws DatabaseException {
 						r.addFieldValue(fieldNum, fieldValue);
 					}
 					break;
+					case T_FIELD_LOCATION:
 					case T_FIELD_PAIR: {
 						long offset = indexStream.readInt() + valueBase;
 						indexCursor += 4;
@@ -486,6 +494,11 @@ public void removeRecord(int rid) throws DatabaseException {
 							String extraValue = recordsFileStore.readUTF();
 							r.addFieldValue(fieldNum, fieldValue, extraValue);
 					}
+					break;
+					case T_FIELD_AFFILIATES:
+					case T_FIELD_UNKNOWN:
+					default:
+						throw new DatabaseException("Invalid field "+fieldNum+" field type = "+ft.toString());
 					}
 				}
 			} catch (FieldDataException e) {

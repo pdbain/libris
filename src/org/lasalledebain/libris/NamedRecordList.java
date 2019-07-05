@@ -7,7 +7,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 
-public class NamedRecordList extends RecordList implements RecordIdNameMapper {
+public class NamedRecordList<RecordType extends Record> extends RecordList<RecordType> implements RecordIdNameMapper {
 
 	SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
 	private LibrisDatabase database;

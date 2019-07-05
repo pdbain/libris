@@ -10,15 +10,15 @@ import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.LibrisUi;
 
-public abstract class GenericDatabase implements XMLElement {
-	protected GroupManager groupMgr;
+public abstract class GenericDatabase<RecordType extends Record> implements XMLElement {
+	protected GroupManager<RecordType> groupMgr;
 	protected LibrisFileManager fileMgr;
 	protected IndexManager indexMgr;
 	protected Repository documentRepository;
 	protected final LibrisUi ui;
 	protected ModifiedRecordList modifiedRecords;
-	protected LibrisJournalFileManager journalFile;
-	protected Records databaseRecords;
+	protected LibrisJournalFileManager<RecordType> journalFile;
+	protected Records<RecordType> databaseRecords;
 	protected LibrisMetadata metadata;
 	protected boolean readOnly;
 
@@ -34,18 +34,13 @@ public abstract class GenericDatabase implements XMLElement {
 		return fileMgr;
 	}
 
-	public LibrisJournalFileManager getJournalFileMgr() throws LibrisException {
-		if (null == journalFile) {
-			journalFile = LibrisJournalFileManager.createLibrisJournalFileManager(this, fileMgr.getJournalFileMgr());
-		}
-		return journalFile;
-	}
-
+	public abstract LibrisJournalFileManager<RecordType> getJournalFileMgr() throws LibrisException;
+	
 	public int getLastRecordId() {
 		return metadata.getLastRecordId();
 	}
 
-	public LibrisRecordsFileManager getRecordsFileMgr() throws LibrisException {
+	public LibrisRecordsFileManager<DatabaseRecord> getRecordsFileMgr() throws LibrisException {
 		return indexMgr.getRecordsFileMgr();
 	}
 
@@ -57,7 +52,7 @@ public abstract class GenericDatabase implements XMLElement {
 		return readOnly;
 	}
 
-	public abstract  Record newRecord() throws InputException;
+	public abstract  RecordType newRecord() throws InputException;
 
 	/**
 	 * Get the record.  If the record has been modified but not written to the database file, use that.

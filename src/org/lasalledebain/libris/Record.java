@@ -12,21 +12,23 @@ import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 
 public abstract class Record implements Comparable<Record>, XMLElement {
 	protected int id;
 	protected String name;
 	static final String elementTag = XML_RECORD_TAG;
-	protected static final int NULL_ID = RecordId.getNullId();
 	public static String getXmlTag() {
 		return elementTag;
 	}
 	private int artifactId;
 // TODO 1 save artifactId in native file
+	protected LibrisAttributes attributes;
+	boolean editable = false;
 	
 	public Record() {
-		artifactId = NULL_ID;
+		artifactId = RecordId.NULL_RECORD_ID;
 	}
 	/**
 	 * @return id of the related file in the artifact database
@@ -51,8 +53,19 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public static boolean validateRecordName(String name) {
 		return name.matches("^\\p{Alpha}[\\p{Alpha}\\p{Digit}_]*");
 	}
-	public abstract void setRecordId(int recId);
-	public abstract int getRecordId();
+
+	public void setRecordId(int recId) {
+		id = recId;
+	}
+
+	public int getRecordId() {
+		return id;
+	}
+	
+	@Override
+	public String getElementTag() {
+		return getXmlTag();
+	}
 	
 	/**
 	 * @return name of record, or null if no name
@@ -62,8 +75,6 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	}
 
 	public abstract void setName(String name) throws InputException;
-	public abstract void setEditable(boolean newValue);
-	public abstract boolean isEditable();
 	/**
 	 * TODO Add idAdjustment to the recordId.  Also add idAdjustment to all references to other records
 	 * greater than baseId.
@@ -132,6 +143,21 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 		return false;
 	}
 	public abstract String generateTitle();
+
+	public LibrisAttributes getAttributes() {
+		if (null == attributes) {
+			attributes = new LibrisAttributes();
+		}
+		return attributes;
+	}
+
+	public void setEditable(boolean newValue) {
+		editable = newValue;
+	}
+	
+	public boolean isEditable() {
+		return editable;
+	}
 	
 	// TODO abbreviate title
 	

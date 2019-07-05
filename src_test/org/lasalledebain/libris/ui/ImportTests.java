@@ -40,7 +40,7 @@ public class ImportTests extends TestCase {
 			Record[] recList = LibrisDatabase.importDelimitedTextFile(db, importData, null, ',');
 			db.save();
 			for (Record rec: recList) {
-				System.out.print(rec.toString());
+				Utilities.trace(rec.toString());
 			}
 			db.getUi().quit(true);
 		} catch (DatabaseException e) {

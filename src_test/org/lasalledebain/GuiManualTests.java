@@ -21,8 +21,10 @@ import javax.xml.stream.XMLStreamException;
 
 import junit.framework.TestCase;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -212,10 +214,10 @@ public class GuiManualTests extends TestCase {
 
 	public void testRecordWindowSanity() {
 		loadSchema();
-		RecordTemplate template = null;
+		RecordFactory<DatabaseRecord> template = null;
 		try {
 			template = RecordTemplate.templateFactory(mySchema);
-			Record rec = template.makeRecord(true);
+			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
 				myGuiLayout = (Layout) myLayouts.getLayout(LAYOUT1);
@@ -240,10 +242,10 @@ public class GuiManualTests extends TestCase {
 
 	public void testMultipleFieldValues() {
 		loadSchema();
-		RecordTemplate template = null;
+		RecordFactory<DatabaseRecord> template = null;
 		try {
 			template = RecordTemplate.templateFactory(mySchema);
-			Record rec = template.makeRecord(true);
+			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
 				myGuiLayout = (Layout) myLayouts.getLayout(LAYOUT1);

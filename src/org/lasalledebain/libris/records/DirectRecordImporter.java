@@ -6,9 +6,9 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.field.FieldValueStringList;
 
-public class DirectRecordImporter extends RecordImporter {
+public class DirectRecordImporter<RecordType extends Record> extends RecordImporter<RecordType> {
 
-	public DirectRecordImporter(GenericDatabase db) {
+	public DirectRecordImporter(GenericDatabase<RecordType> db) {
 		super(db);
 	}
 

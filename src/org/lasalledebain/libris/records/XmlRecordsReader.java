@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import javax.xml.stream.FactoryConfigurationError;
 
 import org.lasalledebain.libris.DatabaseInstance;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
@@ -36,7 +37,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
  * Read records from an XML file.
  *
  */
-public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,LibrisXMLConstants {
+public class XmlRecordsReader<RecordType extends Record> implements Iterable<Record>, Iterator<Record>,LibrisXMLConstants {
 	ElementManager recsMgr;
 	private GenericDatabase database;
 
@@ -123,7 +124,7 @@ public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,Libr
 				nextElement = librisMgr.getNextId();	
 			}
 			ElementManager recordsMgr = librisMgr.nextElement();
-			XmlRecordsReader recordsRdr = new XmlRecordsReader(database, recordsMgr);
+			XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader(database, recordsMgr);
 			int lastId = 0;
 			metadata.setSavedRecords(0);
 			LibrisFileManager fileMgr = database.getFileMgr();
@@ -182,7 +183,7 @@ public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,Libr
 			int idOffset = lastMasterId - instanceInfo.getRecordIdBase();
 			assertTrue("Increment starting record ID invalid", idOffset >= 0);
 			ElementManager recordsMgr = librisMgr.nextElement();
-			XmlRecordsReader recordsRdr = new XmlRecordsReader(database, recordsMgr);
+			XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader(database, recordsMgr);
 			int numGroups = database.getSchema().getNumGroups();
 			for (Record r: recordsRdr) {
 				if (null == r) {
