@@ -23,7 +23,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class RecordInstance extends Record implements  LibrisXMLConstants {
+public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 
 	Field[] recordData;
 	GroupMember affiliations[];
@@ -34,7 +34,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	
 	private static final GroupMember[] dummyAffiliations = new GroupMember[0];
 
-	public RecordInstance(RecordTemplate recordTemplate) {
+	public DatabaseRecord(RecordTemplate recordTemplate) {
 		super();
 		template = recordTemplate;
 		name = null;
@@ -577,7 +577,7 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	
 	@Override
 	public Record duplicate() throws DatabaseException, FieldDataException  {
-		Record otherRec = new RecordInstance(template);
+		Record otherRec = new DatabaseRecord(template);
 		otherRec.setEditable(true);
 		for (int i = 0; i < recordData.length; ++i) {
 			Field fld = recordData[i];

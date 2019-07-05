@@ -28,7 +28,7 @@ public class SortedKeyValueFileManagerTest extends TestCase {
 	
 	@Before
 	public void setUp() {
-		System.out.println("Starting "+getName());
+		Utilities.trace("Starting "+getName());
 		int indexLevels = 1;
 		fileList = new ArrayList<FileAccessManager>(3);
 		if (multiLevelTests.contains(getName())) {
@@ -39,7 +39,7 @@ public class SortedKeyValueFileManagerTest extends TestCase {
 			fail("could not create working directory ");
 		}
 		FileAccessManager dataManager = new FileAccessManager(workDir, "data");
-		System.out.println(dataManager.getPath());
+		Utilities.trace(dataManager.getPath());
 		fileList.add(dataManager);
 		for (int i = 1; i <= indexLevels; ++i) {
 			FileAccessManager indexManager = new FileAccessManager(workDir, "index_"+i);

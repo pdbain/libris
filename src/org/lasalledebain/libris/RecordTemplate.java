@@ -91,7 +91,7 @@ public class RecordTemplate {
 	}
 
 	public Record makeRecord() {
-		return new RecordInstance(this);
+		return new DatabaseRecord(this);
 	}
 
 	public Record makeRecord(boolean editable) throws FieldDataException {

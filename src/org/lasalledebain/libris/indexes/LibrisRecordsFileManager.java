@@ -19,7 +19,7 @@ import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.ModifiedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
-import org.lasalledebain.libris.RecordInstance;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -396,7 +396,7 @@ public void removeRecord(int rid) throws DatabaseException {
 	private Record readRecord(long recordPosition) throws InputException, DatabaseException {
 		try {
 			int recId = recordsFileStore.readInt();
-			RecordInstance r = new RecordInstance(database.getMainRecordTemplate());
+			DatabaseRecord r = new DatabaseRecord(database.getMainRecordTemplate());
 			r.setRecordId(recId);
 
 			byte flags = recordsFileStore.readByte();
