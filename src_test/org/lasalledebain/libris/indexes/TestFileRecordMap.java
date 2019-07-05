@@ -10,6 +10,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 
 import junit.framework.TestCase;
 
+import static org.lasalledebain.Utilities.trace;
 
 public class TestFileRecordMap extends TestCase {
 	File workingDirectory;
@@ -81,7 +82,7 @@ public class TestFileRecordMap extends TestCase {
 			index = new FileRecordMap(indexFileMgr, true);
 			index.putRecordPosition(69,31415926535L);
 		} catch (DatabaseException exc) {
-			System.out.println("caught expected exception: "+exc.getMessage());
+			trace("caught expected exception: "+exc.getMessage());
 			try {
 				index.close();
 			} catch (DatabaseException e) {
@@ -112,7 +113,7 @@ public class TestFileRecordMap extends TestCase {
 				try {
 					index.putRecordPosition(id, posn);
 					if ((iteration % 1000) == 0) {
-						System.out.println("id="+id+" position="+posn);
+						trace("id="+id+" position="+posn);
 					}
 					if (iteration > 1000) {
 						assertEquals(6, index.getRecordPosition(1789429131));
@@ -209,7 +210,7 @@ public class TestFileRecordMap extends TestCase {
 				System.out.print(">");
 			}
 		}
-		System.out.println("\nindex populated");
+		trace("\nindex populated");
 		index.flush();
 	}
 

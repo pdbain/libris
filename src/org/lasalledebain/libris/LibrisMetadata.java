@@ -26,7 +26,6 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, 
 	private int modifiedRecords;
 	private DatabaseInstance instanceInfo;
 	private Date databaseDate;
-	private boolean hasRepo;
 	/**
 	 * Dynamic attributes of the database
 	 */
@@ -118,14 +117,6 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, 
 
 	public static Date getCurrentDate() {
 		return new Date();
-	}
-
-	public boolean hasRepository() {
-		return hasRepo;
-	}
-
-	public void hasRepository(boolean hasRepo) {
-		this.hasRepo = hasRepo;
 	}
 
 	public static String formatDateAndTime(Date theDate) {
@@ -231,7 +222,8 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, 
 			return false;
 		} else {
 			LibrisMetadata otherMetadat = (LibrisMetadata) comparand;
-			return uiLayouts.equals(otherMetadat.uiLayouts);
+			return (lastRecordId == otherMetadat.lastRecordId)
+					&& (signatureLevels == otherMetadat.signatureLevels);
 		}
 	}
 

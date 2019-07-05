@@ -1,14 +1,14 @@
 package org.lasalledebain.libris.records;
 
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValueStringList;
 
 public abstract class RecordImporter {
-	LibrisDatabase db;
+	GenericDatabase db;
 
-	public RecordImporter(LibrisDatabase db) {
+	public RecordImporter(GenericDatabase db) {
 		this.db = db;
 	}
 	

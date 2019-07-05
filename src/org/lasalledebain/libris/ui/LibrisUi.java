@@ -2,6 +2,7 @@ package org.lasalledebain.libris.ui;
 
 import java.io.File;
 
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
@@ -24,7 +25,7 @@ public interface LibrisUi {
 	public boolean isDatabaseSelected();
 	public boolean isDatabaseOpen();
 	public boolean isDatabaseReadOnly();
-	public LibrisDatabase getDatabase();
+	public GenericDatabase getDatabase();
 	void setDatabaseFile(File dbFile);
 	public abstract String SelectSchemaFile(String schemaName) throws DatabaseException;
 	public void setTitle(String title);

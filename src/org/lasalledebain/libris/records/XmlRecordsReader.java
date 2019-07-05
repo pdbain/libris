@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.records;
 
+import static org.lasalledebain.libris.exception.DatabaseError.assertTrue;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -13,6 +15,7 @@ import javax.xml.stream.FactoryConfigurationError;
 
 import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
@@ -27,8 +30,7 @@ import org.lasalledebain.libris.indexes.RecordPositions;
 import org.lasalledebain.libris.ui.Messages;
 import org.lasalledebain.libris.util.Reporter;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-import static org.lasalledebain.libris.exception.DatabaseError.assertTrue; 
+import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants; 
 
 /**
  * Read records from an XML file.
@@ -36,14 +38,14 @@ import static org.lasalledebain.libris.exception.DatabaseError.assertTrue;
  */
 public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,LibrisXMLConstants {
 	ElementManager recsMgr;
-	private LibrisDatabase database;
+	private GenericDatabase database;
 
 	/**
 	 * @param database database object
 	 * @param recsMgr XML element manager for <record> element 
 	 * @throws DatabaseException 
 	 */
-	public XmlRecordsReader(LibrisDatabase database, ElementManager recsMgr) throws DatabaseException {
+	public XmlRecordsReader(GenericDatabase database, ElementManager recsMgr) throws DatabaseException {
 		this.database = database;
 		this.recsMgr = recsMgr;
 		// recsMgr.parseOpenTag();

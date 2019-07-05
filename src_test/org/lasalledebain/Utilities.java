@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamException;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -383,6 +384,10 @@ public class Utilities extends TestCase {
 		testLogger.setLevel(Boolean.getBoolean("org.lasalledebain.test.verbose")? Level.ALL: Level.WARNING);
 	}
 	
+	public static void trace(String msg) {
+		testLogger.fine(msg);
+	}
+	
 	public static void info(String msg) {
 		testLogger.info(msg);
 	}
@@ -461,7 +466,7 @@ public class Utilities extends TestCase {
 	public static final String LIBRIS_TEST_LOGGER = "org.lasalledebain.LibrisTest";
 	public static Level defaultLoggingLevel = Level.WARNING;
 
-	public static void checkRecords(LibrisDatabase database, int lastId) {
+	public static void checkRecords(GenericDatabase database, int lastId) {
 		for (int i = 1; i <= lastId; ++i) {
 			try {
 				Record r = database.getRecord(i);

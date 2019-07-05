@@ -44,7 +44,7 @@ public interface LibrisConstants {
 	String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
 	String REPO_DB = "repo_db";
 	public static final String SCHEMA_NAME = "SCHEMA";
-	public static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
+	public static final String AUX_DIRECTORY_NAME = ".libris_db_files";
 	public static final String POSITION_FILENAME = "positions";
 	public static final String PROPERTIES_FILENAME = "properties";
 	public static final String RECORDS_FILENAME = "records";

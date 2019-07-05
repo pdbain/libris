@@ -28,6 +28,6 @@ public class DiagnosticDatabase extends LibrisDatabase {
 	@Override
 	public void fromXml(ElementManager librisMgr) throws LibrisException {
 		super.fromXml(librisMgr);
-		metadata.setLastRecordId(1);
+		databaseMetadata.setLastRecordId(1);
 	}
 }

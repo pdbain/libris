@@ -20,6 +20,7 @@ import java.util.TreeSet;
 import org.junit.After;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.FilteredRecordList;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.InputException;
@@ -33,7 +34,6 @@ import org.lasalledebain.libris.util.DeterministicFieldGenerator;
 import org.lasalledebain.libris.util.FieldGenerator;
 import org.lasalledebain.libris.util.Lorem;
 import org.lasalledebain.libris.util.RandomFieldGenerator;
-import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import junit.framework.AssertionFailedError;
@@ -407,7 +407,7 @@ public class TestRecordFilter extends TestCase {
 		// assertTrue("too few records found", recordCount == expectedIdCollection.size());
 	}
 	
-	 Record makeRecord (LibrisDatabase database, FieldGenerator[] fieldGenerators, int fieldNums[], HashSet<String> keyWords) throws InputException {
+	 Record makeRecord (GenericDatabase database, FieldGenerator[] fieldGenerators, int fieldNums[], HashSet<String> keyWords) throws InputException {
 		Record rec = database.newRecord();
 		keyWords.clear();
 		for (int i = 0; i < fieldNums.length; ++i) {

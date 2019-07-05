@@ -38,8 +38,6 @@ public class IndexManager implements LibrisConstants {
 	private LibrisFileManager fileMgr;
 
 	private Boolean indexed = null;
-	@SuppressWarnings("unused")
-	private LibrisMetadata metadata;
 	private LibrisDatabase database;
 	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
 	private AffiliateList affList[];
@@ -67,11 +65,10 @@ public class IndexManager implements LibrisConstants {
 	 *            set true to prevent updates
 	 * @throws DatabaseException
 	 */
-	public IndexManager(LibrisDatabase librisDatabase, LibrisMetadata metadata, LibrisFileManager fileMgr)
+	public IndexManager(LibrisDatabase librisDatabase, LibrisFileManager fileMgr)
 			throws DatabaseException {
 		database = librisDatabase;
 		this.fileMgr = fileMgr;
-		this.metadata = metadata;
 
 		namedRecsFileMgrs = new ArrayList<FileAccessManager>(1 + NAMED_RECORDS_INDEX_LEVELS);
 		namedRecsFileMgrs.add(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.NAMEDRECORDS_FILENAME_ROOT + "data"));

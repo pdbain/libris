@@ -401,11 +401,6 @@ public class RecordInstance extends Record implements  LibrisXMLConstants {
 	}
 	
 	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
 	public void setName(String newName) throws InputException {
 		if ((null != newName) && newName.isEmpty()) {
 			this.name = null;

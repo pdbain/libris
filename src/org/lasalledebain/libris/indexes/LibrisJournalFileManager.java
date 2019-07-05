@@ -11,7 +11,7 @@ import java.util.Iterator;
 import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.FileAccessManager;
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -32,18 +32,18 @@ public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter
 	HashMap<Integer, RecordIdAndLength> journalIndex;
 
 	public static LibrisJournalFileManager createLibrisJournalFileManager(
-			LibrisDatabase database, FileAccessManager journalFileMr) throws LibrisException {
+			GenericDatabase database, FileAccessManager journalFileMr) throws LibrisException {
 		return new LibrisJournalFileManager(database, journalFileMr);
 	}
 
-	private LibrisDatabase database;
+	private GenericDatabase database;
 	private FileAccessManager journalFileMgr;
 	private RandomAccessFile journalFile;
 	private ByteArrayOutputStream xmlBuffer;
 	private ElementWriter xmlWriter;
 	private LibrisAttributes databaseProperties;
 
-	private LibrisJournalFileManager(LibrisDatabase database, FileAccessManager journalFileMr) throws LibrisException  {
+	private LibrisJournalFileManager(GenericDatabase database, FileAccessManager journalFileMr) throws LibrisException  {
 		this.database = database;
 		databaseProperties = database.getAttributes();
 		journalIndex = new HashMap<Integer, RecordIdAndLength>();
@@ -195,7 +195,7 @@ public class LibrisJournalFileManager implements Iterable<Record>, RecordsWriter
 		try {
 			iter = new JournalFileRecordIterator();
 		} catch (Exception e) {
-			database.getUi().alert("Error constructing iterator", e);
+			database.alert("Error constructing iterator", e);
 			return null;
 		}
 		return iter;

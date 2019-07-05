@@ -184,11 +184,8 @@ public class AffiliatesField extends GenericField implements Field, Iterable<Fie
 
 	@Override
 	public FieldValue removeValue() {
-		FieldValue result;
 		if (isEmpty()) {
-			result = new FieldNullValue();
 		} else {
-			result = new FieldIntValue(affiliates[0]);
 			if (affiliates.length == 1) {
 				affiliates = null;
 			} else {

@@ -1,15 +1,15 @@
 package org.lasalledebain.libris.indexes;
 
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDefs;
 
 public class GroupManager {
-	private LibrisDatabase database;
+	private GenericDatabase database;
 	GroupDefs defs;
 
-	public GroupManager(LibrisDatabase db) {
+	public GroupManager(GenericDatabase db) {
 		database = db;
 	}
 

@@ -6,6 +6,8 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.XmlException;
 
 public class ElementWriter implements LibrisXMLConstants {

@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.XmlException;
@@ -13,7 +13,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class XmlRecordsWriter implements RecordsWriter {
-	LibrisDatabase database;
+	GenericDatabase database;
 	ElementWriter recWriter;
 	private OutputStream opStream;
 	/**
@@ -21,7 +21,7 @@ public class XmlRecordsWriter implements RecordsWriter {
 	 * @param recWriter
 	 * @throws XmlException 
 	 */
-	public XmlRecordsWriter(LibrisDatabase database, OutputStream xmlOutputStream) throws XmlException {
+	public XmlRecordsWriter(GenericDatabase database, OutputStream xmlOutputStream) throws XmlException {
 		this.database = database;
 		this.opStream = xmlOutputStream;
 		try {

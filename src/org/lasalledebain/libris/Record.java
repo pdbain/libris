@@ -57,7 +57,10 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	/**
 	 * @return name of record, or null if no name
 	 */
-	public abstract String getName();
+	public String getName() {
+		return name;
+	}
+
 	public abstract void setName(String name) throws InputException;
 	public abstract void setEditable(boolean newValue);
 	public abstract boolean isEditable();

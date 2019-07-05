@@ -28,7 +28,7 @@ public class LibrisFileManager implements LibrisConstants {
 	private File auxDirectory;
 	
 
-	private String[] coreAuxFiles = {
+	private static final String[] coreAuxFiles = {
 					PROPERTIES_FILENAME,
 					POSITION_FILENAME,
 					RECORDS_FILENAME, 
@@ -52,6 +52,7 @@ public class LibrisFileManager implements LibrisConstants {
 	private boolean databaseReserved;
 
 	public LibrisFileManager(File dbFile, File auxDir) throws UserErrorException {
+			String auxDirectoryName = AUX_DIRECTORY_NAME;
 		activeManagers = new HashMap<String, FileAccessManager>();
 		expendableFiles = new HashSet<FileAccessManager>();
 		databaseFile = dbFile;
@@ -66,12 +67,36 @@ public class LibrisFileManager implements LibrisConstants {
 				directoryName = directoryName.substring(0, suffixPosition);
 			}
 
-			auxDirectory = new File(databaseDir, AUX_DIRECTORY_NAME+'_'+directoryName);
+			auxDirectory = new File(databaseDir, auxDirectoryName+'_'+directoryName);
 		}
 		lockFile = new File(auxDirectory, LOCK_FILENAME);
 		open(auxDirectory);
 		mgrLock  = new ReentrantLock();
 		locked = false;
+	}
+
+	public LibrisFileManager(File dbFile, String auxDirectoryName) throws UserErrorException {
+
+	activeManagers = new HashMap<String, FileAccessManager>();
+	expendableFiles = new HashSet<FileAccessManager>();
+	databaseFile = dbFile;
+	if (!databaseFile.exists()) {
+		throw new UserErrorException("database file "+dbFile+" dos not exist");
+	}
+
+	File databaseDir = databaseFile.getParentFile();
+	String directoryName = databaseFile.getName();
+	int suffixPosition = directoryName.lastIndexOf(".xml");
+	if (suffixPosition > 0) {
+		directoryName = directoryName.substring(0, suffixPosition);
+	}
+
+	auxDirectory = new File(databaseDir, auxDirectoryName+'_'+directoryName);
+	lockFile = new File(auxDirectory, LOCK_FILENAME);
+	open(auxDirectory);
+	mgrLock  = new ReentrantLock();
+	locked = false;
+		// TODO Auto-generated constructor stub
 	}
 
 	public void setDatabaseFile(String databaseFileName) {

@@ -48,7 +48,7 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 
 		journalFile = new File(workDir, "JournalTest"+'.'+FILENAME_JOURNAL_SUFFIX);
 		journalFileMgr = testDatabase.getFileMgr().makeAccessManager(getName(), journalFile);
-		System.out.println("Journal file: "+journalFile.getPath());
+		Utilities.trace("Journal file: "+journalFile.getPath());
 	}
 	public void testAddRecord() {
 		try {
@@ -65,14 +65,12 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 			ElementManager recsMgr = dbMgr.nextElement();
 			recsMgr.parseOpenTag();
 			
-			int index = 0;
 			Iterator<Record> expectedRecords = testRecords.iterator();
 			while (recsMgr.hasNext()) {
 				ElementManager recMgr = recsMgr.nextElement();
 				Record rec = rt.makeRecord(true);
 				rec.fromXml(recMgr);
 				assertEquals(expectedRecords.next(), rec);
-				++index;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -91,13 +89,11 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 
 			LibrisJournalFileManager journal = LibrisJournalFileManager.createLibrisJournalFileManager(testDatabase, journalFileMgr);
 			makeTestRecords(recData, numTestRecords, journal);
-			int index = 0;
 			Iterator<Record> journalRecords = journal.iterator();
 			Iterator<Record> expectedRecords = testRecords.iterator();
 			while (journalRecords.hasNext()) {
 				Record rec = journalRecords.next();
 				assertEquals(expectedRecords.next(), rec);
-				++index;
 			}
 
 		} catch (Exception e) {
@@ -117,13 +113,11 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 			Field f = r.getField(fieldNames[2]);
 			f.changeValue("x");
 			journal.put(r);
-			int index = 0;
 			Iterator<Record> journalRecords = journal.iterator();
 			Iterator<Record> expectedRecords = testRecords.iterator();
 			while (journalRecords.hasNext()) {
 				Record rec = journalRecords.next();
 				assertEquals(expectedRecords.next(), rec);
-				++index;
 			}
 
 		} catch (Exception e) {

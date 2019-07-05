@@ -65,9 +65,7 @@ static final int FANOUT = 100;
 	private static final DynamicSchema mySchema = makeSchema();
 	File root;
 
-	private final ChildUi myUi;
 	public Repository(ChildUi ui, LibrisDatabase db, File theRoot) {
-		myUi = ui;
 		repoDatabase = db;
 		root = theRoot;
 	}
@@ -176,6 +174,10 @@ static final int FANOUT = 100;
 		}
 	}
 	
+	public static DynamicSchema getRepositorySchema() {
+		return mySchema;
+	}
+
 	public ArtifactParameters getArtifactInfo(int artifactId) {
 		try {
 			final Record record = repoDatabase.getRecord(artifactId);

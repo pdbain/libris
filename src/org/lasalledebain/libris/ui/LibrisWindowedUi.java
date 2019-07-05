@@ -176,7 +176,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	public void updateUITitle(boolean isModified) {
 		String databaseName = "no database open";
 		if (null != currentDatabase) {
-			DatabaseAttributes databaseAttributes = currentDatabase.getAttributes();
+			DatabaseAttributes databaseAttributes = currentDatabase.getDatabaseAttributes();
 			if (null != databaseAttributes) {
 				databaseName = databaseAttributes.getDatabaseName();
 				if (isModified) {

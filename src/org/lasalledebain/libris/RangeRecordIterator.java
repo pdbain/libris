@@ -7,10 +7,10 @@ import java.util.Objects;
 import org.lasalledebain.libris.exception.InputException;
 
 class RangeRecordIterable implements Iterable<Record> {
-	private LibrisDatabase database;
+	private GenericDatabase database;
 	int limit;
 	int base;
-	public RangeRecordIterable(LibrisDatabase db, int startId, int endId) {
+	public RangeRecordIterable(GenericDatabase db, int startId, int endId) {
 		database = db;
 		base = startId + 1;
 		limit = endId;
