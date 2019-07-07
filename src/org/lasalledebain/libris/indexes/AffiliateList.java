@@ -17,7 +17,7 @@ import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.index.AffiliateListEntry;
 import org.lasalledebain.libris.ui.Messages;
 
-public class AffiliateList {
+public class AffiliateList<RecordType extends Record> {
 
 	private final FileAccessManager overflowFileMgr;
 	private final FileAccessManager hashTableFileMgr;
@@ -157,7 +157,7 @@ public class AffiliateList {
 		}
 	}
 
-	public Iterable<Record> getDescendents(int parent, RecordList masterList) {
-		return new DescendentRecordIterator(masterList, parent, this);
+	public Iterable<Record> getDescendents(int parent, RecordList<RecordType> masterList) {
+		return new DescendentRecordIterator<>(masterList, parent, this);
 	}
 }

@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
@@ -85,7 +86,7 @@ public class Utilities extends TestCase {
 	public static final String EXAMPLE_LARGE_PDF = "mesa.pdf";
 	public static final String EXAMPLE_DOCS_ZIP = "example_docs.zip";
 	
-	static RecordFactory makeRecordTemplate(String[] fieldNames,
+	static RecordFactory<DatabaseRecord> makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {
 		Schema s = new MockSchema();
 		for (int i = 0; i < fts.length; ++i) {
@@ -93,7 +94,7 @@ public class Utilities extends TestCase {
 			FieldTemplate ft = createTemplate(id, fts[i]);
 			s.addField(ft);
 		}
-		RecordFactory rt = RecordTemplate.templateFactory(s);
+		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		return rt;
 	}
 
@@ -149,7 +150,7 @@ public class Utilities extends TestCase {
 	LibrisException, RecordDataException,
 	FactoryConfigurationError, DatabaseException, FileNotFoundException {
 		Schema s = Utilities.loadSchema(schemaFile);
-		RecordFactory rt = RecordTemplate.templateFactory(s);
+		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		ElementManager mgr = makeElementManagerFromFile(recordFile, "record");
 		Record rec = rt.makeRecord(true);
 		rec.fromXml(mgr);
@@ -159,7 +160,7 @@ public class Utilities extends TestCase {
 	static Record loadRecordFromXml(File schemaFile, InputStream xmlStream, File sourceFile) throws 
 		LibrisException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
 		Schema s = Utilities.loadSchema(schemaFile);
-		RecordFactory rt = RecordTemplate.templateFactory(s);
+		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		String sourcePath = (null == sourceFile)? null : sourceFile.getPath();
 		ElementManager mgr = makeElementManagerFromInputStream(xmlStream, sourcePath, LibrisXMLConstants.XML_RECORD_TAG);
 		Record rec = rt.makeRecord(true);
@@ -469,7 +470,7 @@ public class Utilities extends TestCase {
 	public static final String LIBRIS_TEST_LOGGER = "org.lasalledebain.LibrisTest";
 	public static Level defaultLoggingLevel = Level.WARNING;
 
-	public static void checkRecords(GenericDatabase database, int lastId) {
+	public static void checkRecords(GenericDatabase<DatabaseRecord> database, int lastId) {
 		for (int i = 1; i <= lastId; ++i) {
 			try {
 				Record r = database.getRecord(i);
@@ -498,7 +499,7 @@ public class Utilities extends TestCase {
 	public static LibrisJournalFileManager createLibrisJournalFileManager(
 			GenericDatabase database, FileAccessManager journalFileMr) throws LibrisException {
 		RecordTemplate recFactory = RecordTemplate.templateFactory(database.getSchema(), null);
-		return LibrisJournalFileManager.createLibrisJournalFileManager(database, journalFileMr, recFactory);
+		return new LibrisJournalFileManager(database, journalFileMr, recFactory);
 	}
 
 }

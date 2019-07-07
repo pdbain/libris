@@ -21,7 +21,7 @@ class RecordNameChooser extends DefaultComboBoxModel {
 
 	private void initializeList(KeyIntegerTuple editedValue) {
 		removeAllElements();
-		int parentNum = RecordId.getNullId();
+		int parentNum = RecordId.NULL_RECORD_ID;
 		if (null != editedValue) {
 			parentNum = editedValue.getValue();
 		}

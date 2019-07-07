@@ -284,4 +284,16 @@ public class ArtifactRecord extends Record {
 		return null;
 	}
 
+	@Override
+	public Field addFieldValue(int fieldNum, int mainValue, String extraValue) throws InputException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

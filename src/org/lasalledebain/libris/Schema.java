@@ -7,7 +7,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
@@ -152,7 +151,7 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 		return t;
 	}
 
-	public FieldType getFieldType(short fieldNum) {
+	public FieldType getFieldType(int fieldNum) {
 		FieldTemplate f = fieldList.get(fieldNum);
 		return f.getFtype();
 	}

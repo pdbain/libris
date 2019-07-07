@@ -21,6 +21,8 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 
+import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;;
+
 public class NameList extends GuiControl {
 
 	private final JList<KeyIntegerTuple> control;
@@ -33,7 +35,7 @@ public class NameList extends GuiControl {
 
 	private static KeyIntegerTuple makeNullTuple() {
 		try {
-			return new KeyIntegerTuple("<none>", RecordId.getNullId());
+			return new KeyIntegerTuple("<none>", NULL_RECORD_ID);
 		} catch (InputException e) {
 			throw new InternalError("Unexpected exception", e);
 		}
@@ -132,7 +134,7 @@ public class NameList extends GuiControl {
 						boolean result = false;
 						if ((0 == i) && (1 == affiliateInfo.size())) {
 							KeyIntegerTuple entry = affiliateInfo.get(0);
-							result = (RecordId.getNullId() != entry.getValue());
+							result = (NULL_RECORD_ID != entry.getValue());
 						} else {
 							result = (i < affiliateInfo.size());
 						}

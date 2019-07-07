@@ -602,7 +602,8 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 		try {
 			DiagnosticDatabase db = new DiagnosticDatabase(testDatabaseFile);
 			RecordPositions recPosns = new RecordPositions(new MockLibrisRecordMap());
-			LibrisRecordsFileManager recMgr = new LibrisRecordsFileManager(db, false, schem, testRecordsFile, recPosns);
+			LibrisRecordsFileManager recMgr = new LibrisRecordsFileManager(db, false,
+					schem, testRecordsFile, recPosns);
 			recMgr.reset();
 			return recMgr;
 		} catch (LibrisException e) {

@@ -6,10 +6,10 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDefs;
 
 public class GroupManager<RecordType extends Record> {
-	private GenericDatabase<Record> database;
+	private GenericDatabase<RecordType> database;
 	GroupDefs defs;
 
-	public GroupManager(GenericDatabase<Record> db) {
+	public GroupManager(GenericDatabase<RecordType> db) {
 		database = db;
 	}
 

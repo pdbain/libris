@@ -24,7 +24,7 @@ class JournalFileRecordIterator<RecordType extends Record> implements Iterator<R
 	private InputStream ipStream;
 	private FileAccessManager fileMgr;
 
-	public JournalFileRecordIterator(FileAccessManager theMgr, RecordFactory theFactory) throws InputException, DatabaseException {
+	public JournalFileRecordIterator(FileAccessManager theMgr, RecordFactory<RecordType> theFactory) throws InputException, DatabaseException {
 		LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 		try {
 			fileMgr = theMgr;

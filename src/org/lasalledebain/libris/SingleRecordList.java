@@ -2,10 +2,10 @@ package org.lasalledebain.libris;
 
 import java.util.Iterator;
 
-public class SingleRecordList<RecordType extends Record> extends RecordList<RecordType> implements Iterator<Record> {
-	Record rec;
+public class SingleRecordList<RecordType extends Record> extends RecordList<RecordType> implements Iterator<RecordType> {
+	RecordType rec;
 	int position;
-	public SingleRecordList(Record rec) {
+	public SingleRecordList(RecordType rec) {
 		this.rec = rec;
 	}
 
@@ -15,7 +15,7 @@ public class SingleRecordList<RecordType extends Record> extends RecordList<Reco
 
 	public Iterator<Record> iterator() {
 
-		return new SingleRecordList(rec);
+		return new SingleRecordList<Record>(rec);
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class SingleRecordList<RecordType extends Record> extends RecordList<Reco
 	}
 
 	@Override
-	public Record next() {
+	public RecordType next() {
 		position = 1;
 		return rec;
 	}

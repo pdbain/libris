@@ -3,9 +3,6 @@ package org.lasalledebain.libris;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -15,28 +12,20 @@ import org.lasalledebain.libris.ui.LastFilterSettings;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, LibrisConstants {
+public abstract class LibrisMetadata extends GenericDatabaseMetadata implements XMLElement, LibrisConstants {
 
 	protected LibrisDatabase database;
 	protected Layouts uiLayouts;
-	private int lastRecordId;
 	private int savedRecords;
 	private int modifiedRecords;
 	private DatabaseInstance instanceInfo;
-	private Date databaseDate;
 	/**
 	 * Dynamic attributes of the database
 	 */
 	private Properties usageProperties;
 
-	private boolean lastRecOkay;
 	private LastFilterSettings lastFiltSettings;
-	private int signatureLevels;
-	private static SimpleDateFormat dateAndTimeFormatter = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
-	private static SimpleDateFormat compactDateFormatter = new SimpleDateFormat(LibrisConstants.YMD);
-
 	public LibrisMetadata() {
 		usageProperties = new Properties();
 		lastFiltSettings = new LastFilterSettings();
@@ -92,7 +81,7 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, 
 				return e;
 			}
 		} else {
-			lastRecordId = RecordId.getNullId();
+			lastRecordId = RecordId.NULL_RECORD_ID;
 		}
 		String sigLevelsString = usageProperties.getProperty(PROPERTY_SIGNATURE_LEVELS);
 		if (!Objects.isNull(sigLevelsString)) {
@@ -103,33 +92,6 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, 
 		return null;
 	}
 
-	public static Date parseDateString(String dateString) throws ParseException {
-		return dateAndTimeFormatter.parse(dateString);
-	}
-
-	public static String getCurrentDateAndTimeString() {
-		return formatDateAndTime(getCurrentDate());
-	}
-
-	public static String getCompactDateString() {
-		return formatCompactDate(getCurrentDate());
-	}
-
-	public static Date getCurrentDate() {
-		return new Date();
-	}
-
-	public static String formatDateAndTime(Date theDate) {
-		return dateAndTimeFormatter.format(theDate);
-	}
-
-	public static String formatCompactDate(Date theDate) {
-		return compactDateFormatter.format(theDate);
-	}
-
-	public synchronized int getLastRecordId() {
-		return lastRecordId;
-	}
 	public synchronized int getRecordIdBase() {
 		int result =  (null == instanceInfo) ? 0 : instanceInfo.getRecordIdBase();
 		return result;
@@ -140,21 +102,10 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, 
 		lastRecordId = Math.max(lastRecordId, instanceInfo.getRecordIdBase());
 	}
 
-	public synchronized void setLastRecordId(final int recId) {
-		if ((RecordId.isNull(lastRecordId)) || ((recId > lastRecordId))) {
-			lastRecordId = recId;
-		}
-		lastRecOkay = true;
-	}
-
 	public DatabaseInstance getInstanceInfo() {
 		return instanceInfo;
 	}
 
-	public synchronized int newRecordId() {
-		int newId = ++lastRecordId;
-		return newId;
-	}
 	public boolean isMetadataOkay() {
 		return lastRecOkay;
 	}
@@ -186,16 +137,6 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, 
 		this.modifiedRecords += numAdded;
 	}
 
-	public static String getXmlTag() {
-		return XML_METADATA_TAG;
-	}
-
-
-	@Override
-	public String getElementTag() {
-		return getElementTag();
-	}
-
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
 		toXml(output, false);
@@ -221,7 +162,7 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, 
 		if (!LibrisMetadata.class.isAssignableFrom(comparand.getClass())) {
 			return false;
 		} else {
-			LibrisMetadata otherMetadat = (LibrisMetadata) comparand;
+			GenericDatabaseMetadata otherMetadat = (GenericDatabaseMetadata) comparand;
 			return (lastRecordId == otherMetadat.lastRecordId)
 					&& (signatureLevels == otherMetadat.signatureLevels);
 		}
@@ -229,21 +170,5 @@ public abstract class LibrisMetadata implements LibrisXMLConstants, XMLElement, 
 
 	public int getFieldNum() {
 		return 0;
-	}
-
-	public void setSignatureLevels(int sigLevels) {
-		signatureLevels = sigLevels;
-	}
-
-	public int getSignatureLevels() {
-		return signatureLevels;
-	}
-
-	public Date getDatabaseDate() {
-		return databaseDate;
-	}
-
-	public void setDatabaseDate(Date databaseDate) {
-		this.databaseDate = databaseDate;
 	}	
 }

@@ -33,18 +33,18 @@ import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.util.Reporter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class IndexManager implements LibrisConstants {
+public class IndexManager<RecordType extends Record> implements LibrisConstants {
 
+	private GenericDatabase<RecordType> database;
 	private LibrisFileManager fileMgr;
 
 	private Boolean indexed = null;
-	private LibrisDatabase database;
 	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
-	private AffiliateList affList[];
+	private AffiliateList<RecordType> affList[];
 
 	private ArrayList<FileAccessManager> namedRecsFileMgrs;
 	private int numGroups;
-	private LibrisRecordsFileManager recordsFile;
+	private LibrisRecordsFileManager<RecordType> recordsFile;
 	private TermCountIndex termCounts;
 	static final int NAMED_RECORDS_INDEX_LEVELS = Integer.getInteger("org.lasalledebain.libris.namedrecsindexlevels", 2);
 	private final SignatureManager sigMgr;
@@ -65,7 +65,7 @@ public class IndexManager implements LibrisConstants {
 	 *            set true to prevent updates
 	 * @throws DatabaseException
 	 */
-	public IndexManager(LibrisDatabase librisDatabase, LibrisFileManager fileMgr)
+	public IndexManager(GenericDatabase<RecordType> librisDatabase, LibrisFileManager fileMgr)
 			throws DatabaseException {
 		database = librisDatabase;
 		this.fileMgr = fileMgr;
@@ -90,7 +90,7 @@ public class IndexManager implements LibrisConstants {
 		return indexed;
 	}
 
-	public void buildIndexes(IndexConfiguration config, Records<Record> recs) throws LibrisException {
+	public void buildIndexes(IndexConfiguration config, Records<RecordType> recs) throws LibrisException {
 		int numGroups = database.getSchema().getNumGroups();
 		FileAccessManager childTempFiles[] = new FileAccessManager[numGroups];
 		FileAccessManager affiliateTempFiles[] = new FileAccessManager[numGroups];
@@ -155,7 +155,7 @@ public class IndexManager implements LibrisConstants {
 				affiliateTempFiles[g].close();
 				FileAccessManager hashTableFileMgr = fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_HASHTABLE_ROOT + g);
 				FileAccessManager overflowFileMgr = fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT + g);
-				AffiliateList l = new AffiliateList(hashTableFileMgr, overflowFileMgr, false);
+				AffiliateList<RecordType> l = new AffiliateList<RecordType>(hashTableFileMgr, overflowFileMgr, false);
 				l.setSize(numChildren[g] + numAffiliates[g]);
 				buildAffiliateIndex(l, childTempFiles[g], hashTableFileMgr, overflowFileMgr, numChildren[g], true);
 				buildAffiliateIndex(l, affiliateTempFiles[g], hashTableFileMgr, overflowFileMgr, numAffiliates[g], false);
@@ -201,7 +201,7 @@ public class IndexManager implements LibrisConstants {
 		}
 	}
 
-	 private void buildAffiliateIndex(AffiliateList l, FileAccessManager affiliateTempFMgr, 
+	 private void buildAffiliateIndex(AffiliateList<RecordType> l, FileAccessManager affiliateTempFMgr, 
 			FileAccessManager hashTableFileMgr, FileAccessManager overflowFileMgr, int numAffiliates, boolean isChildren)
 					throws DatabaseException {
 		try {
@@ -259,7 +259,7 @@ public class IndexManager implements LibrisConstants {
 		numGroups = database.getSchema().getNumGroups();
 		affList = new AffiliateList[numGroups];
 		for (int i = 0; i < numGroups; ++i) {
-			affList[i] = new AffiliateList(fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_HASHTABLE_ROOT + i),
+			affList[i] = new AffiliateList<RecordType>(fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_HASHTABLE_ROOT + i),
 					fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT), readOnly);
 		}
 		termCounts = new TermCountIndex(fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT), false);
@@ -278,7 +278,7 @@ public class IndexManager implements LibrisConstants {
 	public void flush() throws InputException, DatabaseException {
 		namedRecordIndex.flush();
 		termCounts.flush();
-		for (AffiliateList aff: affList) {
+		for (AffiliateList<RecordType> aff: affList) {
 			aff.flush();
 		}
 		sigMgr.flush();
@@ -292,9 +292,10 @@ public class IndexManager implements LibrisConstants {
 		return namedRecordIndex;
 	}
 
-	public LibrisRecordsFileManager<DatabaseRecord> getRecordsFileMgr() throws LibrisException {
+	public LibrisRecordsFileManager<RecordType> getRecordsFileMgr() throws LibrisException {
 		if (null == recordsFile) {
-			recordsFile = new LibrisRecordsFileManager<DatabaseRecord>(database, database.isReadOnly(), database.getSchema(), fileMgr);
+			recordsFile = new LibrisRecordsFileManager<RecordType>(database, database.isReadOnly(), 
+					database.getRecordFactory(), database.getSchema(), fileMgr);
 		}
 		return recordsFile;
 	}
@@ -319,7 +320,7 @@ public class IndexManager implements LibrisConstants {
 		affList[groupNum].addAffiliate(dest, src);
 	}
 
-	public AffiliateList getAffiliateList(int groupNum) {
+	public AffiliateList<RecordType> getAffiliateList(int groupNum) {
 		if (groupNum >= affList.length) {
 			throw new DatabaseError("cannot access group " + groupNum);
 		}

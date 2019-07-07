@@ -12,8 +12,8 @@ import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class XmlRecordsWriter implements RecordsWriter {
-	GenericDatabase database;
+public class XmlRecordsWriter<RecordType extends Record> implements RecordsWriter<RecordType> {
+	GenericDatabase<RecordType> database;
 	ElementWriter recWriter;
 	private OutputStream opStream;
 	/**
@@ -21,7 +21,7 @@ public class XmlRecordsWriter implements RecordsWriter {
 	 * @param recWriter
 	 * @throws XmlException 
 	 */
-	public XmlRecordsWriter(GenericDatabase database, OutputStream xmlOutputStream) throws XmlException {
+	public XmlRecordsWriter(GenericDatabase<RecordType> database, OutputStream xmlOutputStream) throws XmlException {
 		this.database = database;
 		this.opStream = xmlOutputStream;
 		try {
@@ -44,7 +44,7 @@ public class XmlRecordsWriter implements RecordsWriter {
 	}
 
 	@Override
-	public void addAll(Iterable<Record> recList) throws DatabaseException {
+	public void addAll(Iterable<RecordType> recList) throws DatabaseException {
 		for (Record r: recList) {
 			put(r);
 		}

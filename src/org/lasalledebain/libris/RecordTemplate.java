@@ -28,7 +28,7 @@ public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 	// TODO test duplicate IDs
 	private Schema dbSchema;
 	private GroupDefs grpDefs;
-	public RecordList records;
+	public RecordList<DatabaseRecord> records;
 
 	public GroupDefs getGroupDefs() {
 		return grpDefs;
@@ -55,7 +55,7 @@ public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 	public static RecordTemplate templateFactory(Schema s) throws InputException {
 		return templateFactory(s, null);
 	}
-	public static RecordTemplate templateFactory(Schema s, RecordList recs) throws InputException {
+	public static RecordTemplate templateFactory(Schema s, RecordList<DatabaseRecord> recs) throws InputException {
 		String[] fieldIds = s.getFieldIds();
 		RecordTemplate recTemplate = new RecordTemplate(s, fieldIds.length);
 		for (String id: fieldIds) {

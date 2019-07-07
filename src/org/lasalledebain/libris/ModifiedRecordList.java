@@ -9,11 +9,6 @@ import org.lasalledebain.libris.exception.UserErrorException;
 public class ModifiedRecordList<RecordType extends Record> extends RecordList<RecordType> {
 
 	TreeMap<Integer, Record> modifiedRecords;
-	private static EmptyRecordList emptyList = new EmptyRecordList();
-	public static EmptyRecordList getEmptyList() {
-		return emptyList;
-	}
-
 	public ModifiedRecordList() {
 		modifiedRecords = new TreeMap<Integer, Record>();
 	}

@@ -9,21 +9,21 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.util.StringUtils;
 
 public class SignatureManager implements LibrisConstants {
-	private LibrisDatabase database;
+	private GenericDatabase<?> database;
 	private BloomFilterSectionEditor signatureEditors[];
 	private int sigLevels;
 	private FileAccessManager signatureFileManagers[];
 	private RandomAccessFile sigQueryFiles[];
 
-	public SignatureManager(LibrisDatabase database) {
+	public SignatureManager(GenericDatabase<?> database) {
 		super();
 		this.database = database;
 		sigLevels = 0;

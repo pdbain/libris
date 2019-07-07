@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.exception;
 
+@SuppressWarnings("serial")
 public class DatabaseError extends Error {
 
 	public DatabaseError(String msg, Exception exc) {

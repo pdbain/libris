@@ -110,7 +110,7 @@ public class BrowserWindow extends JPanel {
 		moreButton.setVisible(true);
 	}
 
-	public void initialize(RecordList records) throws DatabaseException {
+	public void initialize(RecordList<DatabaseRecord> records) throws DatabaseException {
 		recordsSource = records;
 		enableNext(false);
 		final Layouts layouts = database.getLayouts();
@@ -138,7 +138,7 @@ public class BrowserWindow extends JPanel {
 		if (null != chosenRecord) {		
 			return chosenRecord.getRecordId();
 		} else {
-			return RecordId.getNullId();
+			return RecordId.NULL_RECORD_ID;
 		}
 	}
 

@@ -10,9 +10,9 @@ import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 public class NamedRecordList<RecordType extends Record> extends RecordList<RecordType> implements RecordIdNameMapper {
 
 	SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
-	private LibrisDatabase database;
+	private GenericDatabase<RecordType>  database;
 
-	public NamedRecordList(LibrisDatabase db) {
+	public NamedRecordList(GenericDatabase<RecordType> db) {
 		database = db;
 		namedRecordIndex = database.getNamedRecordIndex();
 	}
@@ -25,7 +25,7 @@ public class NamedRecordList<RecordType extends Record> extends RecordList<Recor
 	@Override
 	public int getId(String recName) throws InputException {
 		 KeyIntegerTuple r = namedRecordIndex.getByName(recName);
-		return (null == r) ? RecordId.getNullId(): r.getValue();
+		return (null == r) ? RecordId.NULL_RECORD_ID: r.getValue();
 	}
 	
 	@Override

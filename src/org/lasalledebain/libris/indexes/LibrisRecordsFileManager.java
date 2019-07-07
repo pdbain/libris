@@ -13,13 +13,14 @@ import java.util.logging.Level;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.ModifiedRecordList;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordId;
-import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -77,13 +78,13 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 	private FileAccessManager recordsFile;
 	private Schema dbSchema;
 	protected RecordPositions recPosns;
-
+	RecordFactory<RecordType> myRecordFactory = null;
 	private RecordHeader recordList = null;
 	private RecordHeader freeList = null;
 	private RandomAccessFile recordsFileStore;
 	private boolean readOnly;
 
-	private LibrisDatabase database;
+	private GenericDatabase<RecordType> database;
 
 	/**
 	 * @param database
@@ -93,16 +94,19 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 	 * @param positionFile 
 	 * @throws LibrisException 
 	 */
-	public LibrisRecordsFileManager(LibrisDatabase db, boolean readOnly, Schema dbSchema, LibrisFileManager fileMgr) throws LibrisException {
+	public LibrisRecordsFileManager(GenericDatabase<RecordType> db, boolean readOnly,  RecordFactory<RecordType> recordFact,
+			Schema dbSchema, LibrisFileManager fileMgr) throws LibrisException {
 		this(db, readOnly, dbSchema, fileMgr.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME), new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.POSITION_FILENAME), readOnly));
 	}
 
-	public LibrisRecordsFileManager(LibrisDatabase db, boolean readOnly, Schema dbSchema, FileAccessManager recordsFile, RecordPositions recPosns) throws LibrisException {
+	public LibrisRecordsFileManager(GenericDatabase<RecordType> db, boolean readOnly,
+			Schema dbSchema, FileAccessManager recordsFile, RecordPositions recPosns) throws LibrisException {
 		this.database = db;
 		this.readOnly = readOnly;
 		this.dbSchema = dbSchema;
 		this.recPosns = recPosns;			
 		this.recordsFile = recordsFile;
+		myRecordFactory = db.getRecordFactory();
 		open();
 	}
 
@@ -400,10 +404,10 @@ public void removeRecord(int rid) throws DatabaseException {
 	}
 }
 
-	private Record readRecord(long recordPosition) throws InputException, DatabaseException {
+	private RecordType readRecord(long recordPosition) throws InputException, DatabaseException {
 		try {
 			int recId = recordsFileStore.readInt();
-			DatabaseRecord r = new DatabaseRecord(database.getMainRecordTemplate());
+			RecordType r = myRecordFactory.makeRecord(true);//
 			r.setRecordId(recId);
 
 			byte flags = recordsFileStore.readByte();
@@ -436,7 +440,7 @@ public void removeRecord(int rid) throws DatabaseException {
 			ByteArrayInputStream fieldIndex = new ByteArrayInputStream(indexData);
 			DataInputStream indexStream = new DataInputStream(fieldIndex);
 
-			short fieldNum = LibrisConstants.NULL_FIELD_NUM;
+			int fieldNum = LibrisConstants.NULL_FIELD_NUM;
 			int indexCursor = 0;
 			int indexEnd = indexSize - 4; /* subtract padding */
 			try {
@@ -515,7 +519,7 @@ public void removeRecord(int rid) throws DatabaseException {
 	private class RecordIterator implements Iterator<Record> {
 		Iterator<RecordHeader> rhi;
 		private RecordHeader currentHeader;
-		private ModifiedRecordList modifiedRecords;
+		private ModifiedRecordList<RecordType> modifiedRecords;
 		int nextId;
 		final int lastId;
 		private int currentId;
@@ -524,7 +528,7 @@ public void removeRecord(int rid) throws DatabaseException {
 			lastId = database.getLastRecordId();
 			currentHeader = null;
 			nextId = 1;
-			currentId = RecordId.getNullId();
+			currentId = RecordId.NULL_RECORD_ID;
 			rhi = recordList.iterator();
 			modifiedRecords = database.getModifiedRecords();
 		}

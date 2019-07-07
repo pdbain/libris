@@ -6,7 +6,7 @@ import java.util.Iterator;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.UserErrorException;
 
-class EmptyRecordList extends ModifiedRecordList {
+class EmptyRecordList<RecordType extends Record> extends ModifiedRecordList<RecordType> {
 
 	@Override
 	public Iterator<Record> iterator() {

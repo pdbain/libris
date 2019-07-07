@@ -31,7 +31,7 @@ public class AffiliateEditor {
 	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
 	private final GuiControl guiCtrl;
 	public AffiliateEditor(Record currentRecord, final GuiControl ctrl, LibrisWindowedUi ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
-			Vector<KeyIntegerTuple> affiliateInfo, JList affiliateList, GroupDef grpDef) {
+			Vector<KeyIntegerTuple> affiliateInfo, JList<KeyIntegerTuple> affiliateList, GroupDef grpDef) {
 		guiCtrl = ctrl;
 		affInfo = affiliateInfo;
 		affList = affiliateList;
@@ -166,7 +166,7 @@ public class AffiliateEditor {
 		}
 		
 		public int getSelectedId() {
-			int id = RecordId.getNullId();
+			int id = RecordId.NULL_RECORD_ID;
 			KeyIntegerTuple recTuple = (KeyIntegerTuple) recordFilter.getSelectedItem();
 			if (null != recTuple) {
 				id = recTuple.getValue();

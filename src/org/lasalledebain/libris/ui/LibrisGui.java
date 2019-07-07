@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.NamedRecordList;
@@ -95,7 +96,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		updateUITitle(false);
 
 		displayPanel.addLayouts(currentDatabase.getLayouts());
-		RecordList list = currentDatabase.getRecords();
+		RecordList<DatabaseRecord> list = currentDatabase.getRecords();
 		resultsPanel.initialize(list);
 		recordsAccessible(!readOnly);
 		databaseModifiable(!readOnly);
@@ -482,7 +483,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	public void setRecordName(NamedRecordList namedRecs) throws InputException {
+	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException {
 		RecordWindow currentRecordWindow = getCurrentRecordWindow();
 		if (null != currentRecordWindow){
 			Record rec = currentRecordWindow.getRecord();

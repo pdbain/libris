@@ -1,12 +1,13 @@
 package org.lasalledebain.libris.index;
 
+import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
 
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
@@ -18,7 +19,7 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
-import org.lasalledebain.libris.xmlUtils.XmlShapes;
+import org.lasalledebain.libris.xmlUtils.XmlShapes;;
 
 /**
  * Represents a node in a group graph.
@@ -28,7 +29,6 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
  */
 public class GroupMember extends GenericField implements XMLElement {
 
-	private static final int NULL_ID = RecordId.getNullId();
 	private static final String memberTag = XML_MEMBER_TAG;
 	private static final String affiliationTag = XML_AFFILIATION_TAG;
 	GroupDef def;
@@ -38,7 +38,7 @@ public class GroupMember extends GenericField implements XMLElement {
 	static private final int[] dummyAffiliates = new int[0];
 
 	public int getParent() {
-		return (affiliates.length == 0) ? NULL_ID: affiliates[0];
+		return (affiliates.length == 0) ? NULL_RECORD_ID: affiliates[0];
 	}
 
 	public String getGroupId() {
@@ -127,7 +127,7 @@ public class GroupMember extends GenericField implements XMLElement {
 	public LibrisAttributes getAttributes() throws XmlException {
 		LibrisAttributes attrs = new LibrisAttributes();
 		int parent = getParent();
-		if (NULL_ID != parent) {
+		if (NULL_RECORD_ID != parent) {
 			attrs.setAttribute(XML_MEMBER_PARENT_ATTR, Integer.toString(parent));
 		}
 		attrs.setAttribute(XML_MEMBER_GROUP_ATTR, def.getFieldId());		
@@ -181,7 +181,7 @@ public class GroupMember extends GenericField implements XMLElement {
 	}
 
 	public void setParent(int parent) {
-		if ((affiliates.length > 0) && (NULL_ID == affiliates[0])) {
+		if ((affiliates.length > 0) && (NULL_RECORD_ID == affiliates[0])) {
 			affiliates[0] = parent;
 		} else {
 			int[] tempAffiliations = new int[affiliates.length + 1];

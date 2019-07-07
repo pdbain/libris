@@ -6,11 +6,11 @@ import java.util.Objects;
 
 import org.lasalledebain.libris.exception.InputException;
 
-class RangeRecordIterable implements Iterable<Record> {
-	private GenericDatabase<Record> database;
+class RangeRecordIterable<RecordType extends Record> implements Iterable<Record> {
+	private GenericDatabase<RecordType> database;
 	int limit;
 	int base;
-	public RangeRecordIterable(GenericDatabase db, int startId, int endId) {
+	public RangeRecordIterable(GenericDatabase<RecordType> db, int startId, int endId) {
 		database = db;
 		base = startId + 1;
 		limit = endId;

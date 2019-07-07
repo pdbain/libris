@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 
 class DatabaseRecordList extends RecordList<DatabaseRecord> {
@@ -20,7 +21,7 @@ class DatabaseRecordList extends RecordList<DatabaseRecord> {
 		try {
 			iter = database.getDatabaseRecords().iterator();
 		} catch (LibrisException e) {
-			return new ErrorIterator(e);
+			throw new InternalError("Error getting database records", e);
 		}
 		return iter;
 	}

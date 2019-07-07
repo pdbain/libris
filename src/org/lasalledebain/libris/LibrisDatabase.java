@@ -3,7 +3,6 @@ package org.lasalledebain.libris;
 import static org.lasalledebain.libris.exception.Assertion.assertEquals;
 import static org.lasalledebain.libris.exception.Assertion.assertNotNull;
 import static org.lasalledebain.libris.exception.Assertion.assertTrue;
-import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -77,14 +76,14 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	}
 	public LibrisDatabase(File databaseFile, boolean readOnly, LibrisUi ui, Schema schem) throws LibrisException  {
 		super(ui,new LibrisFileManager(databaseFile, AUX_DIRECTORY_NAME));
-		indexMgr = new IndexManager(this, fileMgr);
-		metadata = databaseMetadata = new LibrisDatabaseMetadata(this);
+		indexMgr = new IndexManager<DatabaseRecord>(this, fileMgr);
+		databaseMetadata = new LibrisDatabaseMetadata(this);
 		isModified = false;
 		dbOpen = false;
 		this.readOnly = readOnly;
 		mySchema = schem;
-		modifiedRecords = readOnly? ModifiedRecordList.getEmptyList(): new ModifiedRecordList();			
-		groupMgr = new GroupManager(this);
+		modifiedRecords = readOnly? new EmptyRecordList<>(): new ModifiedRecordList<DatabaseRecord>();			
+		groupMgr = new GroupManager<DatabaseRecord>(this);
 		documentRepository = null;
 	}
 
@@ -152,7 +151,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			if (isIndexed()) {
 				saveMetadata();
 			}
-			Records recs = getDatabaseRecords();
+			Records<DatabaseRecord> recs = getDatabaseRecords();
 			recs.putRecords(modifiedRecords);
 			try {
 				recs.flush();
@@ -307,7 +306,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			final File databaseFile = fileMgr.getDatabaseFile();
 			databaseMetadata.setSavedRecords(0);
 			XmlRecordsReader.importXmlRecords(this, databaseFile);
-			Records recs = getDatabaseRecords();
+			Records<DatabaseRecord> recs = getDatabaseRecords();
 			indexMgr.buildIndexes(config, recs);
 			save();
 			freeDatabase();
@@ -394,7 +393,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return false;
 		};
 		ElementManager recsMgr = incrementManager.nextElement();
-		XmlRecordsReader<DatabaseRecord> recordsReader = new XmlRecordsReader(this, recsMgr);
+		XmlRecordsReader<DatabaseRecord> recordsReader = new XmlRecordsReader<DatabaseRecord>(this, recsMgr);
 		for (Record newRec: recordsReader) {
 			if (idAdjustment > 0) {
 				newRec.offsetIds(baseId, idAdjustment);
@@ -598,7 +597,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 */
 	public Records<DatabaseRecord> getDatabaseRecords() throws LibrisException {
 		if (null == databaseRecords) {
-			databaseRecords = new Records(this, fileMgr);
+			databaseRecords = new Records<DatabaseRecord>(this, fileMgr);
 		}
 		return databaseRecords;
 	}
@@ -644,12 +643,12 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		if (RecordId.isNull(id)) {
 			id = newRecordId();
 			rec.setRecordId(id);
-			metadata.adjustModifiedRecords(1);
+			databaseMetadata.adjustModifiedRecords(1);
 		} else {
 			if (isRecordReadOnly(id)) {
 				throw new DatabaseException("Record "+id+" is read-only");
 			}
-			metadata.setLastRecordId(id);
+			databaseMetadata.setLastRecordId(id);
 		}
 		getJournalFileMgr().put(rec);
 		String recordName = rec.getName();
@@ -660,7 +659,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		
 		modifiedRecords.addRecord(rec);
 		setModified(true);
-		metadata.adjustSavedRecords(1);
+		databaseMetadata.adjustSavedRecords(1);
 		for (int g = 0; g < mySchema.getNumGroups(); ++g) {
 			int[] affiliations = rec.getAffiliates(g);
 			if (affiliations.length != 0) {
@@ -682,7 +681,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			saveMetadata();
 		}
 		setModified(false);
-		Records recs = getDatabaseRecords();
+		Records<DatabaseRecord> recs = getDatabaseRecords();
 		int id = NULL_RECORD_ID;
 		int lastId = 0;
 		for (Record rec: recList) {
@@ -719,9 +718,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	public int getModifiedRecordCount() {
 		return databaseMetadata.getModifiedRecords();
-	}
-	public synchronized ModifiedRecordList getModifiedRecords() {
-		return modifiedRecords;
 	}
 
 	public boolean isLocked() {
@@ -796,7 +792,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 		lockDatabase();
 		instanceInfo.doJoin();
-		Iterable<Record> rangeIter = new RangeRecordIterable(this, instanceInfo.getRecordIdBase(), getLastRecordId());
+		Iterable<Record> rangeIter = new RangeRecordIterable<DatabaseRecord>(this, instanceInfo.getRecordIdBase(), getLastRecordId());
 		try {
 			ElementWriter outWriter = ElementWriter.eventWriterFactory(destination);
 			toXml(outWriter, false, rangeIter, true); 
@@ -831,32 +827,22 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return mainRecordTemplate;
 	}
 
-	public NamedRecordList<DatabaseRecord> getNamedRecords() {
-		NamedRecordList<DatabaseRecord> l = new NamedRecordList<DatabaseRecord>(this);
-		return l;
-	}
-
 	public Iterable<Record> getChildRecords(int parent, int groupNum, boolean allDescendents) {
-		AffiliateList affList = indexMgr.getAffiliateList(groupNum);
+		AffiliateList<DatabaseRecord> affList = indexMgr.getAffiliateList(groupNum);
 		if (allDescendents) {
 			return affList.getDescendents(parent, this.getRecords());
 		} else {
 			int[] result = affList.getChildren(parent);
-			return new ArrayRecordIterator(getRecords(), result);
+			return new ArrayRecordIterator<DatabaseRecord>(getRecords(), result);
 		}
 	}
 
 	public Iterable<Record> getAffiliateRecords(int parent, int groupNum) {
-		AffiliateList affList = indexMgr.getAffiliateList(groupNum);
+		AffiliateList<DatabaseRecord> affList = indexMgr.getAffiliateList(groupNum);
 		int[] result = affList.getAffiliates(parent);
-		return new ArrayRecordIterator(getRecords(), result);
+		return new ArrayRecordIterator<DatabaseRecord>(getRecords(), result);
 	}
 
-	public String getRecordName(int recordNum) throws InputException {
-		Record rec = getRecord(recordNum);
-		return (null == rec) ? null: rec.getName();
-	}
-	
 	public File getArtifactFile(int artifact) {
 		if (hasDocumentRepository() && !RecordId.isNull(artifact)) {
 			return documentRepository.getArtifactFile(artifact);
@@ -875,25 +861,25 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	public LibrisJournalFileManager<DatabaseRecord> getJournalFileMgr() throws LibrisException {
 		if (null == journalFile) {
-			journalFile = LibrisJournalFileManager.createLibrisJournalFileManager(this, fileMgr.getJournalFileMgr(), RecordTemplate.templateFactory(getSchema(), null));
+			journalFile = new LibrisJournalFileManager(this, fileMgr.getJournalFileMgr(), RecordTemplate.templateFactory(getSchema(), null));
 		}
 		return journalFile;
 	}
 
-	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
+	public FilteredRecordList<DatabaseRecord> makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int searchList[], Collection<String> searchTerms) throws UserErrorException, IOException {
-		RecordList recList = new SignatureFilteredRecordList(this, searchTerms);
+		RecordList<DatabaseRecord> recList = new SignatureFilteredRecordList<DatabaseRecord>(this, searchTerms);
 		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, searchList, searchTerms);
-		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);
+		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(recList, filter);
 		return filteredList;
 	}
 	
-	public FilteredRecordList makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
+	public FilteredRecordList<DatabaseRecord> makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int searchList[], String searchTerm) throws UserErrorException, IOException {
 		Collection<String> searchTerms = Collections.singleton(searchTerm);
-		RecordList recList = new SignatureFilteredRecordList(this, searchTerms);
+		RecordList<DatabaseRecord> recList = new SignatureFilteredRecordList<DatabaseRecord>(this, searchTerms);
 		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, searchList, searchTerms);
-		FilteredRecordList filteredList = new FilteredRecordList(recList, filter);
+		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(recList, filter);
 		return filteredList;
 	}
 	public void incrementTermCount(String term) {
@@ -911,6 +897,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public void setDocumentRepository(Repository documentRepository) {
 		this.documentRepository = documentRepository;
 		databaseMetadata.hasDocumentRepository(true);
+	}
+	@Override
+	public RecordFactory<DatabaseRecord> getRecordFactory() {
+		return getMainRecordTemplate();
 	}
 	
 }

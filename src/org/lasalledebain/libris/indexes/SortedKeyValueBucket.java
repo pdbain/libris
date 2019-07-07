@@ -138,7 +138,7 @@ public abstract class SortedKeyValueBucket<T extends KeyValueTuple> implements I
 		return (null == result)? null: result.getValue();
 	}
 	
-	class PrefixIterator<T extends KeyValueTuple> implements Iterator {
+	class PrefixIterator<TupleType extends KeyValueTuple> implements Iterator<T> {
 		String prefix;
 		Iterator<T> masterIterator;
 		T nextElement;

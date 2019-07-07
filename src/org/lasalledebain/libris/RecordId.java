@@ -18,12 +18,6 @@ public class RecordId {
 		return result;
 	}
 
-	@Deprecated
-	public static int getNullId() {
-		// TODO get rid of this
-		return 0;
-	}
-
 	public static String toString(int id) {
 		return Integer.toString(id);
 	}

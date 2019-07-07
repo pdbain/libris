@@ -92,6 +92,8 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract Field addFieldValue(String fieldName, String fieldData) throws InputException;
 	public abstract Field addFieldValue(String fid, int data) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, String fieldData) throws InputException;
+	public abstract Field addFieldValue(int fieldNum, int mainValue, String extraValue) throws InputException;
+	public abstract Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, int fieldData) throws InputException;
 	public abstract Field addFieldValuePair(int fieldNum, String value, String extraValue) throws InputException;
 	public abstract Field addFieldValuePair(String fid, String value, String extraValue) throws InputException;

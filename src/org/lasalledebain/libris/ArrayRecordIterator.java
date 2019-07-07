@@ -5,12 +5,12 @@ import java.util.Iterator;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 
-public class ArrayRecordIterator implements Iterable<Record> {
+public class ArrayRecordIterator<RecordType extends Record> implements Iterable<Record> {
 
 	private final int recList[];
-	private final RecordList parentList;
+	private final RecordList<RecordType> parentList;
 
-	public ArrayRecordIterator(RecordList masterList, int[] recList) {
+	public ArrayRecordIterator(RecordList<RecordType> masterList, int[] recList) {
 		this.parentList = masterList;
 		this.recList = recList;
 	}

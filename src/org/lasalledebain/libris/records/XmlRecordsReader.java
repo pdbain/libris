@@ -17,6 +17,7 @@ import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
+import org.lasalledebain.libris.GenericDatabaseMetadata;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
@@ -39,14 +40,14 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
  */
 public class XmlRecordsReader<RecordType extends Record> implements Iterable<Record>, Iterator<Record>,LibrisXMLConstants {
 	ElementManager recsMgr;
-	private GenericDatabase database;
+	private GenericDatabase<RecordType> database;
 
 	/**
 	 * @param database database object
 	 * @param recsMgr XML element manager for <record> element 
 	 * @throws DatabaseException 
 	 */
-	public XmlRecordsReader(GenericDatabase database, ElementManager recsMgr) throws DatabaseException {
+	public XmlRecordsReader(GenericDatabase<RecordType> database, ElementManager recsMgr) throws DatabaseException {
 		this.database = database;
 		this.recsMgr = recsMgr;
 		// recsMgr.parseOpenTag();
@@ -55,7 +56,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 	@Override
 	public Iterator<Record> iterator() {
 		try {
-			XmlRecordsReader recs = new XmlRecordsReader(database, recsMgr);
+			XmlRecordsReader<RecordType> recs = new XmlRecordsReader<RecordType>(database, recsMgr);
 			recsMgr.parseOpenTag();
 			return recs;
 		} catch (LibrisException e) {
@@ -124,7 +125,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 				nextElement = librisMgr.getNextId();	
 			}
 			ElementManager recordsMgr = librisMgr.nextElement();
-			XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader(database, recordsMgr);
+			XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader<DatabaseRecord>(database, recordsMgr);
 			int lastId = 0;
 			metadata.setSavedRecords(0);
 			LibrisFileManager fileMgr = database.getFileMgr();
@@ -172,7 +173,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 	}
 	
 	public static void importIncrementFile(LibrisDatabase database, Reader source, String filePath) throws LibrisException {
-		LibrisMetadata metadata = database.getMetadata();
+		GenericDatabaseMetadata metadata = database.getMetadata();
 		int lastMasterId = metadata.getLastRecordId();
 		try {
 			ElementManager librisMgr = database.makeLibrisElementManager(source, XML_LIBRIS_TAG, filePath);
@@ -183,7 +184,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 			int idOffset = lastMasterId - instanceInfo.getRecordIdBase();
 			assertTrue("Increment starting record ID invalid", idOffset >= 0);
 			ElementManager recordsMgr = librisMgr.nextElement();
-			XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader(database, recordsMgr);
+			XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader<DatabaseRecord>(database, recordsMgr);
 			int numGroups = database.getSchema().getNumGroups();
 			for (Record r: recordsRdr) {
 				if (null == r) {

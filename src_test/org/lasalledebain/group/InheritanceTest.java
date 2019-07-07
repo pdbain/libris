@@ -504,7 +504,8 @@ public class InheritanceTest extends TestCase {
 			for (int i = 1; i <= recId; ++i) {
 				FieldValue fv;
 				fv = rec.getFieldValue(fieldNamesAndValues[i][0]);
-				assertEquals("record "+i, fieldNamesAndValues[i][1], fv.getMainValueAsString());
+				String mainValue = fv.getMainValueAsString();
+				assertEquals("record "+rec.getRecordId()+" field "+i, fieldNamesAndValues[i][1], mainValue);
 			}
 		} catch (InputException e) {
 			e.printStackTrace();

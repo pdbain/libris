@@ -218,7 +218,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 						throw new InputException("Cannot locate parent record "+parentRecordId);
 					}
 					fld = parentRecord.getField(fieldNum);
-					if (null == fld) {
+					if ((null == fld) || fld.isEmpty()) {
 						fld = parentRecord.getDefaultField(fieldNum);
 					}
 				} else {

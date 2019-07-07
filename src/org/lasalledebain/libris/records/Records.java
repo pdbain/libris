@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
@@ -16,10 +17,10 @@ import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 
 public class Records<RecordType extends Record> implements Iterable<Record>{
 
-	private LibrisRecordsFileManager recMgr;
-	LibrisDatabase db;
+	private LibrisRecordsFileManager<RecordType> recMgr;
+	GenericDatabase<RecordType> db;
 
-	public Records(LibrisDatabase db, LibrisFileManager fileMgr) throws LibrisException {
+	public Records(GenericDatabase<RecordType> db, LibrisFileManager fileMgr) throws LibrisException {
 		recMgr = db.getRecordsFileMgr();
 		this.db = db;
 	}
@@ -32,7 +33,7 @@ public class Records<RecordType extends Record> implements Iterable<Record>{
 		throw new DatabaseException("not implemented");
 	}
 
-	public void putRecords(RecordList<Record> modifiedRecords) throws InputException, DatabaseException {
+	public void putRecords(RecordList<RecordType> modifiedRecords) throws InputException, DatabaseException {
 		for (Record r: modifiedRecords) {
 			recMgr.putRecord(r);
 		}

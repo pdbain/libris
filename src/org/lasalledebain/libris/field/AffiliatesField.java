@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.field;
 
+import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -7,12 +9,11 @@ import java.util.Iterator;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordIdNameMapper;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.InternalError;
-import org.lasalledebain.libris.index.GroupDef;
+import org.lasalledebain.libris.index.GroupDef;;
 
 public class AffiliatesField extends GenericField implements Field, Iterable<FieldValue>{
 	private int affiliates[];
@@ -42,7 +43,7 @@ public class AffiliatesField extends GenericField implements Field, Iterable<Fie
 	public void addValue(String recName) throws FieldDataException {
 		try {
 			int recId = mapper.getId(recName);
-			if (RecordId.getNullId() == recId) {
+			if (NULL_RECORD_ID == recId) {
 				throw new FieldDataException("Record "+recName+" not found");
 			}
 			addIntegerValue(recId);
@@ -75,7 +76,7 @@ public class AffiliatesField extends GenericField implements Field, Iterable<Fie
 	}
 
 	private void setValue(String recName, int recId) throws FieldDataException {
-		if (RecordId.getNullId() == recId) {
+		if (NULL_RECORD_ID == recId) {
 			throw new FieldDataException("Record "+recName+" not found");
 		}
 		affiliates = new int[1];
@@ -85,7 +86,7 @@ public class AffiliatesField extends GenericField implements Field, Iterable<Fie
 	@Override
 	public void changeValue(FieldValue fieldValue) throws FieldDataException {
 		int recId = fieldValue.getValueAsInt();
-		if (RecordId.getNullId() == recId) {
+		if (NULL_RECORD_ID == recId) {
 			String recName = fieldValue.getValueAsString();
 			changeValue(recName);
 		} else {
@@ -210,7 +211,7 @@ public class AffiliatesField extends GenericField implements Field, Iterable<Fie
 		ArrayList<Integer> buff = new ArrayList<Integer>();
 		for (FieldValue v: values) {
 			int recId = v.getValueAsInt();
-			if (RecordId.getNullId() == recId) {
+			if (NULL_RECORD_ID == recId) {
 				String recName = v.getValueAsString();
 
 				try {
@@ -218,7 +219,7 @@ public class AffiliatesField extends GenericField implements Field, Iterable<Fie
 				} catch (InputException e) {
 					throw new FieldDataException("Error looking up record "+recName, e);
 				}
-				if (RecordId.getNullId() == recId) {
+				if (NULL_RECORD_ID == recId) {
 					throw new FieldDataException("Error looking up record "+recName);
 				}
 				buff.add(recId);

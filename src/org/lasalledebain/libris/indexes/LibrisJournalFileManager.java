@@ -12,7 +12,6 @@ import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
-import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
@@ -22,7 +21,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class LibrisJournalFileManager<RecordType extends Record> implements Iterable<RecordType>, RecordsWriter, LibrisXMLConstants {
+public class LibrisJournalFileManager<RecordType extends Record> implements Iterable<RecordType>, RecordsWriter<RecordType>, LibrisXMLConstants {
 	HashMap<Integer, RecordIdAndLength> journalIndex;
 	private GenericDatabase<RecordType> database;
 	private FileAccessManager journalFileMgr;
@@ -32,12 +31,7 @@ public class LibrisJournalFileManager<RecordType extends Record> implements Iter
 	private LibrisAttributes databaseProperties;
 	private RecordFactory<RecordType> myRecordFactory;
 
-	public static LibrisJournalFileManager createLibrisJournalFileManager(GenericDatabase database, FileAccessManager journalFileMr,
-			RecordFactory recordFact) throws LibrisException {
-		return new LibrisJournalFileManager(database, journalFileMr, recordFact);
-	}
-
-	private LibrisJournalFileManager(GenericDatabase<RecordType> database, FileAccessManager journalFileMr, RecordFactory<RecordType> recFact) throws LibrisException  {
+	public LibrisJournalFileManager(GenericDatabase<RecordType> database, FileAccessManager journalFileMr, RecordFactory<RecordType> recFact) throws LibrisException  {
 		this.database = database;
 		myRecordFactory = recFact;
 		databaseProperties = database.getAttributes();
@@ -117,7 +111,7 @@ public class LibrisJournalFileManager<RecordType extends Record> implements Iter
 	}
 
 	@Override
-	public void addAll(Iterable<Record> recList) throws LibrisException {
+	public void addAll(Iterable<RecordType> recList) throws LibrisException {
 		for (Record rec: recList) {
 			put(rec);
 		}

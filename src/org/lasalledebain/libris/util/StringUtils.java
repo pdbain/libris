@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.lasalledebain.libris.LibrisConstants;
-import org.lasalledebain.libris.exception.DatabaseException;
 
 public class StringUtils {
 	public static class StringHashSpliterator implements Spliterator.OfInt {

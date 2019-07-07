@@ -19,6 +19,7 @@ import java.util.TreeSet;
 
 import org.junit.After;
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -58,7 +59,7 @@ public class TestRecordFilter extends TestCase {
 	public void testSingleWordFilter() throws FileNotFoundException, IOException {
 		db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
 		KeywordFilter filter = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {0, 1}, new String[] {"k1", "k3"});
-		FilteredRecordList filteredList = new FilteredRecordList(db.getRecords(), filter);
+		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(db.getRecords(), filter);
 		Integer[] ids = new Integer[] {1,4};
 		checkReturnedRecords(filteredList, Arrays.asList(ids));
 	}
@@ -66,9 +67,9 @@ public class TestRecordFilter extends TestCase {
 	public void testCascadeWordFilter() throws FileNotFoundException, IOException {
 		db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
 		KeywordFilter filter1 = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {0, 1}, new String[] {"k1"});
-		FilteredRecordList filteredList1 = new FilteredRecordList(db.getRecords(), filter1);
+		FilteredRecordList<DatabaseRecord> filteredList1 = new FilteredRecordList<DatabaseRecord>(db.getRecords(), filter1);
 		KeywordFilter filter2 = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {0, 1}, new String[] {"k3"});
-		FilteredRecordList filteredList2 = new FilteredRecordList(filteredList1, filter2);
+		FilteredRecordList<DatabaseRecord> filteredList2 = new FilteredRecordList<DatabaseRecord>(filteredList1, filter2);
 		Integer[] ids = new Integer[] {1,4};
 		checkReturnedRecords(filteredList2, Arrays.asList(ids));
 	}
@@ -79,7 +80,7 @@ public class TestRecordFilter extends TestCase {
 		rec.addFieldValue("ID_keywords", "k2 k4 k1 k3");
 		int newId = db.put(rec);
 		KeywordFilter filter = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {0, 1}, new String[] {"k1", "k3"});
-		FilteredRecordList filteredList = new FilteredRecordList(db.getRecords(), filter);
+		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(db.getRecords(), filter);
 		Integer[] ids = new Integer[] {1,4, newId};
 		checkReturnedRecords(filteredList, Arrays.asList(ids));
 		db.closeDatabase(true);
@@ -101,7 +102,7 @@ public class TestRecordFilter extends TestCase {
 	public void testKeywordAndBloomFilter() throws UserErrorException, IOException {
 		db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
 		final String[] searchTerms = new String[] {"k1", "k3"};
-		FilteredRecordList filteredList = db.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
+		FilteredRecordList<DatabaseRecord> filteredList = db.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
 				new int[] {0, 1}, Arrays.asList(searchTerms));
 		Integer[] ids = new Integer[] {1,4};
 		checkReturnedRecords(filteredList, Arrays.asList(ids));
@@ -123,7 +124,7 @@ public class TestRecordFilter extends TestCase {
 		ui.rebuildDatabase();
 		database = ui.openDatabase();
 		for (String term: keyWordsAndRecords.keySet()) {
-			FilteredRecordList filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
+			FilteredRecordList<DatabaseRecord> filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
 					fieldNums, term);
 			checkReturnedRecords(filteredList, keyWordsAndRecords.get(term));
 		}
@@ -148,7 +149,7 @@ public class TestRecordFilter extends TestCase {
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
 		for (String term: keyWordsAndRecords.keySet()) {
-			FilteredRecordList filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
+			FilteredRecordList<DatabaseRecord> filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
 					keywordFieldNums, term);
 			checkReturnedRecords(filteredList, keyWordsAndRecords.get(term));
 		}
@@ -183,7 +184,7 @@ public class TestRecordFilter extends TestCase {
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
 
-		FilteredRecordList filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
+		FilteredRecordList<DatabaseRecord> filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
 				keywordFieldNums, singleKeyword);
 		checkReturnedRecords(filteredList, Arrays.asList(singleKeywordRecord));
 		filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
@@ -273,7 +274,7 @@ public class TestRecordFilter extends TestCase {
 		String searchTerm = "UPPERCASEWORD";
 
 		List<Integer> recordList = keyWordsAndRecords.get(searchTerm);
-		FilteredRecordList filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, false, 
+		FilteredRecordList<DatabaseRecord> filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, false, 
 				keywordFieldNums, Arrays.asList(searchTerm.toLowerCase()));
 		checkReturnedRecords(filteredList, recordList);
 		
@@ -340,7 +341,7 @@ public class TestRecordFilter extends TestCase {
 		database = ui.openDatabase();
 
 		for (String term: keyWordsAndRecords.keySet()) {
-			FilteredRecordList filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
+			FilteredRecordList<DatabaseRecord> filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
 					keywordFieldNums, term);
 			try{
 				checkReturnedRecords(filteredList, keyWordsAndRecords.get(term));
@@ -370,7 +371,7 @@ public class TestRecordFilter extends TestCase {
 			recordList = keyWordsAndRecords.get(searchTerms[i]);
 			recordSet.retainAll(recordList);
 		}
-		FilteredRecordList filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
+		FilteredRecordList<DatabaseRecord> filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, 
 				fieldNums, Arrays.asList(searchTerms));
 		checkReturnedRecords(filteredList, recordSet);
 	}
@@ -386,12 +387,12 @@ public class TestRecordFilter extends TestCase {
 				recordSet.addAll(recordList);
 			}
 		}
-		FilteredRecordList filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_PREFIX, true, 
+		FilteredRecordList<DatabaseRecord> filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_PREFIX, true, 
 				fieldNums, Arrays.asList(key));
 		checkReturnedRecords(filteredList, recordSet);
 	}
 
-	private void checkReturnedRecords(FilteredRecordList<Record> filteredList, Collection<Integer> expectedIdCollection) {
+	private void checkReturnedRecords(FilteredRecordList<DatabaseRecord> filteredList, Collection<Integer> expectedIdCollection) {
 		//Iterator<Integer> expectedIds = expectedIdCollection.iterator();
 		Iterator<Integer> expectedIds = expectedIdCollection.stream().sorted().iterator();
 		// int recordCount = 0;
@@ -407,7 +408,7 @@ public class TestRecordFilter extends TestCase {
 		// assertTrue("too few records found", recordCount == expectedIdCollection.size());
 	}
 	
-	 Record makeRecord (GenericDatabase database, FieldGenerator[] fieldGenerators, int fieldNums[], HashSet<String> keyWords) throws InputException {
+	 Record makeRecord (GenericDatabase<DatabaseRecord> database, FieldGenerator[] fieldGenerators, int fieldNums[], HashSet<String> keyWords) throws InputException {
 		Record rec = database.newRecord();
 		keyWords.clear();
 		for (int i = 0; i < fieldNums.length; ++i) {

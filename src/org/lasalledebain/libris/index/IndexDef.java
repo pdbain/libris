@@ -1,10 +1,11 @@
 package org.lasalledebain.libris.index;
 
+import static org.lasalledebain.libris.LibrisDatabase.log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.InputException;
@@ -12,8 +13,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
-
-import static org.lasalledebain.libris.LibrisDatabase.log;
 
 public class IndexDef implements XMLElement {
 

@@ -13,13 +13,12 @@ import org.lasalledebain.libris.ui.LibrisUi;
 public abstract class GenericDatabase<RecordType extends Record> implements XMLElement {
 	protected GroupManager<RecordType> groupMgr;
 	protected LibrisFileManager fileMgr;
-	protected IndexManager indexMgr;
+	protected IndexManager<RecordType> indexMgr;
 	protected Repository documentRepository;
 	protected final LibrisUi ui;
-	protected ModifiedRecordList modifiedRecords;
+	protected ModifiedRecordList<RecordType> modifiedRecords;
 	protected LibrisJournalFileManager<RecordType> journalFile;
 	protected Records<RecordType> databaseRecords;
-	protected LibrisMetadata metadata;
 	protected boolean readOnly;
 
 
@@ -34,13 +33,19 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return fileMgr;
 	}
 
+	public synchronized ModifiedRecordList<RecordType> getModifiedRecords() {
+		return modifiedRecords;
+	}
+
 	public abstract LibrisJournalFileManager<RecordType> getJournalFileMgr() throws LibrisException;
 	
 	public int getLastRecordId() {
-		return metadata.getLastRecordId();
+		return getMetadata().lastRecordId;
 	}
+	
+	public abstract GenericDatabaseMetadata getMetadata();
 
-	public LibrisRecordsFileManager<DatabaseRecord> getRecordsFileMgr() throws LibrisException {
+	public LibrisRecordsFileManager<RecordType> getRecordsFileMgr() throws LibrisException {
 		return indexMgr.getRecordsFileMgr();
 	}
 
@@ -65,7 +70,8 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		Record rec = modifiedRecords.getRecord(recId);
 		if (null == rec) {
 			try {
-				rec = indexMgr.getRecordsFileMgr().getRecord(recId);
+				LibrisRecordsFileManager<RecordType> recFileMgr = indexMgr.getRecordsFileMgr();
+				rec = recFileMgr.getRecord(recId);
 			} catch (Exception e) {
 				throw new InputException("Error getting record "+recId, e);
 			}
@@ -87,6 +93,20 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return result;
 	}
 
+	public String getRecordName(int recordNum) throws InputException {
+		Record rec = getRecord(recordNum);
+		return (null == rec) ? null: rec.getName();
+	}
+	
+	public NamedRecordList<RecordType> getNamedRecords() {
+		NamedRecordList<RecordType> l = new NamedRecordList<RecordType>(this);
+		return l;
+	}
+
+	public SortedKeyValueFileManager<KeyIntegerTuple> getNamedRecordIndex() {
+		return indexMgr.getNamedRecordIndex();
+	}
+
 	public void alert(String msg, Exception e) {
 		getUi().alert(msg, e);
 	}
@@ -94,5 +114,5 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		getUi().alert(msg);
 	}
 
-
+	public abstract RecordFactory<RecordType> getRecordFactory();
 }

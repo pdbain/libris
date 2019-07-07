@@ -18,7 +18,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
-public class FilteringRecordImporter extends RecordImporter implements LibrisXMLConstants {
+public class FilteringRecordImporter<RecordType extends Record> extends RecordImporter implements LibrisXMLConstants {
 
 	ArrayList<FilteringFieldImporter> fieldImporters;
 	public FilteringRecordImporter(LibrisDatabase db, LibrisXmlFactory fact, FileAccessManager librisImportFileMgr) throws InputException {
