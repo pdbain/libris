@@ -9,7 +9,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 class EmptyRecordList<RecordType extends Record> extends ModifiedRecordList<RecordType> {
 
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		return Collections.emptyIterator();
 	}
 
@@ -24,7 +24,7 @@ class EmptyRecordList<RecordType extends Record> extends ModifiedRecordList<Reco
 	}
 
 	@Override
-	public Record getRecord(int id) throws InputException {
+	public RecordType getRecord(int id) throws InputException {
 		return null;
 	}
 	

@@ -16,6 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.lasalledebain.MockSchema;
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
@@ -48,7 +49,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	LibrisFileManager fileMgr;
 
 	public void testAddRecord() {
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		try {
 			for (int i= 1; i <= 4; ++i) {
 				Record r = makeRandomRecord(recTemplate, i);
@@ -60,7 +61,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 		}
 	}
 	public void testIterator() {
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		ArrayList<Record> recList = new ArrayList<Record>();
 		testLogger.log(Level.INFO, "create records");
 		try {
@@ -78,7 +79,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	}
 	public void testRandomRecordAccess() {
 
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		ArrayList<Record> expectedRecordList = new ArrayList<Record>();
 		testLogger.log(Level.INFO, "create records");
 		final int NUM_RECORDS = 100;
@@ -108,7 +109,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	}
 	public void testGetNonexistentRecord() {
 
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		ArrayList<Record> expectedRecordList = new ArrayList<Record>();
 		testLogger.log(Level.INFO, "create records");
 		final int NUM_RECORDS = 4;
@@ -129,7 +130,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	}
 	public void testReplaceRecordInPlace() {
 
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		ArrayList<Record> expectedRecordList = new ArrayList<Record>();
 		testLogger.log(Level.INFO, "create records");
 		final int NUM_RECORDS = 4;
@@ -167,7 +168,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 
 	public void testRandomReplaceRecordInPlace() {
 
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		ArrayList<Record> expectedRecordList = new ArrayList<Record>();
 		testLogger.log(Level.INFO, "create records");
 		final int NUM_RECORDS = 100;
@@ -196,7 +197,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	}
 
 	public void testReplaceRecordAtEnd() {
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		ArrayList<Record> expectedRecordList = new ArrayList<Record>();
 		testLogger.log(Level.INFO, "create records");
 		final int NUM_RECORDS = 100;
@@ -224,7 +225,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	}
 
 	public void testRemoveRecord() {
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		ArrayList<Record> expectedRecordList = new ArrayList<Record>();
 		testLogger.log(Level.INFO, "create records");
 		try {
@@ -250,7 +251,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 		}
 	}
 	public void testReopenFile() {
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		ArrayList<Record> recList = new ArrayList<Record>();
 		testLogger.log(Level.INFO, "create records");
 		try {
@@ -269,7 +270,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	}
 
 	public void testStandardRecord() {
-		LibrisRecordsFileManager recFile = makeRecFileMgr();
+		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
 		ArrayList<Record> recList = new ArrayList<Record>();
 		testLogger.log(Level.INFO, "create records");
 		try {
@@ -305,6 +306,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 				opstream.write((3 * i) % 256);
 			}
 
+			@SuppressWarnings("resource")
 			FileInputStream testIpStream = new FileInputStream(backup);
 			assertEquals("backup file wrong length", backup.length(), expectedLength);
 			for (int i = 0; i < 128; ++i) {
@@ -344,7 +346,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 			importer.finish(true);
 			opStream.close();
 			recPosns.close();
-			LibrisRecordsFileManager recMgr = new LibrisRecordsFileManager(testDb, false, schem, 
+			LibrisRecordsFileManager<DatabaseRecord> recMgr = new LibrisRecordsFileManager<DatabaseRecord>(testDb, false, schem, 
 					testRecordsFile, recPosns);
 			readAndCompareRecords(recMgr, recList);
 		} catch (Exception e) {
@@ -374,7 +376,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 			long endTime = System.currentTimeMillis();
 			double elapsedTime = 0.0 + endTime - startTime;
 			testLogger.log(Level.INFO, "import time="+(elapsedTime/1000)+" seconds, "+(elapsedTime/numRecs)+" ms/record");
-			LibrisRecordsFileManager recMgr = new LibrisRecordsFileManager(testDb, false, schem, 
+			LibrisRecordsFileManager<DatabaseRecord> recMgr = new LibrisRecordsFileManager<DatabaseRecord>(testDb, false, schem, 
 					testRecordsFile, recPosns);
 			readAndCompareRecords(recMgr, recList, false);
 		} catch (Exception e) {
@@ -383,7 +385,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 		}
 	}
 
-	private void readAndCompareRecords(LibrisRecordsFileManager recFile,
+	private void readAndCompareRecords(LibrisRecordsFileManager<DatabaseRecord> recFile,
 			ArrayList<Record> expectedRecords, boolean verbose) {
 		testLogger.log(Level.INFO, "read back records");
 		for (Record er: expectedRecords) {
@@ -598,11 +600,11 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 		return result;
 
 	}
-	private LibrisRecordsFileManager makeRecFileMgr() {
+	private LibrisRecordsFileManager<DatabaseRecord> makeRecFileMgr() {
 		try {
 			DiagnosticDatabase db = new DiagnosticDatabase(testDatabaseFile);
 			RecordPositions recPosns = new RecordPositions(new MockLibrisRecordMap());
-			LibrisRecordsFileManager recMgr = new LibrisRecordsFileManager(db, false,
+			LibrisRecordsFileManager<DatabaseRecord> recMgr = new LibrisRecordsFileManager<DatabaseRecord>(db, false,
 					schem, testRecordsFile, recPosns);
 			recMgr.reset();
 			return recMgr;
@@ -612,7 +614,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 		}
 		return null;
 	}
-	private void getRecordAndCompare(LibrisRecordsFileManager recFile,
+	private void getRecordAndCompare(LibrisRecordsFileManager<DatabaseRecord> recFile,
 			ArrayList<Record> expectedRecordList, int i) {
 		Record expectedRecord = expectedRecordList.get(i);
 		int rid = expectedRecord.getRecordId();
@@ -628,7 +630,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 			fail("Unexpected exception");
 		}
 	}
-	private void readAndCompareRecords(LibrisRecordsFileManager recFile,
+	private void readAndCompareRecords(LibrisRecordsFileManager<DatabaseRecord> recFile,
 			ArrayList<Record> expectedRecords) {
 		readAndCompareRecords(recFile, expectedRecords, true);
 	}

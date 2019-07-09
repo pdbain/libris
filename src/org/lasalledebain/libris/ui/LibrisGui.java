@@ -230,8 +230,8 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	public Record newRecord() {
-		Record rec = null;
+	public DatabaseRecord newRecord() {
+		DatabaseRecord rec = null;
 		RecordWindow rw = newRecordWindow();
 		if (null != rw) {
 			rec = rw.getRecord();
@@ -240,7 +240,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 	
 	public RecordWindow newRecordWindow() {
-		Record record = null;
+		DatabaseRecord record = null;
 		RecordWindow rw = null;
 		try {
 			record = currentDatabase.newRecord();
@@ -456,9 +456,9 @@ public class LibrisGui extends LibrisWindowedUi {
 			return false;
 		}
 		int rid = resultsPanel.getSelectedRecordId();
-		Record newRecord = null;
+		DatabaseRecord newRecord = null;
 		try {
-			Record originalRecord = currentDatabase.getRecord(rid);
+			DatabaseRecord originalRecord = currentDatabase.getRecord(rid);
 			newRecord = originalRecord.duplicate();
 			newRecord.setEditable(true);
 		} catch (LibrisException e1) {

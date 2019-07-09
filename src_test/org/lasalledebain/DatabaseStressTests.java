@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -30,11 +31,11 @@ public class DatabaseStressTests extends TestCase {
 			testLogger.log(Level.INFO, "add records");
 			long startTime = System.currentTimeMillis();
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
-				Record rec = db.newRecord();
+				DatabaseRecord rec = db.newRecord();
 				for (int f = 0; f < 4; ++f) {
 					rec.addFieldValue(0, "rec_"+i+"_field_"+f);
 				}
-				db.put(rec);
+				db.putRecord(rec);
 				assertEquals("Wrong record ID", i, rec.getRecordId());
 				expectedRecords.add(rec);
 				if (0 == (i % 64)) {

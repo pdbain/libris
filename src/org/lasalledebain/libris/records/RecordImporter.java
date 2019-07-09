@@ -12,5 +12,5 @@ public abstract class RecordImporter<RecordType extends Record> {
 		this.db = db;
 	}
 	
-	public abstract Record importRecord(FieldValueStringList[] fields) throws LibrisException;
+	public abstract RecordType importRecord(FieldValueStringList[] fields) throws LibrisException;
 }

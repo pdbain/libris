@@ -24,7 +24,7 @@ public class SignatureFilteredRecordList<RecordType extends Record> extends Reco
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		try {
 			return new RecordIterator();
 		} catch (IOException | UserErrorException e) {
@@ -33,12 +33,12 @@ public class SignatureFilteredRecordList<RecordType extends Record> extends Reco
 	}
 
 	@Override
-	public Record getRecord(int id) throws InputException {
+	public RecordType getRecord(int id) throws InputException {
 		return dataBase.getRecord(id);
 	}
 
-	private class RecordIterator implements Iterator<Record> {
-		Record currentRecord;
+	private class RecordIterator implements Iterator<RecordType> {
+		RecordType currentRecord;
 		private SignatureFilteredIdList filteredIdSource;
 		public RecordIterator() throws UserErrorException, IOException {
 			filteredIdSource = dataBase.indexMgr.makeSignatureFilteredIdIterator(terms);
@@ -63,9 +63,9 @@ public class SignatureFilteredRecordList<RecordType extends Record> extends Reco
 		}
 
 		@Override
-		public Record next() {
+		public RecordType next() {
 			if (hasNext()) {
-				Record temp = currentRecord;
+				RecordType temp = currentRecord;
 				currentRecord = null;
 				return temp;
 			} else {

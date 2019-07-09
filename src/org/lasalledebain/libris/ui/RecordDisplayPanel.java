@@ -17,6 +17,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -64,7 +65,7 @@ public class RecordDisplayPanel extends JPanel {
 		menu = mainGui.getMenu();
 	}
 
-	RecordWindow addRecord(Record record, boolean editable) throws LibrisException {
+	RecordWindow addRecord(DatabaseRecord record, boolean editable) throws LibrisException {
 		RecordWindow rw = new RecordWindow(mainGui, recLayout, record, editable, modListener);
 		rw.setModified(false);
 		addRecordWindow(rw);
@@ -81,16 +82,10 @@ public class RecordDisplayPanel extends JPanel {
 				return; /* already have the record */
 			}
 		}
-		Record rec = database.getRecord(recId);
+		DatabaseRecord rec = database.getRecord(recId);
 		addRecord(rec, false);
 	}
 
-	/**
-	 * @param record
-	 * @param titleFieldIds
-	 * @param rw
-	 * @throws DatabaseException 
-	 */
 	public void addRecordWindow(RecordWindow rw) throws DatabaseException {
 		openRecords.add(rw);
 		String recordTitle = rw.createTitle(getTitleFieldIds());
@@ -180,7 +175,7 @@ public class RecordDisplayPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				int selectedRecordIndex = openRecordPanes.getSelectedIndex();
 				if (selectedRecordIndex >= 0) {
-					Record currentRecord = openRecords.get(selectedRecordIndex).getRecord();
+					DatabaseRecord currentRecord = openRecords.get(selectedRecordIndex).getRecord();
 					int artifactId = currentRecord.getArtifactId();
 					File recordArtifact = database.getArtifactFile(artifactId);
 					if (!Objects.isNull(recordArtifact)) {
@@ -240,17 +235,17 @@ public class RecordDisplayPanel extends JPanel {
 		if (selectedRecordIndex >= 0) {
 			boolean closeWindow = false;
 			RecordWindow currentRecordWindow = openRecords.get(selectedRecordIndex);
-			Record currentRecord = currentRecordWindow.getRecord();
+			DatabaseRecord currentRecord = currentRecordWindow.getRecord();
 			try {
 				if (enter) {
 					currentRecordWindow.enter();
-					database.put(currentRecord);
+					database.putRecord(currentRecord);
 					mainGui.put(currentRecord);
 				} else {
 					int result = currentRecordWindow.checkClose();
 					switch (result) {
 					case Dialogue.CANCEL_OPTION: return;
-					case Dialogue.YES_OPTION: database.put(currentRecord);
+					case Dialogue.YES_OPTION: database.putRecord(currentRecord);
 					case Dialogue.NO_OPTION: closeWindow = true; break;
 					default: closeWindow = true;
 					}

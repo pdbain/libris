@@ -38,7 +38,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
  * Read records from an XML file.
  *
  */
-public class XmlRecordsReader<RecordType extends Record> implements Iterable<Record>, Iterator<Record>,LibrisXMLConstants {
+public class XmlRecordsReader<RecordType extends Record> implements Iterable<RecordType>, Iterator<RecordType>,LibrisXMLConstants {
 	ElementManager recsMgr;
 	private GenericDatabase<RecordType> database;
 
@@ -54,7 +54,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 	}
 	
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		try {
 			XmlRecordsReader<RecordType> recs = new XmlRecordsReader<RecordType>(database, recsMgr);
 			recsMgr.parseOpenTag();
@@ -71,8 +71,8 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 	}
 
 	@Override
-	public Record next() {
-		Record inputRecord = null;
+	public RecordType next() {
+		RecordType inputRecord = null;
 		ElementManager recMgr;
 
 		try {
@@ -186,7 +186,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 			ElementManager recordsMgr = librisMgr.nextElement();
 			XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader<DatabaseRecord>(database, recordsMgr);
 			int numGroups = database.getSchema().getNumGroups();
-			for (Record r: recordsRdr) {
+			for (DatabaseRecord r: recordsRdr) {
 				if (null == r) {
 					LibrisException e = LibrisException.getLastException();
 					throw e;
@@ -208,7 +208,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 						}
 					}
 				}
-				database.put(r);
+				database.putRecord(r);
 				LibrisDatabase.log(Level.FINE, "importXmlRecords put record "+RecordId.toString(r.getRecordId())); //$NON-NLS-1$
 			}
 			librisMgr.closeFile();

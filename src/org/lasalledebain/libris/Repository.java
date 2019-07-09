@@ -51,7 +51,7 @@ private static final String ID_SOURCE = "ID_source";
 private static final String ID_TITLE = "ID_title";
 private static final String ID_COMMENTS = "ID_comments";
 
-LibrisDatabase repoDatabase;
+GenericDatabase<DatabaseRecord> repoDatabase;
 static public int GROUP_FIELD;
 static public  int TITLE_FIELD;
 static public int SOURCE_FIELD;
@@ -65,7 +65,7 @@ static final int FANOUT = 100;
 	private static final DynamicSchema mySchema = makeSchema();
 	File root;
 
-	public Repository(ChildUi ui, LibrisDatabase db, File theRoot) {
+	public Repository(ChildUi ui, GenericDatabase<DatabaseRecord> db, File theRoot) {
 		repoDatabase = db;
 		root = theRoot;
 	}
@@ -200,7 +200,7 @@ static final int FANOUT = 100;
 	}
 	
 	public int putArtifactInfo(ArtifactParameters artifactParameters) throws LibrisException {
-		Record rec = repoDatabase.newRecord();
+		DatabaseRecord rec = repoDatabase.newRecord();
 		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
 		rec.addFieldValue(ID_DATE, artifactParameters.date);
 		rec.addFieldValue(ID_DOI, artifactParameters.doi);
@@ -223,7 +223,7 @@ static final int FANOUT = 100;
 			}
 			rec.setParent(0, parent.getRecordId());
 		}
-		int id = repoDatabase.put(rec);
+		int id = repoDatabase.putRecord(rec);
 		return id;	
 	}
 	

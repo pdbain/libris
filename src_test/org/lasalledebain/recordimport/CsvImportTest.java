@@ -6,13 +6,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import junit.framework.TestCase;
-
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.Libris;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -27,13 +25,15 @@ import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.util.DiagnosticDatabase;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
+import junit.framework.TestCase;
+
 
 public class CsvImportTest extends TestCase {
 	private static final char CSV_COLUMN_SEP = '\t';
 	private DiagnosticDatabase testDatabase;
 	HashMap<String, String> valueTranslations;
 	public void testArrayImport() {
-		 RecordImporter imp = new DirectRecordImporter(testDatabase);
+		 RecordImporter<DatabaseRecord> imp = new DirectRecordImporter<DatabaseRecord>(testDatabase);
 		 try {
 			 convertToCsvBytes(testData1);
 			 for (FieldValueStringList row[]: convertToFVSL(testData1)) {
@@ -52,7 +52,7 @@ public class CsvImportTest extends TestCase {
 		try {
 			Record[] recs = recReader.importRecordsToDatabase(
 					new InputStreamReader(new ByteArrayInputStream(convertToCsvBytes(testData1))),
-					new DirectRecordImporter(testDatabase));
+					new DirectRecordImporter<DatabaseRecord>(testDatabase));
 			int i = 0;
 			for (FieldValueStringList[] row: convertToFVSL(testData1)) {
 				checkFields(row, recs[i]);
@@ -66,7 +66,7 @@ public class CsvImportTest extends TestCase {
 
 	public void testFilteredImport() {
 		try {
-			FilteringRecordImporter imp = new FilteringRecordImporter(testDatabase, 
+			FilteringRecordImporter<DatabaseRecord> imp = new FilteringRecordImporter<DatabaseRecord>(testDatabase, 
 					new LibrisXmlFactory(), 
 					db1Mgr);
 
@@ -87,7 +87,7 @@ public class CsvImportTest extends TestCase {
 
 	public void testWildcardSubstitution() {
 		try {
-			FilteringRecordImporter imp = new FilteringRecordImporter(testDatabase, 
+			FilteringRecordImporter<DatabaseRecord> imp = new FilteringRecordImporter<DatabaseRecord>(testDatabase, 
 					new LibrisXmlFactory(),db1Mgr);
 
 			DelimitedTextRecordsReader recReader = new DelimitedTextRecordsReader(testDatabase, CSV_COLUMN_SEP);

@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import org.lasalledebain.libris.exception.InputException;
 
-class RangeRecordIterable<RecordType extends Record> implements Iterable<Record> {
+class RangeRecordIterable<RecordType extends Record> implements Iterable<RecordType> {
 	private GenericDatabase<RecordType> database;
 	int limit;
 	int base;
@@ -15,9 +15,9 @@ class RangeRecordIterable<RecordType extends Record> implements Iterable<Record>
 		base = startId + 1;
 		limit = endId;
 	}
-	class RangeRecordIterator implements Iterator<Record> {
+	class RangeRecordIterator implements Iterator<RecordType> {
 		private int cursor;
-		private Record nextRecord;
+		private RecordType nextRecord;
 		public RangeRecordIterator() {
 			cursor = base;
 			nextRecord = null;
@@ -35,8 +35,8 @@ class RangeRecordIterable<RecordType extends Record> implements Iterable<Record>
 			return !Objects.isNull(nextRecord);
 		}
 		@Override
-		public Record next() {
-			Record result;
+		public RecordType next() {
+			RecordType result;
 			if (!hasNext()) {
 				throw new NoSuchElementException();
 			}		
@@ -47,7 +47,7 @@ class RangeRecordIterable<RecordType extends Record> implements Iterable<Record>
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		return new RangeRecordIterator();
 	}
 }

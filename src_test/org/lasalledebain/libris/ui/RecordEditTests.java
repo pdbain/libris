@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -124,7 +125,7 @@ public class RecordEditTests extends TestCase {
 			File dbFile = db.getDatabaseFile();
 			BrowserWindow resultsWindow = gui.getResultsWindow();
 			int recId = 0;
-			Record rec;
+			DatabaseRecord rec;
 			{
 				rec = gui.newRecord();
 				rec.setEditable(true);
@@ -135,7 +136,7 @@ public class RecordEditTests extends TestCase {
 				fld = rec.getField(ID_PUB);
 				fld.addIntegerValue(1);
 				fld.addValuePair(-1, TEST_PUBLISHER);
-				db.put(rec);
+				db.putRecord(rec);
 				recId = rec.getRecordId();
 				db.save();
 			}
@@ -143,7 +144,7 @@ public class RecordEditTests extends TestCase {
 			{
 				Field fld = rec.getField(ID_PUB);
 				fld.addValuePair(-1, "foobar");
-				db.put(rec);
+				db.putRecord(rec);
 				db.save();
 				assertTrue("Could not close database", db.closeDatabase(false));
 			}
@@ -171,7 +172,7 @@ public class RecordEditTests extends TestCase {
 			TestGUI gui = rebuildAndOpenDatabase(getName(), TEST_DB_WITH_DEFAULTS_XML_FILE);
 			LibrisDatabase db = gui.getDatabase();
 			short pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
-			Record rec = gui.newRecord();
+			DatabaseRecord rec = gui.newRecord();
 			rec.setEditable(false);
 			Field fld = rec.getField("ID_auth");
 			assertNull("author field not empty", fld);

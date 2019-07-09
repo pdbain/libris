@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -17,7 +18,6 @@ public class DelimitedTextRecordsReader {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -711158397627820062L;
 	public String[] fieldIds;
 	private LibrisDatabase db;
 	private char separatorChar;
@@ -80,15 +80,15 @@ public class DelimitedTextRecordsReader {
 	}
 	
 
-	public Record[] importRecordsToDatabase(Reader importReader, RecordImporter recImporter) throws LibrisException  {
+	public Record[] importRecordsToDatabase(Reader importReader, RecordImporter<DatabaseRecord> recImporter) throws LibrisException  {
 		Iterator<FieldValueStringList[]> recRdr = (new CsvRecords(importReader, separatorChar)).iterator();
 		ArrayList<Record> newRecords = new ArrayList<Record>();
 		rowCount = 0;
 		while (recRdr.hasNext()) {
 			FieldValueStringList[] recFields = recRdr.next();
 			++rowCount;
-			Record rec = recImporter.importRecord(recFields);
-			db.put(rec);
+			DatabaseRecord rec = recImporter.importRecord(recFields);
+			db.putRecord(rec);
 			newRecords.add(rec);
 		}
 		return newRecords.toArray(new Record[newRecords.size()]);

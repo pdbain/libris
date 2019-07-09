@@ -14,8 +14,8 @@ public class DirectRecordImporter<RecordType extends Record> extends RecordImpor
 
 	@Override
 	public
-	Record importRecord(FieldValueStringList[] fields) throws DatabaseException, InputException {
-		Record rec = db.newRecord();
+	RecordType importRecord(FieldValueStringList[] fields) throws DatabaseException, InputException {
+		RecordType rec = db.newRecord();
 		short fieldNum = 0;
 		for (FieldValueStringList values: fields) {
 			for (String value: values) {

@@ -22,26 +22,9 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public static String getXmlTag() {
 		return elementTag;
 	}
-	private int artifactId;
-// TODO 1 save artifactId in native file
 	protected LibrisAttributes attributes;
 	boolean editable = false;
 	
-	public Record() {
-		artifactId = RecordId.NULL_RECORD_ID;
-	}
-	/**
-	 * @return id of the related file in the artifact database
-	 */
-	public int getArtifactId() {
-		return artifactId;
-	}
-	/**
-	 * @param artifactId id of the related file in the artifact database
-	 */
-	public void setArtifactId(int artifactId) {
-		this.artifactId = artifactId;
-	}
 	public static ElementShape getShape() {
 		ElementShape shape = new ElementShape(elementTag);
 		shape.setRequiredAttributeNames(new String[] {XML_RECORD_ID_ATTR});

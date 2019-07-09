@@ -145,14 +145,14 @@ public class Utilities extends TestCase {
 		return myLayouts;
 	}
 
-	static Record loadRecordFromXml(File schemaFile, File recordFile)
+	static DatabaseRecord loadRecordFromXml(File schemaFile, File recordFile)
 	throws LibrisException, XMLStreamException,
 	LibrisException, RecordDataException,
 	FactoryConfigurationError, DatabaseException, FileNotFoundException {
 		Schema s = Utilities.loadSchema(schemaFile);
 		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		ElementManager mgr = makeElementManagerFromFile(recordFile, "record");
-		Record rec = rt.makeRecord(true);
+		DatabaseRecord rec = rt.makeRecord(true);
 		rec.fromXml(mgr);
 		return rec;
 	}

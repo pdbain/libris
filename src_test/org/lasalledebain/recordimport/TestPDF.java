@@ -14,6 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
@@ -60,7 +61,7 @@ public class TestPDF extends TestCase {
 			short keywordField = db.getSchema().getFieldNum("ID_keywords");
 			short abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
-			Record rec = db.newRecord();
+			DatabaseRecord rec = db.newRecord();
 			File testPdf = Utilities.getTestDatabase(Utilities.EXAMPLE_ARTIFACT_PDF);
 			importer.importDocument(testPdf.toURI(), t -> 1, rec);
 			String keywordsText = rec.getField(keywordField).getValuesAsString();
@@ -81,7 +82,7 @@ public class TestPDF extends TestCase {
 			short keywordField = db.getSchema().getFieldNum("ID_keywords");
 			short abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
-			Record rec = db.newRecord();
+			DatabaseRecord rec = db.newRecord();
 			File testPdf = Utilities.getTestDatabase(Utilities.EXAMPLE_LARGE_PDF);
 			importer.importDocument(testPdf.toURI(), t -> 1, rec);
 			String keywordsText = rec.getField(keywordField).getValuesAsString();
@@ -107,8 +108,8 @@ public class TestPDF extends TestCase {
 			short keywordField = db.getSchema().getFieldNum("ID_keywords");
 			short abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
-			Record parentRec = db.newRecord();
-			db.put(parentRec);
+			DatabaseRecord parentRec = db.newRecord();
+			db.putRecord(parentRec);
 			parentRec.setName("Parent_record");
 			URI exampleDocs = URI.create("jar:file:"+(Utilities.getTestDatabase(Utilities.EXAMPLE_DOCS_ZIP).getAbsolutePath()));
 			File docDir = new File(workdir, "docs");

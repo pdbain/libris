@@ -157,7 +157,7 @@ public class AffiliateList<RecordType extends Record> {
 		}
 	}
 
-	public Iterable<Record> getDescendents(int parent, RecordList<RecordType> masterList) {
-		return new DescendentRecordIterator<>(masterList, parent, this);
+	public Iterable<RecordType> getDescendents(int parent, RecordList<RecordType> masterList) {
+		return new DescendentRecordIterator<RecordType>(masterList, parent, this);
 	}
 }

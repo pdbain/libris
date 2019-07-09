@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -100,7 +101,7 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 	}
 
 	@Override
-	public void setRecordName(NamedRecordList namedRecs) throws InputException {
+	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException {
 		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
 	}
 

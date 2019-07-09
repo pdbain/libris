@@ -13,9 +13,9 @@ public class SingleRecordList<RecordType extends Record> extends RecordList<Reco
 		position = 0;
 	}
 
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 
-		return new SingleRecordList<Record>(rec);
+		return new SingleRecordList<RecordType>(rec);
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class SingleRecordList<RecordType extends Record> extends RecordList<Reco
 	}
 
 	@Override
-	public Record getRecord(int id) {
+	public RecordType getRecord(int id) {
 		if ((null != rec) && (rec.getRecordId() == id)) {
 			return rec;
 		} else {

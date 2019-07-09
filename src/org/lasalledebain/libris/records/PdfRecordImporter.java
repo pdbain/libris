@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 import org.lasalledebain.libris.ArtifactParameters;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
@@ -42,7 +43,7 @@ public class PdfRecordImporter {
 		setAbstractField(absField);
 	}
 
-	public void importDocument(URI sourceFileUri, Function<String, Integer> documentFrequency, Record rec) throws LibrisException, IOException {
+	public void importDocument(URI sourceFileUri, Function<String, Integer> documentFrequency, DatabaseRecord rec) throws LibrisException, IOException {
 		
 		/* copy file to repository */
 		int artifactId = artifactRepository.importFile(new ArtifactParameters(sourceFileUri));
@@ -78,10 +79,10 @@ public class PdfRecordImporter {
 			recordDatabase.incrementTermCounts(StringUtils.getTerms(documentText, true).map(w -> stem(w)));
 		}
 		for (URI sourceFileUri: sourceFiles) {
-			Record rec = recordDatabase.newRecord();
+			DatabaseRecord rec = recordDatabase.newRecord();
 			importDocument(sourceFileUri, documentFrequency, rec);
 			rec.setParent(0, parentId);
-			recordDatabase.put(rec);
+			recordDatabase.putRecord(rec);
 		}
 	}
 

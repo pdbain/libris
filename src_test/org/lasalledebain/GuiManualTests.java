@@ -158,7 +158,7 @@ public class GuiManualTests extends TestCase {
 		try {
 			Schema schem = Utilities.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
-			Record rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
+			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
 			assertNotNull("could not load "+Utilities.LAYOUT2, myGuiLayout);
 			RecordWindow rWindow = new RecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), false, null);
@@ -181,7 +181,7 @@ public class GuiManualTests extends TestCase {
 		try {
 			Schema schem = Utilities.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
-			Record rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
+			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = (Layout) myLayouts.getLayout(Utilities.LAYOUT2);
 			} catch (ClassCastException e) {
@@ -337,7 +337,7 @@ public class GuiManualTests extends TestCase {
 		try {
 			Schema schem = Utilities.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
-			Record rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
+			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = myLayouts.getLayout(LAYOUT1A);
 			} catch (ClassCastException e) {

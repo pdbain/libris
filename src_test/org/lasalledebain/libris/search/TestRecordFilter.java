@@ -76,9 +76,9 @@ public class TestRecordFilter extends TestCase {
 
 	public void testAddRecord() throws LibrisException, FileNotFoundException, IOException {
 		db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
-		Record rec = db.newRecord();
+		DatabaseRecord rec = db.newRecord();
 		rec.addFieldValue("ID_keywords", "k2 k4 k1 k3");
-		int newId = db.put(rec);
+		int newId = db.putRecord(rec);
 		KeywordFilter filter = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {0, 1}, new String[] {"k1", "k3"});
 		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(db.getRecords(), filter);
 		Integer[] ids = new Integer[] {1,4, newId};
@@ -307,12 +307,12 @@ public class TestRecordFilter extends TestCase {
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
-		Record rec = database.newRecord();
+		DatabaseRecord rec = database.newRecord();
 		final String newKeyWords[] = {"FirstKeyword", "SecondKeyword", "ThirdKeyword"};
 		for (int i = 0; i < newKeyWords.length; ++i) {
 			rec.addFieldValue(keywordFieldNums[i], newKeyWords[i]);
 		}
-		int newId = database.put(rec);
+		int newId = database.putRecord(rec);
 		HashMap<String, List<Integer>> keyWordsAndRecords = new HashMap<>();
 		for (String s: newKeyWords) {
 			keyWordsAndRecords.put(s, Arrays.asList(newId));
@@ -408,8 +408,8 @@ public class TestRecordFilter extends TestCase {
 		// assertTrue("too few records found", recordCount == expectedIdCollection.size());
 	}
 	
-	 Record makeRecord (GenericDatabase<DatabaseRecord> database, FieldGenerator[] fieldGenerators, int fieldNums[], HashSet<String> keyWords) throws InputException {
-		Record rec = database.newRecord();
+	DatabaseRecord makeRecord (GenericDatabase<DatabaseRecord> database, FieldGenerator[] fieldGenerators, int fieldNums[], HashSet<String> keyWords) throws InputException {
+		 DatabaseRecord rec = database.newRecord();
 		keyWords.clear();
 		for (int i = 0; i < fieldNums.length; ++i) {
 			String fieldText = fieldGenerators[i].makeFieldString(keyWords);
@@ -422,8 +422,8 @@ public class TestRecordFilter extends TestCase {
 		 HashMap<String, List<Integer>> keyWordsAndRecords = new HashMap<>();
 		 HashSet<String> keyWords = new HashSet<>();
 		 for (int i = 1; i <= numRecs; i++) {
-			 Record rec = makeRecord(database, fieldGenerators, fieldNums, keyWords);
-			 int recNum = database.put(rec);
+			 DatabaseRecord rec = makeRecord(database, fieldGenerators, fieldNums, keyWords);
+			 int recNum = database.putRecord(rec);
 			 for (String s: keyWords) {
 				 List<Integer> list = keyWordsAndRecords.get(s);
 				 if (null == list) {

@@ -20,6 +20,7 @@ import javax.swing.ListSelectionModel;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
+@SuppressWarnings("serial")
 public class FieldValueArranger extends JDialog {
 	 
     private JButton upButton;

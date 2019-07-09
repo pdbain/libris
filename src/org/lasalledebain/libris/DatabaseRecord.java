@@ -32,6 +32,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	private long dataLength = -1;
 	private static final GroupMember[] dummyAffiliations = new GroupMember[0];
 	private int artifactId;
+	// TODO 1 save artifactId in native file
 
 	public DatabaseRecord(RecordTemplate recordTemplate) {
 		super();
@@ -574,8 +575,8 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	}
 	
 	@Override
-	public Record duplicate() throws DatabaseException, FieldDataException  {
-		Record otherRec = new DatabaseRecord(template);
+	public DatabaseRecord duplicate() throws DatabaseException, FieldDataException  {
+		DatabaseRecord otherRec = new DatabaseRecord(template);
 		otherRec.setEditable(true);
 		for (int i = 0; i < recordData.length; ++i) {
 			Field fld = recordData[i];

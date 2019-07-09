@@ -45,7 +45,7 @@ public class BrowserWindow extends JPanel {
 	private JButton moreButton;
 	private JButton refreshButton;
 	private RandomAccessBrowserList recList;
-	private Iterator<Record> recordsIterator;
+	private Iterator<DatabaseRecord> recordsIterator;
 	private ImageIcon searchIcon;
 
 	private RecordList<DatabaseRecord> recordsSource;
@@ -159,7 +159,7 @@ public class BrowserWindow extends JPanel {
 		chooser.setModel(recList);
 	}
 
-	public void doRefresh(Iterable<Record> src) {
+	public void doRefresh(Iterable<DatabaseRecord> src) {
 		recordsIterator = src.iterator();
 		recList = getRecords();
 		chooser.setModel(recList);

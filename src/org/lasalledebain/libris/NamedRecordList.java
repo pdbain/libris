@@ -29,11 +29,11 @@ public class NamedRecordList<RecordType extends Record> extends RecordList<Recor
 	}
 	
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		return new NamedRecordIterator();
 	}
 
-	class NamedRecordIterator implements Iterator<Record>{
+	class NamedRecordIterator implements Iterator<RecordType>{
 		private Iterator<KeyIntegerTuple> tupleIterator;
 
 		NamedRecordIterator() {
@@ -46,7 +46,7 @@ public class NamedRecordList<RecordType extends Record> extends RecordList<Recor
 		}
 
 		@Override
-		public Record next() {
+		public RecordType next() {
 			KeyIntegerTuple tup = tupleIterator.next();
 			int numericId = tup.getValue();
 			try {
@@ -64,7 +64,7 @@ public class NamedRecordList<RecordType extends Record> extends RecordList<Recor
 	}
 
 	@Override
-	public Record getRecord(int id) throws InputException {
+	public RecordType getRecord(int id) throws InputException {
 		return database.getRecord(id);
 	}
 

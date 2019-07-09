@@ -15,6 +15,7 @@ import java.util.logging.Level;
 
 import org.junit.Test;
 import org.lasalledebain.libris.DatabaseInstance;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -43,7 +44,7 @@ public class DatabaseTests extends TestCase {
 		try {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE);
 			rootDb =  Libris.buildAndOpenDatabase(testDatabaseFile);
-			RecordFactory rt = RecordTemplate.templateFactory(rootDb.getSchema(), null);
+			RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(rootDb.getSchema(), null);
 			Vector<Record> recordList = new Vector<Record>();
 			ElementManager librisMgr = Utilities.makeElementManagerFromFile(testDatabaseFile, "libris");
 			librisMgr.parseOpenTag();
@@ -90,11 +91,11 @@ public class DatabaseTests extends TestCase {
 			rootDb = buildTestDatabase(testDatabaseFileCopy);
 
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
-				Record rec = rootDb.getRecord(i);
+				DatabaseRecord rec = rootDb.getRecord(i);
 				Field f = rec.getField(ID_AUTH);
 				f.changeValue("new value "+i);
 				testLogger.log(Level.INFO,rec.toString());
-				rootDb.put(rec);
+				rootDb.putRecord(rec);
 			}
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
 				Record rec = rootDb.getRecord(i);
@@ -115,11 +116,11 @@ public class DatabaseTests extends TestCase {
 			rootDb = buildTestDatabase(testDatabaseFileCopy);
 
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
-				Record rec = rootDb.getRecord(i);
+				DatabaseRecord rec = rootDb.getRecord(i);
 				rec.setName("Name_"+i);
 				rec.addFieldValue(ID_AUTH, "new value "+i);
 				testLogger.log(Level.INFO,rec.toString());
-				rootDb.put(rec);
+				rootDb.putRecord(rec);
 			}
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
 				Record rec = rootDb.getRecord(i);
@@ -192,11 +193,11 @@ public class DatabaseTests extends TestCase {
 			LibrisUi testUi = rootDb.getUi();
 			String expected = null;
 			{
-				Record rec = rootDb.getRecord(1);
+				DatabaseRecord rec = rootDb.getRecord(1);
 				Field f = rec.getField(ID_publisher);
 				f.addValuePair("", "test data");
 				expected = f.getValuesAsString();
-				rootDb.put(rec);
+				rootDb.putRecord(rec);
 				rootDb.save();
 				testUi.closeDatabase(false);
 			}
@@ -267,8 +268,8 @@ public class DatabaseTests extends TestCase {
 			testLogger.log(Level.INFO, "database rebuilt");
 			int lastId = rootDb.getLastRecordId();
 			for (int i = lastId+1; i <= numRecs; ++i) {
-				Record rec = rootDb.newRecord();
-				int recNum = rootDb.put(rec);
+				DatabaseRecord rec = rootDb.newRecord();
+				int recNum = rootDb.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 			}
 			rootDb.save();
@@ -300,14 +301,13 @@ public class DatabaseTests extends TestCase {
 			assertTrue("database copy does not match original", forkDb.equals(rootDb));
 			
 			rootDb.closeDatabase(false);
-;
 			DatabaseInstance inst = forkDb.getMetadata().getInstanceInfo();
 			assertNotNull("Database instance information missing", inst);
 			assertEquals("Wrong base ID", lastId, inst.getRecordIdBase());
 			final int numRecs = 10;
 			for (int i = lastId+1; i <= numRecs; ++i) {
-				Record rec = forkDb.newRecord();
-				int recNum = forkDb.put(rec);
+				DatabaseRecord rec = forkDb.newRecord();
+				int recNum = forkDb.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 			}
 			forkDb.save();
@@ -315,7 +315,7 @@ public class DatabaseTests extends TestCase {
 
 			for (int i = 1; i <= numRecs; ++i) {
 				try {
-					Record r = forkDb.getRecord(i);
+					DatabaseRecord r = forkDb.getRecord(i);
 					assertNotNull("Cannot find record "+i, r);
 					assertEquals("Wrong record ID",  i, r.getRecordId());
 					boolean readOnly = forkDb.isRecordReadOnly(i);
@@ -324,13 +324,13 @@ public class DatabaseTests extends TestCase {
 					int resultId;
 					if (i <= lastId) {
 						try {
-							resultId = forkDb.put(r);
+							resultId = forkDb.putRecord(r);
 							fail("record " + resultId + " from root database not read-only");
 						} catch (DatabaseException e) {
 
 						}
 					} else {
-						resultId = forkDb.put(r);
+						resultId = forkDb.putRecord(r);
 						assertEquals("record from fork database wrong ID", i, resultId);
 					}
 				} catch (InputException e) {
@@ -379,9 +379,9 @@ public class DatabaseTests extends TestCase {
 			assertEquals("Wrong base ID", lastId, inst.getRecordIdBase());
 			final int numRecs = 10;
 			for (int i = lastId+1; i <= numRecs; ++i) {
-				Record rec = forkDb.newRecord();
+				DatabaseRecord rec = forkDb.newRecord();
 				rec.addFieldValue("ID_title", "Record"+newRecordNumber++);
-				int recNum = forkDb.put(rec);
+				int recNum = forkDb.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				expectedRecords.add(rec);
 			}
@@ -424,11 +424,11 @@ public class DatabaseTests extends TestCase {
 				testLogger.log(Level.INFO,getName()+": copy database to "+forkFile);
 				rootDb.exportFork(forkStream);
 				forkStream.close();
-				Record newRootRec = rootDb.newRecord();
+				DatabaseRecord newRootRec = rootDb.newRecord();
 				String fieldData = "Record"+newRecordNumber;
 				newRootRec.addFieldValue("ID_title", fieldData);
 				testLogger.log(Level.INFO,"add new record with "+fieldData+" to root database");
-				rootDb.put(newRootRec);
+				rootDb.putRecord(newRootRec);
 				newRecordNumber++;
 				rootDb.save();
 				expectedRecords.add(newRootRec);
@@ -438,10 +438,10 @@ public class DatabaseTests extends TestCase {
 				forkDb = Libris.buildAndOpenDatabase(forkFile);
 				Record recCopy;
 				{
-					Record newForkRec = rootDb.newRecord();
+					DatabaseRecord newForkRec = rootDb.newRecord();
 					String fieldData = "Record"+newRecordNumber;
 					newForkRec.addFieldValue("ID_title", fieldData);
-					int newId = forkDb.put(newForkRec);
+					int newId = forkDb.putRecord(newForkRec);
 					recCopy = newForkRec.duplicate();
 					testLogger.log(Level.INFO,"add new record " + newId + " with "+fieldData+" to fork "+incrementNumber);
 				}
@@ -470,7 +470,6 @@ public class DatabaseTests extends TestCase {
 
 	@Test
 	public void testAdjustAffiliates() {
-		ArrayList<Record> rootExpectedRecords = new ArrayList<>();
 		int newRecordNumber;
 		try {
 			File workdir = Utilities.getTempTestDirectory();
@@ -490,23 +489,23 @@ public class DatabaseTests extends TestCase {
 			instanceStream.close();
 
 
-			Record newRootRec = rootDb.newRecord();
+			DatabaseRecord newRootRec = rootDb.newRecord();
 			newRootRec.addFieldValue("ID_title", "Record"+newRecordNumber++);
-			rootDb.put(newRootRec);
+			rootDb.putRecord(newRootRec);
 			rootDb.save();
 						
 			forkDb = Libris.buildAndOpenDatabase(dbInstance);
 			assertNotNull("Error rebuilding database copy", forkDb);
 
-			Record newForkRec1 = forkDb.newRecord();
+			DatabaseRecord newForkRec1 = forkDb.newRecord();
 			newForkRec1.addFieldValue("ID_title", "Record"+newRecordNumber++);
 			newForkRec1.setParent(0, baseAffiliate);
-			int newRecNum = forkDb.put(newForkRec1);
+			int newRecNum = forkDb.putRecord(newForkRec1);
 			
-			Record newForkRec2 = forkDb.newRecord();
+			DatabaseRecord newForkRec2 = forkDb.newRecord();
 			newForkRec2.addFieldValue("ID_title", "Record"+newRecordNumber++);
 			newForkRec2.setParent(0, newRecNum);
-			forkDb.put(newForkRec2);
+			forkDb.putRecord(newForkRec2);
 					
 			forkDb.save();
 			forkDb.exportIncrement(new FileOutputStream(dbIncrement));
@@ -564,9 +563,9 @@ public class DatabaseTests extends TestCase {
 			instanceStream.close();
 			int extraBaseRecords = 5;
 			for (int i = baseId+1; i <= baseId+extraBaseRecords; ++i) {
-				Record rec = rootDb.newRecord();
+				DatabaseRecord rec = rootDb.newRecord();
 				rec.addFieldValue("ID_title", "Record"+newRecordNumber++);
-				int recNum = rootDb.put(rec);
+				int recNum = rootDb.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				rootExpectedRecords.add(rec);
 			}
@@ -582,9 +581,9 @@ public class DatabaseTests extends TestCase {
 			assertEquals("Wrong base ID", baseId, inst.getRecordIdBase());
 			final int numIncrementRecs = 10;
 			for (int i = baseId+1; i <= numIncrementRecs; ++i) {
-				Record rec = forkDb.newRecord();
+				DatabaseRecord rec = forkDb.newRecord();
 				rec.addFieldValue("ID_title", "Record"+newRecordNumber++);
-				int recNum = forkDb.put(rec);
+				int recNum = forkDb.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				incrementExpectedRecords.add(rec);
 			}

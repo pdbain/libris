@@ -18,21 +18,22 @@ public class FilteredRecordList<RecordType extends Record> extends RecordList<Re
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
-		return new RecordIterator(recordSource.iterator());
+	public Iterator<RecordType> iterator() {
+		Iterator<RecordType> iter = recordSource.iterator();
+		return new RecordIterator(iter);
 	}
 
 	@Override
-	public Record getRecord(int id) throws InputException {
+	public RecordType getRecord(int id) throws InputException {
 		return recordSource.getRecord(id);
 	}
 
-	class RecordIterator implements Iterator<Record> {
+	class RecordIterator implements Iterator<RecordType> {
 
-		private Record savedRec;
-		protected Iterator<Record> recordSource;
+		private RecordType savedRec;
+		protected Iterator<RecordType> recordSource;
 
-		protected RecordIterator(Iterator<Record> src) {
+		protected RecordIterator(Iterator<RecordType> src) {
 			savedRec = null;
 			recordSource = src;
 		}
@@ -41,7 +42,7 @@ public class FilteredRecordList<RecordType extends Record> extends RecordList<Re
 		public boolean hasNext() {
 			try {
 				while ((null == savedRec) && recordSource.hasNext()) {
-					Record temp = recordSource.next();
+					RecordType temp = recordSource.next();
 					if (filter.matches(temp)) {
 						savedRec = temp;
 					}
@@ -53,9 +54,9 @@ public class FilteredRecordList<RecordType extends Record> extends RecordList<Re
 		}
 
 		@Override
-		public Record next() {
+		public RecordType next() {
 			if (hasNext()) {
-				Record temp = savedRec;
+				RecordType temp = savedRec;
 				savedRec = null;
 				return temp;
 			} else {

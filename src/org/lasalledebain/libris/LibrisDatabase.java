@@ -329,7 +329,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return XML_LIBRIS_TAG;
 	}
 	private void toXml(ElementWriter outWriter, boolean includeMetadata,
-			Iterable<Record> recordSource, boolean includeInstanceInfo) throws XmlException, LibrisException {
+			Iterable<DatabaseRecord> recordSource, boolean includeInstanceInfo) throws XmlException, LibrisException {
 		outWriter.writeStartElement(XML_LIBRIS_TAG, getAttributes(), false);
 		if (includeInstanceInfo) {
 			DatabaseInstance databaseInstanceInfo = databaseMetadata.getInstanceInfo();
@@ -394,11 +394,11 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		};
 		ElementManager recsMgr = incrementManager.nextElement();
 		XmlRecordsReader<DatabaseRecord> recordsReader = new XmlRecordsReader<DatabaseRecord>(this, recsMgr);
-		for (Record newRec: recordsReader) {
+		for (DatabaseRecord newRec: recordsReader) {
 			if (idAdjustment > 0) {
 				newRec.offsetIds(baseId, idAdjustment);
 			}
-			put(newRec);
+			putRecord(newRec);
 		}
 		return true;
 	}
@@ -587,7 +587,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return xmlFactory;
 	}
 
-	public Iterable<Record> getRecordReader() throws LibrisException {
+	public Iterable<DatabaseRecord> getRecordReader() throws LibrisException {
 		return getRecordsFileMgr();
 	}
 	/**
@@ -638,7 +638,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 * @return ID of the new record
 	 * @throws LibrisException 
 	 */
-	public int put(Record rec) throws LibrisException {
+	public int putRecord(DatabaseRecord rec) throws LibrisException {
 		int id = rec.getRecordId();
 		if (RecordId.isNull(id)) {
 			id = newRecordId();
@@ -792,7 +792,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 		lockDatabase();
 		instanceInfo.doJoin();
-		Iterable<Record> rangeIter = new RangeRecordIterable<DatabaseRecord>(this, instanceInfo.getRecordIdBase(), getLastRecordId());
+		Iterable<DatabaseRecord> rangeIter = new RangeRecordIterable<DatabaseRecord>(this, instanceInfo.getRecordIdBase(), getLastRecordId());
 		try {
 			ElementWriter outWriter = ElementWriter.eventWriterFactory(destination);
 			toXml(outWriter, false, rangeIter, true); 
@@ -827,7 +827,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return mainRecordTemplate;
 	}
 
-	public Iterable<Record> getChildRecords(int parent, int groupNum, boolean allDescendents) {
+	public Iterable<DatabaseRecord> getChildRecords(int parent, int groupNum, boolean allDescendents) {
 		AffiliateList<DatabaseRecord> affList = indexMgr.getAffiliateList(groupNum);
 		if (allDescendents) {
 			return affList.getDescendents(parent, this.getRecords());
@@ -837,7 +837,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 	}
 
-	public Iterable<Record> getAffiliateRecords(int parent, int groupNum) {
+	public Iterable<DatabaseRecord> getAffiliateRecords(int parent, int groupNum) {
 		AffiliateList<DatabaseRecord> affList = indexMgr.getAffiliateList(groupNum);
 		int[] result = affList.getAffiliates(parent);
 		return new ArrayRecordIterator<DatabaseRecord>(getRecords(), result);
@@ -861,7 +861,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	public LibrisJournalFileManager<DatabaseRecord> getJournalFileMgr() throws LibrisException {
 		if (null == journalFile) {
-			journalFile = new LibrisJournalFileManager(this, fileMgr.getJournalFileMgr(), RecordTemplate.templateFactory(getSchema(), null));
+			journalFile = new LibrisJournalFileManager<DatabaseRecord>(this, fileMgr.getJournalFileMgr(), RecordTemplate.templateFactory(getSchema(), null));
 		}
 		return journalFile;
 	}

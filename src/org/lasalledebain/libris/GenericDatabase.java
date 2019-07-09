@@ -59,6 +59,8 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public abstract  RecordType newRecord() throws InputException;
 
+	public abstract int putRecord(DatabaseRecord rec) throws LibrisException;
+	
 	/**
 	 * Get the record.  If the record has been modified but not written to the database file, use that.
 	 * Otherwise read the record from the file.
@@ -66,8 +68,8 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	 * @return record, or null if it cannot be found
 	 * @throws InputException  in case of error
 	 */
-	public Record getRecord(int recId) throws InputException {
-		Record rec = modifiedRecords.getRecord(recId);
+	public RecordType getRecord(int recId) throws InputException {
+		RecordType rec = modifiedRecords.getRecord(recId);
 		if (null == rec) {
 			try {
 				LibrisRecordsFileManager<RecordType> recFileMgr = indexMgr.getRecordsFileMgr();

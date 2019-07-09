@@ -15,7 +15,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 
-public class Records<RecordType extends Record> implements Iterable<Record>{
+public class Records<RecordType extends Record> implements Iterable<RecordType>{
 
 	private LibrisRecordsFileManager<RecordType> recMgr;
 	GenericDatabase<RecordType> db;
@@ -25,7 +25,7 @@ public class Records<RecordType extends Record> implements Iterable<Record>{
 		this.db = db;
 	}
 
-	public Iterable<Record> getNativeRecordsReader() {
+	public Iterable<RecordType> getNativeRecordsReader() {
 		return recMgr;
 	}
 
@@ -47,11 +47,11 @@ public class Records<RecordType extends Record> implements Iterable<Record>{
 		recMgr.flush();
 	}
 
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		return recMgr.iterator();
 	}
 
-	public Iterator<Record> iterator(String prefix) {
+	public Iterator<RecordType> iterator(String prefix) {
 		return db.getNamedRecords().iterator();
 	}
 }

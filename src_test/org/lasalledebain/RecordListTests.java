@@ -98,9 +98,9 @@ public class RecordListTests extends TestCase {
 			testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			final LibrisUi myUi = testDb.getUi();
-			Record rec = testDb.newRecord();
+			DatabaseRecord rec = testDb.newRecord();
 			rec.addFieldValue(ID_AUTH, "new record");
-			int id = testDb.put(rec);
+			int id = testDb.putRecord(rec);
 			testDb.save();
 			testDb.getUi().quit(true);
 			testDb = myUi.openDatabase();
@@ -119,9 +119,9 @@ public class RecordListTests extends TestCase {
 			testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			final LibrisUi myUi = testDb.getUi();
-			Record rec = testDb.newRecord();
+			DatabaseRecord rec = testDb.newRecord();
 			rec.addFieldValue(ID_AUTH, "new record");
-			testDb.put(rec);
+			testDb.putRecord(rec);
 			testDb.save();
 			testDb.save();
 			testDb.save();
@@ -156,9 +156,9 @@ public class RecordListTests extends TestCase {
 			for (int r=1; r <= expectedIds.length; ++r) {
 				int oldId = r;
 				testDb = myUi.openDatabase();
-				Record rec = testDb.getRecord(oldId);
+				DatabaseRecord rec = testDb.getRecord(oldId);
 				rec.addFieldValue("ID_title", ((r % 2) == 0)? shortValue: longvalue);
-				int newId = testDb.put(rec);
+				int newId = testDb.putRecord(rec);
 				assertEquals("new ID != oldId", newId, oldId);
 				testDb.save();
 				testDb.getUi().quit(true);
@@ -183,11 +183,11 @@ public class RecordListTests extends TestCase {
 
 			checkRecordOrder(testDb, expectedData);
 
-			Record r = testDb.getRecord(3);
+			DatabaseRecord r = testDb.getRecord(3);
 			Field f = r.getField(ID_AUTH);
 			f.addValue(EXTRA_DATA);
 			expectedData[3] += ", "+EXTRA_DATA;
-			testDb.put(r);
+			testDb.putRecord(r);
 			testDb.save();
 			testDb.getUi().quit(true);
 			testDb = null;

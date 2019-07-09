@@ -9,6 +9,7 @@ import java.util.logging.Level;
 
 import org.junit.Test;
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -102,7 +103,7 @@ public class GroupDefsTests extends TestCase {
 			testLogger.log(Level.INFO, "database rebuilt");
 			ArrayList<Record> recList = new ArrayList<Record>();
 			{
-				Record curr = db.newRecord();
+				DatabaseRecord curr = db.newRecord();
 				Record rec1 = curr =db.newRecord();
 				curr.addFieldValuePair(ID_PUBLISHER, "", "Publisher 1");
 				saveRecord(db, recList, curr);
@@ -200,8 +201,8 @@ public class GroupDefsTests extends TestCase {
 	}
 
 	private void saveRecord(LibrisDatabase db, ArrayList<Record> recList,
-			Record curr) throws LibrisException {
-		db.put(curr);
+			DatabaseRecord curr) throws LibrisException {
+		db.putRecord(curr);
 		recList.add(curr);
 	}
 

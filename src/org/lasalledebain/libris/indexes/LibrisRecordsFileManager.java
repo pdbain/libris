@@ -32,7 +32,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.util.Reporter;
 
-public class LibrisRecordsFileManager<RecordType extends Record> implements Iterable<Record>, LibrisConstants {
+public class LibrisRecordsFileManager<RecordType extends Record> implements Iterable<RecordType>, LibrisConstants {
 
 	private static final long MINIMUM_RECORDS_FILE_LENGTH = 2*RecordHeader.getHeaderLength(); /* head & tail, record and free */
 // TODO test oversize records
@@ -155,7 +155,7 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		final RecordIterator iter = new RecordIterator();
 		return iter;
 	}
@@ -371,12 +371,12 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 		}
 		return recordBuffer.toByteArray();
 	}
-	public Record getRecord(int id) throws InputException {
+	public RecordType getRecord(int id) throws InputException {
 		try {
 			long pos = recPosns.getRecordFilePosition(id);
 			if (pos > 0) {
 				recordsFileStore.seek(pos);
-				Record rec = readRecord(pos);
+				RecordType rec = readRecord(pos);
 				return rec;
 			}
 		} catch (IOException e) {
@@ -516,7 +516,7 @@ public void removeRecord(int rid) throws DatabaseException {
 	}
 
 
-	private class RecordIterator implements Iterator<Record> {
+	private class RecordIterator implements Iterator<RecordType> {
 		Iterator<RecordHeader> rhi;
 		private RecordHeader currentHeader;
 		private ModifiedRecordList<RecordType> modifiedRecords;
@@ -540,9 +540,9 @@ public void removeRecord(int rid) throws DatabaseException {
 
 		
 		@Override
-		public Record next() {
+		public RecordType next() {
 			try {
-				Record result = modifiedRecords.getRecord(nextId);
+				RecordType result = modifiedRecords.getRecord(nextId);
 				if (null == result) {
 					while ((currentId < nextId) && rhi.hasNext()) {
 						currentHeader = rhi.next();

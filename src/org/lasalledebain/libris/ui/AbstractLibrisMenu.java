@@ -8,7 +8,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
 
 public abstract class AbstractLibrisMenu {

@@ -16,8 +16,8 @@ class DatabaseRecordList extends RecordList<DatabaseRecord> {
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
-		Iterator<Record> iter;
+	public Iterator<DatabaseRecord> iterator() {
+		Iterator<DatabaseRecord> iter;
 		try {
 			iter = database.getDatabaseRecords().iterator();
 		} catch (LibrisException e) {
@@ -27,7 +27,7 @@ class DatabaseRecordList extends RecordList<DatabaseRecord> {
 	}
 
 	@Override
-	public Record getRecord(int id) throws InputException {
+	public DatabaseRecord getRecord(int id) throws InputException {
 		return database.getRecord(id);
 	}
 
