@@ -436,7 +436,7 @@ public class DatabaseTests extends TestCase {
 			int incrementNumber = 0;
 			for (File forkFile: forkFiles) {
 				forkDb = Libris.buildAndOpenDatabase(forkFile);
-				Record recCopy;
+				DatabaseRecord recCopy;
 				{
 					DatabaseRecord newForkRec = rootDb.newRecord();
 					String fieldData = "Record"+newRecordNumber;

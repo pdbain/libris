@@ -18,7 +18,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 class FilteringFieldImporter implements LibrisXMLConstants, LibrisConstants {
 
 	ArrayList<FieldDataSource> sources;
-	private short fieldNum;
+	private int fieldNum;
 
 	public FilteringFieldImporter(ElementManager fmgr, Schema schem) throws DatabaseException, InputException, XmlException {
 		

@@ -71,20 +71,18 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	/* field management */
 	public abstract void setAllFields(String[] fieldData) throws InputException;
 	public abstract void setField(int fieldNum, Field values) throws DatabaseException;
-	public abstract void setField(String fid, Field values) throws InputException, DatabaseException;
 	public abstract Field addFieldValue(String fieldName, String fieldData) throws InputException;
-	public abstract Field addFieldValue(String fid, int data) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, String fieldData) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, int mainValue, String extraValue) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, int fieldData) throws InputException;
 	public abstract Field addFieldValuePair(int fieldNum, String value, String extraValue) throws InputException;
-	public abstract Field addFieldValuePair(String fid, String value, String extraValue) throws InputException;
-	public abstract Field getField(String fieldId) throws InputException;
+	public Field getField(String fieldId) throws InputException {
+		return getField(getFieldNum(fieldId));
+	}
+	
 	public abstract Field getDefaultField(int fieldNum) throws InputException;
-	public abstract Field getDefaultField(String fieldId) throws InputException;
 	public abstract Field getField(int fieldNum) throws InputException;
-	public abstract FieldValue getFieldValue(String fieldId) throws InputException;
 	public abstract FieldValue getFieldValue(int fieldNum) throws InputException;
 	public abstract void removeField(int fieldNum) throws LibrisException;
 	public abstract Iterable<Field> getFields();
@@ -142,6 +140,28 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	
 	public boolean isEditable() {
 		return editable;
+	}
+	public abstract Integer getFieldNum(String fieldId) throws FieldDataException;
+	public void setField(String fid, Field values) throws FieldDataException, DatabaseException {
+		int position = getFieldNum(fid);
+		setField(position, values);
+	}
+	public Field addFieldValue(String fieldName, int fieldData) throws InputException { 
+		return addFieldValue(getFieldNum(fieldName), fieldData);
+	}
+
+	public Field addFieldValuePair(String fieldName, String value, String extraValue) throws InputException {
+		int fieldNum = getFieldNum(fieldName);
+		return addFieldValuePair(fieldNum, value, extraValue);
+	}
+
+	public Field getDefaultField(String fieldId) throws InputException {
+		int i = getFieldNum(fieldId);
+		return getDefaultField(i);
+	}
+
+	public FieldValue getFieldValue(String fieldId) throws InputException {
+		return getFieldValue(getFieldNum(fieldId));
 	}
 	
 	// TODO abbreviate title

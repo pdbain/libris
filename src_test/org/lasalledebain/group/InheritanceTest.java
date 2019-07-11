@@ -319,7 +319,7 @@ public class InheritanceTest extends TestCase {
 				} else {
 					assertNotNull("Record "+i+" has no children", children);
 					int childCount = childrenSet.size();
-					for (DatabaseRecord r: children) {
+					for (Record r: children) {
 						int recordId = r.getRecordId();
 						assertTrue("Unexpected child "+recordId+" of record "+i, childrenSet.contains(recordId));
 						--childCount;
@@ -348,7 +348,7 @@ public class InheritanceTest extends TestCase {
 			HashSet s = new HashSet<>();
 			expectedChildren.put(i, s);
 			 Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
-			for (DatabaseRecord c: children) {
+			for (Record c: children) {
 				s.add(c.getRecordId());
 			}
 		}
@@ -359,7 +359,7 @@ public class InheritanceTest extends TestCase {
 			HashSet s = new HashSet<>();
 			expectedAffiliates.put(i, s);
 			 Iterable<DatabaseRecord> affiliates = db.getAffiliateRecords(i, 0);
-			for (DatabaseRecord c: affiliates) {
+			for (Record c: affiliates) {
 				s.add(c.getRecordId());
 			}
 		}
@@ -390,7 +390,7 @@ public class InheritanceTest extends TestCase {
 		}
 	}
 	assertTrue("child not found", found);
-	DatabaseRecord actualChild = db.getRecord(childId);
+	Record actualChild = db.getRecord(childId);
 	assertNotNull("cannot get "+childId, actualChild);
 	assertEquals("Wrong parent",  parentId, actualChild.getParent(0));
 	}

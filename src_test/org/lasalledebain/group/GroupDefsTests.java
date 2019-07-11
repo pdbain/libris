@@ -101,7 +101,7 @@ public class GroupDefsTests extends TestCase {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE);
 			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
-			ArrayList<Record> recList = new ArrayList<Record>();
+			ArrayList<DatabaseRecord> recList = new ArrayList<DatabaseRecord>();
 			{
 				DatabaseRecord curr = db.newRecord();
 				Record rec1 = curr =db.newRecord();
@@ -200,7 +200,7 @@ public class GroupDefsTests extends TestCase {
 
 	}
 
-	private void saveRecord(LibrisDatabase db, ArrayList<Record> recList,
+	private void saveRecord(LibrisDatabase db, ArrayList<DatabaseRecord> recList,
 			DatabaseRecord curr) throws LibrisException {
 		db.putRecord(curr);
 		recList.add(curr);

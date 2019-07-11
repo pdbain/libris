@@ -171,8 +171,8 @@ public class RecordEditTests extends TestCase {
 		try {
 			TestGUI gui = rebuildAndOpenDatabase(getName(), TEST_DB_WITH_DEFAULTS_XML_FILE);
 			LibrisDatabase db = gui.getDatabase();
-			short pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
-			DatabaseRecord rec = gui.newRecord();
+			int pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
+			Record rec = gui.newRecord();
 			rec.setEditable(false);
 			Field fld = rec.getField("ID_auth");
 			assertNull("author field not empty", fld);

@@ -14,7 +14,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 public class IndexField extends EmptyXmlElement {
 
 	private Schema databaseSchema;
-	private short fieldNum;
+	private int fieldNum;
 
 	public IndexField(Schema schem) {
 		databaseSchema = schem;

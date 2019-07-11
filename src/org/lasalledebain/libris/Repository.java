@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -30,39 +31,43 @@ import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
 
 public class Repository extends Libris {
-// TODO 1 Add Repository field to LibrisDatabase and add repository field to record
-private static final String LEVEL_PREFIX = "_L";
+	// TODO 1 Add Repository field to LibrisDatabase and add repository field to
+	// record
+	private static final String LEVEL_PREFIX = "_L";
 
-private static final String DIRECTORY_PREFIX = "D_";
+	private static final String DIRECTORY_PREFIX = "D_";
 
-private static final String ARTIFACT_PREFIX = "A_";
+	private static final String ARTIFACT_PREFIX = "A_";
 
-private static final String ID_GROUPS = "ID_groups";
+	private static final String ID_GROUPS = "ID_groups";
 
-private static final String REPOSITORY = "Repository";
+	private static final String REPOSITORY = "Repository";
 
-public static final String ID_DATE = "ID_date";
-public static final String ID_DOI = "ID_doi";
+	public static final String ID_DATE = "ID_date";
+	public static final String ID_DOI = "ID_doi";
 
-public static final String ID_KEYWORDS = "ID_keywords";
+	public static final String ID_KEYWORDS = "ID_keywords";
 
-private static final String ID_SOURCE = "ID_source";
+	private static final String ID_SOURCE = "ID_source";
 
-private static final String ID_TITLE = "ID_title";
-private static final String ID_COMMENTS = "ID_comments";
+	private static final String ID_TITLE = "ID_title";
+	private static final String ID_COMMENTS = "ID_comments";
 
-GenericDatabase<DatabaseRecord> repoDatabase;
-static public int GROUP_FIELD;
-static public  int TITLE_FIELD;
-static public int SOURCE_FIELD;
-static public int DOI_FIELD;
-static public int DATE_FIELD;
-static public int KEYWORDS_FIELD;
-static public int COMMENTS_FIELD;
+	GenericDatabase<DatabaseRecord> repoDatabase;
+	static public int GROUP_FIELD;
+	static public int TITLE_FIELD;
+	static public int SOURCE_FIELD;
+	static public int DOI_FIELD;
+	static public int DATE_FIELD;
+	static public int KEYWORDS_FIELD;
+	static public int COMMENTS_FIELD;
+	static final String[] fieldIds = new String[] { ID_GROUPS, ID_TITLE, ID_SOURCE, ID_DOI, ID_DATE, ID_KEYWORDS,
+			ID_COMMENTS };
 
-static final int FANOUT = 100;
+	static final int FANOUT = 100;
 
 	private static final DynamicSchema mySchema = makeSchema();
+	private static HashMap<String, Integer> idMap;
 	File root;
 
 	public Repository(ChildUi ui, GenericDatabase<DatabaseRecord> db, File theRoot) {
@@ -71,22 +76,31 @@ static final int FANOUT = 100;
 	}
 
 	private static DynamicSchema makeSchema() {
+		idMap = new HashMap<String, Integer>(7);
 		DynamicSchema theSchema = new DynamicSchema();
-		GroupDef grp = new GroupDef(theSchema, ID_GROUPS,"", 0);
+		GroupDef grp = new GroupDef(theSchema, ID_GROUPS, "", 0);
 		GROUP_FIELD = theSchema.addField(grp);
+		idMap.put(ID_GROUPS, GROUP_FIELD);
 		GroupDefs defs = theSchema.getGroupDefs();
 		defs.addGroup(grp);
 		TITLE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_TITLE, "", T_FIELD_STRING));
+		idMap.put(ID_TITLE, TITLE_FIELD);
 		SOURCE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_SOURCE, "", T_FIELD_LOCATION));
+		idMap.put(ID_SOURCE, SOURCE_FIELD);
 		DOI_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DOI, "", T_FIELD_STRING));
+		idMap.put(ID_DOI, DOI_FIELD);
 		DATE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DATE, "", T_FIELD_STRING));
+		idMap.put(ID_DATE, DATE_FIELD);
 		KEYWORDS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_KEYWORDS, "", T_FIELD_STRING));
+		idMap.put(ID_KEYWORDS, KEYWORDS_FIELD);
 		COMMENTS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_COMMENTS, "", T_FIELD_STRING));
+		idMap.put(ID_COMMENTS, COMMENTS_FIELD);
 		return theSchema;
 	}
 
 	/**
 	 * Create a database file in the repository directory
+	 * 
 	 * @param repoRoot repository directory
 	 * @return database file on success, null on failure
 	 * @throws LibrisException
@@ -99,12 +113,12 @@ static final int FANOUT = 100;
 		Layouts theLayouts = new Layouts(mySchema);
 		MetadataHolder metadata = new MetadataHolder(mySchema, theLayouts);
 		boolean success = LibrisDatabase.newDatabase(databaseFile, REPOSITORY, false, theUi, metadata);
-		return success? databaseFile: null;
+		return success ? databaseFile : null;
 	}
-	
+
 	public static File getDatabaseFileFromRoot(File repoRoot) throws DatabaseException {
 		if (!repoRoot.exists() || !repoRoot.isDirectory() || !repoRoot.canWrite()) {
-			throw new DatabaseException("Cannot access repository directory "+repoRoot.getPath());
+			throw new DatabaseException("Cannot access repository directory " + repoRoot.getPath());
 		}
 		File databaseFile = new File(repoRoot, LibrisConstants.REPO_DB);
 		return databaseFile;
@@ -124,39 +138,42 @@ static final int FANOUT = 100;
 			count /= FANOUT;
 		}
 		String dirNames[] = new String[levels];
-		dirNames[0] = "r_"+levels;
+		dirNames[0] = "r_" + levels;
 		count = id;
 		for (int l = levels - 1; l > 0; l--) {
 			count /= FANOUT;
-			dirNames[l] = DIRECTORY_PREFIX+count+LEVEL_PREFIX+l;
+			dirNames[l] = DIRECTORY_PREFIX + count + LEVEL_PREFIX + l;
 		}
 		String path = String.join(File.separator, Arrays.asList(dirNames));
 		return new File(root, path);
 	}
-	
-	public int importFile(org.lasalledebain.libris.ArtifactParameters artifactParameters) throws LibrisException, IOException {
+
+	public int importFile(org.lasalledebain.libris.ArtifactParameters artifactParameters)
+			throws LibrisException, IOException {
 		final URI sourceUri = artifactParameters.source;
 		File sourceFile = new File(sourceUri);
 		if (!sourceFile.isFile()) {
-			throw new UserErrorException(sourceUri.toString()+" is not a file");
+			throw new UserErrorException(sourceUri.toString() + " is not a file");
 		}
 		int id = putArtifactInfo(artifactParameters);
 		copyFileToRepo(sourceFile, id);
 		return id;
 	}
-	
+
 	public URI copyFileToRepo(File original, int id) throws InputException, IOException {
 		File dir = idToDirectoryPath(root, id);
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
-				throw new InputException("Cannot create directory "+dir.getAbsolutePath()+" to hold artifact "+id+" "+original.getName());
-			};
+				throw new InputException("Cannot create directory " + dir.getAbsolutePath() + " to hold artifact " + id
+						+ " " + original.getName());
+			}
+			;
 		}
 		if (!dir.isDirectory()) {
-			throw new InputException(dir.getAbsolutePath()+" is not a directory");
+			throw new InputException(dir.getAbsolutePath() + " is not a directory");
 		}
 		String originalName = original.getName();
-		String nameWithId = ARTIFACT_PREFIX+Integer.toString(id)+"_"+originalName;
+		String nameWithId = ARTIFACT_PREFIX + Integer.toString(id) + "_" + originalName;
 		Path destinationPath = Paths.get(dir.getAbsolutePath(), nameWithId);
 		Files.copy(original.toPath(), destinationPath);
 		return destinationPath.toUri();
@@ -168,12 +185,12 @@ static final int FANOUT = 100;
 			final FieldValue sourceField = record.getFieldValue(SOURCE_FIELD);
 			String uriString = sourceField.getMainValueAsString();
 			File result = new File(new URI(uriString));
-			return result;	
+			return result;
 		} catch (InputException | URISyntaxException e) {
 			throw new InternalError("Error retrieving artifact " + artifactId, e);
 		}
 	}
-	
+
 	public static DynamicSchema getRepositorySchema() {
 		return mySchema;
 	}
@@ -198,7 +215,7 @@ static final int FANOUT = 100;
 		}
 
 	}
-	
+
 	public int putArtifactInfo(ArtifactParameters artifactParameters) throws LibrisException {
 		DatabaseRecord rec = repoDatabase.newRecord();
 		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
@@ -219,15 +236,15 @@ static final int FANOUT = 100;
 		if (!artifactParameters.recordParentName.isEmpty()) {
 			Record parent = repoDatabase.getRecord(artifactParameters.recordParentName);
 			if (Objects.isNull(parent)) {
-				throw new InputException("Cannot locate record "+artifactParameters.recordParentName);
+				throw new InputException("Cannot locate record " + artifactParameters.recordParentName);
 			}
 			rec.setParent(0, parent.getRecordId());
 		}
 		int id = repoDatabase.putRecord(rec);
-		return id;	
+		return id;
 	}
-	
+
 	public int putArtifactInfo(URI sourceLocation) throws LibrisException {
-		return putArtifactInfo(new ArtifactParameters(sourceLocation));	
-	}	
+		return putArtifactInfo(new ArtifactParameters(sourceLocation));
+	}
 }

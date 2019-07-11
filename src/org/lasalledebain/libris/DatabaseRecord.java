@@ -78,12 +78,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		}
 	}
 	@Override
-	public void setField(String fid, Field values) throws FieldDataException, DatabaseException {
-		int position = template.getFieldIndex(fid);
-		setField(position, values);
-	}
-	
-	@Override
 	public Field addFieldValue(int position, String fieldData) throws InputException {
 		if (Objects.isNull(fieldData) || fieldData.isEmpty()){
 			return null;
@@ -131,8 +125,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 
 	@Override
 	public Field addFieldValue(String fieldName, String fieldData) throws InputException {
-		int position = template.getFieldIndex(fieldName);
-		return addFieldValue(position, fieldData);
+		return addFieldValue(getFieldNum(fieldName), fieldData);
 	}
 	
 	@Override
@@ -146,12 +139,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	}
 	
 	@Override
-	public Field addFieldValue(String fieldName, int fieldData) throws InputException { 
-		int position = template.getFieldIndex(fieldName);
-		return addFieldValue(position, fieldData);
-	}
-	
-	@Override
 	public Field addFieldValuePair(int fieldNum, String fieldValue, String extraValue)
 	throws InputException {
 		if (null == recordData[fieldNum]) {
@@ -161,19 +148,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		return recordData[fieldNum];
 	}
 
-	@Override
-	public Field addFieldValuePair(String fieldName, String value, String extraValue)
-			throws InputException {
-		int fieldNum = template.getFieldIndex(fieldName);
-		return addFieldValuePair(fieldNum, value, extraValue);
-	}
-
-	@Override
-	public Field getField(String fieldId) throws InputException {
-		int i = template.getFieldIndex(fieldId);
-		return getField(i);
-	}
-	
 	@Override
 	public Field getField(int fieldNum) throws InputException  {
 		Field fld = recordData[fieldNum];
@@ -231,15 +205,8 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	}
 
 	@Override
-	public Field getDefaultField(String fieldId) throws InputException {
-		int i = template.getFieldIndex(fieldId);
-		return getDefaultField(i);
-	}
-
-	@Override
-	public FieldValue getFieldValue(String fieldId) throws InputException {
-		int i = template.getFieldIndex(fieldId);
-		return getFieldValue(i);
+	public Integer getFieldNum(String fieldId) throws FieldDataException {
+		return template.getFieldIndex(fieldId);
 	}
 
 	@Override

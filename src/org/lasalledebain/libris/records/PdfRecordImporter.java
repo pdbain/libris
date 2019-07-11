@@ -24,7 +24,7 @@ public class PdfRecordImporter {
 	private static final int MIN_ABSTRACT_LENGTH = 1000;
 	LibrisDatabase recordDatabase;
 	Repository artifactRepository;
-	short abstractField, keywordsField;
+	int abstractField, keywordsField;
 	boolean setAbstract;
 	boolean setKeywords;
 	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository) {
@@ -34,7 +34,7 @@ public class PdfRecordImporter {
 		setKeywords = false;
 	}
 	
-	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository, short keyField, short absField) {
+	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository, int keyField, int absField) {
 		this.recordDatabase = recordDatabase;
 		this.artifactRepository = artifactRepository;
 		setAbstract = false;
@@ -86,12 +86,12 @@ public class PdfRecordImporter {
 		}
 	}
 
-	public void setAbstractField(short abstractField) {
+	public void setAbstractField(int abstractField) {
 		this.abstractField = abstractField;
 		setAbstract = true;
 	}
 
-	public void setKeywordsField(short keywordsField) {
+	public void setKeywordsField(int keywordsField) {
 		this.keywordsField = keywordsField;
 		setKeywords = true;
 	}

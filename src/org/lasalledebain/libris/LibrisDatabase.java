@@ -64,6 +64,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public  LibrisException rebuildException;
 	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 	private Schema mySchema;
+	protected Repository documentRepository;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisDatabaseMetadata databaseMetadata;
 	private static final Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());

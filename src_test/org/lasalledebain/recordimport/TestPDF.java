@@ -58,8 +58,8 @@ public class TestPDF extends TestCase {
 	public void testImportDocument() {
 		try {
 			db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
-			short keywordField = db.getSchema().getFieldNum("ID_keywords");
-			short abstractField = db.getSchema().getFieldNum("ID_text");
+			int keywordField = db.getSchema().getFieldNum("ID_keywords");
+			int abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
 			DatabaseRecord rec = db.newRecord();
 			File testPdf = Utilities.getTestDatabase(Utilities.EXAMPLE_ARTIFACT_PDF);
@@ -79,8 +79,8 @@ public class TestPDF extends TestCase {
 	public void testImportLargeDocument() {
 		try {
 			db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
-			short keywordField = db.getSchema().getFieldNum("ID_keywords");
-			short abstractField = db.getSchema().getFieldNum("ID_text");
+			int keywordField = db.getSchema().getFieldNum("ID_keywords");
+			int abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
 			DatabaseRecord rec = db.newRecord();
 			File testPdf = Utilities.getTestDatabase(Utilities.EXAMPLE_LARGE_PDF);
@@ -105,8 +105,8 @@ public class TestPDF extends TestCase {
 	        Map<String, String> env = new HashMap<>(); 
 	        env.put("create", "true");
 	        LibrisUi ui = db.getUi();
-			short keywordField = db.getSchema().getFieldNum("ID_keywords");
-			short abstractField = db.getSchema().getFieldNum("ID_text");
+			int keywordField = db.getSchema().getFieldNum("ID_keywords");
+			int abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
 			DatabaseRecord parentRec = db.newRecord();
 			db.putRecord(parentRec);

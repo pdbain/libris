@@ -289,7 +289,7 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 
 		for (Field f: recData.getFields()) {
 			try {
-				short fieldNum = dbSchema.getFieldNum(f.getFieldId());
+				int fieldNum = dbSchema.getFieldNum(f.getFieldId());
 				FieldType ft = f.getType();
 				for (FieldValue fv: f.getFieldValues()) { // FIXME NPE here
 					int oldValueEnd = fieldValues.size();

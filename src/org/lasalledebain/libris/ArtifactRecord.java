@@ -1,5 +1,9 @@
 package org.lasalledebain.libris;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Objects;
+
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -13,6 +17,16 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
 public class ArtifactRecord extends Record {
+
+	public ArtifactRecord(Schema theSchema) {
+		fieldList = new Field[NUM_FIELDS];
+		mySchema = theSchema;
+	}
+
+	private Field[] fieldList;
+	private static final int NUM_FIELDS = 7;
+	final Schema mySchema;
+	
 
 	@Override
 	public int compareTo(Record o) {
@@ -51,7 +65,7 @@ public class ArtifactRecord extends Record {
 	}
 
 	@Override
-	public void setField(String fid, Field values) throws InputException, DatabaseException {
+	public void setField(String fid, Field values) throws DatabaseException {
 		// TODO Auto-generated method stub
 
 	}
@@ -136,14 +150,18 @@ public class ArtifactRecord extends Record {
 
 	@Override
 	public Iterable<Field> getFields() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Iterable<Field>() {
+			
+			@Override
+			public Iterator<Field> iterator() {
+				return Arrays.stream(fieldList).filter(f -> !Objects.isNull(f)).iterator();
+			}
+		};
 	}
 
 	@Override
 	public String[] getFieldIds() {
-		// TODO Auto-generated method stub
-		return null;
+		return Repository.fieldIds;
 	}
 
 	@Override
@@ -294,6 +312,11 @@ public class ArtifactRecord extends Record {
 	public Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Integer getFieldNum(String fieldId) throws FieldDataException {
+		return mySchema.getFieldNum(fieldId);
 	}
 
 }

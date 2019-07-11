@@ -14,7 +14,6 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected GroupManager<RecordType> groupMgr;
 	protected LibrisFileManager fileMgr;
 	protected IndexManager<RecordType> indexMgr;
-	protected Repository documentRepository;
 	protected final LibrisUi ui;
 	protected ModifiedRecordList<RecordType> modifiedRecords;
 	protected LibrisJournalFileManager<RecordType> journalFile;
@@ -59,7 +58,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public abstract  RecordType newRecord() throws InputException;
 
-	public abstract int putRecord(DatabaseRecord rec) throws LibrisException;
+	public abstract int putRecord(RecordType rec) throws LibrisException;
 	
 	/**
 	 * Get the record.  If the record has been modified but not written to the database file, use that.
