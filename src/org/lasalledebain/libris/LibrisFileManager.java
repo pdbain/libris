@@ -12,8 +12,9 @@ import java.util.HashSet;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 
+import org.lasalledebain.libris.exception.Assertion;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 
@@ -320,10 +321,8 @@ public class LibrisFileManager implements LibrisConstants {
 		return journalAccessMgr;
 	}
 
-	private void checkLock() throws InternalError {
-		if (locked && !mgrLock.isHeldByCurrentThread()) {
-			throw new InternalError("file manager locked by other thread");
-		}
+	private void checkLock() throws DatabaseError {
+		Assertion.assertTrueError("file manager locked by other thread", !locked || mgrLock.isHeldByCurrentThread());
 	}
 	public boolean fileSet() {
 		return (null != databaseFile);

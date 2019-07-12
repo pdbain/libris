@@ -9,10 +9,10 @@ import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.ui.EmptyField;
@@ -245,7 +245,7 @@ public abstract class GenericField implements Field {
 	}
 	@Override
 	public void fromXml(ElementManager mgr) throws LibrisException {
-		throw new InternalError("Use staic method "+getClass().getName()+".fromXml()");
+		throw new DatabaseError("Use staic method "+getClass().getName()+".fromXml()");
 	}
 
 	public static Field fromXml(ElementManager fieldManager, Record rec) throws XmlException, DatabaseException, InputException {

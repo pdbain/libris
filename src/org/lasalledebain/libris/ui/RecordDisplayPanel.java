@@ -19,7 +19,6 @@ import javax.swing.event.ChangeListener;
 
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisMenu.NewRecordListener;

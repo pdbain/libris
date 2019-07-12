@@ -1,5 +1,7 @@
 package org.lasalledebain.libris;
 
+import java.util.Arrays;
+
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -16,14 +18,18 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 
 public abstract class Record implements Comparable<Record>, XMLElement {
+	static final String elementTag = XML_RECORD_TAG;
 	protected int id;
 	protected String name;
-	static final String elementTag = XML_RECORD_TAG;
+	protected LibrisAttributes attributes;
+	Field[] recordFields;
+	protected static final GroupMember[] dummyAffiliations = new GroupMember[0];
+	boolean editable = false;
+
+
 	public static String getXmlTag() {
 		return elementTag;
 	}
-	protected LibrisAttributes attributes;
-	boolean editable = false;
 	
 	public static ElementShape getShape() {
 		ElementShape shape = new ElementShape(elementTag);
@@ -71,7 +77,10 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	/* field management */
 	public abstract void setAllFields(String[] fieldData) throws InputException;
 	public abstract void setField(int fieldNum, Field values) throws DatabaseException;
-	public abstract Field addFieldValue(String fieldName, String fieldData) throws InputException;
+	public Field addFieldValue(String fieldName, String fieldData) throws InputException {
+		return addFieldValue(getFieldNum(fieldName), fieldData);
+	}
+	
 	public abstract Field addFieldValue(int fieldNum, String fieldData) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, int mainValue, String extraValue) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException;
@@ -87,15 +96,30 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract void removeField(int fieldNum) throws LibrisException;
 	public abstract Iterable<Field> getFields();
 	public abstract String[] getFieldIds();
-	public abstract FieldType getFieldType(String fid);
+	public abstract FieldType getFieldType(String fieldId);
 	public abstract boolean valuesEqual(Record comparand);
-	public abstract void getKeywords(int[] fieldList, RecordKeywords keywordList) throws InputException;
-	public abstract void getKeywords(IndexField[] indexFields, RecordKeywords keywordList) throws InputException;
 	
 	/* format conversion */
-	public abstract String toString();
+	@Override
+	public String toString() {
+		StringBuffer buff = new StringBuffer();
+		buff.append("Record ID: ");
+		buff.append(RecordId.toString(getRecordId())); 
+		buff.append('\n');
+		affiliationInfoToString(buff);
+		for (Field f:recordFields) {
+			if (null == f) {
+				continue;
+			}
+			String fieldString = f.toString();
+			buff.append(fieldString); 
+			buff.append('\n');
+		}
+		return buff.toString();
+	}
+	protected abstract void affiliationInfoToString(StringBuffer buff);
+
 	public abstract String generateTitle(String[] titleFieldIds);
-	public abstract long getDataLength();
 	public abstract void fromXml(ElementManager recMgr) throws LibrisException;
 	public abstract void toXml(ElementWriter output) throws LibrisException;
 	
@@ -117,7 +141,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	 * @param groupNum Group to query
 	 * @return 0 if no parent, 1 if parent only, N if parent and N-1 affiliates
 	 */
-	public abstract short getNumAffiliatesAndParent(int groupNum);
+	public abstract int getNumAffiliatesAndParent(int groupNum);
 	public abstract void addAffiliate(int groupNum, int affiliate) throws FieldDataException;
 	public abstract void addAffiliate(String groupId, Record affiliate) throws FieldDataException;
 	public abstract void setParent(String groupId, Record parent) throws FieldDataException;
@@ -163,7 +187,29 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public FieldValue getFieldValue(String fieldId) throws InputException {
 		return getFieldValue(getFieldNum(fieldId));
 	}
-	
+
+	public void getKeywords(int[] fieldList, RecordKeywords keywordList) throws InputException {
+		for (int fieldNum: fieldList) {
+			getFieldKeywords(keywordList, fieldNum);
+		}
+	}
+
+	public void getKeywords(IndexField[] indexFields, RecordKeywords keywordList) throws InputException {
+		for (IndexField f: indexFields) {
+			int fieldNum = f.getFieldNum();
+			getFieldKeywords(keywordList, fieldNum);
+		}
+	}
+
+	protected void getFieldKeywords(RecordKeywords keywordList, int fieldNum) throws InputException {
+		Field fld = getField(fieldNum);
+		if (null != fld) {
+			String values = fld.getValuesAsString();
+			if ((null != values) && !values.isEmpty()) {
+				keywordList.addKeywords(Arrays.asList(values.split("\\W+")));
+			}
+		}
+	}
 	// TODO abbreviate title
 	
 }

@@ -16,7 +16,6 @@ import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.PdfRecordImporter;

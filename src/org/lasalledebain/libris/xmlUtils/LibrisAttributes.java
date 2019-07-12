@@ -97,7 +97,6 @@ public class LibrisAttributes implements Iterable<String[]> {
 	}
 	
 	public static Date parseDate(String dbDateString) {
-		DateFormat dfmt = null;
 		if (null != dbDateString) {
 			try {
 				Date modDate = LibrisMetadata.parseDateString(dbDateString);

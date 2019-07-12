@@ -10,12 +10,10 @@ import java.util.prefs.Preferences;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XmlSchema;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.IndexConfiguration;
 
@@ -150,12 +148,12 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 	@Override
 	public void arrangeValues() {
-		throw new InternalError("LibrisUiGeneric.arrangeValues unimplemented");
+		throw new DatabaseError("LibrisUiGeneric.arrangeValues unimplemented");
 	}
 
 	@Override
-	public void addRecord(Record newRecord) throws DatabaseException {
-		throw new InternalError("LibrisUiGeneric.addRecord unimplemented");
+	public void addRecord(Record newRecord) throws DatabaseException{
+		throw new DatabaseError("LibrisUiGeneric.addRecord unimplemented");
 	}
 
 	@Override
@@ -218,7 +216,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 	@Override
 	public void removeFieldValue() {
-		throw new InternalError("removeField not implemented");
+		throw new DatabaseError("removeField not implemented");
 	}
 
 	@Override

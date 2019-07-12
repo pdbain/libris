@@ -496,10 +496,10 @@ public class Utilities extends TestCase {
 		return tf;
 	}
 
-	public static LibrisJournalFileManager createLibrisJournalFileManager(
-			GenericDatabase database, FileAccessManager journalFileMr) throws LibrisException {
+	public static LibrisJournalFileManager<DatabaseRecord> createLibrisJournalFileManager(
+			GenericDatabase<DatabaseRecord> database, FileAccessManager journalFileMr) throws LibrisException {
 		RecordTemplate recFactory = RecordTemplate.templateFactory(database.getSchema(), null);
-		return new LibrisJournalFileManager(database, journalFileMr, recFactory);
+		return new LibrisJournalFileManager<DatabaseRecord>(database, journalFileMr, recFactory);
 	}
 
 }

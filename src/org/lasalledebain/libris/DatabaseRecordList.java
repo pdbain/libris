@@ -3,8 +3,8 @@ package org.lasalledebain.libris;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 
 class DatabaseRecordList extends RecordList<DatabaseRecord> {
@@ -21,7 +21,7 @@ class DatabaseRecordList extends RecordList<DatabaseRecord> {
 		try {
 			iter = database.getDatabaseRecords().iterator();
 		} catch (LibrisException e) {
-			throw new InternalError("Error getting database records", e);
+			throw new DatabaseError("Error getting database records", e);
 		}
 		return iter;
 	}

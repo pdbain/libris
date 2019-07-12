@@ -3,13 +3,13 @@ package org.lasalledebain;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.field.FieldValue;
+
+import junit.framework.TestCase;
 
 
 public class FieldTest extends TestCase {
@@ -65,7 +65,7 @@ public class FieldTest extends TestCase {
 			thrown = false;
 			try {
 				rof.setValues(new FieldValue[0]);
-			} catch (InternalError e) {
+			} catch (DatabaseError e) {
 				thrown = true;
 			}
 			assertTrue("No error setValues(array) read-only view", thrown);
@@ -74,7 +74,7 @@ public class FieldTest extends TestCase {
 			thrown = false;
 			try {
 				rof.setValues(Arrays.asList((new FieldValue[0])));
-			} catch (InternalError e) {
+			} catch (DatabaseError e) {
 				thrown = true;
 			}
 			assertTrue("No error setValues(iterator) read-only view", thrown);
@@ -106,7 +106,7 @@ public class FieldTest extends TestCase {
 			thrown = false;
 			try {
 				rof.removeValue();
-			} catch (InternalError e) {
+			} catch (DatabaseError e) {
 				thrown = true;
 			}
 			assertTrue("No error removeValue read-only view", thrown);

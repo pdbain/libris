@@ -23,8 +23,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 
 /**
@@ -203,7 +203,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 				try {
 					database.getUi().setRecordName(database.getNamedRecords());
 				} catch (InputException exc) {
-					throw new InternalError("Error setting name", exc);
+					throw new DatabaseError("Error setting name", exc);
 				}
 			}
 			

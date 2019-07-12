@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.index.IndexField;
@@ -184,7 +183,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 			addKeywords(rId, keywordList.wordStream());
 			sigMgr.flush();
 		} catch (InputException | IOException e) {
-			throw new InternalError("Error adding record "+rec.getRecordId()+" to keyword index", e);
+			throw new DatabaseError("Error adding record "+rec.getRecordId()+" to keyword index", e);
 		}
 	}
 
@@ -202,8 +201,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 	}
 
 	 private void buildAffiliateIndex(AffiliateList<RecordType> l, FileAccessManager affiliateTempFMgr, 
-			FileAccessManager hashTableFileMgr, FileAccessManager overflowFileMgr, int numAffiliates, boolean isChildren)
-					throws DatabaseException {
+			FileAccessManager hashTableFileMgr, FileAccessManager overflowFileMgr, int numAffiliates, boolean isChildren) throws DatabaseException {
 		try {
 			DataInputStream affiliateStream = new DataInputStream(affiliateTempFMgr.getIpStream());
 			final int CACHE_SIZE = 16384;
@@ -236,7 +234,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 			}
 			l.flush();
 		} catch (IOException e) {
-			throw new InternalError("Error building index for group ", e);
+			throw new DatabaseException("Error building index for group ", e);
 		}
 	}
 	

@@ -381,9 +381,9 @@ public class InheritanceTest extends TestCase {
 	}
 
 	private void checkChild(int childId, final int parentId) throws InputException {
-	DatabaseRecord parentRec = db.getRecord(parentId);
+	Record parentRec = db.getRecord(parentId);
 	boolean found = false;
-	for (DatabaseRecord r: db.getChildRecords(parentId, 0, false)) {
+	for (Record r: db.getChildRecords(parentId, 0, false)) {
 		if (r.getRecordId() == childId) {
 			found = true;
 			break;

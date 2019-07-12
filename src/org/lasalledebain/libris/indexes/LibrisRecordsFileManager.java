@@ -22,10 +22,10 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.OutputException;
 import org.lasalledebain.libris.exception.UserErrorException;
@@ -556,7 +556,7 @@ public void removeRecord(int rid) throws DatabaseException {
 				++nextId;
 				return result;
 			} catch (Exception e) {
-				throw new InternalError("error in LibrisRecordsFileManager.next", e);
+				throw new DatabaseError("error in LibrisRecordsFileManager.next", e);
 			}
 		}
 

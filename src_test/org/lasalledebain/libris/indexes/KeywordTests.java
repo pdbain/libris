@@ -1,13 +1,11 @@
 package org.lasalledebain.libris.indexes;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.function.Function;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.libris.util.StringUtils;
 

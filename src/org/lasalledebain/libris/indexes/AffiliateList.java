@@ -10,7 +10,6 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.hashfile.AffiliateHashFile;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
@@ -26,13 +25,13 @@ public class AffiliateList<RecordType extends Record> {
 	private final FileSpaceManager overflowSpaceMgr;
 	private final  AffiliateHashFile myHashFile;
 	private final  BucketOverflowFileManager bucketOverflowMgr;
-	public AffiliateList(FileAccessManager hashTableFileMgr,
+	public AffiliateList(FileAccessManager theFileMgr,
 			FileAccessManager overflowFileMgr, boolean readOnly) throws DatabaseException {
-		this.hashTableFileMgr = hashTableFileMgr;
+		this.hashTableFileMgr = theFileMgr;
 		this.overflowFileMgr = overflowFileMgr;
 		try {
-			hashTableFile = readOnly?  hashTableFileMgr.getReadOnlyRandomAccessFile(): 
-				hashTableFileMgr.getReadWriteRandomAccessFile();
+			hashTableFile = readOnly?  theFileMgr.getReadOnlyRandomAccessFile(): 
+				theFileMgr.getReadWriteRandomAccessFile();
 			overflowFile = readOnly?  overflowFileMgr.getReadOnlyRandomAccessFile(): 
 				overflowFileMgr.getReadWriteRandomAccessFile();
 
@@ -40,7 +39,7 @@ public class AffiliateList<RecordType extends Record> {
 			overflowSpaceMgr.reset();
 			bucketOverflowMgr = new BucketOverflowFileManager(overflowSpaceMgr);
 		} catch (FileNotFoundException | LibrisException exc) {
-			throw new DatabaseException(Messages.getString("AffiliateList.0")+hashTableFileMgr.getPath(), exc); //$NON-NLS-1$
+			throw new DatabaseException(Messages.getString("AffiliateList.0")+theFileMgr.getPath(), exc); //$NON-NLS-1$
 		}
 		try {
 			myHashFile = new AffiliateHashFile(hashTableFile,bucketOverflowMgr);
@@ -75,7 +74,7 @@ public class AffiliateList<RecordType extends Record> {
 		}
 	}
 
-	public void addChild(int parent, int child) throws DatabaseException {
+	public void addChild(int parent, int child) {
 		try {
 			AffiliateListEntry oldEntry = getEntry(parent);
 			AffiliateListEntry newEntry;
@@ -86,11 +85,11 @@ public class AffiliateList<RecordType extends Record> {
 			}
 			myHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {
-			throw new InternalError("Error adding affiliates entry for record "+parent, e);
+			throw new DatabaseError("Error adding affiliates entry for record "+parent, e);
 		}
 	}
 
-	public void addAffiliate(int dest, int src) throws DatabaseException {
+	public void addAffiliate(int dest, int src) {
 		try {
 			AffiliateListEntry oldEntry = getEntry(dest);
 			AffiliateListEntry newEntry;
@@ -101,7 +100,7 @@ public class AffiliateList<RecordType extends Record> {
 			}
 			myHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {
-			throw new InternalError("Error adding affiliates entry for record "+dest, e);
+			throw new DatabaseError("Error adding affiliates entry for record "+dest, e);
 		}
 	}
 
@@ -128,7 +127,7 @@ public class AffiliateList<RecordType extends Record> {
 			}
 			myHashFile.addEntry(newEntry);
 		} catch (DatabaseException | IOException e) {
-			throw new InternalError("Error adding affiliates entry for record "+parent, e);
+			throw new DatabaseError("Error adding affiliates entry for record "+parent, e);
 		}
 	}
 

@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
-import junit.framework.TestCase;
-
 import org.junit.Before;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
@@ -21,6 +19,8 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisUi;
+
+import junit.framework.TestCase;
 
 public class RecordListTests extends TestCase {
 
@@ -163,7 +163,7 @@ public class RecordListTests extends TestCase {
 				testDb.save();
 				testDb.getUi().quit(true);
 				testDb = myUi.openDatabase();
-				Record newRec = testDb.getRecord(newId);
+				DatabaseRecord newRec = testDb.getRecord(newId);
 				assertEquals("New record does not match original", rec, newRec);
 				testDb.getUi().quit(true);
 			}

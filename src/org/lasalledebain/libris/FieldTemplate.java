@@ -130,7 +130,7 @@ public class FieldTemplate implements XMLElement {
 		this.myGroup = grpDef;
 	}
 
-	public Field newField() throws InputException {
+	public Field newField() {
 		Field temp = factory.newField(this);
 		return temp;
 	}

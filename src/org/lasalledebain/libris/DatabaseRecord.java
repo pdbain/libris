@@ -16,8 +16,6 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
-import org.lasalledebain.libris.index.IndexField;
-import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -26,11 +24,8 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 
-	Field[] recordData;
 	GroupMember affiliations[];
 	private RecordTemplate template;
-	private long dataLength = -1;
-	private static final GroupMember[] dummyAffiliations = new GroupMember[0];
 	private int artifactId;
 	// TODO 1 save artifactId in native file
 
@@ -39,9 +34,9 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		template = recordTemplate;
 		name = null;
 		affiliations = null;
-		recordData = new Field[template.getNumFields()];
-		for (int i = 0; i < recordData.length; ++i) {
-			recordData[i] = null;
+		recordFields = new Field[template.getNumFields()];
+		for (int i = 0; i < recordFields.length; ++i) {
+			recordFields[i] = null;
 		}
 		artifactId = RecordId.NULL_RECORD_ID;
 	}
@@ -64,15 +59,15 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		int i = 0;
 		for (String d: fieldData) {
 			Field f = template.newField(i, d);
-			recordData[i] = f;
+			recordFields[i] = f;
 			++i;
 		}
 	}
 	
 	@Override
 	public void setField(int fieldNum, Field values) throws DatabaseException {
-		if (isEditable() && (fieldNum < recordData.length)) {
-			recordData[fieldNum] = values;
+		if (isEditable() && (fieldNum < recordFields.length)) {
+			recordFields[fieldNum] = values;
 		} else {
 			throw new DatabaseException("Cannot set field "+fieldNum);
 		}
@@ -82,12 +77,12 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		if (Objects.isNull(fieldData) || fieldData.isEmpty()){
 			return null;
 		}
-		if (null == recordData[position]) {
-			recordData[position] = template.newField(position, fieldData);
+		if (null == recordFields[position]) {
+			recordFields[position] = template.newField(position, fieldData);
 		} else {
-			recordData[position].addValue(fieldData);
+			recordFields[position].addValue(fieldData);
 		}
-		return recordData[position];
+		return recordFields[position];
 	}
 	/**
 	 * Create a new value pair field
@@ -99,12 +94,12 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	 * @throws InputException 
 	 */
 	public Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException {
-		if (null == recordData[fieldNum]) {
-		recordData[fieldNum] = template.newField(fieldNum, mainValue, extraValue);
+		if (null == recordFields[fieldNum]) {
+		recordFields[fieldNum] = template.newField(fieldNum, mainValue, extraValue);
 		} else {
-			recordData[fieldNum].addValuePair(mainValue, extraValue);
+			recordFields[fieldNum].addValuePair(mainValue, extraValue);
 		}
-		return recordData[fieldNum];
+		return recordFields[fieldNum];
 	}
 
 	/**
@@ -115,47 +110,42 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	 * @throws InputException
 	 */
 	public Field addFieldValue(int fieldNum, int mainValue, String extraValue) throws InputException {
-		if (null == recordData[fieldNum]) {
-		recordData[fieldNum] = template.newField(fieldNum, mainValue, extraValue);
+		if (null == recordFields[fieldNum]) {
+		recordFields[fieldNum] = template.newField(fieldNum, mainValue, extraValue);
 		} else {
-			recordData[fieldNum].addValuePair(mainValue, extraValue);
+			recordFields[fieldNum].addValuePair(mainValue, extraValue);
 		}
-		return recordData[fieldNum];
+		return recordFields[fieldNum];
 	}
 
 	@Override
-	public Field addFieldValue(String fieldName, String fieldData) throws InputException {
-		return addFieldValue(getFieldNum(fieldName), fieldData);
-	}
-	
-	@Override
 	public Field addFieldValue(int position, int fieldData) throws InputException {
-		if (null == recordData[position]) {
-		recordData[position] = template.newField(position, fieldData);
+		if (null == recordFields[position]) {
+		recordFields[position] = template.newField(position, fieldData);
 		} else {
-			recordData[position].addIntegerValue(fieldData);
+			recordFields[position].addIntegerValue(fieldData);
 		}
-		return recordData[position];
+		return recordFields[position];
 	}
 	
 	@Override
 	public Field addFieldValuePair(int fieldNum, String fieldValue, String extraValue)
 	throws InputException {
-		if (null == recordData[fieldNum]) {
-			recordData[fieldNum] = template.newField(fieldNum);
+		if (null == recordFields[fieldNum]) {
+			recordFields[fieldNum] = template.newField(fieldNum);
 		} 
-		recordData[fieldNum].addValuePair(fieldValue, extraValue);
-		return recordData[fieldNum];
+		recordFields[fieldNum].addValuePair(fieldValue, extraValue);
+		return recordFields[fieldNum];
 	}
 
 	@Override
 	public Field getField(int fieldNum) throws InputException  {
-		Field fld = recordData[fieldNum];
+		Field fld = recordFields[fieldNum];
 		if (isEditable()) {
 			if (null == fld) {
 				try {
 					fld = template.newField(fieldNum);
-					recordData[fieldNum] = fld;
+					recordFields[fieldNum] = fld;
 				} catch (InputException e) {
 					throw new FieldDataException("cannot create new "+id, e);
 				}
@@ -212,7 +202,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	@Override
 	public void removeField(int fieldNum) throws LibrisException {
 		if (isEditable()) {
-			recordData[fieldNum] = null;
+			recordFields[fieldNum] = null;
 		} else {
 			throw new DatabaseException("Cannot remove field "+fieldNum);
 		}
@@ -224,7 +214,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	@Override
 	public String[] getFieldIds() {
 		ArrayList<String> idList = new ArrayList<String>();
-		for (Field f: recordData) {
+		for (Field f: recordFields) {
 			if (null != f) {
 				idList.add(f.getFieldId());
 			}
@@ -232,34 +222,11 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		String[] ids = new String[idList.size()];
 		return idList.toArray(ids);
 	}
-	public FieldType getFieldType(String fid) {
-		return template.getFieldType(fid);
-	}
-	@Override
-	public void getKeywords(int[] fieldList, RecordKeywords keywordList) throws InputException {
-		for (int fieldNum: fieldList) {
-			Field fld = getField(fieldNum);
-			if (null != fld) {
-				String values = fld.getValuesAsString();
-				if ((null != values) && !values.isEmpty()) {
-					keywordList.addKeywords(Arrays.asList(values.split("\\W+")));
-				}
-			}
-		}
+	
+	public FieldType getFieldType(String fieldId) {
+		return template.getFieldType(fieldId);
 	}
 	
-	@Override
-	public void getKeywords(IndexField[] indexFields, RecordKeywords keywordList) throws InputException {
-		for (IndexField f: indexFields) {
-			Field fld = getField(f.getFieldNum());
-			if (null != fld) {
-				String values = fld.getValuesAsString();
-				if ((null != values) && !values.isEmpty()) {
-					keywordList.addKeywords(Arrays.asList(values.split("\\W+")));
-				}
-			}
-		}
-	}
 	private class FieldIterator implements Iterator<Field>, Iterable<Field> {
 	
 		int fieldIndex;
@@ -268,15 +235,15 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		}
 		@Override
 		public boolean hasNext() {
-			while ((fieldIndex < recordData.length) && (null == recordData[fieldIndex])) {
+			while ((fieldIndex < recordFields.length) && (null == recordFields[fieldIndex])) {
 				++fieldIndex;
 			}
-			return (fieldIndex < recordData.length);
+			return (fieldIndex < recordFields.length);
 		}
 	
 		@Override
 		public Field next() {
-			return recordData[fieldIndex++];
+			return recordFields[fieldIndex++];
 		}
 	
 		@Override
@@ -337,7 +304,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 				}
 			}
 		}
-		for (Field f: recordData) {
+		for (Field f: recordFields) {
 			if ((null != f) && !f.isEmpty()) {
 				f.toXml(output);
 			}
@@ -346,12 +313,8 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		output.flush();
 	}
 
-	@Override
-	public String toString() {
-		StringBuffer buff = new StringBuffer();
-		buff.append("Record ID: ");
-		buff.append(RecordId.toString(getRecordId())); 
-		buff.append('\n');
+
+	protected void affiliationInfoToString(StringBuffer buff) {
 		for (int groupNum = 0; groupNum < template.getNumGroups(); ++groupNum) {
 			if (hasAffiliations(groupNum)) {
 				GroupMember member = affiliations[groupNum];
@@ -366,15 +329,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 				buff.append('\n');
 			}
 		}
-		for (Field f:recordData) {
-			if (null == f) {
-				continue;
-			}
-			String fieldString = f.toString();
-			buff.append(fieldString); 
-			buff.append('\n');
-		}
-		return buff.toString();
 	}
 	
 	@Override
@@ -394,7 +348,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		if (!getAttributes().equals(comparand.getAttributes())) {
 			return false;
 		}
-		for (Field f: recordData) {
+		for (Field f: recordFields) {
 			try {
 				Field otherField = comparand.getField(f.getFieldId());
 				if (!f.equals(otherField)) {
@@ -508,7 +462,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 			if (otherRec.getFieldIds().length != getFieldIds().length) {
 				result = false;
 			} else {
-				for (Field fld: recordData) {
+				for (Field fld: recordFields) {
 					try {
 						if (null == fld) {
 							continue;
@@ -545,8 +499,8 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	public DatabaseRecord duplicate() throws DatabaseException, FieldDataException  {
 		DatabaseRecord otherRec = new DatabaseRecord(template);
 		otherRec.setEditable(true);
-		for (int i = 0; i < recordData.length; ++i) {
-			Field fld = recordData[i];
+		for (int i = 0; i < recordFields.length; ++i) {
+			Field fld = recordFields[i];
 			if (null == fld) {
 				continue;
 			}
@@ -556,12 +510,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		return otherRec;
 	}
 
-	public long getDataLength() {
-		return dataLength;
-	}
-	public void setDataLength(long dataLength) {
-		this.dataLength = dataLength;
-	}
 	@Override
 	public int compareTo(Record comparand) {
 		int result = Integer.signum(id - comparand.getRecordId());
@@ -608,10 +556,10 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	}
 
 	@Override
-	public short getNumAffiliatesAndParent(int groupNum) {
-		short numAffiliates = 0;
+	public int getNumAffiliatesAndParent(int groupNum) {
+		int numAffiliates = 0;
 		if (hasAffiliations() && (null != affiliations[groupNum])) {
-			numAffiliates = (byte) affiliations[groupNum].getNumberOfValues();
+			numAffiliates = affiliations[groupNum].getNumberOfValues();
 		}
 		return numAffiliates;
 	}

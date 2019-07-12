@@ -8,9 +8,9 @@ import java.util.Iterator;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
@@ -46,7 +46,9 @@ class JournalFileRecordIterator<RecordType extends Record> implements Iterator<R
 		if (!tempHasNext) {
 			try {
 				fileMgr.releaseIpStream(ipStream);
-			} catch (IOException e) {}
+			} catch (IOException e) {
+				throw new DatabaseError("exception in journal iterator", e);
+			}
 		}
 		return tempHasNext;
 	}
@@ -59,7 +61,7 @@ class JournalFileRecordIterator<RecordType extends Record> implements Iterator<R
 			rec.fromXml(recMgr);
 			return rec;
 		} catch (LibrisException e) {
-			throw new InternalError("exception in journal iterator", e);
+			throw new DatabaseError("exception in journal iterator", e);
 		}
 	}
 

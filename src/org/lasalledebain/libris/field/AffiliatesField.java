@@ -10,9 +10,9 @@ import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.RecordIdNameMapper;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.index.GroupDef;;
 
 public class AffiliatesField extends GenericField implements Field, Iterable<FieldValue>{
@@ -158,7 +158,7 @@ public class AffiliatesField extends GenericField implements Field, Iterable<Fie
 			try {
 				recName = mapper.getName(i);
 			} catch (InputException e) {
-				throw new InternalError("error mapping record "+i, e);
+				throw new DatabaseError("error mapping record "+i, e);
 			}
 			buff.append(separator);
 			buff.append(recName);

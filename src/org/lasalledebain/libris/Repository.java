@@ -11,15 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
@@ -39,7 +38,7 @@ public class Repository extends Libris {
 
 	private static final String ARTIFACT_PREFIX = "A_";
 
-	private static final String ID_GROUPS = "ID_groups";
+	static final String ID_GROUPS = "ID_groups";
 
 	private static final String REPOSITORY = "Repository";
 
@@ -61,14 +60,12 @@ public class Repository extends Libris {
 	static public int DATE_FIELD;
 	static public int KEYWORDS_FIELD;
 	static public int COMMENTS_FIELD;
-	static final String[] fieldIds = new String[] { ID_GROUPS, ID_TITLE, ID_SOURCE, ID_DOI, ID_DATE, ID_KEYWORDS,
-			ID_COMMENTS };
-
 	static final int FANOUT = 100;
 
 	private static final DynamicSchema mySchema = makeSchema();
-	private static HashMap<String, Integer> idMap;
 	File root;
+
+	private static FieldTemplate[] templateList;
 
 	public Repository(ChildUi ui, GenericDatabase<DatabaseRecord> db, File theRoot) {
 		repoDatabase = db;
@@ -76,25 +73,22 @@ public class Repository extends Libris {
 	}
 
 	private static DynamicSchema makeSchema() {
-		idMap = new HashMap<String, Integer>(7);
 		DynamicSchema theSchema = new DynamicSchema();
 		GroupDef grp = new GroupDef(theSchema, ID_GROUPS, "", 0);
 		GROUP_FIELD = theSchema.addField(grp);
-		idMap.put(ID_GROUPS, GROUP_FIELD);
 		GroupDefs defs = theSchema.getGroupDefs();
 		defs.addGroup(grp);
 		TITLE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_TITLE, "", T_FIELD_STRING));
-		idMap.put(ID_TITLE, TITLE_FIELD);
 		SOURCE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_SOURCE, "", T_FIELD_LOCATION));
-		idMap.put(ID_SOURCE, SOURCE_FIELD);
 		DOI_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DOI, "", T_FIELD_STRING));
-		idMap.put(ID_DOI, DOI_FIELD);
 		DATE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DATE, "", T_FIELD_STRING));
-		idMap.put(ID_DATE, DATE_FIELD);
 		KEYWORDS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_KEYWORDS, "", T_FIELD_STRING));
-		idMap.put(ID_KEYWORDS, KEYWORDS_FIELD);
 		COMMENTS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_COMMENTS, "", T_FIELD_STRING));
-		idMap.put(ID_COMMENTS, COMMENTS_FIELD);
+		int numFields = COMMENTS_FIELD + 1;
+		templateList = new FieldTemplate[numFields];
+		for (int i = 1; i < numFields; ++i) {
+			templateList[i] = theSchema.getFieldTemplate(i);
+		}
 		return theSchema;
 	}
 
@@ -187,12 +181,24 @@ public class Repository extends Libris {
 			File result = new File(new URI(uriString));
 			return result;
 		} catch (InputException | URISyntaxException e) {
-			throw new InternalError("Error retrieving artifact " + artifactId, e);
+			throw new DatabaseError("Error retrieving artifact " + artifactId, e);
 		}
 	}
 
 	public static DynamicSchema getRepositorySchema() {
 		return mySchema;
+	}
+	
+	public static Field newField(int fieldNum) {
+		return templateList[fieldNum].newField();
+	}
+
+	public static Field newField(int fieldNum, String fieldData) throws InputException {
+		return templateList[fieldNum].newField(fieldData);
+	}
+
+	public static Field newField(int fieldNum, int fieldData) throws InputException {
+		return templateList[fieldNum].newField(fieldData);
 	}
 
 	public ArtifactParameters getArtifactInfo(int artifactId) {
@@ -211,7 +217,7 @@ public class Repository extends Libris {
 			}
 			return result;
 		} catch (InputException | URISyntaxException e) {
-			throw new InternalError("Error retrieving artifact " + artifactId, e);
+			throw new DatabaseError("Error retrieving artifact " + artifactId, e);
 		}
 
 	}

@@ -1,7 +1,5 @@
 package org.lasalledebain.libris.records;
 
-import static org.lasalledebain.libris.exception.DatabaseError.assertTrue;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,6 +22,7 @@ import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
@@ -182,7 +181,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 			DatabaseInstance instanceInfo = new DatabaseInstance();
 			instanceInfo.fromXml(instanceMgr);
 			int idOffset = lastMasterId - instanceInfo.getRecordIdBase();
-			assertTrue("Increment starting record ID invalid", idOffset >= 0);
+			Assertion.assertTrueError("Increment starting record ID invalid", idOffset >= 0);
 			ElementManager recordsMgr = librisMgr.nextElement();
 			XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader<DatabaseRecord>(database, recordsMgr);
 			int numGroups = database.getSchema().getNumGroups();

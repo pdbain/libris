@@ -425,7 +425,7 @@ public class DatabaseTests extends TestCase {
 				rootDb.exportFork(forkStream);
 				forkStream.close();
 				DatabaseRecord newRootRec = rootDb.newRecord();
-				String fieldData = "Record"+newRecordNumber;
+				String fieldData = "DatabaseRecord"+newRecordNumber;
 				newRootRec.addFieldValue("ID_title", fieldData);
 				testLogger.log(Level.INFO,"add new record with "+fieldData+" to root database");
 				rootDb.putRecord(newRootRec);
@@ -582,7 +582,7 @@ public class DatabaseTests extends TestCase {
 			final int numIncrementRecs = 10;
 			for (int i = baseId+1; i <= numIncrementRecs; ++i) {
 				DatabaseRecord rec = forkDb.newRecord();
-				rec.addFieldValue("ID_title", "Record"+newRecordNumber++);
+				rec.addFieldValue("ID_title", "DatabaseRecord"+newRecordNumber++);
 				int recNum = forkDb.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				incrementExpectedRecords.add(rec);
