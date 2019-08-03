@@ -62,7 +62,7 @@ public class Repository extends Libris {
 	static public int COMMENTS_FIELD;
 	static final int FANOUT = 100;
 
-	private static final DynamicSchema mySchema = makeSchema();
+	static final DynamicSchema mySchema = makeSchema();
 	File root;
 
 	private static FieldTemplate[] templateList;

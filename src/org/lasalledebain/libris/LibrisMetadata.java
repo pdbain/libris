@@ -17,7 +17,6 @@ public abstract class LibrisMetadata extends GenericDatabaseMetadata implements 
 
 	protected LibrisDatabase database;
 	protected Layouts uiLayouts;
-	private int savedRecords;
 	private int modifiedRecords;
 	private DatabaseInstance instanceInfo;
 	/**
@@ -112,18 +111,6 @@ public abstract class LibrisMetadata extends GenericDatabaseMetadata implements 
 
 	public LastFilterSettings getLastFilterSettings() {
 		return lastFiltSettings;
-	}
-
-	public int getSavedRecords() {
-		return savedRecords;
-	}
-
-	public void setSavedRecords(int savedRecords) {
-		this.savedRecords = savedRecords;
-	}
-
-	public void adjustSavedRecords(int numAdded) {
-		this.savedRecords += numAdded;
 	}
 
 	public int getModifiedRecords() {

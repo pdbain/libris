@@ -28,6 +28,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_INDEXFIELD_ID_ATTR = "id";
 	public static final String XML_INDEXFIELD_STOPLIST_ATTR = "false";
 	public static final String XML_LIBRIS_TAG = "libris";
+	public static final String XML_ARTIFACTS_TAG = "artifacts";
 	public static final String XML_METADATA_TAG = "metadata";
 	public static final String XML_SCHEMA_TAG = "schema";
 	public static final String XML_RECORDS_TAG = "records";
@@ -57,7 +58,6 @@ public interface LibrisXMLConstants {
 	public static final String XML_GROUPDEFS_TAG = "groupdefs";
 	public static final String XML_GROUPDEF_TAG = "groupdef";
 	public static final String XML_INDEXES_TAG = "indexes";
-	public static final String XML_RECORDS_LASTID_ATTR = "lastid";
 	public static final String XML_INDEXDEFS_TAG = "indexdefs";
 	public static final String XML_INDEXDEF_TAG = "indexdef";
 	public static final String XML_INDEXFIELD_TAG = "indexfield";

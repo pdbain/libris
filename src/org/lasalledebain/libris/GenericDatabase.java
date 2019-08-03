@@ -1,7 +1,11 @@
 package org.lasalledebain.libris;
 
+import java.util.Objects;
+
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
@@ -19,6 +23,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected LibrisJournalFileManager<RecordType> journalFile;
 	protected Records<RecordType> databaseRecords;
 	protected boolean readOnly;
+	protected boolean isModified;
 
 
 	public GenericDatabase(LibrisUi theUi, LibrisFileManager theFileManager) {
@@ -48,6 +53,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return indexMgr.getRecordsFileMgr();
 	}
 
+	public Iterable<RecordType> getRecordReader() throws LibrisException {
+		return getRecordsFileMgr();
+	}
+	
 	public LibrisUi getUi() {
 		return ui;
 	}
@@ -56,6 +65,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return readOnly;
 	}
 
+	public boolean isRecordReadOnly(int recordId) {
+		
+		return isReadOnly();
+	}
 	public abstract  RecordType newRecord() throws InputException;
 
 	public abstract int putRecord(RecordType rec) throws LibrisException;
@@ -116,4 +129,46 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	}
 
 	public abstract RecordFactory<RecordType> getRecordFactory();
+
+	protected int genericPutRecord(LibrisMetadata metaData, RecordType rec)
+			throws DatabaseException, LibrisException, InputException, UserErrorException {
+				int id = rec.getRecordId();
+				if (RecordId.isNull(id)) {
+					id = newRecordId();
+					rec.setRecordId(id);
+					metaData.adjustModifiedRecords(1);
+				} else {
+					if (isRecordReadOnly(id)) {
+						throw new DatabaseException("Record "+id+" is read-only");
+					}
+					metaData.setLastRecordId(id);
+				}
+				getJournalFileMgr().put(rec);
+				String recordName = rec.getName();
+				if (Objects.nonNull(recordName)) {
+					indexMgr.addNamedRecord(id, recordName);
+				}
+				indexMgr.addRecordKeywords(rec);
+				
+				modifiedRecords.addRecord(rec);
+				setModified(true);
+				metaData.adjustSavedRecords(1);
+				return id;
+			}
+
+	public int newRecordId() {
+		return getMetadata().newRecordId();
+	}
+
+	public int getSavedRecordCount() {
+		return getMetadata().getSavedRecords();
+	}
+
+	public boolean isModified() {
+		return isModified;
+	}
+
+	public void setModified(boolean isModified) {
+		this.isModified = isModified;
+	}
 }

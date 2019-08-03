@@ -69,7 +69,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	protected LibrisDatabaseMetadata databaseMetadata;
 	private static final Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());
 	protected DatabaseAttributes xmlAttributes;
-	private boolean isModified;
 	private boolean dbOpen;
 	
 	public LibrisDatabase(File databaseFile, boolean readOnly, LibrisUi ui) throws LibrisException  {
@@ -289,7 +288,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		metadata.toXml(databaseWriter);
 		{
 			LibrisAttributes recordsAttrs = new LibrisAttributes();
-			recordsAttrs.setAttribute(XML_RECORDS_LASTID_ATTR, 0);
 			databaseWriter.writeStartElement(XML_RECORDS_TAG, recordsAttrs, true);
 		}
 		databaseWriter.writeEndElement();
@@ -344,7 +342,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 		if (null != recordSource) {
 			LibrisAttributes recordsAttrs = new LibrisAttributes();
-			recordsAttrs.setAttribute(XML_RECORDS_LASTID_ATTR, RecordId.toString(databaseMetadata.getLastRecordId()));
 			outWriter.writeStartElement(XML_RECORDS_TAG, recordsAttrs, false);
 			for (Record r: recordSource) {
 				r.toXml(outWriter);
@@ -428,10 +425,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		fileMgr.getDatabaseFileMgr().close();
 	}
 
-	public boolean isModified() {
-		return isModified;
-	}
-
 	@Override
 	public boolean equals(Object comparand) {
 		try {
@@ -470,9 +463,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 	}
 
-	public void setModified(boolean isModified) {
-		this.isModified = isModified;
-	}
 	/**
 	 * @param sourceFileMgr
 	 * @return
@@ -588,9 +578,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return xmlFactory;
 	}
 
-	public Iterable<DatabaseRecord> getRecordReader() throws LibrisException {
-		return getRecordsFileMgr();
-	}
 	/**
 	 * Create Records manager if necessary and return it.
 	 * @return
@@ -640,27 +627,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 * @throws LibrisException 
 	 */
 	public int putRecord(DatabaseRecord rec) throws LibrisException {
-		int id = rec.getRecordId();
-		if (RecordId.isNull(id)) {
-			id = newRecordId();
-			rec.setRecordId(id);
-			databaseMetadata.adjustModifiedRecords(1);
-		} else {
-			if (isRecordReadOnly(id)) {
-				throw new DatabaseException("Record "+id+" is read-only");
-			}
-			databaseMetadata.setLastRecordId(id);
-		}
-		getJournalFileMgr().put(rec);
-		String recordName = rec.getName();
-		if (Objects.nonNull(recordName)) {
-			indexMgr.addNamedRecord(id, recordName);
-		}
-		indexMgr.addRecordKeywords(rec);
-		
-		modifiedRecords.addRecord(rec);
-		setModified(true);
-		databaseMetadata.adjustSavedRecords(1);
+			LibrisMetadata metaData = getMetadata();
+		int id = genericPutRecord(metaData, rec);
 		for (int g = 0; g < mySchema.getNumGroups(); ++g) {
 			int[] affiliations = rec.getAffiliates(g);
 			if (affiliations.length != 0) {
@@ -705,14 +673,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 	}
 
-	public int newRecordId() {
-		return databaseMetadata.newRecordId();
-	}
-
-	public int getSavedRecordCount() {
-		return databaseMetadata.getSavedRecords();
-	}
-
 	public RecordList<DatabaseRecord> getRecords() {
 		return new DatabaseRecordList(this);	
 	}
@@ -734,12 +694,13 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		readOnly = true;
 	}
 
+	@Override
 	public boolean isRecordReadOnly(int recordId) {
 		boolean result;
 		if (readOnly) {
 			result = true;
 		} else {
-			result = (recordId <= databaseMetadata.getRecordIdBase());
+			result = (recordId <= getMetadata().getRecordIdBase());
 		}
 		return result;
 	}

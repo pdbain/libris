@@ -4,7 +4,7 @@
 <!ENTITY % usagetype "(newrecord|formdisplay|summarydisplay|formentry|tabledisplay)">
 <!ENTITY % groupstructure "(flat|hierarchical)">
 
-<!ELEMENT libris (instance?, metadata?, records?)>
+<!ELEMENT libris (instance?, metadata?, records?, artifacts?)>
 <!ENTITY % databaseAttributes	"
 	schemaname NMTOKEN #REQUIRED
 	schemaversion NMTOKEN #REQUIRED
@@ -22,7 +22,6 @@
 	forkdate CDATA #REQUIRED
 	joindate CDATA #IMPLIED
 >
-
 
 <!ELEMENT schema (groupdefs, fielddefs, indexdefs) >
 
@@ -116,9 +115,11 @@ Define the indexes in the database
 Records section.
 -->
 <!ELEMENT records (record*)>
-<!ATTLIST records
-	lastid NMTOKEN #REQUIRED
->
+
+<!--
+Artifacts section.
+-->
+<!ELEMENT artifacts (record*)>
 <!--
 Represents a document or a index item
 -->

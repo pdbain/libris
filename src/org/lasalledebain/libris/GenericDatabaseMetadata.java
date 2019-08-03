@@ -6,12 +6,13 @@ import java.util.Date;
 
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class GenericDatabaseMetadata implements LibrisXMLConstants {
+public abstract class GenericDatabaseMetadata implements LibrisXMLConstants {
 
 	protected int lastRecordId;
 	private Date databaseDate;
 	protected boolean lastRecOkay;
 	protected int signatureLevels;
+	protected int savedRecords;
 	private static SimpleDateFormat dateAndTimeFormatter = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
 	private static SimpleDateFormat compactDateFormatter = new SimpleDateFormat(LibrisConstants.YMD);
 
@@ -77,6 +78,18 @@ public class GenericDatabaseMetadata implements LibrisXMLConstants {
 
 	public void setDatabaseDate(Date databaseDate) {
 		this.databaseDate = databaseDate;
+	}
+
+	public int getSavedRecords() {
+		return savedRecords;
+	}
+
+	public void setSavedRecords(int savedRecords) {
+		this.savedRecords = savedRecords;
+	}
+
+	public void adjustSavedRecords(int numAdded) {
+		this.savedRecords += numAdded;
 	}
 
 }
