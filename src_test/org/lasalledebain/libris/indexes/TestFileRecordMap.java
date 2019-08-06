@@ -27,7 +27,7 @@ public class TestFileRecordMap extends TestCase {
 		Utilities.deleteRecursively(workingDirectory);
 		workingDirectory.mkdirs();
 		indexFile = new File(workingDirectory, "testIndexFile");
-		fileMgr  = new LibrisFileManager(workingDirectory, indexFile);
+		fileMgr  = new LibrisFileManager(workingDirectory);
 		FileAccessManager indexFileMgr = fileMgr.makeAccessManager(getName(), indexFile);
 		index = new FileRecordMap(indexFileMgr, false);
 	}

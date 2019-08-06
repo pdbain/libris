@@ -55,10 +55,10 @@ public class Libris {
 						auxDir = new File(auxDirpath);
 					}
 				}
+				// TODO configurable aux dir
 				LibrisGui ui = new LibrisGui(dbFile, readOnly);				
 				if (null != dbFile) {
 					LibrisDatabase db = ui.openDatabase();
-					db.setAuxDir(auxDir);
 				} else {
 					ui.sendChooseDatabase();
 				}

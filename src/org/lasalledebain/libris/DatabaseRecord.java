@@ -85,24 +85,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		return recordFields[position];
 	}
 	/**
-	 * Create a new value pair field
-	 * @param fieldNum Position of the field in the field list
-	 * @param mainValue First value of the pair
-	 * @param extraValue Second value of the pair.  May be null or zero length
-	 * @return new field
-	 * @throws DatabaseException
-	 * @throws InputException 
-	 */
-	public Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException {
-		if (null == recordFields[fieldNum]) {
-		recordFields[fieldNum] = template.newField(fieldNum, mainValue, extraValue);
-		} else {
-			recordFields[fieldNum].addValuePair(mainValue, extraValue);
-		}
-		return recordFields[fieldNum];
-	}
-
-	/**
 	 * @param fieldNum Position of the field in the field list
 	 * @param mainValue First value of the pair
 	 * @param extraValue Second value of the pair.  May be null or zero length
@@ -128,13 +110,21 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		return recordFields[position];
 	}
 	
-	@Override
-	public Field addFieldValuePair(int fieldNum, String fieldValue, String extraValue)
-	throws InputException {
+	/**
+	 * Create a new value pair field
+	 * @param fieldNum Position of the field in the field list
+	 * @param mainValue First value of the pair
+	 * @param extraValue Second value of the pair.  May be null or zero length
+	 * @return new field
+	 * @throws DatabaseException
+	 * @throws InputException 
+	 */
+	public Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException {
 		if (null == recordFields[fieldNum]) {
-			recordFields[fieldNum] = template.newField(fieldNum);
-		} 
-		recordFields[fieldNum].addValuePair(fieldValue, extraValue);
+			recordFields[fieldNum] = template.newField(fieldNum, mainValue, extraValue);
+		} else {
+			recordFields[fieldNum].addValuePair(mainValue, extraValue);
+		}
 		return recordFields[fieldNum];
 	}
 
@@ -360,67 +350,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		}
 		return true;
 	}
-	@Override
-	public String generateTitle(String[] fieldIds) {
-		StringBuffer buff = new StringBuffer("[");
-		int wordLimit = 8;
-		final int MAX_WORD_LENGTH = 8;
-		final char ELLIPSIS_CHAR = '\u2026';
-		final String ELLIPSIS_STRING = "\u2026";
-		String idString = (NULL_RECORD_ID == id)? "<unknown>": RecordId.toString(id);
-		buff.append(idString);
-		buff.append("]: ");
-		if (null != name) {
-			buff.append(name);
-		} else {
-			String[][] fieldWordsList = new String[fieldIds.length][];
-			ArrayList<String> fieldStrings = new ArrayList<>(fieldIds.length);
-			int fieldCount = 0;
-			for (String fieldId: fieldIds) {
-				Field fld;
-				try {
-					fld = getField(fieldId);
-				} catch (InputException e) {
-					throw new InternalError(e);
-				}
-				if ((null == fld) || !fld.isText()) {
-					continue;
-				}
-				String[] fieldWords = fld.getValuesAsString().split("\\s+");
-				fieldWordsList[fieldCount++] = fieldWords;
-			}
-			int f = 0;
-			boolean lastEllipsis = false;
-			while (fieldCount > 0) {
-				String fieldWords[] = fieldWordsList[f];
-				ArrayList<String> fieldBuff = new ArrayList<>(fieldWords.length);
-				int wordsPerField = Math.min(wordLimit/fieldCount, fieldWords.length);
-				for (int i = 0; i < wordsPerField; ++i) {
-					String titleWord = fieldWords[i];
-					if (lastEllipsis = (titleWord.length() > MAX_WORD_LENGTH)) {
-						titleWord = titleWord.substring(0, MAX_WORD_LENGTH - 1)+ELLIPSIS_CHAR;
-					}
-					fieldBuff.add(titleWord);
-				}
-				fieldStrings.add(String.join(" ", fieldBuff));
-				if ((1 == fieldCount) && !lastEllipsis && (wordsPerField < fieldWords.length)) {
-					fieldStrings.add(ELLIPSIS_STRING);
-				}
-				wordLimit -= wordsPerField;
-				fieldCount--;
-				f++;
-			}
-			if (0 == buff.length()) {
-				buff.append("Untitled");
-			} else {
-				buff.append(String.join("; ", fieldStrings));
-			}
-		}
-		return buff.toString();
-	}
-	public String generateTitle() {
-		return generateTitle(template.getFieldIds());
-	}
 	
 	@Override
 	public int[] getAffiliates(int groupNum) throws InputException {
@@ -510,13 +439,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		return otherRec;
 	}
 
-	@Override
-	public int compareTo(Record comparand) {
-		int result = Integer.signum(id - comparand.getRecordId());
-		return result;
-	}
-	
-	
 	/* Group management */
 	
 	@Override

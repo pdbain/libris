@@ -1,8 +1,5 @@
 package org.lasalledebain.libris;
 
-import static org.lasalledebain.libris.Field.FieldType.T_FIELD_LOCATION;
-import static org.lasalledebain.libris.Field.FieldType.T_FIELD_STRING;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -22,8 +19,6 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
-import org.lasalledebain.libris.index.GroupDef;
-import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.ui.ChildUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
@@ -42,54 +37,33 @@ public class Repository extends Libris {
 
 	private static final String REPOSITORY = "Repository";
 
-	public static final String ID_DATE = "ID_date";
-	public static final String ID_DOI = "ID_doi";
+	static final String ID_DATE = "ID_date";
+	static final String ID_DOI = "ID_doi";
 
-	public static final String ID_KEYWORDS = "ID_keywords";
+	static final String ID_KEYWORDS = "ID_keywords";
 
-	private static final String ID_SOURCE = "ID_source";
+	static final String ID_SOURCE = "ID_source";
 
-	private static final String ID_TITLE = "ID_title";
-	private static final String ID_COMMENTS = "ID_comments";
+	static final String ID_TITLE = "ID_title";
+	static final String ID_COMMENTS = "ID_comments";
 
 	GenericDatabase<DatabaseRecord> repoDatabase;
-	static public int GROUP_FIELD;
-	static public int TITLE_FIELD;
-	static public int SOURCE_FIELD;
-	static public int DOI_FIELD;
-	static public int DATE_FIELD;
-	static public int KEYWORDS_FIELD;
-	static public int COMMENTS_FIELD;
+	static int GROUP_FIELD;
+	static int TITLE_FIELD;
+	static int SOURCE_FIELD;
+	static int DOI_FIELD;
+	static int DATE_FIELD;
+	static int KEYWORDS_FIELD;
+	static int COMMENTS_FIELD;
 	static final int FANOUT = 100;
 
-	static final DynamicSchema mySchema = makeSchema();
 	File root;
 
-	private static FieldTemplate[] templateList;
+	static FieldTemplate[] templateList;
 
 	public Repository(ChildUi ui, GenericDatabase<DatabaseRecord> db, File theRoot) {
 		repoDatabase = db;
 		root = theRoot;
-	}
-
-	private static DynamicSchema makeSchema() {
-		DynamicSchema theSchema = new DynamicSchema();
-		GroupDef grp = new GroupDef(theSchema, ID_GROUPS, "", 0);
-		GROUP_FIELD = theSchema.addField(grp);
-		GroupDefs defs = theSchema.getGroupDefs();
-		defs.addGroup(grp);
-		TITLE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_TITLE, "", T_FIELD_STRING));
-		SOURCE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_SOURCE, "", T_FIELD_LOCATION));
-		DOI_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DOI, "", T_FIELD_STRING));
-		DATE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DATE, "", T_FIELD_STRING));
-		KEYWORDS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_KEYWORDS, "", T_FIELD_STRING));
-		COMMENTS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_COMMENTS, "", T_FIELD_STRING));
-		int numFields = COMMENTS_FIELD + 1;
-		templateList = new FieldTemplate[numFields];
-		for (int i = 1; i < numFields; ++i) {
-			templateList[i] = theSchema.getFieldTemplate(i);
-		}
-		return theSchema;
 	}
 
 	/**
@@ -104,8 +78,8 @@ public class Repository extends Libris {
 	public static File initialize(File repoRoot) throws LibrisException, XMLStreamException, IOException {
 		File databaseFile = getDatabaseFileFromRoot(repoRoot);
 		HeadlessUi theUi = new HeadlessUi(databaseFile, false);
-		Layouts theLayouts = new Layouts(mySchema);
-		MetadataHolder metadata = new MetadataHolder(mySchema, theLayouts);
+		Layouts theLayouts = new Layouts(ArtifactDatabase.artifactsSchema);
+		MetadataHolder metadata = new MetadataHolder(ArtifactDatabase.artifactsSchema, theLayouts);
 		boolean success = LibrisDatabase.newDatabase(databaseFile, REPOSITORY, false, theUi, metadata);
 		return success ? databaseFile : null;
 	}
@@ -124,7 +98,7 @@ public class Repository extends Libris {
 		return result;
 	}
 
-	public File idToDirectoryPath(File root, int id) {
+	public static File idToDirectoryPath(File root, int id) {
 		int levels = 1;
 		int count = id;
 		while (count > FANOUT) {
@@ -185,22 +159,6 @@ public class Repository extends Libris {
 		}
 	}
 
-	public static DynamicSchema getRepositorySchema() {
-		return mySchema;
-	}
-	
-	public static Field newField(int fieldNum) {
-		return templateList[fieldNum].newField();
-	}
-
-	public static Field newField(int fieldNum, String fieldData) throws InputException {
-		return templateList[fieldNum].newField(fieldData);
-	}
-
-	public static Field newField(int fieldNum, int fieldData) throws InputException {
-		return templateList[fieldNum].newField(fieldData);
-	}
-
 	public ArtifactParameters getArtifactInfo(int artifactId) {
 		try {
 			final Record record = repoDatabase.getRecord(artifactId);
@@ -253,4 +211,5 @@ public class Repository extends Libris {
 	public int putArtifactInfo(URI sourceLocation) throws LibrisException {
 		return putArtifactInfo(new ArtifactParameters(sourceLocation));
 	}
+
 }

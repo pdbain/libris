@@ -70,10 +70,11 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 		this.fileMgr = fileMgr;
 
 		namedRecsFileMgrs = new ArrayList<FileAccessManager>(1 + NAMED_RECORDS_INDEX_LEVELS);
-		namedRecsFileMgrs.add(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.NAMEDRECORDS_FILENAME_ROOT + "data"));
+		FileAccessManager auxFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.NAMEDRECORDS_FILENAME_ROOT + "data");
+		namedRecsFileMgrs.add(auxFileMgr);
 		for (int i = 0; i < IndexManager.NAMED_RECORDS_INDEX_LEVELS; ++i) {
 			namedRecsFileMgrs.add(
-					fileMgr.getAuxiliaryFileMgr(LibrisFileManager.NAMEDRECORDS_FILENAME_ROOT + "index" + (i + 1)));
+					fileMgr.getAuxiliaryFileMgr(LibrisConstants.NAMEDRECORDS_FILENAME_ROOT + "index" + (i + 1)));
 		}
 
 		sigMgr = new SignatureManager(database);

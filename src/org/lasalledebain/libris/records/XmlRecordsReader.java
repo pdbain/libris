@@ -93,18 +93,6 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 		return;
 	}
 
-	public int getFieldNum() {
-		return 0;
-	}
-
-	public String getId() {
-		return null;
-	}
-
-	public String getTitle() {
-		return null;
-	}
-
 	public static void importXmlRecords(LibrisDatabase database, File source) throws LibrisException {
 		LibrisMetadata metadata = database.getMetadata();
 		try {
@@ -128,8 +116,8 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 			int lastId = 0;
 			metadata.setSavedRecords(0);
 			LibrisFileManager fileMgr = database.getFileMgr();
-			FileAccessManager recordsFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME);
-			RecordPositions recPosns = new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.POSITION_FILENAME), false);
+			FileAccessManager recordsFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME);
+			RecordPositions recPosns = new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisConstants.POSITION_FILENAME), false);
 			BulkImporter importer = new BulkImporter(database.getSchema(), recordsFileMgr.getOpStream(), recPosns);
 			importer.initialize();
 			boolean nonEmpty = false;

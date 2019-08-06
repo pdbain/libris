@@ -1,5 +1,11 @@
 package org.lasalledebain.libris;
 
+import static org.lasalledebain.libris.LibrisConstants.JOURNAL_FILENAME;
+import static org.lasalledebain.libris.LibrisConstants.LOCK_FILENAME;
+import static org.lasalledebain.libris.LibrisConstants.POSITION_FILENAME;
+import static org.lasalledebain.libris.LibrisConstants.PROPERTIES_FILENAME;
+import static org.lasalledebain.libris.LibrisConstants.RECORDS_FILENAME;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,29 +22,9 @@ import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.UserErrorException;
 
-public class LibrisFileManager implements LibrisConstants {	
-	/**
-	 * XML representation of the schema and database records
-	 */
-	private File databaseFile;
-	/**
-	 * Location of indexes, native copy of records, etc.
-	 */
-	private File auxDirectory;
-	
-
-	private static final String[] coreAuxFiles = {
-					PROPERTIES_FILENAME,
-					POSITION_FILENAME,
-					RECORDS_FILENAME, 
-					LOCK_FILENAME
-	};
+public class LibrisFileManager {	
 	private FileAccessManager schemaAccessMgr;
-
-	private final HashSet<FileAccessManager> expendableFiles;
-	private final HashMap<String, FileAccessManager> activeManagers;
 	ReentrantLock mgrLock;
 	boolean locked;
 
@@ -46,65 +32,33 @@ public class LibrisFileManager implements LibrisConstants {
 	 * XML representation of database records added
 	 */
 	private FileAccessManager journalAccessMgr;
-	private FileAccessManager databaseAccessMgr;
 	private File lockFile;
 	private FileOutputStream dbLockFile;
 	private FileLock dbLock;
 	private boolean databaseReserved;
 
-	public LibrisFileManager(File dbFile, File auxDir) throws UserErrorException {
-			String auxDirectoryName = AUX_DIRECTORY_NAME;
+	public LibrisFileManager(File auxDir) {
+		auxDirectory = auxDir;
 		activeManagers = new HashMap<String, FileAccessManager>();
 		expendableFiles = new HashSet<FileAccessManager>();
-		databaseFile = dbFile;
-		if (!databaseFile.exists()) {
-			throw new UserErrorException("database file "+dbFile+" dos not exist");
-		}
-		if (null == auxDir) {
-			File databaseDir = databaseFile.getParentFile();
-			String directoryName = databaseFile.getName();
-			int suffixPosition = directoryName.lastIndexOf(".xml");
-			if (suffixPosition > 0) {
-				directoryName = directoryName.substring(0, suffixPosition);
-			}
-
-			auxDirectory = new File(databaseDir, auxDirectoryName+'_'+directoryName);
-		}
 		lockFile = new File(auxDirectory, LOCK_FILENAME);
 		open(auxDirectory);
 		mgrLock  = new ReentrantLock();
 		locked = false;
 	}
+	/**
+	 * Location of indexes, native copy of records, etc.
+	 */
+	protected final File auxDirectory;
+	protected final HashSet<FileAccessManager> expendableFiles;
+	protected final HashMap<String, FileAccessManager> activeManagers;
+	protected static final String[] coreAuxFiles = {
+						PROPERTIES_FILENAME,
+						POSITION_FILENAME,
+						RECORDS_FILENAME, 
+						LOCK_FILENAME
+		};
 
-	public LibrisFileManager(File dbFile, String auxDirectoryName) throws UserErrorException {
-
-	activeManagers = new HashMap<String, FileAccessManager>();
-	expendableFiles = new HashSet<FileAccessManager>();
-	databaseFile = dbFile;
-	if (!databaseFile.exists()) {
-		throw new UserErrorException("database file "+dbFile+" dos not exist");
-	}
-
-	File databaseDir = databaseFile.getParentFile();
-	String directoryName = databaseFile.getName();
-	int suffixPosition = directoryName.lastIndexOf(".xml");
-	if (suffixPosition > 0) {
-		directoryName = directoryName.substring(0, suffixPosition);
-	}
-
-	auxDirectory = new File(databaseDir, auxDirectoryName+'_'+directoryName);
-	lockFile = new File(auxDirectory, LOCK_FILENAME);
-	open(auxDirectory);
-	mgrLock  = new ReentrantLock();
-	locked = false;
-		// TODO Auto-generated constructor stub
-	}
-
-	public void setDatabaseFile(String databaseFileName) {
-		setDatabaseFile(new File(databaseFileName));
-	}
-	
-	// FIXME put database lock in aux dir
 	public synchronized boolean  reserveDatabase() {
 		try {
 			lockFile.createNewFile();
@@ -166,7 +120,7 @@ public class LibrisFileManager implements LibrisConstants {
 		}
 		try {
 			createAuxDirectory();
-			for (FileAccessManager f:expendableFiles) {
+			for (FileAccessManager f: expendableFiles) {
 				if (f.exists()) {
 					f.delete();
 				}
@@ -188,14 +142,6 @@ public class LibrisFileManager implements LibrisConstants {
 		}
 	}
 
-	public String getDatabaseFilePath() {
-		return (databaseFile == null)? "<no database file given>": databaseFile.getPath();
-	}
-
-	public String getDatabaseDirectory() {
-		return (databaseFile == null)? "<no database file given>": databaseFile.getParent();
-	}
-
 	public void open(File auxDir) {
 		try {
 			setAuxiliaryFiles(auxDir);
@@ -206,8 +152,6 @@ public class LibrisFileManager implements LibrisConstants {
 
 	public void close() {
 		checkLock();
-		databaseFile = null;
-		auxDirectory = null;
 		activeManagers.values().forEach(f->f.close());
 	}
 	/**
@@ -216,14 +160,8 @@ public class LibrisFileManager implements LibrisConstants {
 	 */
 	private synchronized void setAuxiliaryFiles(File databaseDir) throws DatabaseException {
 		checkLock();
-		if (!fileSet()) {
-			throw new DatabaseException("Database file not set");
-		}
 		journalAccessMgr = new FileAccessManager(new File(auxDirectory, JOURNAL_FILENAME));
 		activeManagers.put(JOURNAL_FILENAME, journalAccessMgr);
-		
-		databaseAccessMgr = new FileAccessManager(databaseFile);
-		activeManagers.put(LibrisConstants.DATABASE_NAME, databaseAccessMgr);
 		
 		for (String m: coreAuxFiles) {
 			makeExpendableAccessManager(m);
@@ -248,18 +186,6 @@ public class LibrisFileManager implements LibrisConstants {
 		mgr.close();
 		activeManagers.remove(mgr);
 	}
-	/**
-	 * @return File object for the database source (XML) file
-	 */
-	public synchronized FileAccessManager getDatabaseFileMgr() {
-		checkLock();
-		return databaseAccessMgr;
-	}
-	
-	public synchronized File getDatabaseFile() {
-		checkLock();
-		return databaseFile;
-	}
 	
 	public synchronized FileAccessManager getAuxiliaryFileMgr(String auxFileName) {
 		checkLock();
@@ -274,22 +200,9 @@ public class LibrisFileManager implements LibrisConstants {
 		return new FileOutputStream(new File(auxDirectory, fileName));
 	}
 
-	/**
-	 * Set the database source (XML) file
-	 * @param dbFile
-	 */
-	public synchronized void setDatabaseFile(File dbFile) {
-		checkLock();
-		databaseFile = dbFile;
-	}
-	
 	public synchronized File getAuxDirectory() {
 		checkLock();
 		return auxDirectory;
-	}
-	public synchronized void setAuxDirectory(File auxDirectory) {
-		checkLock();
-		this.auxDirectory = auxDirectory;
 	}
 
 	public synchronized FileAccessManager getSchemaAccessMgr() {
@@ -308,7 +221,7 @@ public class LibrisFileManager implements LibrisConstants {
 			throw new DatabaseException("schema file already set");
 		}
 		schemaAccessMgr = new FileAccessManager(schemaFile);
-		activeManagers.put(SCHEMA_NAME, schemaAccessMgr);
+		activeManagers.put(LibrisConstants.SCHEMA_NAME, schemaAccessMgr);
 		return schemaFile.exists() && (schemaFile.length() > 0);
 	}
 
@@ -321,11 +234,8 @@ public class LibrisFileManager implements LibrisConstants {
 		return journalAccessMgr;
 	}
 
-	private void checkLock() throws DatabaseError {
+	void checkLock() throws DatabaseError {
 		Assertion.assertTrueError("file manager locked by other thread", !locked || mgrLock.isHeldByCurrentThread());
-	}
-	public boolean fileSet() {
-		return (null != databaseFile);
 	}
 	
 	public synchronized boolean lock() {

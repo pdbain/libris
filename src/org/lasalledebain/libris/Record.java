@@ -1,5 +1,8 @@
 package org.lasalledebain.libris;
 
+import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.lasalledebain.libris.Field.FieldType;
@@ -52,6 +55,12 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	}
 	
 	@Override
+	public int compareTo(Record comparand) {
+		int result = Integer.signum(id - comparand.getRecordId());
+		return result;
+	}
+	
+	@Override
 	public String getElementTag() {
 		return getXmlTag();
 	}
@@ -85,7 +94,6 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract Field addFieldValue(int fieldNum, int mainValue, String extraValue) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, int fieldData) throws InputException;
-	public abstract Field addFieldValuePair(int fieldNum, String value, String extraValue) throws InputException;
 	public Field getField(String fieldId) throws InputException {
 		return getField(getFieldNum(fieldId));
 	}
@@ -119,7 +127,6 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	}
 	protected abstract void affiliationInfoToString(StringBuffer buff);
 
-	public abstract String generateTitle(String[] titleFieldIds);
 	public abstract void fromXml(ElementManager recMgr) throws LibrisException;
 	public abstract void toXml(ElementWriter output) throws LibrisException;
 	
@@ -149,7 +156,67 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public boolean hasAffiliations(int groupNum) {
 		return false;
 	}
-	public abstract String generateTitle();
+
+	public String generateTitle(String[] fieldIds) {
+		StringBuffer buff = new StringBuffer("[");
+		int wordLimit = 8;
+		final int MAX_WORD_LENGTH = 8;
+		final char ELLIPSIS_CHAR = '\u2026';
+		final String ELLIPSIS_STRING = "\u2026";
+		String idString = (NULL_RECORD_ID == id)? "<unknown>": RecordId.toString(id);
+		buff.append(idString);
+		buff.append("]: ");
+		if (null != name) {
+			buff.append(name);
+		} else {
+			String[][] fieldWordsList = new String[fieldIds.length][];
+			ArrayList<String> fieldStrings = new ArrayList<>(fieldIds.length);
+			int fieldCount = 0;
+			for (String fieldId: fieldIds) {
+				Field fld;
+				try {
+					fld = getField(fieldId);
+				} catch (InputException e) {
+					throw new InternalError(e);
+				}
+				if ((null == fld) || !fld.isText()) {
+					continue;
+				}
+				String[] fieldWords = fld.getValuesAsString().split("\\s+");
+				fieldWordsList[fieldCount++] = fieldWords;
+			}
+			int f = 0;
+			boolean lastEllipsis = false;
+			while (fieldCount > 0) {
+				String fieldWords[] = fieldWordsList[f];
+				ArrayList<String> fieldBuff = new ArrayList<>(fieldWords.length);
+				int wordsPerField = Math.min(wordLimit/fieldCount, fieldWords.length);
+				for (int i = 0; i < wordsPerField; ++i) {
+					String titleWord = fieldWords[i];
+					if (lastEllipsis = (titleWord.length() > MAX_WORD_LENGTH)) {
+						titleWord = titleWord.substring(0, MAX_WORD_LENGTH - 1)+ELLIPSIS_CHAR;
+					}
+					fieldBuff.add(titleWord);
+				}
+				fieldStrings.add(String.join(" ", fieldBuff));
+				if ((1 == fieldCount) && !lastEllipsis && (wordsPerField < fieldWords.length)) {
+					fieldStrings.add(ELLIPSIS_STRING);
+				}
+				wordLimit -= wordsPerField;
+				fieldCount--;
+				f++;
+			}
+			if (0 == buff.length()) {
+				buff.append("Untitled");
+			} else {
+				buff.append(String.join("; ", fieldStrings));
+			}
+		}
+		return buff.toString();
+	}
+	public String generateTitle() {
+		return generateTitle(getFieldIds());
+	}
 
 	public LibrisAttributes getAttributes() {
 		if (null == attributes) {
@@ -176,7 +243,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 
 	public Field addFieldValuePair(String fieldName, String value, String extraValue) throws InputException {
 		int fieldNum = getFieldNum(fieldName);
-		return addFieldValuePair(fieldNum, value, extraValue);
+		return addFieldValue(fieldNum, value, extraValue);
 	}
 
 	public Field getDefaultField(String fieldId) throws InputException {

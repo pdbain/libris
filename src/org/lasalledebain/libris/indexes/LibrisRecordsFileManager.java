@@ -96,7 +96,7 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 	 */
 	public LibrisRecordsFileManager(GenericDatabase<RecordType> db, boolean readOnly,  RecordFactory<RecordType> recordFact,
 			Schema dbSchema, LibrisFileManager fileMgr) throws LibrisException {
-		this(db, readOnly, dbSchema, fileMgr.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME), new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.POSITION_FILENAME), readOnly));
+		this(db, readOnly, dbSchema, fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME), new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisConstants.POSITION_FILENAME), readOnly));
 	}
 
 	public LibrisRecordsFileManager(GenericDatabase<RecordType> db, boolean readOnly,

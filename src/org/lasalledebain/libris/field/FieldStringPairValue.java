@@ -7,7 +7,7 @@ public class FieldStringPairValue extends FieldValue {
 	public boolean isEmpty() {
 		return (null == values[0]) || values[0].isEmpty();
 	}
-	String[] values;
+	private final String[] values;
 	private String concatenator = "-";
 	public FieldStringPairValue(String val0, String val1) {
 		values = new String[2];

@@ -16,7 +16,6 @@ import org.lasalledebain.libris.ui.LibrisUi;
 
 public abstract class GenericDatabase<RecordType extends Record> implements XMLElement {
 	protected GroupManager<RecordType> groupMgr;
-	protected LibrisFileManager fileMgr;
 	protected IndexManager<RecordType> indexMgr;
 	protected final LibrisUi ui;
 	protected ModifiedRecordList<RecordType> modifiedRecords;
@@ -24,7 +23,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected Records<RecordType> databaseRecords;
 	protected boolean readOnly;
 	protected boolean isModified;
-
+	protected final LibrisFileManager fileMgr;
 
 	public GenericDatabase(LibrisUi theUi, LibrisFileManager theFileManager) {
 		ui = theUi;

@@ -7,8 +7,9 @@ import java.io.RandomAccessFile;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisConstants;
+import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
-import org.lasalledebain.libris.exception.UserErrorException;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.RecordHeader;
 
 public class DbDump {
@@ -32,15 +33,15 @@ public class DbDump {
 		out = System.out;
 		LibrisFileManager fm;
 		try {
-			fm = new LibrisFileManager(dbFileObj, LibrisConstants.AUX_DIRECTORY_NAME);
+			fm = LibrisDatabase.createDatabaseFileManager(dbFileObj);
 			dumpRecords(fm);
-		} catch (UserErrorException e) {
+		} catch (DatabaseException e) {
 			System.err.println("Cannot open database: "+e.getMessage());
 		}
 	}
 
 	private static void dumpRecords(LibrisFileManager fm) {
-		FileAccessManager rf = fm.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME);
+		FileAccessManager rf = fm.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME);
 		try {
 			RandomAccessFile recordsFileStore = rf.getReadOnlyRandomAccessFile();
 			RecordHeader recordList = new RecordHeader(recordsFileStore, 0);

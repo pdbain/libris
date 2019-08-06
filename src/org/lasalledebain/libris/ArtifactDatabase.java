@@ -1,8 +1,13 @@
 package org.lasalledebain.libris;
 
+import static org.lasalledebain.libris.Field.FieldType.T_FIELD_LOCATION;
+import static org.lasalledebain.libris.Field.FieldType.T_FIELD_STRING;
+
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
+import org.lasalledebain.libris.index.GroupDef;
+import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -12,6 +17,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements LibrisXMLConstants {
 
+	static final DynamicSchema artifactsSchema = ArtifactDatabase.makeSchema();
 	public ArtifactDatabase(LibrisUi theUi, LibrisFileManager theFileManager) {
 		super(theUi, theFileManager);
 	}
@@ -45,7 +51,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	@Override
 	public Schema getSchema() {
-		return Repository.mySchema;
+		return ArtifactDatabase.artifactsSchema;
 	}
 
 	@Override
@@ -78,6 +84,40 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	}
 	public boolean isRecordReadOnly(int recordId) {
 		return false;
+	}
+	public static Field newField(int fieldNum, int fieldData) throws InputException {
+		return Repository.templateList[fieldNum].newField(fieldData);
+	}
+	public static Field newField(int fieldNum, String mainValue, String extraValue) throws InputException {
+		return Repository.templateList[fieldNum].newField(mainValue, extraValue);
+	}
+	public static Field newField(int fieldNum, int mainValue, String extraValue) throws InputException {
+		return Repository.templateList[fieldNum].newField(mainValue, extraValue);
+	}
+	public static Field newField(int fieldNum, String fieldData) throws InputException {
+		return Repository.templateList[fieldNum].newField(fieldData);
+	}
+	public static Field newField(int fieldNum) {
+		return Repository.templateList[fieldNum].newField();
+	}
+	static DynamicSchema makeSchema() {
+		DynamicSchema theSchema = new DynamicSchema();
+		GroupDef grp = new GroupDef(theSchema, Repository.ID_GROUPS, "", 0);
+		Repository.GROUP_FIELD = theSchema.addField(grp);
+		GroupDefs defs = theSchema.getGroupDefs();
+		defs.addGroup(grp);
+		Repository.TITLE_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_TITLE, "", T_FIELD_STRING));
+		Repository.SOURCE_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_SOURCE, "", T_FIELD_LOCATION));
+		Repository.DOI_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_DOI, "", T_FIELD_STRING));
+		Repository.DATE_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_DATE, "", T_FIELD_STRING));
+		Repository.KEYWORDS_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_KEYWORDS, "", T_FIELD_STRING));
+		Repository.COMMENTS_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_COMMENTS, "", T_FIELD_STRING));
+		int numFields = Repository.COMMENTS_FIELD + 1;
+		Repository.templateList = new FieldTemplate[numFields];
+		for (int i = 1; i < numFields; ++i) {
+			Repository.templateList[i] = theSchema.getFieldTemplate(i);
+		}
+		return theSchema;
 	}
 
 }

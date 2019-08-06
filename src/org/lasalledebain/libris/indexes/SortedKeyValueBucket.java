@@ -87,8 +87,8 @@ public abstract class SortedKeyValueBucket<T extends KeyValueTuple> implements I
 	 */
 	public void removeElement(String key) throws InputException {
 		T victim = tuples.get(key);
-		if (null ==victim) {
-			throw new InputException("key not found"+victim.key);
+		if (null == victim) {
+			throw new InputException("key not found: "+key);
 		}
 		occupancy = (occupancy - victim.entrySize());
 		tuples.remove(key);

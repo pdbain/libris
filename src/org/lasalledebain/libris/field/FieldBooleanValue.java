@@ -5,7 +5,8 @@ import org.lasalledebain.libris.exception.FieldDataException;
 
 public class FieldBooleanValue extends FieldValue {
 
-	boolean value;
+	private final boolean value;
+	
 	public FieldBooleanValue(String data) throws FieldDataException {
 		value = Boolean.parseBoolean(data);
 		if (!value && !data.equalsIgnoreCase(LibrisConstants.BOOLEAN_FALSE_STRING)) {

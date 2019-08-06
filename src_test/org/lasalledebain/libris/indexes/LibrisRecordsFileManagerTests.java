@@ -418,7 +418,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 		if (null == workDir) {
 			fail("could not create working directory ");
 		}
-		fileMgr  = new LibrisFileManager(workDir, testDatabaseFile);
+		fileMgr  = new LibrisFileManager(workDir);
 		testRecordsFile = fileMgr.makeAccessManager(getName(), new File(workDir, "tempRecordsFile"));
 
 		if (null == schem) {

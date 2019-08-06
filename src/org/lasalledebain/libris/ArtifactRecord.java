@@ -1,13 +1,13 @@
 package org.lasalledebain.libris;
 
+import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
+import static org.lasalledebain.libris.exception.Assertion.assertTrueError;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
 
 import org.lasalledebain.libris.Field.FieldType;
-
-import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
-import static org.lasalledebain.libris.exception.Assertion.assertTrueError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
@@ -16,8 +16,6 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
-import org.lasalledebain.libris.index.IndexField;
-import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -31,12 +29,6 @@ public class ArtifactRecord extends Record {
 		recordFields = new Field[NUM_FIELDS];
 		mySchema = theSchema;
 		affiliations = null;
-	}
-
-	@Override
-	public int compareTo(Record o) {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override
@@ -60,9 +52,13 @@ public class ArtifactRecord extends Record {
 	}
 
 	@Override
-	public Record duplicate() throws DatabaseException, FieldDataException {
-		// TODO Auto-generated method stub
-		return null;
+	public ArtifactRecord duplicate() throws DatabaseException, FieldDataException {
+		ArtifactRecord otherRec = new ArtifactRecord(mySchema);
+		otherRec.setEditable(true);
+		for (int i = 0; i < recordFields.length; ++i) {
+			otherRec.recordFields[i] = recordFields[i].duplicate();
+		}
+		return otherRec;
 	}
 
 	@Override
@@ -71,7 +67,7 @@ public class ArtifactRecord extends Record {
 			if ((null == fieldData) || fieldData[i].isEmpty()) {
 				recordFields[i] = null;
 			} else {
-				recordFields[i] = Repository.newField(i, fieldData[i]);
+				recordFields[i] = ArtifactDatabase.newField(i, fieldData[i]);
 			}
 		}
 	}
@@ -89,40 +85,34 @@ public class ArtifactRecord extends Record {
 
 	@Override
 	public Field addFieldValue(int fieldNum, String fieldData) throws InputException {
-		if (null == recordFields[fieldNum]) {
-			recordFields[fieldNum] = Repository.newField(fieldNum, fieldData);
-			return recordFields[fieldNum];
-		} else {
-			throw new InputException("Multiple field values not permitted in this field");
-		}
+		checkFieldIsNull(fieldNum);
+		recordFields[fieldNum] = ArtifactDatabase.newField(fieldNum, fieldData);
+		return recordFields[fieldNum];
 	}
 
 	@Override
 	public Field addFieldValue(int fieldNum, int fieldData) throws InputException {
-		if (null == recordFields[fieldNum]) {
-			recordFields[fieldNum] = Repository.newField(fieldNum, fieldData);
-			return recordFields[fieldNum];
-		} else {
+		checkFieldIsNull(fieldNum);
+		recordFields[fieldNum] = ArtifactDatabase.newField(fieldNum, fieldData);
+		return recordFields[fieldNum];
+	}
+
+	private void checkFieldIsNull(int fieldNum) throws InputException {
+		if (null != recordFields[fieldNum]) {
 			throw new InputException("Multiple field values not permitted in this field");
 		}
 	}
 
 	@Override
 	public Field addFieldValue(int fieldNum, int mainValue, String extraValue) throws InputException {
-		// TODO Auto-generated method stub
-		return null;
+		checkFieldIsNull(fieldNum);
+		return recordFields[fieldNum] = ArtifactDatabase.newField(fieldNum, mainValue, extraValue);
 	}
 
 	@Override
 	public Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Field addFieldValuePair(int fieldNum, String value, String extraValue) throws InputException {
-		// TODO Auto-generated method stub
-		return null;
+		checkFieldIsNull(fieldNum);
+		return recordFields[fieldNum] = ArtifactDatabase.newField(fieldNum, mainValue, extraValue);
 	}
 
 	@Override
@@ -182,20 +172,20 @@ public class ArtifactRecord extends Record {
 
 	@Override
 	public boolean valuesEqual(Record comparand) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void getKeywords(int[] fieldList, RecordKeywords keywordList) throws InputException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void getKeywords(IndexField[] indexFields, RecordKeywords keywordList) throws InputException {
-		// TODO Auto-generated method stub
-
+		if (!getAttributes().equals(comparand.getAttributes())) {
+			return false;
+		}
+		for (Field f: recordFields) {
+			try {
+				Field otherField = comparand.getField(f.getFieldId());
+				if (!f.equals(otherField)) {
+					return false;
+				}
+			} catch (InputException e) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -211,12 +201,6 @@ public class ArtifactRecord extends Record {
 			}
 			buff.append('\n');
 		}
-	}
-
-	@Override
-	public String generateTitle(String[] titleFieldIds) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -363,12 +347,6 @@ public class ArtifactRecord extends Record {
 		} else {
 			affiliations.setParent(parent);
 		}
-	}
-
-	@Override
-	public String generateTitle() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
