@@ -42,7 +42,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	MockSchema schem = null;
 	private RecordTemplate recTemplate;
 	Random rand = new Random(52748372);
-	private File workDir;
+	private File workingDirectory;
 	private final int NUM_ENUM_CHOICES = 10;
 	private static FileAccessManager testRecordsFile;
 	private File testDatabaseFile;
@@ -413,13 +413,13 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	@Before
 	public void setUp() throws Exception {
 		testLogger.log(Level.INFO, "Starting "+getName());
-		workDir = Utilities.getTempTestDirectory();
-		testDatabaseFile = Utilities.getTestDatabase(Utilities.TEST_DB1_XML_FILE);
-		if (null == workDir) {
+		workingDirectory = Utilities.makeTempTestDirectory();
+		testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
+		if (null == workingDirectory) {
 			fail("could not create working directory ");
 		}
-		fileMgr  = new LibrisFileManager(workDir);
-		testRecordsFile = fileMgr.makeAccessManager(getName(), new File(workDir, "tempRecordsFile"));
+		fileMgr  = new LibrisFileManager(workingDirectory);
+		testRecordsFile = fileMgr.makeAccessManager(getName(), new File(workingDirectory, "tempRecordsFile"));
 
 		if (null == schem) {
 			schem = makeSchemaWithAllFieldTypes();
@@ -432,7 +432,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	@After
 	public void tearDown() throws Exception {
 		testLogger.log(Level.INFO, "Ending "+getName());
-		Utilities.deleteRecursively(workDir);
+		Utilities.deleteRecursively(workingDirectory);
 	}
 
 	public MockSchema makeSchemaWithAllFieldTypes() {

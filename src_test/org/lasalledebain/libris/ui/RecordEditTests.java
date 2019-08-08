@@ -37,6 +37,7 @@ public class RecordEditTests extends TestCase {
 	private static final String ID_PAGES = "ID_pages";
 	private static final String ID_HARDCOPY = "ID_hardcopy";
 	PrintStream out = System.out;
+	private File workingDirectory;
 	static int pauseDuration = Integer.getInteger("libris.test.pause", -1);
 	
 	public void testRecordSanity() {
@@ -545,7 +546,7 @@ public class RecordEditTests extends TestCase {
 	private TestGUI rebuildAndOpenDatabase(String testName,
 			String databaseFileName) throws FileNotFoundException, IOException,
 			DatabaseException {
-		LibrisDatabase db = Utilities.buildTestDatabase(databaseFileName);
+		LibrisDatabase db = Utilities.buildTestDatabase(workingDirectory, databaseFileName);
 		File dbFile = db.getDatabaseFile();
 		assertTrue("Could not close database", db.closeDatabase(false));
 	
@@ -571,11 +572,12 @@ public class RecordEditTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		testLogger.log(Level.INFO, "Starting "+getName());
+		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		testLogger.log(Level.INFO, "Ending "+getName());
-		Utilities.deleteTestDatabaseFiles();
+		Utilities.deleteWorkingDirectory();
 	}
 }

@@ -28,15 +28,15 @@ import junit.framework.TestCase;
 public class TestPDF extends TestCase {
 
 	private LibrisDatabase db;
-	private File workdir;
+	private File workingDirectory;
 	private File repoFile;
 	private File repoRoot;
 	private Repository repo;
 
 	@Before
 	public void setUp() throws Exception {
-		workdir = Utilities.makeTempTestDirectory();
-		repoRoot = new File(workdir, "repo_root");
+		workingDirectory = Utilities.makeTempTestDirectory();
+		repoRoot = new File(workingDirectory, "repo_root");
 		assertTrue("Could not create "+repoRoot.getPath(), repoRoot.mkdir());
 		final File repoDbFile = Repository.initialize(repoRoot);
 		assertTrue("could not create database", null != repoDbFile);
@@ -49,19 +49,19 @@ public class TestPDF extends TestCase {
 	public void tearDown() throws Exception {
 		assertTrue("Could not close database", db.closeDatabase(false));
 		db = null;
-		Utilities.deleteRecursively(workdir);
+		Utilities.deleteRecursively(workingDirectory);
 		Utilities.deleteTestDatabaseFiles();
 	}
 
 	@Test
 	public void testImportDocument() {
 		try {
-			db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
+			db = Utilities.buildTestDatabase(workingDirectory, Utilities.KEYWORD_DATABASE4_XML);
 			int keywordField = db.getSchema().getFieldNum("ID_keywords");
 			int abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
 			DatabaseRecord rec = db.newRecord();
-			File testPdf = Utilities.getTestDatabase(Utilities.EXAMPLE_ARTIFACT_PDF);
+			File testPdf = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_ARTIFACT_PDF, workingDirectory);
 			importer.importDocument(testPdf.toURI(), t -> 1, rec);
 			String keywordsText = rec.getField(keywordField).getValuesAsString();
 			String abstractText = rec.getField(abstractField).getValuesAsString();
@@ -71,18 +71,19 @@ public class TestPDF extends TestCase {
 			assertTrue("Abstract malformed: "+abstractText, 
 					abstractText.contains("Now is the time for all good men to come to the aid of the party."));
 		} catch (LibrisException | IOException e) {
+			e.printStackTrace();
 			fail("unexpected exception"+e.getMessage());
 		}
 	}
 	@Test
 	public void testImportLargeDocument() {
 		try {
-			db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
+			db = Utilities.buildTestDatabase(workingDirectory, Utilities.KEYWORD_DATABASE4_XML);
 			int keywordField = db.getSchema().getFieldNum("ID_keywords");
 			int abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
 			DatabaseRecord rec = db.newRecord();
-			File testPdf = Utilities.getTestDatabase(Utilities.EXAMPLE_LARGE_PDF);
+			File testPdf = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_LARGE_PDF, workingDirectory);
 			importer.importDocument(testPdf.toURI(), t -> 1, rec);
 			String keywordsText = rec.getField(keywordField).getValuesAsString();
 			String abstractText = rec.getField(abstractField).getValuesAsString();
@@ -94,13 +95,14 @@ public class TestPDF extends TestCase {
 					abstractText.contains(expectedAbstractContents
 							));
 		} catch (LibrisException | IOException e) {
+			e.printStackTrace();
 			fail("unexpected exception"+e.getMessage());
 		}
 	}
 	@Test
 	public void testImportMultipleDocuments() throws IOException {
 		try {
-			db = Utilities.buildTestDatabase(Utilities.KEYWORD_DATABASE1_XML);
+			db = Utilities.buildTestDatabase(workingDirectory, Utilities.KEYWORD_DATABASE1_XML);
 	        Map<String, String> env = new HashMap<>(); 
 	        env.put("create", "true");
 	        LibrisUi ui = db.getUi();
@@ -110,17 +112,18 @@ public class TestPDF extends TestCase {
 			DatabaseRecord parentRec = db.newRecord();
 			db.putRecord(parentRec);
 			parentRec.setName("Parent_record");
-			URI exampleDocs = URI.create("jar:file:"+(Utilities.getTestDatabase(Utilities.EXAMPLE_DOCS_ZIP).getAbsolutePath()));
-			File docDir = new File(workdir, "docs");
+			URI exampleDocs = URI.create("jar:file:"+(Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_DOCS_ZIP, workingDirectory).getAbsolutePath()));
+			File docDir = new File(workingDirectory, "docs");
 			ZipUtils.unzipZipFile(exampleDocs, docDir);
  			final List<URI> fileUris = Arrays.stream(docDir.listFiles()).map(f -> f.toURI()).collect(Collectors.toList());
 			importer.importPDFDocuments(fileUris, parentRec);
 			ui.saveDatabase();
-			File dumpFile = new File(workdir, "dump.libr");
+			File dumpFile = new File(workingDirectory, "dump.libr");
 			db.exportDatabaseXml(new FileOutputStream(dumpFile), true, true, false);
 			ui.closeDatabase(false);
 			
 		} catch (LibrisException e) {
+			e.printStackTrace();
 			fail("unexpected exception"+e.getMessage());
 		}
 	}

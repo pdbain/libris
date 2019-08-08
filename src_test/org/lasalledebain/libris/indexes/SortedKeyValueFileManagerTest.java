@@ -34,7 +34,7 @@ public class SortedKeyValueFileManagerTest extends TestCase {
 		if (multiLevelTests.contains(getName())) {
 			indexLevels = 2;
 		}
-		workDir = Utilities.getTempTestDirectory();
+		workDir = Utilities.makeTempTestDirectory();
 		if (null == workDir) {
 			fail("could not create working directory ");
 		}

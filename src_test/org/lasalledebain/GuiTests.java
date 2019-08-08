@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 
 public class GuiTests extends TestCase {
 	private Schema mySchema;
+	private File workingDirectory;
 	public void testGuiLayoutXml() {
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, "layoutDeclarations.xml");
@@ -51,8 +52,8 @@ public class GuiTests extends TestCase {
 	}
 
 	private LibrisDatabase buildDatabase() throws IOException {
-		File testDatabaseFileCopy;
-		testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
+		File testDatabaseFileCopy1 = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
+		File testDatabaseFileCopy = testDatabaseFileCopy1;
 		LibrisDatabase db = null;
 		try {
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
@@ -80,6 +81,7 @@ public class GuiTests extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 // TODO test required fields
 }

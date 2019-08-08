@@ -5,6 +5,7 @@ import static org.lasalledebain.Utilities.getRecordIdString;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.junit.Before;
@@ -28,9 +29,11 @@ public class RecordListTests extends TestCase {
 	private static final String ID_AUTH = "ID_auth";
 	private static final String[] expectedIds = {"1", "2", "3", "4"};
 	private LibrisDatabase testDb;
+	private File workingDirectory;
 
 	@Before
 	public void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 		Utilities.deleteTestDatabaseFiles();
 		testDb = null;
 	}
@@ -45,7 +48,7 @@ public class RecordListTests extends TestCase {
 
 	public void testDatabaseRecordList () {
 		try {
-			testDb = Libris.buildAndOpenDatabase(Utilities.getTestDatabase(Utilities.TEST_DB1_XML_FILE));
+			testDb = Libris.buildAndOpenDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory));
 			RecordList<DatabaseRecord> list = testDb.getRecords();
 			int recordCount = 0;
 			for (Record r: list) {
@@ -65,7 +68,7 @@ public class RecordListTests extends TestCase {
 
 	public void testModifiedList () {
 		try {
-			testDb = Libris.buildAndOpenDatabase(Utilities.getTestDatabase(Utilities.TEST_DB1_XML_FILE));
+			testDb = Libris.buildAndOpenDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory));
 			RecordList<DatabaseRecord> list = testDb.getRecords();
 			ModifiedRecordList modList = new ModifiedRecordList();
 			ArrayList<Record> foundRecords = new ArrayList<Record>();
@@ -95,7 +98,7 @@ public class RecordListTests extends TestCase {
 
 		File testDatabaseFileCopy;
 		try {
-			testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
+			testDatabaseFileCopy = getTestDatabase();
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			final LibrisUi myUi = testDb.getUi();
 			DatabaseRecord rec = testDb.newRecord();
@@ -111,12 +114,18 @@ public class RecordListTests extends TestCase {
 			fail("Unexpected exception");
 		}
 	}
+
+	private File getTestDatabase() throws IOException {
+		File testDatabaseFileCopy1 = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
+		File testDatabaseFileCopy = testDatabaseFileCopy1;
+		return testDatabaseFileCopy;
+	}
 	
 	public void testMultipleSaves() {
 
 		File testDatabaseFileCopy;
 		try {
-			testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
+			testDatabaseFileCopy = getTestDatabase();
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			final LibrisUi myUi = testDb.getUi();
 			DatabaseRecord rec = testDb.newRecord();
@@ -149,7 +158,7 @@ public class RecordListTests extends TestCase {
 				"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
 		File testDatabaseFileCopy;
 		try {
-			testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
+			testDatabaseFileCopy = getTestDatabase();
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			testDb.getUi().quit(true);
 			final LibrisUi myUi = testDb.getUi();

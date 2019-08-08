@@ -15,12 +15,12 @@ import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.LibrisUi;
 
 public class LibrisRecordMapTest extends TestCase {
-	private File workDir;
+	private File workingDirectory;
 	private String recordNames[];
 
 	public void testBuildIndex() {
 		try {
-			File testDatabaseFile = Utilities.getTestDatabase(Utilities.TEST_DB1_XML_FILE);
+			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
 			final LibrisUi myUi = db.getUi();
 			
@@ -41,7 +41,7 @@ public class LibrisRecordMapTest extends TestCase {
 	
 	public void testDatabaseGetNamedRecords() {
 		try {
-			File testDatabaseFile = Utilities.copyTestDatabaseFile(workDir, Utilities.DATABASE_WITH_GROUPS_XML);
+			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_XML, workingDirectory);
 			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
 			HashSet<String> nameSet = new HashSet<String>(Arrays.asList(recordNames));
 			for (Record r: db.getNamedRecords()) {
@@ -62,7 +62,7 @@ public class LibrisRecordMapTest extends TestCase {
 
 	public void testDatabaseGetRecordByName() {
 		try {
-			File testDatabaseFile = Utilities.copyTestDatabaseFile(workDir, Utilities.DATABASE_WITH_GROUPS_XML);
+			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_XML, workingDirectory);
 			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
 			
 			int expectedId = 1;
@@ -82,7 +82,7 @@ public class LibrisRecordMapTest extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		workDir = Utilities.getTempTestDirectory();
+		workingDirectory = Utilities.makeTempTestDirectory();
 		recordNames = new String[] {"g_pub1",
 				"g_pub1_v1",
 				"g_fred_foobar",
@@ -94,7 +94,7 @@ public class LibrisRecordMapTest extends TestCase {
 
 	@Override
 	protected void tearDown() throws Exception {
-		Utilities.deleteRecursively(workDir);
+		Utilities.deleteRecursively(workingDirectory);
 	
 	}
 }

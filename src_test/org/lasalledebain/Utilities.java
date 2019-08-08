@@ -110,9 +110,9 @@ public class Utilities extends TestCase {
 	}
 
 	// TODO rename getTestDatabase to getTestFile()
-	public static File getTestDatabase(String dbName) {
+	private static File getTestDatabase(String testFile) {
 		File testDir = getTestDataDirectory();
-		return new File(testDir, dbName);
+		return new File(testDir, testFile);
 	}
 
 	public static File makeTestDirectory() {
@@ -247,32 +247,24 @@ public class Utilities extends TestCase {
 			copy.transferFrom(original, 0, original.size());
 		}
 	}
-	/**
-	 * @return
-	 * @throws IOException 
-	 */
-	public static File copyTestDatabaseFile() throws IOException {
-		String testDbName = TEST_DB1_XML_FILE;
-		File testDatabaseFileCopy = copyTestDatabaseFile(testDbName);
-		return testDatabaseFileCopy;
-	}
 
+	@Deprecated
 	public static File copyTestDatabaseFile(String testDbName)
 			throws FileNotFoundException, IOException {
 		File testDatabaseFile = getTestDatabase(testDbName);
-		File testDatabaseFileCopy = new File(getTempTestDirectory(), testDatabaseFile.getName());
+		File testDatabaseFileCopy = new File(makeTempTestDirectory(), testDatabaseFile.getName());
 		copyFile(testDatabaseFile, testDatabaseFileCopy);
 		return testDatabaseFileCopy;
 	}
 	
-	public static File copyTestDatabaseFile(File workdir, String testDbName)
-	throws FileNotFoundException, IOException {
+	public static File copyTestDatabaseFile(String testDbName, File targetDirectory)
+			throws FileNotFoundException, IOException {
 		File testDatabaseFile = getTestDatabase(testDbName);
-		File testDatabaseFileCopy = new File(workdir, testDatabaseFile.getName());
+		File testDatabaseFileCopy = new File(targetDirectory, testDatabaseFile.getName());
 		copyFile(testDatabaseFile, testDatabaseFileCopy);
 		return testDatabaseFileCopy;
 	}
-
+	
 	public static void deleteTestDatabaseFiles() {
 		deleteTestDatabaseFiles(TEST_DB1_XML_FILE);
 	}
@@ -295,30 +287,35 @@ public class Utilities extends TestCase {
 		}
 	}
 	
-	public static File getTempTestDirectory() {
+	private static File getTempTestDirectory() {
 		File tempTestDirectory = new File(System.getProperty("java.io.tmpdir"), "libristest");
-		if (!tempTestDirectory.exists() && !tempTestDirectory.mkdir()) {
-			return null;
-		} else {
-			return tempTestDirectory;
-		}
+		return tempTestDirectory;
 	}
 
 	public static File makeTempTestDirectory() {
-		File tempTestDirectory = new File(System.getProperty("java.io.tmpdir"), "libristest");
+		File tempTestDirectory = getTempTestDirectory();
 		deleteRecursively(tempTestDirectory);
-		if (!tempTestDirectory.exists() && !tempTestDirectory.mkdir()) {
-			return null;
-		} else {
-			return tempTestDirectory;
-		}
+		assertTrue("Cannot create temporary test directory " + tempTestDirectory.getAbsolutePath(), tempTestDirectory.mkdir());
+		return tempTestDirectory;
 	}
 
+	public static File makeTempTestDirectory(String directoryName) {
+		File parent = makeTempTestDirectory();
+		File testDir = new File(parent, directoryName);
+		assertTrue("Cannot create temporary test directory " + testDir.getAbsolutePath(), testDir.mkdir());
+		return testDir;
+	}
+	
+	@Deprecated
 	public static FileSpaceManager makeFileSpaceManager(String managerName) {
-		File workDir = getTempTestDirectory();
+		File workDir = makeTempTestDirectory();
 		if (null == workDir) {
 			fail("could not create working directory ");
 		}
+		return makeFileSpaceManager(workDir, managerName);
+	}
+
+	public static FileSpaceManager makeFileSpaceManager(File workDir, String managerName) {
 		File testFile = new File(workDir, managerName);
 		if (!testFile.exists()) {
 			try {
@@ -400,9 +397,9 @@ public class Utilities extends TestCase {
 		testLogger.warning(msg);
 	}
 
-	public static LibrisDatabase buildTestDatabase(String databaseFileName)
+	public static LibrisDatabase buildTestDatabase(File workingDirectory, String databaseFileName)
 			throws FileNotFoundException, IOException {
-		File testDatabaseFileCopy = copyTestDatabaseFile(databaseFileName);			
+		File testDatabaseFileCopy = copyTestDatabaseFile(databaseFileName, workingDirectory);			
 		LibrisDatabase db = null;
 		try {
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
@@ -487,11 +484,18 @@ public class Utilities extends TestCase {
 	 * @param dirName 
 	 * 
 	 */
+	@Deprecated
 	public static File makeTestFileObject(String dirName) {
-		File workingDirectory = new File(getTempTestDirectory(), dirName);
+		File workingDirectory = new File(makeTempTestDirectory(), dirName);
 		deleteRecursively(workingDirectory);
 		workingDirectory.mkdirs();
 		File tf = new File(workingDirectory, "testIndexFile");
+		tf.deleteOnExit();
+		return tf;
+	}
+
+	public static File makeTestFileObject(File parentDirectory, String fileName) {
+		File tf = new File(parentDirectory, fileName);
 		tf.deleteOnExit();
 		return tf;
 	}

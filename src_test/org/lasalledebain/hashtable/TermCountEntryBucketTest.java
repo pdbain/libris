@@ -19,22 +19,22 @@ import junit.framework.TestCase;
 public class TermCountEntryBucketTest extends TestCase {
 	private static final String TESTSTRING1 = "teststring1";
 	private RandomAccessFile backingStore;
-	private File testFile;
+	private File testFile = null;
 	FileSpaceManager mgr;
 	private TermCountHashBucket buck;
 	@Before
 	protected void setUp() throws Exception {
-		if (null == testFile) {
-			testFile = Utilities.makeTestFileObject("termCountHashFile");
-		}
+		File workingDirectory = Utilities.makeTempTestDirectory("termCountHashFile");
+		testFile = Utilities.makeTestFileObject(workingDirectory, "testIndexFile");
 		backingStore = HashUtils.MakeHashFile(testFile);
-		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
+		mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
 		buck = new TermCountHashBucket(backingStore, 0);
 	}
 
 	@After
 	protected void tearDown() throws Exception {
 		testFile.delete();
+		Utilities.deleteWorkingDirectory();
 	}
 
 	@Test

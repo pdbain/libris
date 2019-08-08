@@ -37,14 +37,16 @@ public class TermcountHashfileTests extends TestCase {
 	private File testFile;
 	FileSpaceManager mgr;
 	StringKeyHashFile<TermCountEntry, TermCountHashBucket> hashFile;
+	private File workingDirectory;
 
 	@Before
 	protected void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 		if (null == testFile) {
-			testFile = Utilities.makeTestFileObject("termCountHashFile");
+			testFile = Utilities.makeTestFileObject(workingDirectory, "termCountHashFile");
 		}
 		backingStore = HashUtils.MakeHashFile(testFile);
-		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
+		mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
 		hashFile = new TermCountHashFile(backingStore);
 	}
 
@@ -52,6 +54,7 @@ public class TermcountHashfileTests extends TestCase {
 	protected void tearDown() throws Exception {
 		hashFile.clear();
 		testFile.delete();
+		Utilities.deleteWorkingDirectory();
 	}
 
 	@Test
@@ -128,8 +131,7 @@ public class TermcountHashfileTests extends TestCase {
 	
 	@Test
 	public void testTermCountIndex() throws DatabaseException, LibrisException, IOException {
-		Utilities.deleteWorkingDirectory();
-		File workDir = Utilities.getTempTestDirectory();
+		File workDir = Utilities.makeTempTestDirectory();
 		if (null == workDir) {
 			fail("could not create working directory ");
 		}
@@ -150,7 +152,7 @@ public class TermcountHashfileTests extends TestCase {
 
 	public void testBuildIndex() {
 		try {
-			File testDatabaseFile = Utilities.getTestDatabase(Utilities.KEYWORD_DATABASE4_XML);
+			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE4_XML, workingDirectory);
 			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
 			IndexField[] indexFieldList = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
 			final LibrisUi myUi = db.getUi();

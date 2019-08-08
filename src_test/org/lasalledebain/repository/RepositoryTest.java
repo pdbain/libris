@@ -31,7 +31,7 @@ public class RepositoryTest  extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		workdir = Utilities.getTempTestDirectory();
+		workdir = Utilities.makeTempTestDirectory();
 		repoRoot = new File(workdir, "root");
 		repoRoot.mkdir();
 	}

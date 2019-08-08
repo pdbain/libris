@@ -52,7 +52,7 @@ public class GroupDefsTests extends TestCase {
 		File inputFile = new File(testDir, Utilities.SCHEMA_WITH_GROUP_DEFS_XML);
 		try {
 			Schema schema = Utilities.loadSchema(inputFile);
-			File workdir = Utilities.getTempTestDirectory();
+			File workdir = Utilities.makeTempTestDirectory();
 			File exportedXml = new File (workdir, "schema_copy.xml");
 			exportedXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(exportedXml);

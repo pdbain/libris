@@ -19,6 +19,7 @@ import junit.framework.TestCase;
 public class HashBucketTests extends TestCase {
 
 	private File testFile = null;
+	private File workingDirectory;
 
 	@Test
 	public void testAddEntry() {
@@ -67,7 +68,7 @@ public class HashBucketTests extends TestCase {
 
 	@Test
 	public void testVariableSizeReadAndWrite() {
-		FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
+		FileSpaceManager mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
 		MockOverflowManager overflowManager = new MockOverflowManager(mgr);
 
 		RandomAccessFile backingStore = HashUtils.MakeHashFile(testFile);
@@ -101,9 +102,13 @@ public class HashBucketTests extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		if (null == testFile) {
-			testFile = Utilities.makeTestFileObject("TestFileRecordMap");
-		}
+		workingDirectory = Utilities.makeTempTestDirectory("TestFileRecordMap");
+		testFile = Utilities.makeTestFileObject(workingDirectory, "testIndexFile");
+	}
+
+	@Override
+	protected void tearDown() throws Exception {
+		Utilities.deleteWorkingDirectory();
 	}
 
 }

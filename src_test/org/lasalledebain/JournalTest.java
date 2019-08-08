@@ -37,12 +37,8 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 	
 	@Override
 	protected void setUp() throws Exception {
-		Utilities.deleteWorkingDirectory();
-		workDir = Utilities.getTempTestDirectory();
-		if (null == workDir) {
-			fail("could not create working directory ");
-		}
-		testDatabase = new DiagnosticDatabase(Utilities.getTestDatabase(Utilities.TEST_DB1_XML_FILE));
+		workDir = Utilities.makeTempTestDirectory();
+		testDatabase = new DiagnosticDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workDir));
 		File schemaFile = new File(Utilities.getTestDataDirectory(), Utilities.TEST_SCHEMA2_XML_FILE);
 		Schema schem = Utilities.loadSchema(schemaFile);
 		testDatabase.setSchema(schem);

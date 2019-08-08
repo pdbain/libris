@@ -38,6 +38,7 @@ public class DatabaseTests extends TestCase {
 	private final static String[] authors = {"", "John le Carre", "Homer", "Louise Creighton"};
 	private LibrisDatabase rootDb;
 	private LibrisDatabase forkDb;
+	private File workingDirectory;
 	// TODO override auxiliary directory
 	public void testReadRecordsFromSingleFile() {
 		try {
@@ -67,7 +68,7 @@ public class DatabaseTests extends TestCase {
 
 		final int NUM_RECORDS = 3;
 		try {
-			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
+			File testDatabaseFileCopy = getTestDatabase();
 			rootDb = buildTestDatabase(testDatabaseFileCopy);
 
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
@@ -86,7 +87,7 @@ public class DatabaseTests extends TestCase {
 
 		final int NUM_RECORDS = 3;
 		try {
-			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
+			File testDatabaseFileCopy = getTestDatabase();
 			rootDb = buildTestDatabase(testDatabaseFileCopy);
 
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
@@ -135,7 +136,7 @@ public class DatabaseTests extends TestCase {
 
 	public void testOpenAndImmediatelyCloseDatabase() {
 		try {
-			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
+			File testDatabaseFileCopy = getTestDatabase();
 			rootDb = buildTestDatabase(testDatabaseFileCopy);
 			LibrisUi testUi = rootDb.getUi();
 			testUi.closeDatabase(false);
@@ -150,7 +151,7 @@ public class DatabaseTests extends TestCase {
 
 	public void testOpenIndexAndImmediatelyCloseDatabase() {
 		try {
-			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile());
+			rootDb = buildTestDatabase(getTestDatabase());
 			rootDb.closeDatabase(false);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -161,7 +162,7 @@ public class DatabaseTests extends TestCase {
 
 	public void testMultipleRebuild() {
 		try {			
-			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile();			
+			File testDatabaseFileCopy = getTestDatabase();			
 			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			LibrisUi ui = rootDb.getUi();
 			LibrisMetadata meta = rootDb.getMetadata();
@@ -188,7 +189,7 @@ public class DatabaseTests extends TestCase {
 
 	public void testEnumOutOfRange() {
 		try {
-			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile());
+			rootDb = buildTestDatabase(getTestDatabase());
 			LibrisUi testUi = rootDb.getUi();
 			String expected = null;
 			{
@@ -214,8 +215,8 @@ public class DatabaseTests extends TestCase {
 	}
 	public void testXmlExportAll() {
 		try {
-			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile());
-			File workdir = Utilities.getTempTestDirectory();
+			rootDb = buildTestDatabase(getTestDatabase());
+			File workdir = Utilities.makeTempTestDirectory();
 			File copyDbXml = new File (workdir, "database_copy.xml");
 			copyDbXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
@@ -237,7 +238,7 @@ public class DatabaseTests extends TestCase {
 		try {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML);
 			LibrisDatabase db = buildTestDatabase(testDatabaseFileCopy);
-			File workdir = Utilities.getTempTestDirectory();
+			File workdir = Utilities.makeTempTestDirectory();
 			File copyDbXml = new File (workdir, "database_copy.xml");
 			copyDbXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
@@ -281,10 +282,10 @@ public class DatabaseTests extends TestCase {
 
 	public void testFork() {
 		try {
-			File workdir = Utilities.getTempTestDirectory();
+			File workdir = Utilities.makeTempTestDirectory();
 			File dbInstance = new File(workdir, "database_instance.xml");
 			{
-				rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile());
+				rootDb = buildTestDatabase(getTestDatabase());
 				File copyDbXml = new File (workdir, "database_copy.xml");
 				testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
 				copyDbXml.deleteOnExit();
@@ -352,10 +353,10 @@ public class DatabaseTests extends TestCase {
 		ArrayList<Record> expectedRecords = new ArrayList<>();
 		int newRecordNumber;
 		try {
-			File workdir = Utilities.getTempTestDirectory();
+			File workdir = Utilities.makeTempTestDirectory();
 			File dbInstance = new File(workdir, "database_instance.xml");
 			File dbIncrement = new File(workdir, "database_increment.xml");
-			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile());
+			rootDb = buildTestDatabase(getTestDatabase());
 			for (Record rec: rootDb.getRecords()) {
 				expectedRecords.add(rec);
 			}
@@ -406,10 +407,10 @@ public class DatabaseTests extends TestCase {
 			ArrayList<File> forkFiles = new ArrayList<>();
 			ArrayList<File> incrementFiles = new ArrayList<>();
 			int newRecordNumber;
-			File workdir = Utilities.getTempTestDirectory();
+			File workdir = Utilities.makeTempTestDirectory();
 			File dbInstance = new File(workdir, "database_instance.xml");
 				dbInstance.deleteOnExit();
-			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile());
+			rootDb = buildTestDatabase(getTestDatabase());
 			for (Record rec: rootDb.getRecords()) {
 				expectedRecords.add(rec);
 			}
@@ -471,7 +472,7 @@ public class DatabaseTests extends TestCase {
 	public void testAdjustAffiliates() {
 		int newRecordNumber;
 		try {
-			File workdir = Utilities.getTempTestDirectory();
+			File workdir = Utilities.makeTempTestDirectory();
 			File dbInstance = new File(workdir, "database_instance.xml");
 			File dbIncrement = new File(workdir, "database_increment.xml");
 			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile(DATABASE_WITH_GROUPS_AND_RECORDS_XML));
@@ -540,10 +541,10 @@ public class DatabaseTests extends TestCase {
 		ArrayList<Record> rootExpectedRecords = new ArrayList<>();
 		int newRecordNumber;
 		try {
-			File workdir = Utilities.getTempTestDirectory();
+			File workdir = Utilities.makeTempTestDirectory();
 			File dbInstance = new File(workdir, "database_instance.xml");
 			File dbIncrement = new File(workdir, "database_increment.xml");
-			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile());
+			rootDb = buildTestDatabase(getTestDatabase());
 			for (Record rec: rootDb.getRecords()) {
 				rootExpectedRecords.add(rec);
 			}
@@ -610,6 +611,7 @@ public class DatabaseTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		testLogger.log(Level.INFO,"running "+getName());
+		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 
 	@Override
@@ -645,5 +647,11 @@ public class DatabaseTests extends TestCase {
 			fail("Cannot open database");
 		}
 		return rootDb;
+	}
+
+	private File getTestDatabase() throws IOException {
+		String testDbName = Utilities.TEST_DB1_XML_FILE;
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(testDbName, workingDirectory);
+		return testDatabaseFileCopy;
 	}
 }

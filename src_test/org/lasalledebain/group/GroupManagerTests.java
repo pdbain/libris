@@ -15,10 +15,13 @@ import org.lasalledebain.libris.indexes.GroupManager;
 public class GroupManagerTests extends TestCase {
 
 	private LibrisDatabase db;
+	private File workingDirectory;
 
 	@Override
 	protected void setUp() throws Exception {
-		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
+		workingDirectory = Utilities.makeTempTestDirectory();
+		File testDatabaseFileCopy1 = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
+		File testDatabaseFileCopy = testDatabaseFileCopy1;
 		db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 	}
 
