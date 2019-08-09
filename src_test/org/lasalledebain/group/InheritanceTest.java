@@ -27,6 +27,7 @@ public class InheritanceTest extends TestCase {
 	File testDatabaseFileCopy;
 	LibrisDatabase db;
 	String fieldNamesAndValues[][] = {{"",""}, {"ID_publisher", "Publisher1"}, {"ID_volume", "Volume 1"}, {"ID_title", "Title1"}};
+	private File workingDirectory;
 
 	public void testSanity() {
 		String dbFile = DATABASE_WITH_GROUPS_AND_RECORDS_XML;
@@ -334,7 +335,7 @@ public class InheritanceTest extends TestCase {
 	}
 	private void setupDatabase(String dbFile) {
 		try {
-			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile);
+			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile, workingDirectory);
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
 		} catch (Exception e) {
@@ -523,7 +524,7 @@ public class InheritanceTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		testLogger.log(Level.INFO, "Starting "+getName());
-
+		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 
 }

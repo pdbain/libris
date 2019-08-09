@@ -32,6 +32,7 @@ public class GroupDefsTests extends TestCase {
 	private static final String ID_VOLUME = "ID_volume";
 	private static final String ID_PUBLISHER = "ID_publisher";
 	private static final String ID_AUTH = "ID_auth";
+	private File workingDirectory;
 
 	@Test
 	public void testFromXml() {
@@ -98,7 +99,7 @@ public class GroupDefsTests extends TestCase {
 	 */
 	public void testFieldInheritance() {
 		try {
-			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE);
+			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE, workingDirectory);
 			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
 			ArrayList<DatabaseRecord> recList = new ArrayList<DatabaseRecord>();
@@ -191,6 +192,7 @@ public class GroupDefsTests extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 		testLogger.log(Level.INFO, "Starting "+getName());
 	}
 

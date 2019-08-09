@@ -42,7 +42,7 @@ public class DatabaseTests extends TestCase {
 	// TODO override auxiliary directory
 	public void testReadRecordsFromSingleFile() {
 		try {
-			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE);
+			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 			rootDb =  Libris.buildAndOpenDatabase(testDatabaseFile);
 			RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(rootDb.getSchema(), null);
 			Vector<Record> recordList = new Vector<Record>();
@@ -112,7 +112,7 @@ public class DatabaseTests extends TestCase {
 
 		final int NUM_RECORDS = 6;
 		try {
-			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML);
+			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
 			rootDb = buildTestDatabase(testDatabaseFileCopy);
 
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
@@ -236,7 +236,7 @@ public class DatabaseTests extends TestCase {
 
 	public void testXmlExportAllWithGroups() {
 		try {
-			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML);
+			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
 			LibrisDatabase db = buildTestDatabase(testDatabaseFileCopy);
 			File workdir = Utilities.makeTempTestDirectory();
 			File copyDbXml = new File (workdir, "database_copy.xml");
@@ -263,7 +263,7 @@ public class DatabaseTests extends TestCase {
 		final int numRecs = 1024;
 		String dbFile = DATABASE_WITH_GROUPS_XML;
 		try {
-			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile);
+			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile, workingDirectory);
 			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
 			int lastId = rootDb.getLastRecordId();
@@ -472,12 +472,11 @@ public class DatabaseTests extends TestCase {
 	public void testAdjustAffiliates() {
 		int newRecordNumber;
 		try {
-			File workdir = Utilities.makeTempTestDirectory();
-			File dbInstance = new File(workdir, "database_instance.xml");
-			File dbIncrement = new File(workdir, "database_increment.xml");
-			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile(DATABASE_WITH_GROUPS_AND_RECORDS_XML));
+			File dbInstance = new File(workingDirectory, "database_instance.xml");
+			File dbIncrement = new File(workingDirectory, "database_increment.xml");
+			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile(DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory));
 			newRecordNumber = rootDb.getLastRecordId() + 1;
-			File copyDbXml = new File (workdir, "database_copy.xml");
+			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
 			copyDbXml.deleteOnExit();
 			dbInstance.deleteOnExit();

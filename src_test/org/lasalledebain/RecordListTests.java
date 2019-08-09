@@ -187,7 +187,7 @@ public class RecordListTests extends TestCase {
 		File testDatabaseFileCopy;
 		String expectedData[] = {null, "record1", "record2", "record3", "record4"};
 		try {
-			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbName);
+			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbName, workingDirectory);
 			 testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 
 			checkRecordOrder(testDb, expectedData);

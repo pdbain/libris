@@ -248,15 +248,6 @@ public class Utilities extends TestCase {
 		}
 	}
 
-	@Deprecated
-	public static File copyTestDatabaseFile(String testDbName)
-			throws FileNotFoundException, IOException {
-		File testDatabaseFile = getTestDatabase(testDbName);
-		File testDatabaseFileCopy = new File(makeTempTestDirectory(), testDatabaseFile.getName());
-		copyFile(testDatabaseFile, testDatabaseFileCopy);
-		return testDatabaseFileCopy;
-	}
-	
 	public static File copyTestDatabaseFile(String testDbName, File targetDirectory)
 			throws FileNotFoundException, IOException {
 		File testDatabaseFile = getTestDatabase(testDbName);

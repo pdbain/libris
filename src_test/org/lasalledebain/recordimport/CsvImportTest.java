@@ -32,6 +32,7 @@ public class CsvImportTest extends TestCase {
 	private static final char CSV_COLUMN_SEP = '\t';
 	private DiagnosticDatabase testDatabase;
 	HashMap<String, String> valueTranslations;
+	private File workingDirectory;
 	public void testArrayImport() {
 		 RecordImporter<DatabaseRecord> imp = new DirectRecordImporter<DatabaseRecord>(testDatabase);
 		 try {
@@ -107,7 +108,8 @@ public class CsvImportTest extends TestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
-		final File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE);
+		workingDirectory = Utilities.makeTempTestDirectory();
+		final File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 		testDatabase = new DiagnosticDatabase(testDatabaseFile);
 		HeadlessUi ui = new HeadlessUi(testDatabaseFile, false);
 		Libris.buildIndexes(testDatabaseFile, ui);

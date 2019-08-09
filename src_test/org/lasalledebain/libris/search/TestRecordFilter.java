@@ -121,7 +121,7 @@ public class TestRecordFilter extends TestCase {
 	public void testSearchSanity() throws FileNotFoundException, IOException, LibrisException {
 		Random rand = new Random(314159);
 		final int numRecs = 2;
-		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML);
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
 		IndexConfiguration config = new IndexConfiguration(testDatabaseFileCopy);
 		LibrisUi ui = config.getDatabaseUi();
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
@@ -143,7 +143,7 @@ public class TestRecordFilter extends TestCase {
 	public void testSearch() throws FileNotFoundException, IOException, LibrisException {
 		Random rand = new Random(314159);
 		final int numRecs = 100;
-		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML);
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
 		IndexConfiguration config = new IndexConfiguration(testDatabaseFileCopy);
 		config.setAttribute(IndexConfiguration.SIGNATURE_LEVELS, 2);
 		LibrisUi ui = config.getDatabaseUi();
@@ -167,7 +167,7 @@ public class TestRecordFilter extends TestCase {
 	}
 
 	public void testSearchMultipleResults() throws FileNotFoundException, IOException, LibrisException {
-		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML);
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
 		IndexConfiguration config = new IndexConfiguration(testDatabaseFileCopy);
 		config.setAttribute(IndexConfiguration.SIGNATURE_LEVELS, 2);
 		LibrisUi ui = config.getDatabaseUi();
@@ -379,7 +379,7 @@ public class TestRecordFilter extends TestCase {
 	}
 
 	private IndexConfiguration copyAndBuildDatabase() throws FileNotFoundException, IOException {
-		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML);
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
 		IndexConfiguration config = new IndexConfiguration(testDatabaseFileCopy);
 		config.setAttribute(IndexConfiguration.SIGNATURE_LEVELS, 2);
 		database = Utilities.buildTestDatabase(config);
