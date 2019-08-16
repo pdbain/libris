@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.records;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Reader;
@@ -25,6 +26,7 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.exception.OutputException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.BulkImporter;
 import org.lasalledebain.libris.indexes.RecordPositions;
@@ -94,9 +96,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 	}
 
 	public static void importXmlRecords(LibrisDatabase database, File source) throws LibrisException {
-		LibrisMetadata metadata = database.getMetadata();
 		try {
-			int numAdded = 0;
 			ElementManager librisMgr = database.makeLibrisElementManager(source);
 			librisMgr.parseOpenTag();
 			String nextElement = librisMgr.getNextId();
@@ -112,40 +112,9 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 				nextElement = librisMgr.getNextId();	
 			}
 			ElementManager recordsMgr = librisMgr.nextElement();
-			XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader<DatabaseRecord>(database, recordsMgr);
-			int lastId = 0;
-			metadata.setSavedRecords(0);
-			LibrisFileManager fileMgr = database.getFileMgr();
-			FileAccessManager recordsFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME);
-			RecordPositions recPosns = new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisConstants.POSITION_FILENAME), false);
-			BulkImporter importer = new BulkImporter(database.getSchema(), recordsFileMgr.getOpStream(), recPosns);
-			importer.initialize();
-			boolean nonEmpty = false;
-			for (Record r: recordsRdr) {
-				nonEmpty = true;
-				if (null == r) {
-					LibrisException e = LibrisException.getLastException();
-					throw e;
-				}
-				importer.putRecord(r);
-				++numAdded;
-				LibrisDatabase.log(Level.FINE, "importXmlRecords put record "+RecordId.toString(r.getRecordId())); //$NON-NLS-1$
-				int recId = r.getRecordId();
-				lastId = Math.max(lastId, recId);
-			}
-			try (FileOutputStream reportFile = fileMgr.getUnmanagedOutputFile(LibrisConstants.IMPORT_REPORT_FILE)) {
-				Reporter rpt = new Reporter();
-				recPosns.generateReport(rpt);
-				rpt.writeReport(reportFile);
-			};
-
-			metadata.setSavedRecords(numAdded);
-			importer.finish(nonEmpty);
-			recordsFileMgr.releaseOpStream();
-			recPosns.close();
+			importRecordsImpl(database, recordsMgr);
 			librisMgr.closeFile();
 			database.closeDatabaseSource();
-			metadata.setLastRecordId(lastId);
 		} catch (XmlException e) {
 			throw new DatabaseException(Messages.getString("XmlRecordsReader.1"), e); //$NON-NLS-1$
 
@@ -157,6 +126,44 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 			throw new DatabaseException(Messages.getString("XmlRecordsReader.6"), e); //$NON-NLS-1$
 
 			}
+	}
+
+	private static void importRecordsImpl(LibrisDatabase database, ElementManager recordsMgr)
+			throws DatabaseException, IOException, FileNotFoundException, LibrisException, OutputException {
+		LibrisMetadata metadata = database.getMetadata();
+		XmlRecordsReader<DatabaseRecord> recordsRdr = new XmlRecordsReader<DatabaseRecord>(database, recordsMgr);
+		int lastId = 0;
+		int numAdded = 0;
+		metadata.setSavedRecords(0);
+		LibrisFileManager fileMgr = database.getFileMgr();
+		FileAccessManager recordsFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME);
+		RecordPositions recPosns = new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisConstants.POSITION_FILENAME), false);
+		BulkImporter importer = new BulkImporter(database.getSchema(), recordsFileMgr.getOpStream(), recPosns);
+		importer.initialize();
+		boolean nonEmpty = false;
+		for (Record r: recordsRdr) {
+			nonEmpty = true;
+			if (null == r) {
+				LibrisException e = LibrisException.getLastException();
+				throw e;
+			}
+			importer.putRecord(r);
+			++numAdded;
+			LibrisDatabase.log(Level.FINE, "importXmlRecords put record "+RecordId.toString(r.getRecordId())); //$NON-NLS-1$
+			int recId = r.getRecordId();
+			lastId = Math.max(lastId, recId);
+		}
+		try (FileOutputStream reportFile = fileMgr.getUnmanagedOutputFile(LibrisConstants.IMPORT_REPORT_FILE)) {
+			Reporter rpt = new Reporter();
+			recPosns.generateReport(rpt);
+			rpt.writeReport(reportFile);
+		};
+
+		metadata.setSavedRecords(numAdded);
+		metadata.setLastRecordId(lastId);
+		importer.finish(nonEmpty);
+		recordsFileMgr.releaseOpStream();
+		recPosns.close();
 	}
 	
 	public static void importIncrementFile(LibrisDatabase database, Reader source, String filePath) throws LibrisException {

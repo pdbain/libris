@@ -110,10 +110,10 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 			};
 
 			metadata.setSavedRecords(numAdded);
+			metadata.setLastRecordId(lastId);
 			importer.finish(nonEmpty);
 			recordsFileMgr.releaseOpStream();
 			recPosns.close();
-			metadata.setLastRecordId(lastId);
 		} catch (IOException e) {
 			throw new DatabaseException(Messages.getString("XmlRecordsReader.6"), e); //$NON-NLS-1$
 		}
