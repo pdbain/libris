@@ -1,9 +1,12 @@
 package org.lasalledebain.libris;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Objects;
 
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.IndexConfiguration;
+import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -108,6 +111,13 @@ public class Libris {
 			return db.closeDatabase(false);
 		} else {
 			return false;
+		}
+	}
+	static {
+		URL props = PdfRecordImporter.class.getClassLoader().getResource("commons-logging.properties");
+		if (Objects.nonNull(props)) {
+			String path = props.getPath();
+			System.setProperty("java.util.logging.config.file", path);
 		}
 	}
 }

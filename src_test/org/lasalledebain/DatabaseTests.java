@@ -216,8 +216,7 @@ public class DatabaseTests extends TestCase {
 	public void testXmlExportAll() {
 		try {
 			rootDb = buildTestDatabase(getTestDatabase());
-			File workdir = Utilities.makeTempTestDirectory();
-			File copyDbXml = new File (workdir, "database_copy.xml");
+			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			copyDbXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
 			testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
@@ -238,8 +237,7 @@ public class DatabaseTests extends TestCase {
 		try {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
 			LibrisDatabase db = buildTestDatabase(testDatabaseFileCopy);
-			File workdir = Utilities.makeTempTestDirectory();
-			File copyDbXml = new File (workdir, "database_copy.xml");
+			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			copyDbXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
 			testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
@@ -282,11 +280,10 @@ public class DatabaseTests extends TestCase {
 
 	public void testFork() {
 		try {
-			File workdir = Utilities.makeTempTestDirectory();
-			File dbInstance = new File(workdir, "database_instance.xml");
+			File dbInstance = new File(workingDirectory, "database_instance.xml");
 			{
 				rootDb = buildTestDatabase(getTestDatabase());
-				File copyDbXml = new File (workdir, "database_copy.xml");
+				File copyDbXml = new File (workingDirectory, "database_copy.xml");
 				testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
 				copyDbXml.deleteOnExit();
 				dbInstance.deleteOnExit();
@@ -353,15 +350,14 @@ public class DatabaseTests extends TestCase {
 		ArrayList<Record> expectedRecords = new ArrayList<>();
 		int newRecordNumber;
 		try {
-			File workdir = Utilities.makeTempTestDirectory();
-			File dbInstance = new File(workdir, "database_instance.xml");
-			File dbIncrement = new File(workdir, "database_increment.xml");
+			File dbInstance = new File(workingDirectory, "database_instance.xml");
+			File dbIncrement = new File(workingDirectory, "database_increment.xml");
 			rootDb = buildTestDatabase(getTestDatabase());
 			for (Record rec: rootDb.getRecords()) {
 				expectedRecords.add(rec);
 			}
 			newRecordNumber = rootDb.getLastRecordId() + 1;
-			File copyDbXml = new File (workdir, "database_copy.xml");
+			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
 			copyDbXml.deleteOnExit();
 			dbInstance.deleteOnExit();
@@ -407,8 +403,7 @@ public class DatabaseTests extends TestCase {
 			ArrayList<File> forkFiles = new ArrayList<>();
 			ArrayList<File> incrementFiles = new ArrayList<>();
 			int newRecordNumber;
-			File workdir = Utilities.makeTempTestDirectory();
-			File dbInstance = new File(workdir, "database_instance.xml");
+			File dbInstance = new File(workingDirectory, "database_instance.xml");
 				dbInstance.deleteOnExit();
 			rootDb = buildTestDatabase(getTestDatabase());
 			for (Record rec: rootDb.getRecords()) {
@@ -416,7 +411,7 @@ public class DatabaseTests extends TestCase {
 			}
 			newRecordNumber = rootDb.getLastRecordId() + 1;
 			for (int forkNum = 0; forkNum < 3; ++forkNum) {
-				File forkFile = new File (workdir, "database_copy_"+forkNum+".xml");
+				File forkFile = new File (workingDirectory, "database_copy_"+forkNum+".xml");
 				testLogger.log(Level.INFO,getName()+": copy database to "+forkFile);
 				forkFiles.add(forkFile);
 				forkFile.deleteOnExit();
@@ -449,7 +444,7 @@ public class DatabaseTests extends TestCase {
 				recCopy.setRecordId(newRecordNumber);
 				expectedRecords.add(recCopy);
 				++newRecordNumber;
-				File dbIncrement = new File(workdir, "database_increment_"+incrementNumber+".xml");
+				File dbIncrement = new File(workingDirectory, "database_increment_"+incrementNumber+".xml");
 				dbIncrement.deleteOnExit();
 				forkDb.exportIncrement(new FileOutputStream(dbIncrement));
 				incrementFiles.add(dbIncrement);
@@ -540,9 +535,8 @@ public class DatabaseTests extends TestCase {
 		ArrayList<Record> rootExpectedRecords = new ArrayList<>();
 		int newRecordNumber;
 		try {
-			File workdir = Utilities.makeTempTestDirectory();
-			File dbInstance = new File(workdir, "database_instance.xml");
-			File dbIncrement = new File(workdir, "database_increment.xml");
+			File dbInstance = new File(workingDirectory, "database_instance.xml");
+			File dbIncrement = new File(workingDirectory, "database_increment.xml");
 			rootDb = buildTestDatabase(getTestDatabase());
 			for (Record rec: rootDb.getRecords()) {
 				rootExpectedRecords.add(rec);
@@ -551,7 +545,7 @@ public class DatabaseTests extends TestCase {
 			ArrayList<Record> forkExpectedRecords = (ArrayList<Record>) rootExpectedRecords.clone();
 			ArrayList<Record> incrementExpectedRecords = new ArrayList<>();
 			newRecordNumber = rootDb.getLastRecordId() + 1;
-			File copyDbXml = new File (workdir, "database_copy.xml");
+			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
 			copyDbXml.deleteOnExit();
 			dbInstance.deleteOnExit();

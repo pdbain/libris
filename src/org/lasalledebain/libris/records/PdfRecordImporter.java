@@ -2,22 +2,24 @@ package org.lasalledebain.libris.records;
 
 import static org.lasalledebain.libris.util.LibrisStemmer.stem;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.util.StringUtils;;
+import org.lasalledebain.libris.util.StringUtils;
 
 public class PdfRecordImporter {
 	private static final int KEYWORD_LIMIT = 100;
@@ -27,6 +29,7 @@ public class PdfRecordImporter {
 	int abstractField, keywordsField;
 	boolean setAbstract;
 	boolean setKeywords;
+
 	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository) {
 		this.recordDatabase = recordDatabase;
 		this.artifactRepository = artifactRepository;
@@ -98,7 +101,8 @@ public class PdfRecordImporter {
 
 	private static String pdfToText(URI sourceFileUri) throws IOException, MalformedURLException {
 		/* extract text */
-		PDDocument pdfDoc = PDDocument.load(sourceFileUri.toURL());
+		PDDocument pdfDoc = PDDocument.load(new File(sourceFileUri));
+		// TODO suppress font warnings
 		PDFTextStripper doc = new PDFTextStripper();
 		String docString = doc.getText(pdfDoc).trim();
 		pdfDoc.close();

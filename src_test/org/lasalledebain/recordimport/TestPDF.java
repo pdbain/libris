@@ -4,12 +4,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +36,13 @@ public class TestPDF extends TestCase {
 	private File repoFile;
 	private File repoRoot;
 	private Repository repo;
+	static {
+		URL props = PdfRecordImporter.class.getClassLoader().getResource("commons-logging.properties");
+		if (Objects.nonNull(props)) {
+			String path = props.getPath();
+			System.setProperty("java.util.logging.config.file", path);
+		}
+	}
 
 	@Before
 	public void setUp() throws Exception {
