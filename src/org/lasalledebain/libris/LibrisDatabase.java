@@ -235,34 +235,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 	}
 
-	@Override
-	public void fromXml(ElementManager librisMgr) throws LibrisException {
-		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
-		LibrisAttributes attrs = new LibrisAttributes(dbElementAttrs);
-		String dateString = attrs.get(XML_DATABASE_DATE_ATTR);
-		if ((null == dateString) || dateString.isEmpty()) {
-			databaseMetadata.setDatabaseDate(new Date());
-		} else try {
-			databaseMetadata.setDatabaseDate(LibrisMetadata.parseDateString(dateString));
-		} catch (ParseException e) {
-			throw new InputException("illegal date format: "+dateString, e);
-		}
-		
-		String nextElement = librisMgr.getNextId();
-		DatabaseInstance instanceInfo = null;
-		if (XML_INSTANCE_TAG.equals(nextElement)) {
-			ElementManager instanceMgr = librisMgr.nextElement();
-			instanceInfo  = new DatabaseInstance();
-			instanceInfo.fromXml(instanceMgr);
-			databaseMetadata.setInstanceInfo(instanceInfo);
-			nextElement = librisMgr.getNextId();
-		}
-		xmlAttributes = new DatabaseAttributes(dbElementAttrs);
-		if (xmlAttributes.isLocked()) {
-			readOnly = true;
-		}
-	}
-
 	private void loadMetadata(ElementManager librisMgr)
 			throws DatabaseException, XmlException, InputException, LibrisException {
 		String nextElementId = librisMgr.getNextId();
@@ -311,9 +283,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			loadDatabaseInfo(config.isLoadMetadata());
 			mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 			final File databaseFile = getDatabaseFile();
-			databaseMetadata.setSavedRecords(0);
-			XmlRecordsReader.importXmlRecords(this, databaseFile);
 			Records<DatabaseRecord> recs = getDatabaseRecords();
+			XmlRecordsReader.importXmlRecords(this, recs, databaseFile);
 			indexMgr.buildIndexes(config, recs);
 			save();
 			freeDatabase();
@@ -323,11 +294,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 	}
 
-	@Override
-	public void toXml(ElementWriter outWriter) throws LibrisException {
-		toXml(outWriter, true, getRecordReader(), false);
-	}
-
 	public String getElementTag() {
 		return getXmlTag();
 	}
@@ -335,6 +301,43 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public String getXmlTag() {
 		return XML_LIBRIS_TAG;
 	}
+	@Override
+	public void fromXml(ElementManager librisMgr) throws LibrisException {
+		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
+		LibrisAttributes attrs = new LibrisAttributes(dbElementAttrs);
+		String dateString = attrs.get(XML_DATABASE_DATE_ATTR);
+		if ((null == dateString) || dateString.isEmpty()) {
+			databaseMetadata.setDatabaseDate(new Date());
+		} else try {
+			databaseMetadata.setDatabaseDate(LibrisMetadata.parseDateString(dateString));
+		} catch (ParseException e) {
+			throw new InputException("illegal date format: "+dateString, e);
+		}
+		
+		String nextElement = librisMgr.getNextId();
+		DatabaseInstance instanceInfo = null;
+		if (XML_INSTANCE_TAG.equals(nextElement)) {
+			ElementManager instanceMgr = librisMgr.nextElement();
+			instanceInfo  = new DatabaseInstance();
+			instanceInfo.fromXml(instanceMgr);
+			databaseMetadata.setInstanceInfo(instanceInfo);
+			nextElement = librisMgr.getNextId();
+		}
+		xmlAttributes = new DatabaseAttributes(dbElementAttrs);
+		if (xmlAttributes.isLocked()) {
+			readOnly = true;
+		}
+	}
+
+	@Override
+	public void toXml(ElementWriter outWriter) throws LibrisException {
+		outWriter.writeStartElement(XML_LIBRIS_TAG, getAttributes(), false);
+		databaseMetadata.toXml(outWriter);
+		databaseRecords.toXml(outWriter);
+		outWriter.writeEndElement(); /* database */	
+		outWriter.flush();
+	}
+
 	private void toXml(ElementWriter outWriter, boolean includeMetadata,
 			Iterable<DatabaseRecord> recordSource, boolean includeInstanceInfo) throws XmlException, LibrisException {
 		outWriter.writeStartElement(XML_LIBRIS_TAG, getAttributes(), false);
@@ -358,6 +361,34 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 		outWriter.writeEndElement(); /* database */	
 		outWriter.flush();
+	}
+
+	public void exportDatabaseXml(OutputStream destination, boolean includeSchema, boolean includeRecords, boolean addInstanceInfo) throws LibrisException {
+		ElementWriter outWriter;
+		if (!isDatabaseOpen()) {
+			throw new UserErrorException("exportDatabaseXml: database not open");
+		}
+	
+		try {
+			outWriter = ElementWriter.eventWriterFactory(destination);
+		} catch (XMLStreamException e) {
+			throw new OutputException(Messages.getString("LibrisDatabase.exception_export_xml"), e); //$NON-NLS-1$
+		}
+		toXml(outWriter, includeSchema, getRecordReader(), addInstanceInfo); 
+	}
+
+	public void exportDatabaseXml(OutputStream destination) throws LibrisException {
+		ElementWriter outWriter;
+		if (!isDatabaseOpen()) {
+			throw new UserErrorException("exportDatabaseXml: database not open");
+		}
+	
+		try {
+			outWriter = ElementWriter.eventWriterFactory(destination);
+		} catch (XMLStreamException e) {
+			throw new OutputException(Messages.getString("LibrisDatabase.exception_export_xml"), e); //$NON-NLS-1$
+		}
+		toXml(outWriter); 
 	}
 
 	/**
@@ -760,20 +791,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		importer.fieldIds = fids;
 		Record[] recs = importer.importRecordsToDatabase();
 		return recs;
-	}
-
-	public void exportDatabaseXml(OutputStream destination, boolean includeSchema, boolean includeRecords, boolean addInstanceInfo) throws LibrisException {
-		ElementWriter outWriter;
-		if (!isDatabaseOpen()) {
-			throw new UserErrorException("exportDatabaseXml: database not open");
-		}
-
-		try {
-			outWriter = ElementWriter.eventWriterFactory(destination);
-		} catch (XMLStreamException e) {
-			throw new OutputException(Messages.getString("LibrisDatabase.exception_export_xml"), e); //$NON-NLS-1$
-		}
-		toXml(outWriter, includeSchema, getRecordReader(), addInstanceInfo); 
 	}
 
 	public boolean exportIncrement(OutputStream destination) throws OutputException  {

@@ -48,6 +48,13 @@ public class Assertion {
 		}
 	}
 
+	public static void assertNotNullError(String message, Object actual) throws InputException {
+		boolean result = Objects.nonNull(actual);
+		if (!result) {
+			throw new DatabaseError("Error: "+message+" is null");
+		}
+	}
+
 	public static boolean assertNotNull(LibrisUi ui, String message, Object expected) {
 		boolean result = Objects.nonNull(expected);
 		if (!result) {

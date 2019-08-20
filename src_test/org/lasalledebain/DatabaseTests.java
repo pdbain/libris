@@ -213,6 +213,7 @@ public class DatabaseTests extends TestCase {
 		}
 
 	}
+	
 	public void testXmlExportAll() {
 		try {
 			rootDb = buildTestDatabase(getTestDatabase());
@@ -221,6 +222,26 @@ public class DatabaseTests extends TestCase {
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
 			testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
 			rootDb.exportDatabaseXml(copyStream, true, true, false);
+			copyStream.close();
+
+			forkDb = Libris.buildAndOpenDatabase(copyDbXml);
+			assertNotNull("Error rebuilding database copy", forkDb);
+			assertTrue("database copy does not match original", forkDb.equals(rootDb));
+			copyDbXml.delete();
+		} catch (Throwable e) {
+			e.printStackTrace();
+			fail("unexpected exception");
+		}
+	}
+
+	public void testDatabaseToXml() {
+		try {
+			rootDb = buildTestDatabase(getTestDatabase());
+			File copyDbXml = new File (workingDirectory, "database_copy.xml");
+			copyDbXml.deleteOnExit();
+			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
+			testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
+			rootDb.exportDatabaseXml(copyStream);
 			copyStream.close();
 
 			forkDb = Libris.buildAndOpenDatabase(copyDbXml);

@@ -1,12 +1,10 @@
 package org.lasalledebain.libris.records;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.GenericDatabaseMetadata;
@@ -24,7 +22,6 @@ import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.BulkImporter;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.RecordPositions;
-import org.lasalledebain.libris.ui.Messages;
 import org.lasalledebain.libris.util.Reporter;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -42,10 +39,6 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 
 	public Iterable<RecordType> getNativeRecordsReader() {
 		return recMgr;
-	}
-
-	public void importRecords(LibrisConstants.DatabaseFormat format, File[] importFiles) throws DatabaseException {
-		throw new DatabaseException("not implemented");
 	}
 
 	public void putRecords(RecordList<RecordType> modifiedRecords) throws InputException, DatabaseException {
@@ -70,32 +63,32 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 		return myDatabase.getNamedRecords().iterator();
 	}
 
+	public static String getXmlTag() {
+		return XML_RECORDS_TAG;
+	}
 	@Override
 	public String getElementTag() {
-		// TODO Auto-generated method stub
-		return null;
+		return getXmlTag();
 	}
 
 	@Override
 	public void fromXml(ElementManager mgr) throws LibrisException {
-		// TODO test Records.fromXml
-		GenericDatabaseMetadata metadata = myDatabase.getMetadata();
-		XmlRecordsReader<RecordType> recordsRdr = new XmlRecordsReader<RecordType>(myDatabase, mgr);
-		int numAdded = 0;
-		int lastId = 0;
-		metadata.setSavedRecords(0);
-		LibrisFileManager fileMgr = myDatabase.getFileMgr();
-		FileAccessManager recordsFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME);
-		RecordPositions recPosns = new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisConstants.POSITION_FILENAME), false);
 		try {
+			GenericDatabaseMetadata metadata = myDatabase.getMetadata();
+			XmlRecordsReader<RecordType> recordsRdr = new XmlRecordsReader<RecordType>(myDatabase, mgr);
+			int lastId = 0;
+			int numAdded = 0;
+			metadata.setSavedRecords(0);
+			LibrisFileManager fileMgr = myDatabase.getFileMgr();
+			FileAccessManager recordsFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME);
+			RecordPositions recPosns = myDatabase.getRecordPositions();
 			BulkImporter importer = new BulkImporter(myDatabase.getSchema(), recordsFileMgr.getOpStream(), recPosns);
 			importer.initialize();
 			boolean nonEmpty = false;
 			for (Record r: recordsRdr) {
 				nonEmpty = true;
 				if (null == r) {
-					LibrisException e = LibrisException.getLastException();
-					throw e;
+					throw new DatabaseException("error importing records");
 				}
 				importer.putRecord(r);
 				++numAdded;
@@ -113,16 +106,18 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 			metadata.setLastRecordId(lastId);
 			importer.finish(nonEmpty);
 			recordsFileMgr.releaseOpStream();
-			recPosns.close();
 		} catch (IOException e) {
-			throw new DatabaseException(Messages.getString("XmlRecordsReader.6"), e); //$NON-NLS-1$
+			throw new DatabaseException(e);
 		}
 	}
 
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
-		// TODO Auto-generated method stub
-		
+		output.writeStartElement(XML_RECORDS_TAG);
+		for (Record r: myDatabase.getRecordReader()) {
+			r.toXml(output);
+		}
+		output.writeEndElement();
 	}
 
 	@Override

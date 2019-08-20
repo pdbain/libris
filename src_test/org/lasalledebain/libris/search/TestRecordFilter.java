@@ -348,7 +348,7 @@ public class TestRecordFilter extends TestCase {
 		IndexConfiguration config = copyAndBuildDatabase();
 
 		Random rand = new Random(3141592);
-		final int numRecs = 10000; // TODO increase to 10^6
+		final int numRecs = 400 ; // TODO DEBUG should be at least 10000; // TODO increase to 10^6
 		config.setAttribute(IndexConfiguration.TERMCOUNT_BUCKETS, numRecs / 4);
 		final FieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
 		final int keywordRatio = 15 * numRecs;
@@ -359,8 +359,12 @@ public class TestRecordFilter extends TestCase {
 				keywordFieldNums);
 		database.exportDatabaseXml(new BufferedOutputStream(new FileOutputStream(config.getDatabaseFile())), true, true,
 				true);
+		for (int i=1 ; i<4; ++i) {
+			Record r = database.getRecord(i);
+			assertNotNull("Record "+i+" null", r);
+		}
 		ui = config.getDatabaseUi();
-		ui.closeDatabase(false);
+		assertTrue("Database not closed", ui.closeDatabase(false));
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
 

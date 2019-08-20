@@ -22,6 +22,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -85,19 +86,6 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 	private boolean readOnly;
 
 	private GenericDatabase<RecordType> database;
-
-	/**
-	 * @param database
-	 * @param dbSchema
-	 * @param recordPositions
-	 * @param recordsFile
-	 * @param positionFile 
-	 * @throws LibrisException 
-	 */
-	public LibrisRecordsFileManager(GenericDatabase<RecordType> db, boolean readOnly,  RecordFactory<RecordType> recordFact,
-			Schema dbSchema, LibrisFileManager fileMgr) throws LibrisException {
-		this(db, readOnly, dbSchema, fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME), new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisConstants.POSITION_FILENAME), readOnly));
-	}
 
 	public LibrisRecordsFileManager(GenericDatabase<RecordType> db, boolean readOnly,
 			Schema dbSchema, FileAccessManager recordsFile, RecordPositions recPosns) throws LibrisException {
@@ -404,7 +392,7 @@ public void removeRecord(int rid) throws DatabaseException {
 	}
 }
 
-	private RecordType readRecord(long recordPosition) throws InputException, DatabaseException {
+	private RecordType readRecord(long recordPosition) throws InputException {
 		try {
 			int recId = recordsFileStore.readInt();
 			RecordType r = myRecordFactory.makeRecord(true);//
@@ -502,7 +490,7 @@ public void removeRecord(int rid) throws DatabaseException {
 					case T_FIELD_AFFILIATES:
 					case T_FIELD_UNKNOWN:
 					default:
-						throw new DatabaseException("Invalid field "+fieldNum+" field type = "+ft.toString());
+						throw new DatabaseError("Invalid field "+fieldNum+" field type = "+ft.toString());
 					}
 				}
 			} catch (FieldDataException e) {
@@ -553,9 +541,10 @@ public void removeRecord(int rid) throws DatabaseException {
 						result = getRecord(nextId);
 					}
 				}
+				Assertion.assertNotNullError("Record "+nextId, result);
 				++nextId;
 				return result;
-			} catch (Exception e) {
+			} catch (InputException e) {
 				throw new DatabaseError("error in LibrisRecordsFileManager.next", e);
 			}
 		}

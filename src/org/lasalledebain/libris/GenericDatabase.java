@@ -2,6 +2,7 @@ package org.lasalledebain.libris;
 
 import java.util.Objects;
 
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -10,6 +11,7 @@ import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
+import org.lasalledebain.libris.indexes.RecordPositions;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -40,6 +42,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return modifiedRecords;
 	}
 
+	public RecordPositions getRecordPositions() throws DatabaseException {
+		return indexMgr.getRecordPositions();
+	}
+	
 	public abstract LibrisJournalFileManager<RecordType> getJournalFileMgr() throws LibrisException;
 	
 	public int getLastRecordId() {
@@ -170,4 +176,5 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	public void setModified(boolean isModified) {
 		this.isModified = isModified;
 	}
+
 }

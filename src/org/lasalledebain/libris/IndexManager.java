@@ -22,6 +22,7 @@ import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.RecordKeywords;
+import org.lasalledebain.libris.indexes.RecordPositions;
 import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 import org.lasalledebain.libris.indexes.SignatureManager;
 import org.lasalledebain.libris.indexes.SortedKeyIntegerBucket;
@@ -41,6 +42,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
 	private AffiliateList<RecordType> affList[];
 
+	private RecordPositions myRecordPositions;
 	private ArrayList<FileAccessManager> namedRecsFileMgrs;
 	private int numGroups;
 	private LibrisRecordsFileManager<RecordType> recordsFile;
@@ -56,7 +58,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 	private IndexField[] indexFields = null;
 	
 	/**
-	 * @param librisDatabase
+	 * @param theDatabase
 	 *            database metadata
 	 * @param metadata
 	 *            database file manager
@@ -64,9 +66,9 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 	 *            set true to prevent updates
 	 * @throws DatabaseException
 	 */
-	public IndexManager(GenericDatabase<RecordType> librisDatabase, LibrisFileManager fileMgr)
+	public IndexManager(GenericDatabase<RecordType> theDatabase, LibrisFileManager fileMgr)
 			throws DatabaseException {
-		database = librisDatabase;
+		database = theDatabase;
 		this.fileMgr = fileMgr;
 
 		namedRecsFileMgrs = new ArrayList<FileAccessManager>(1 + NAMED_RECORDS_INDEX_LEVELS);
@@ -293,8 +295,13 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 
 	public LibrisRecordsFileManager<RecordType> getRecordsFileMgr() throws LibrisException {
 		if (null == recordsFile) {
-			recordsFile = new LibrisRecordsFileManager<RecordType>(database, database.isReadOnly(), 
-					database.getRecordFactory(), database.getSchema(), fileMgr);
+		//	recordsFile = new LibrisRecordsFileManager<RecordType>(database, database.isReadOnly(), database.getRecordFactory(), database.getSchema(), fileMgr);
+			recordsFile = new LibrisRecordsFileManager<RecordType>(database, 
+					database.readOnly, 
+					database.getSchema(), 
+					fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME),
+					database.getRecordPositions()
+					);
 		}
 		return recordsFile;
 	}
@@ -342,6 +349,14 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 			++occupancy;
 			return (LIST_SIZE == occupancy);
 		}
+	}
+
+	public synchronized RecordPositions getRecordPositions() throws DatabaseException {
+		if (null == myRecordPositions) {
+			FileAccessManager positionsFileManager = fileMgr.getAuxiliaryFileMgr(LibrisConstants.POSITION_FILENAME);
+			myRecordPositions = new RecordPositions(positionsFileManager, database.readOnly);
+		}
+		return myRecordPositions;
 	}
 
 }

@@ -29,7 +29,6 @@ public class BulkImporter {
 		this.dbSchema = dbSchema;
 		lastPosition = 0;
 		recFileChannel = recFileWriter.getChannel();
-		initialize();
 	}
 
 	/**
@@ -73,7 +72,6 @@ public class BulkImporter {
 				recFileWriter.write(lastHeader);
 			}
 			recPosns.flush();
-			recPosns.close();
 		} catch (IOException e) {
 			throw new OutputException("Error writing record header", e);
 		}
