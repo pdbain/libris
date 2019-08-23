@@ -102,7 +102,6 @@ public class PdfRecordImporter {
 	private static String pdfToText(URI sourceFileUri) throws IOException, MalformedURLException {
 		/* extract text */
 		PDDocument pdfDoc = PDDocument.load(new File(sourceFileUri));
-		// TODO suppress font warnings
 		PDFTextStripper doc = new PDFTextStripper();
 		String docString = doc.getText(pdfDoc).trim();
 		pdfDoc.close();

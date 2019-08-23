@@ -75,7 +75,6 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 	public void fromXml(ElementManager mgr) throws LibrisException {
 		try {
 			GenericDatabaseMetadata metadata = myDatabase.getMetadata();
-			XmlRecordsReader<RecordType> recordsRdr = new XmlRecordsReader<RecordType>(myDatabase, mgr);
 			int lastId = 0;
 			int numAdded = 0;
 			metadata.setSavedRecords(0);
@@ -85,6 +84,7 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 			BulkImporter importer = new BulkImporter(myDatabase.getSchema(), recordsFileMgr.getOpStream(), recPosns);
 			importer.initialize();
 			boolean nonEmpty = false;
+			Iterable<RecordType> recordsRdr = new XmlRecordsReader<RecordType>(myDatabase, mgr);
 			for (Record r: recordsRdr) {
 				nonEmpty = true;
 				if (null == r) {

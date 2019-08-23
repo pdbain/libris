@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
+import java.util.logging.Level;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisConstants;
@@ -54,7 +55,7 @@ public class DbDump {
 			}
 			rf.releaseRaRoFile(recordsFileStore);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			LibrisDatabase.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 		}
 	}

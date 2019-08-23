@@ -348,7 +348,7 @@ public class TestRecordFilter extends TestCase {
 		IndexConfiguration config = copyAndBuildDatabase();
 
 		Random rand = new Random(3141592);
-		final int numRecs = 400 ; // TODO DEBUG should be at least 10000; // TODO increase to 10^6
+		final int numRecs = 40000; // TODO increase to 10^6
 		config.setAttribute(IndexConfiguration.TERMCOUNT_BUCKETS, numRecs / 4);
 		final FieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
 		final int keywordRatio = 15 * numRecs;

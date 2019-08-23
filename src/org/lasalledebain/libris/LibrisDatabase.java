@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.exception.Assertion;
@@ -284,7 +285,30 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 			final File databaseFile = getDatabaseFile();
 			Records<DatabaseRecord> recs = getDatabaseRecords();
-			XmlRecordsReader.importXmlRecords(this, recs, databaseFile);
+			try {
+				ElementManager librisMgr = this.makeLibrisElementManager(databaseFile);
+				librisMgr.parseOpenTag();
+				String nextElement = librisMgr.getNextId();
+				if (XmlRecordsReader.XML_INSTANCE_TAG.equals(nextElement)) {
+					ElementManager instanceMgr = librisMgr.nextElement();
+					instanceMgr.flushElement();
+					nextElement = librisMgr.getNextId();
+				}
+				ElementManager metadataMgr;
+				if (XmlRecordsReader.XML_METADATA_TAG.equals(nextElement)) {
+					metadataMgr = librisMgr.nextElement();
+					metadataMgr.flushElement();
+					nextElement = librisMgr.getNextId();	
+				}
+				ElementManager recordsMgr = librisMgr.nextElement();
+				recs.fromXml(recordsMgr);
+				librisMgr.closeFile();
+				this.closeDatabaseSource();
+			} catch (FactoryConfigurationError | FileNotFoundException e) {
+				String msg = Messages.getString("XmlRecordsReader.4"); //$NON-NLS-1$
+				LibrisDatabase.log(Level.SEVERE, msg, e); //$NON-NLS-1$
+				throw new DatabaseException(msg); //$NON-NLS-1$
+			}
 			indexMgr.buildIndexes(config, recs);
 			save();
 			freeDatabase();
@@ -430,7 +454,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return false;
 		};
 		ElementManager recsMgr = incrementManager.nextElement();
-		XmlRecordsReader<DatabaseRecord> recordsReader = new XmlRecordsReader<DatabaseRecord>(this, recsMgr);
+		Iterable<DatabaseRecord> recordsReader = new XmlRecordsReader<DatabaseRecord>(this, recsMgr);
 		for (DatabaseRecord newRec: recordsReader) {
 			if (idAdjustment > 0) {
 				newRec.offsetIds(baseId, idAdjustment);
