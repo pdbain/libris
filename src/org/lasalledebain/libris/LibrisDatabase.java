@@ -136,7 +136,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			if (!databaseMetadata.isMetadataOkay()) {
 				throw new DatabaseException("Error in metadata");
 			}
-			getDatabaseRecords();
+			makeDatabaseRecords();
 			if (hasDocumentRepository()) {
 				// TODO open repo documentRepository = Repository.open(getUi(), new File(xmlAttributes.getRepositoryLocation()));
 			}
@@ -155,6 +155,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return Objects.nonNull(fileMgr) && fileMgr.isDatabaseReserved();
 	}
 
+	// TODO pull up
 	public void save()  {
 		try {
 			if (isIndexed()) {
@@ -169,7 +170,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				throw new DatabaseException(e);
 			}
 			setModified(false);
-		} catch (LibrisException e) {
+		} catch (InputException | DatabaseException e) {
 			ui.alert("Exception while saving record", e); //$NON-NLS-1$
 		}
 	}
@@ -278,13 +279,13 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return Libris.buildIndexes(databaseFile, ui);
 	}
 
-	boolean buildIndexes(IndexConfiguration config) throws LibrisException {
+	boolean buildDatabase(IndexConfiguration config) throws LibrisException {
 		fileMgr.createAuxFiles(true);
 		if (reserveDatabase()) {
 			loadDatabaseInfo(config.isLoadMetadata());
 			mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 			final File databaseFile = getDatabaseFile();
-			Records<DatabaseRecord> recs = getDatabaseRecords();
+			Records<DatabaseRecord> recs = makeDatabaseRecords();
 			try {
 				ElementManager librisMgr = this.makeLibrisElementManager(databaseFile);
 				librisMgr.parseOpenTag();
@@ -301,7 +302,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					nextElement = librisMgr.getNextId();	
 				}
 				ElementManager recordsMgr = librisMgr.nextElement();
-				recs.fromXml(recordsMgr);
+				buildIndexes(config, recs, recordsMgr);
+				// TODO move to buildIndexes
+				save();
 				librisMgr.closeFile();
 				this.closeDatabaseSource();
 			} catch (FactoryConfigurationError | FileNotFoundException e) {
@@ -309,8 +312,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				LibrisDatabase.log(Level.SEVERE, msg, e); //$NON-NLS-1$
 				throw new DatabaseException(msg); //$NON-NLS-1$
 			}
-			indexMgr.buildIndexes(config, recs);
-			save();
 			freeDatabase();
 			return true;
 		} else {
@@ -519,7 +520,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 						return false;
 					}
 				}
-			} catch (LibrisException e) {
+			} catch (InputException e) {
+				// TODO throw error
 				log(Level.SEVERE, "error reading records", e); //$NON-NLS-1$
 				return false;
 			}
@@ -648,10 +650,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	private void setRecordsAccessible(boolean accessible) {
 	}
 
-	public boolean isIndexed() {
-		return indexMgr.isIndexed();
-	}
-
 	@Override
 	public LibrisAttributes getAttributes() {
 		return xmlAttributes;
@@ -670,18 +668,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	}
 	public static LibrisXmlFactory getXmlFactory() {
 		return xmlFactory;
-	}
-
-	/**
-	 * Create Records manager if necessary and return it.
-	 * @return
-	 * @throws LibrisException
-	 */
-	public Records<DatabaseRecord> getDatabaseRecords() throws LibrisException {
-		if (null == databaseRecords) {
-			databaseRecords = new Records<DatabaseRecord>(this, fileMgr);
-		}
-		return databaseRecords;
 	}
 	
 	public void viewRecord(int recordId) {
@@ -733,7 +719,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return id;
 	}
 
-	public void saveRecords(Iterable <Record> recList) throws LibrisException {
+	public void saveRecords(Iterable <Record> recList) throws DatabaseException, OutputException, InputException {
 
 		if (isIndexed()) {
 			saveMetadata();

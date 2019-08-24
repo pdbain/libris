@@ -227,7 +227,7 @@ public class RecordListTests extends TestCase {
 	}
 
 	private void checkRecordOrder(LibrisDatabase db, String[] expectedData)
-			throws LibrisException, InputException {
+			throws InputException {
 		int expectedId = 1;
 		for (Record r: db.getDatabaseRecords()) {
 			assertEquals("Wrong record ID", expectedId, r.getRecordId());

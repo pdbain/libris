@@ -105,7 +105,7 @@ public class Libris {
 		LibrisDatabase db = new LibrisDatabase(config.getDatabaseFile(), false, config.getDatabaseUi());
 		config.setLoadMetadata(true);
 		if (!db.isDatabaseReserved()) {
-			if (!db.buildIndexes(config)) {
+			if (!db.buildDatabase(config)) {
 				return false;
 			}
 			return db.closeDatabase(false);

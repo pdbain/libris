@@ -2,12 +2,12 @@ package org.lasalledebain.libris;
 
 import java.util.Objects;
 
-import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.indexes.GroupManager;
+import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
@@ -15,6 +15,7 @@ import org.lasalledebain.libris.indexes.RecordPositions;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 public abstract class GenericDatabase<RecordType extends Record> implements XMLElement {
 	protected GroupManager<RecordType> groupMgr;
@@ -32,12 +33,29 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		fileMgr = theFileManager;
 	}
 
+	protected void buildIndexes(IndexConfiguration config, Records<RecordType> recs, ElementManager recordsMgr)
+			throws LibrisException {
+		recs.fromXml(recordsMgr);
+		indexMgr.buildIndexes(config, recs);
+	}
+
 	public abstract Schema getSchema();
 
 	public LibrisFileManager getFileMgr() {
 		return fileMgr;
 	}
 
+	public Records<RecordType> getDatabaseRecords() {
+		return databaseRecords;
+	}
+
+	protected Records<RecordType> makeDatabaseRecords() throws LibrisException {
+		if (null == databaseRecords) {
+			databaseRecords = new Records<RecordType>(this, fileMgr);
+		}
+		return databaseRecords;
+	}
+	
 	public synchronized ModifiedRecordList<RecordType> getModifiedRecords() {
 		return modifiedRecords;
 	}
@@ -68,6 +86,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public boolean isReadOnly() {
 		return readOnly;
+	}
+
+	public boolean isIndexed() {
+		return indexMgr.isIndexed();
 	}
 
 	public boolean isRecordReadOnly(int recordId) {
