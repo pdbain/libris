@@ -1,8 +1,11 @@
 package org.lasalledebain.libris;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
@@ -15,6 +18,19 @@ public abstract class GenericDatabaseMetadata implements LibrisXMLConstants {
 	protected int savedRecords;
 	private static SimpleDateFormat dateAndTimeFormatter = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
 	private static SimpleDateFormat compactDateFormatter = new SimpleDateFormat(LibrisConstants.YMD);
+	/**
+	 * Dynamic attributes of the database
+	 */
+	protected Properties usageProperties;
+
+	public void saveProperties(FileOutputStream propertiesFile) throws IOException {
+		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_SAVED, getCurrentDateAndTimeString());
+		String lastId = RecordId.toString(lastRecordId);
+		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_RECORD_ID, lastId);
+		usageProperties.setProperty(LibrisConstants.PROPERTY_RECORD_COUNT, (0 == savedRecords)? "0": Integer.toString(savedRecords));
+		usageProperties.setProperty(LibrisConstants.PROPERTY_SIGNATURE_LEVELS, String.valueOf(signatureLevels));
+		usageProperties.store(propertiesFile, "");
+	}
 
 	public static Date parseDateString(String dateString) throws ParseException {
 		return dateAndTimeFormatter.parse(dateString);

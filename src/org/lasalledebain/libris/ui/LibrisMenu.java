@@ -448,7 +448,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 
 	private void openDatabaseImpl(File dbFile) {
 		
-		guiMain.setDatabaseFile(dbFile);
 		try {
 			database = guiMain.openDatabase();
 		} catch (Exception e) {

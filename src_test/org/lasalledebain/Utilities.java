@@ -40,8 +40,8 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.RecordDataException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
-import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -404,7 +404,7 @@ public class Utilities extends TestCase {
 		return db;
 	}
 
-	public static LibrisDatabase buildTestDatabase(IndexConfiguration config)
+	public static LibrisDatabase buildTestDatabase(LibrisIndexConfiguration config)
 			throws FileNotFoundException, IOException {
 		LibrisDatabase db = null;
 		try {

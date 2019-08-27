@@ -19,10 +19,6 @@ public abstract class LibrisMetadata extends GenericDatabaseMetadata implements 
 	protected Layouts uiLayouts;
 	private int modifiedRecords;
 	private DatabaseInstance instanceInfo;
-	/**
-	 * Dynamic attributes of the database
-	 */
-	private Properties usageProperties;
 
 	private LastFilterSettings lastFiltSettings;
 	public LibrisMetadata() {
@@ -48,15 +44,6 @@ public abstract class LibrisMetadata extends GenericDatabaseMetadata implements 
 
 	public Layouts getLayouts() {
 		return uiLayouts;
-	}
-
-	public void saveProperties(FileOutputStream propertiesFile) throws IOException {
-		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_SAVED, getCurrentDateAndTimeString());
-		String lastId = RecordId.toString(lastRecordId);
-		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_RECORD_ID, lastId);
-		usageProperties.setProperty(LibrisConstants.PROPERTY_RECORD_COUNT, (0 == savedRecords)? "0": Integer.toString(savedRecords));
-		usageProperties.setProperty(LibrisConstants.PROPERTY_SIGNATURE_LEVELS, String.valueOf(signatureLevels));
-		usageProperties.store(propertiesFile, "");
 	}
 
 	LibrisException readProperties(FileInputStream ipFile) throws LibrisException, IOException {

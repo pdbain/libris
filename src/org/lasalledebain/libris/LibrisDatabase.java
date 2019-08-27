@@ -38,7 +38,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.GroupManager;
-import org.lasalledebain.libris.indexes.IndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
@@ -155,26 +155,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return Objects.nonNull(fileMgr) && fileMgr.isDatabaseReserved();
 	}
 
-	// TODO pull up
-	public void save()  {
-		try {
-			if (isIndexed()) {
-				saveMetadata();
-			}
-			Records<DatabaseRecord> recs = getDatabaseRecords();
-			recs.putRecords(modifiedRecords);
-			try {
-				recs.flush();
-				indexMgr.flush();
-			} catch (IOException e) {
-				throw new DatabaseException(e);
-			}
-			setModified(false);
-		} catch (InputException | DatabaseException e) {
-			ui.alert("Exception while saving record", e); //$NON-NLS-1$
-		}
-	}
-
 	/**
 	 * @param force close without saving
 	 * @return true if database is not modified or force is true.
@@ -279,7 +259,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return Libris.buildIndexes(databaseFile, ui);
 	}
 
-	boolean buildDatabase(IndexConfiguration config) throws LibrisException {
+	boolean buildDatabase(LibrisIndexConfiguration config) throws LibrisException {
 		fileMgr.createAuxFiles(true);
 		if (reserveDatabase()) {
 			loadDatabaseInfo(config.isLoadMetadata());
@@ -303,8 +283,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				}
 				ElementManager recordsMgr = librisMgr.nextElement();
 				buildIndexes(config, recs, recordsMgr);
-				// TODO move to buildIndexes
-				save();
 				librisMgr.closeFile();
 				this.closeDatabaseSource();
 			} catch (FactoryConfigurationError | FileNotFoundException e) {
@@ -467,24 +445,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	// TODO test read-onlyness
 
-	/**
-	 * 
-	 */
-	private void saveMetadata() {
-		FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.PROPERTIES_FILENAME);
-		synchronized (propsMgr) {
-			try {
-				FileOutputStream opFile = propsMgr.getOpStream();
-				databaseMetadata.saveProperties(opFile);
-			} catch (IOException e) {
-				alert("Exception saving properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
-			} finally {
-				try {
-					propsMgr.releaseOpStream();
-				} catch (IOException e) {}
-			}
-		}
-	}
 	public LibrisMetadata getMetadata() {
 		return databaseMetadata;
 	}
@@ -728,17 +688,18 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		Records<DatabaseRecord> recs = getDatabaseRecords();
 		int id = NULL_RECORD_ID;
 		int lastId = 0;
+		LibrisMetadata metadata = getMetadata();
 		for (Record rec: recList) {
 			id = rec.getRecordId();
 			if (RecordId.isNull(id)) {
-				id = databaseMetadata.newRecordId();
+				id = metadata.newRecordId();
 				rec.setRecordId(id);
 			}
 			recs.putRecord(rec);
 			lastId = Math.max(id, lastId);
 		}
 		if (!RecordId.isNull(id)) {
-			databaseMetadata.setLastRecordId(lastId);
+			metadata.setLastRecordId(lastId);
 		}
 
 		try {

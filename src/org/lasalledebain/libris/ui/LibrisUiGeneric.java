@@ -15,7 +15,7 @@ import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.indexes.IndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 
 public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	
@@ -73,13 +73,6 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	 */
 	public void setOpenReadOnly(boolean openReadOnly) {
 		readOnly = openReadOnly;
-	}
-	/**
-	 * @return the databaseFile
-	 */
-	@Override
-	public File getDatabaseFile() {
-		return databaseFile;
 	}
 
 	public LibrisDatabase openDatabase() throws DatabaseException {
@@ -175,7 +168,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		Libris.buildIndexes(databaseFile, new HeadlessUi(databaseFile, false));
 	}
 
-	public void rebuildDatabase(IndexConfiguration config) throws LibrisException {
+	public void rebuildDatabase(LibrisIndexConfiguration config) throws LibrisException {
 		Libris.buildIndexes(config);
 	}
 

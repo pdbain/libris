@@ -1,5 +1,7 @@
 package org.lasalledebain.libris;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Objects;
 
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -37,6 +39,42 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 			throws LibrisException {
 		recs.fromXml(recordsMgr);
 		indexMgr.buildIndexes(config, recs);
+		save();
+	}
+
+	public void save()  {
+		try {
+			if (isIndexed()) {
+				saveMetadata();
+			}
+			Records<RecordType> recs = getDatabaseRecords();
+			recs.putRecords(modifiedRecords);
+			try {
+				recs.flush();
+				indexMgr.flush();
+			} catch (IOException e) {
+				throw new DatabaseException(e);
+			}
+			setModified(false);
+		} catch (InputException | DatabaseException e) {
+			ui.alert("Exception while saving record", e); //$NON-NLS-1$
+		}
+	}
+
+	public void saveMetadata() {
+		FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.PROPERTIES_FILENAME);
+		synchronized (propsMgr) {
+			try {
+				FileOutputStream opFile = propsMgr.getOpStream();
+				getMetadata().saveProperties(opFile);
+			} catch (IOException e) {
+				alert("Exception saving properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
+			} finally {
+				try {
+					propsMgr.releaseOpStream();
+				} catch (IOException e) {}
+			}
+		}
 	}
 
 	public abstract Schema getSchema();

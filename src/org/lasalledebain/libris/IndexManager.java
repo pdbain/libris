@@ -148,9 +148,9 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 				addKeywords(id, keywordList.wordStream());
 				keywordList.wordStream().forEach(t -> termCounts.incrementTermCount(t));
 			}
-			config.indexingReporter.reportValue(Reporter.INDEXING_RECORDS_NUM_RECS, recordCount);
-			config.indexingReporter.reportValue(Reporter.INDEXING_KEYWORD_COUNT, keywordCount);
-			termCounts.generateReport(config.indexingReporter);
+			config.getIndexingReporter().reportValue(Reporter.INDEXING_RECORDS_NUM_RECS, recordCount);
+			config.getIndexingReporter().reportValue(Reporter.INDEXING_KEYWORD_COUNT, keywordCount);
+			termCounts.generateReport(config.getIndexingReporter());
 
 			for (int g = 0; g < numGroups; ++g) {
 				childTempFiles[g].close();
@@ -166,7 +166,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 
 			setIndexed(true);
 			try (FileOutputStream reportFile = fileMgr.getUnmanagedOutputFile(INDEXING_REPORT_FILE)) {
-				config.indexingReporter.writeReport(reportFile);
+				config.getIndexingReporter().writeReport(reportFile);
 			};
 		} catch (IOException e) {
 			throw new InputException("Error rebuilding indexes", e);

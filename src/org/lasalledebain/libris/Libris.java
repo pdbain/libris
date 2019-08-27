@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.Objects;
 
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.indexes.IndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
@@ -81,7 +81,7 @@ public class Libris {
 		return result;
 	}
 
-	public static LibrisDatabase buildAndOpenDatabase(IndexConfiguration config) throws LibrisException {
+	public static LibrisDatabase buildAndOpenDatabase(LibrisIndexConfiguration config) throws LibrisException {
 		buildIndexes(config);
 		
 		LibrisDatabase result = config.getDatabaseUi().openDatabase();
@@ -97,11 +97,11 @@ public class Libris {
 	}
 
 	public static boolean buildIndexes(File databaseFile, LibrisUi ui) throws LibrisException {
-		IndexConfiguration config = new IndexConfiguration(databaseFile, ui);
+		LibrisIndexConfiguration config = new LibrisIndexConfiguration(databaseFile, ui);
 		return buildIndexes(config);
 	}
 
-	public static boolean buildIndexes(IndexConfiguration config) throws LibrisException {
+	public static boolean buildIndexes(LibrisIndexConfiguration config) throws LibrisException {
 		LibrisDatabase db = new LibrisDatabase(config.getDatabaseFile(), false, config.getDatabaseUi());
 		config.setLoadMetadata(true);
 		if (!db.isDatabaseReserved()) {
