@@ -34,7 +34,7 @@ public class DbDump {
 		out = System.out;
 		LibrisFileManager fm;
 		try {
-			fm = LibrisDatabase.createDatabaseFileManager(dbFileObj);
+			fm = new LibrisFileManager(LibrisDatabase.getDatabaseAuxDirectory(dbFileObj, LibrisDatabase.DATABASE_AUX_DIRECTORY_NAME));
 			dumpRecords(fm);
 		} catch (DatabaseException e) {
 			System.err.println("Cannot open database: "+e.getMessage());

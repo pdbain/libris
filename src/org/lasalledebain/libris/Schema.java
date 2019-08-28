@@ -161,7 +161,7 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	}
 
 	public String getGroupId(int groupNum) {
-		return fieldIdArray[groupNum];
+		return getFieldIds()[groupNum];
 	}
 
 	public Iterable<String> getGroupIds() {

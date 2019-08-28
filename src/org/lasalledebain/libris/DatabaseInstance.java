@@ -18,7 +18,7 @@ public class DatabaseInstance extends LibrisElement {
 		super();
 	}
 
-	public DatabaseInstance(GenericDatabaseMetadata metaData) {
+	public DatabaseInstance(DatabaseMetadata metaData) {
 		recordIdBase = metaData.getLastRecordId();
 		forkDate = LibrisMetadata.getCurrentDate();
 		joinDate = null;

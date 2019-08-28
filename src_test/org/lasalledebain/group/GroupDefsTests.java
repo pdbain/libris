@@ -3,7 +3,9 @@ package org.lasalledebain.group;
 import static org.lasalledebain.Utilities.testLogger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -188,6 +190,30 @@ public class GroupDefsTests extends TestCase {
 			e.printStackTrace();
 			fail("Unexpected exception "+e);
 		}
+	}
+
+	public void testSetParent() throws FileNotFoundException, IOException, LibrisException {
+			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE, workingDirectory);
+			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			testLogger.log(Level.INFO, "database rebuilt");
+			ArrayList<DatabaseRecord> recList = new ArrayList<DatabaseRecord>();
+			{
+				DatabaseRecord curr = db.newRecord();
+				Record rec1 = curr =db.newRecord();
+				curr.addFieldValuePair(ID_PUBLISHER, "", "Publisher 1");
+				saveRecord(db, recList, curr);
+
+				curr = db.newRecord();
+				curr.setParent(GRP_ONE, rec1);
+				curr.setParent(0, rec1.getRecordId());
+				curr.setParent(GRP_ONE, rec1);
+			}
+			
+			{
+				DatabaseRecord child = db.getRecord(2);
+				int numAffiliates = child.getNumAffiliatesAndParent(0);
+				assertEquals("Wrong number of affiliates", 1, numAffiliates);
+			}
 	}
 
 	@Override

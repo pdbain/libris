@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.indexes;
 
 import java.io.File;
-import java.util.Properties;
 
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisUi;

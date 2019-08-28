@@ -41,6 +41,7 @@ import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
+import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
@@ -57,6 +58,8 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
+
+import jdk.internal.org.objectweb.asm.tree.IntInsnNode;
 
 public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements LibrisXMLConstants, LibrisConstants, XMLElement {
 	/**
@@ -79,21 +82,15 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	}
 	
 	public LibrisDatabase(File theDatabaseFile, boolean readOnly, LibrisUi ui, Schema schem) throws LibrisException  {
-		super(ui,createDatabaseFileManager(theDatabaseFile));
+		super(ui,new LibrisFileManager(getDatabaseAuxDirectory(theDatabaseFile, DATABASE_AUX_DIRECTORY_NAME)));
 		myDatabaseFile = theDatabaseFile;
-		indexMgr = new IndexManager<DatabaseRecord>(this, fileMgr);
 		databaseMetadata = new LibrisDatabaseMetadata(this);
 		isModified = false;
 		dbOpen = false;
 		this.readOnly = readOnly;
 		mySchema = schem;
-		modifiedRecords = readOnly? new EmptyRecordList<>(): new ModifiedRecordList<DatabaseRecord>();			
 		groupMgr = new GroupManager<DatabaseRecord>(this);
 		documentRepository = null;
-	}
-
-	public static LibrisFileManager createDatabaseFileManager(File theDatabaseFile) throws DatabaseException {
-		return new LibrisFileManager(getDatabaseAuxDirectory(theDatabaseFile, DATABASE_AUX_DIRECTORY_NAME));
 	}
 
 	public void openDatabase() throws LibrisException {
@@ -119,20 +116,20 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		} else {
 			FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.PROPERTIES_FILENAME);
 			synchronized (propsMgr) {
+				FileInputStream ipFile = null;
 				try {
-					FileInputStream ipFile = propsMgr.getIpStream();
-					LibrisException exc = databaseMetadata.readProperties(ipFile);
-					if (null != exc) {
-						propsMgr.delete();
-						throw new DatabaseException("Exception reading properties file"+propsMgr.getPath(), exc); //$NON-NLS-1$
-					}
-					propsMgr.releaseIpStream(ipFile);
-				} catch (IOException e) {
+					ipFile = propsMgr.getIpStream();
+					databaseMetadata.readProperties(ipFile);
+				} catch (IOException | LibrisException e) {
+					propsMgr.delete();
 					throw new DatabaseException("Exception reading properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
+				} finally {
+					try {
+						propsMgr.releaseIpStream(ipFile);
+					} catch (IOException e) { /* empty */ }					
 				}
 			}
 			indexMgr.open(readOnly);
-			setRecordsAccessible(true);
 			if (!databaseMetadata.isMetadataOkay()) {
 				throw new DatabaseException("Error in metadata");
 			}
@@ -260,8 +257,11 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	}
 
 	boolean buildDatabase(LibrisIndexConfiguration config) throws LibrisException {
-		fileMgr.createAuxFiles(true);
-		if (reserveDatabase()) {
+		boolean result = true;
+		initialize();
+		if (!reserveDatabase()) {
+			result = false;
+		} else {
 			loadDatabaseInfo(config.isLoadMetadata());
 			mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 			final File databaseFile = getDatabaseFile();
@@ -291,10 +291,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				throw new DatabaseException(msg); //$NON-NLS-1$
 			}
 			freeDatabase();
-			return true;
-		} else {
-			return false;
 		}
+		return result;
 	}
 
 	public String getElementTag() {
@@ -607,9 +605,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return mySchema;
 	}
 
-	private void setRecordsAccessible(boolean accessible) {
-	}
-
 	@Override
 	public LibrisAttributes getAttributes() {
 		return xmlAttributes;
@@ -721,6 +716,11 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return xmlAttributes.isLocked();
 	}
 	
+	public boolean isFork() {
+		DatabaseInstance instanceInfo = databaseMetadata.getInstanceInfo();
+		return (null != instanceInfo);
+	}
+
 	public boolean hasDocumentRepository() {
 		return databaseMetadata.hasDocumentRepository();
 	}
@@ -794,11 +794,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	}
 
-	public boolean isFork() {
-		DatabaseInstance instanceInfo = databaseMetadata.getInstanceInfo();
-		return (null != instanceInfo);
-	}
-
 	public GroupManager<DatabaseRecord> getGroupMgr() {
 		return groupMgr;
 	}
@@ -807,7 +802,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return indexMgr.getNamedRecordIndex();
 	}
 
-	public RecordTemplate getMainRecordTemplate() {
+	@Override
+	public RecordFactory<DatabaseRecord> getRecordFactory() {
 		return mainRecordTemplate;
 	}
 
@@ -878,13 +874,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return documentRepository;
 	}
 	
+	@Deprecated
 	public void setDocumentRepository(Repository documentRepository) {
 		this.documentRepository = documentRepository;
 		databaseMetadata.hasDocumentRepository(true);
-	}
-	@Override
-	public RecordFactory<DatabaseRecord> getRecordFactory() {
-		return getMainRecordTemplate();
 	}
 	
 }

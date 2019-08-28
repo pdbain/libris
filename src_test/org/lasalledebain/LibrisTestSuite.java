@@ -20,6 +20,7 @@ import org.lasalledebain.libris.ui.ImportTests;
 import org.lasalledebain.libris.ui.RecordEditTests;
 import org.lasalledebain.recordimport.CsvImportTest;
 import org.lasalledebain.recordimport.TestPDF;
+import org.lasalledebain.repository.ArtifactTest;
 import org.lasalledebain.repository.RepositoryTest;
 
 import junit.framework.Test;
@@ -31,6 +32,7 @@ public class LibrisTestSuite {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.lasalledebain");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(ArtifactTest.class);
 		suite.addTestSuite(TestRecordFilter.class);
 		suite.addTestSuite(TermcountHashfileTests.class);
 		suite.addTestSuite(TermCountEntryBucketTest.class);

@@ -280,6 +280,9 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 				int fieldNum = dbSchema.getFieldNum(f.getFieldId());
 				FieldType ft = f.getType();
 				for (FieldValue fv: f.getFieldValues()) { // FIXME NPE here
+					if (fv.isEmpty() ) {
+						continue;
+					}
 					int oldValueEnd = fieldValues.size();
 					indexStream.writeShort(fieldNum); 
 					switch (ft) {
@@ -309,8 +312,8 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 					case T_FIELD_STRING:
 					case T_FIELD_TEXT:
 						try {
-							indexStream.writeInt(oldValueEnd);
 							final String valueString = fv.getValueAsString();
+							indexStream.writeInt(oldValueEnd);
 							valuesStream.writeUTF(valueString);
 						} catch (UTFDataFormatException e) {
 							throw new DatabaseException("UTF format exception in "+getRecordIdString(recData)+" field "+fieldNum);

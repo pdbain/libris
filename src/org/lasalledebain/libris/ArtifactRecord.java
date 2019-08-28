@@ -32,12 +32,6 @@ public class ArtifactRecord extends Record {
 	}
 
 	@Override
-	public void setName(String name) throws InputException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void offsetIds(int baseId, int idAdjustment) throws InputException {
 		id += idAdjustment;
 
@@ -71,7 +65,7 @@ public class ArtifactRecord extends Record {
 			}
 		}
 	}
-
+	
 	@Override
 	public void setField(int fieldNum, Field value) throws DatabaseException {
 		if (null != value) {
@@ -99,7 +93,8 @@ public class ArtifactRecord extends Record {
 
 	private void checkFieldIsNull(int fieldNum) throws InputException {
 		if (null != recordFields[fieldNum]) {
-			throw new InputException("Multiple field values not permitted in this field");
+			String fieldId = mySchema.getFieldId(fieldNum);
+			throw new InputException("Multiple field values not permitted in field " + fieldId);
 		}
 	}
 
@@ -248,7 +243,7 @@ public class ArtifactRecord extends Record {
 
 	@Override
 	public boolean hasAffiliations() {
-		return (null != affiliations) && (!affiliations.isEmpty());
+		return (null != affiliations);
 	}
 
 	@Override
@@ -273,7 +268,7 @@ public class ArtifactRecord extends Record {
 	public int[] getAffiliates(int groupNum) throws InputException {
 		checkGroupNum(groupNum);
 		if (null == affiliations) {
-			return null;
+			return GroupMember.getDummyAffiliates();
 		} else {
 			return affiliations.getAffiliations();
 		}

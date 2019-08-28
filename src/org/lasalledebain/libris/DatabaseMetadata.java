@@ -1,17 +1,22 @@
 package org.lasalledebain.libris;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Properties;
+import java.util.logging.Level;
 
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class GenericDatabaseMetadata implements LibrisXMLConstants {
+public class DatabaseMetadata implements LibrisXMLConstants {
 
 	protected int lastRecordId;
+	private int modifiedRecords;
 	private Date databaseDate;
 	protected boolean lastRecOkay;
 	protected int signatureLevels;
@@ -21,7 +26,36 @@ public abstract class GenericDatabaseMetadata implements LibrisXMLConstants {
 	/**
 	 * Dynamic attributes of the database
 	 */
-	protected Properties usageProperties;
+	protected final Properties usageProperties;
+	
+	public DatabaseMetadata() {
+		usageProperties = new Properties();
+	}
+
+	public void readProperties(FileInputStream ipFile) throws IOException, DatabaseException {
+		usageProperties.load(ipFile);
+		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_OPENED, LibrisMetadata.getCurrentDateAndTimeString());
+		String recordIdString = usageProperties.getProperty(LibrisConstants.PROPERTY_LAST_RECORD_ID);
+		String recCount = usageProperties.getProperty(LibrisConstants.PROPERTY_RECORD_COUNT);
+		if (null != recCount) try {
+			savedRecords = Integer.parseInt(recCount);
+		} catch (NumberFormatException exc) {
+			LibrisDatabase.log(Level.WARNING, "Error reading "+LibrisConstants.PROPERTY_RECORD_COUNT+" value = "+recCount, exc);
+			savedRecords = 0;
+		}
+		if ((null != recordIdString) && !recordIdString.isEmpty()) {
+			lastRecordId = RecordId.toId(recordIdString);
+			lastRecOkay = true;
+		} else {
+			lastRecordId = RecordId.NULL_RECORD_ID;
+		}
+		String sigLevelsString = usageProperties.getProperty(LibrisConstants.PROPERTY_SIGNATURE_LEVELS);
+		if (!Objects.isNull(sigLevelsString)) {
+			signatureLevels = Integer.parseInt(sigLevelsString);
+		} else {
+			signatureLevels = 1;
+		}
+	}
 
 	public void saveProperties(FileOutputStream propertiesFile) throws IOException {
 		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_SAVED, getCurrentDateAndTimeString());
@@ -48,6 +82,10 @@ public abstract class GenericDatabaseMetadata implements LibrisXMLConstants {
 		return new Date();
 	}
 
+	public boolean isMetadataOkay() {
+		return lastRecOkay;
+	}
+
 	public static String formatDateAndTime(Date theDate) {
 		return dateAndTimeFormatter.format(theDate);
 	}
@@ -65,6 +103,17 @@ public abstract class GenericDatabaseMetadata implements LibrisXMLConstants {
 			lastRecordId = recId;
 		}
 		lastRecOkay = true;
+	}
+
+	public int getModifiedRecords() {
+		return modifiedRecords;
+	}
+
+	public void setModifiedRecords(int modifiedRecords) {
+		this.modifiedRecords = modifiedRecords;
+	}
+	public void adjustModifiedRecords(int numAdded) {
+		this.modifiedRecords += numAdded;
 	}
 
 	public synchronized int newRecordId() {

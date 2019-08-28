@@ -1,5 +1,6 @@
 package org.lasalledebain.libris;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
@@ -30,9 +31,19 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected boolean isModified;
 	protected final LibrisFileManager fileMgr;
 
-	public GenericDatabase(LibrisUi theUi, LibrisFileManager theFileManager) {
+	public GenericDatabase(LibrisUi theUi, LibrisFileManager theFileManager) throws DatabaseException {
 		ui = theUi;
 		fileMgr = theFileManager;
+		indexMgr = new IndexManager<RecordType>(this, fileMgr);
+		modifiedRecords = readOnly? new EmptyRecordList<>(): new ModifiedRecordList<RecordType>();			
+	}
+	
+	public void initialize() throws LibrisException {
+		fileMgr.createAuxFiles(true);		
+		DatabaseMetadata metatada = getMetadata();
+		metatada.setLastRecordId(0);
+		metatada.setSavedRecords(0);
+		saveMetadata();
 	}
 
 	protected void buildIndexes(IndexConfiguration config, Records<RecordType> recs, ElementManager recordsMgr)
@@ -40,6 +51,30 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		recs.fromXml(recordsMgr);
 		indexMgr.buildIndexes(config, recs);
 		save();
+	}
+	
+	public void openDatabase() throws LibrisException {
+		DatabaseMetadata metadata = getMetadata();
+		FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.PROPERTIES_FILENAME);
+		synchronized (propsMgr) {
+			FileInputStream ipFile = null;
+			try {
+				ipFile = propsMgr.getIpStream();
+				metadata.readProperties(ipFile);
+			} catch (IOException | LibrisException e) {
+				propsMgr.delete();
+				throw new DatabaseException("Exception reading properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
+			} finally {
+				try {
+					propsMgr.releaseIpStream(ipFile);
+				} catch (IOException e) { /* empty */ }					
+			}
+		}
+		indexMgr.open(readOnly);
+		if (!metadata.isMetadataOkay()) {
+			throw new DatabaseException("Error in metadata");
+		}
+		makeDatabaseRecords();
 	}
 
 	public void save()  {
@@ -79,6 +114,14 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public abstract Schema getSchema();
 
+	public abstract DatabaseMetadata getMetadata();
+
+	public LibrisUi getUi() {
+		return ui;
+	}
+
+	public abstract RecordFactory<RecordType> getRecordFactory();
+
 	public LibrisFileManager getFileMgr() {
 		return fileMgr;
 	}
@@ -94,6 +137,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return databaseRecords;
 	}
 	
+	public NamedRecordList<RecordType> getNamedRecords() {
+		NamedRecordList<RecordType> l = new NamedRecordList<RecordType>(this);
+		return l;
+	}
+
 	public synchronized ModifiedRecordList<RecordType> getModifiedRecords() {
 		return modifiedRecords;
 	}
@@ -102,14 +150,17 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return indexMgr.getRecordPositions();
 	}
 	
-	public abstract LibrisJournalFileManager<RecordType> getJournalFileMgr() throws LibrisException;
+	public LibrisJournalFileManager<RecordType> getJournalFileMgr() throws LibrisException {
+		if (null == journalFile) {
+			journalFile = new LibrisJournalFileManager<RecordType>(this, fileMgr.getJournalFileMgr(), getRecordFactory());
+		}
+		return journalFile;
+	}
 	
 	public int getLastRecordId() {
 		return getMetadata().lastRecordId;
 	}
 	
-	public abstract GenericDatabaseMetadata getMetadata();
-
 	public LibrisRecordsFileManager<RecordType> getRecordsFileMgr() throws LibrisException {
 		return indexMgr.getRecordsFileMgr();
 	}
@@ -118,22 +169,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return getRecordsFileMgr();
 	}
 	
-	public LibrisUi getUi() {
-		return ui;
+	public int newRecordId() {
+		return getMetadata().newRecordId();
 	}
 
-	public boolean isReadOnly() {
-		return readOnly;
-	}
-
-	public boolean isIndexed() {
-		return indexMgr.isIndexed();
-	}
-
-	public boolean isRecordReadOnly(int recordId) {
-		
-		return isReadOnly();
-	}
 	public abstract  RecordType newRecord() throws InputException;
 
 	public abstract int putRecord(RecordType rec) throws LibrisException;
@@ -177,25 +216,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return (null == rec) ? null: rec.getName();
 	}
 	
-	public NamedRecordList<RecordType> getNamedRecords() {
-		NamedRecordList<RecordType> l = new NamedRecordList<RecordType>(this);
-		return l;
-	}
-
 	public SortedKeyValueFileManager<KeyIntegerTuple> getNamedRecordIndex() {
 		return indexMgr.getNamedRecordIndex();
 	}
 
-	public void alert(String msg, Exception e) {
-		getUi().alert(msg, e);
-	}
-	public void alert(String msg) {
-		getUi().alert(msg);
-	}
-
-	public abstract RecordFactory<RecordType> getRecordFactory();
-
-	protected int genericPutRecord(LibrisMetadata metaData, RecordType rec)
+	protected int genericPutRecord(DatabaseMetadata metaData, RecordType rec)
 			throws DatabaseException, LibrisException, InputException, UserErrorException {
 				int id = rec.getRecordId();
 				if (RecordId.isNull(id)) {
@@ -221,12 +246,21 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 				return id;
 			}
 
-	public int newRecordId() {
-		return getMetadata().newRecordId();
-	}
-
 	public int getSavedRecordCount() {
 		return getMetadata().getSavedRecords();
+	}
+
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public boolean isIndexed() {
+		return indexMgr.isIndexed();
+	}
+
+	public boolean isRecordReadOnly(int recordId) {
+		
+		return isReadOnly();
 	}
 
 	public boolean isModified() {
@@ -235,6 +269,14 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public void setModified(boolean isModified) {
 		this.isModified = isModified;
+	}
+
+	public void alert(String msg, Exception e) {
+		getUi().alert(msg, e);
+	}
+
+	public void alert(String msg) {
+		getUi().alert(msg);
 	}
 
 }

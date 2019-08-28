@@ -322,18 +322,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	}
 	
 	@Override
-	public void setName(String newName) throws InputException {
-		if ((null != newName) && newName.isEmpty()) {
-			this.name = null;
-		} else {
-			if (!validateRecordName(newName)) {
-				throw new InputException("Record name "+newName+" is illegal");
-			}
-			this.name = newName;
-		}
-	}
-
-	@Override
 	public boolean valuesEqual(Record comparand) {
 		if (!getAttributes().equals(comparand.getAttributes())) {
 			return false;

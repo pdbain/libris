@@ -72,7 +72,17 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 		return name;
 	}
 
-	public abstract void setName(String name) throws InputException;
+	public void setName(String newName) throws InputException {
+		if ((null != newName) && newName.isEmpty()) {
+			this.name = null;
+		} else {
+			if (!validateRecordName(newName)) {
+				throw new InputException("Record name "+newName+" is illegal");
+			}
+			this.name = newName;
+		}
+	}
+
 	/**
 	 * TODO Add idAdjustment to the recordId.  Also add idAdjustment to all references to other records
 	 * greater than baseId.

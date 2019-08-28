@@ -295,7 +295,6 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 
 	public LibrisRecordsFileManager<RecordType> getRecordsFileMgr() throws LibrisException {
 		if (null == recordsFile) {
-		//	recordsFile = new LibrisRecordsFileManager<RecordType>(database, database.isReadOnly(), database.getRecordFactory(), database.getSchema(), fileMgr);
 			recordsFile = new LibrisRecordsFileManager<RecordType>(database, 
 					database.readOnly, 
 					database.getSchema(), 

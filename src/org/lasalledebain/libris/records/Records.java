@@ -7,7 +7,7 @@ import java.util.logging.Level;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.GenericDatabaseMetadata;
+import org.lasalledebain.libris.DatabaseMetadata;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
@@ -74,7 +74,7 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 	@Override
 	public void fromXml(ElementManager mgr) throws LibrisException {
 		try {
-			GenericDatabaseMetadata metadata = myDatabase.getMetadata();
+			DatabaseMetadata metadata = myDatabase.getMetadata();
 			int lastId = 0;
 			int numAdded = 0;
 			metadata.setSavedRecords(0);

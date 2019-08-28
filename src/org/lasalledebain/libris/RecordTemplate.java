@@ -95,7 +95,7 @@ public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 	}
 
 	@Override
-	public DatabaseRecord makeRecord(boolean editable) throws FieldDataException {
+	public DatabaseRecord makeRecord(boolean editable) {
 		DatabaseRecord rec = makeRecord();
 		rec.setEditable(editable);
 		return rec;

@@ -10,6 +10,7 @@ public class ArtifactParameters {
 	String keywords;
 	String doi;
 	String recordParentName;
+	int parentId;
 	String recordName;
 	URI source;
 	public ArtifactParameters(URI source) {
@@ -18,6 +19,7 @@ public class ArtifactParameters {
 		recordName = "";
 		recordParentName = "";
 		date = LibrisMetadata.getCurrentDateAndTimeString();
+		parentId = RecordId.NULL_RECORD_ID;
 	}
 	public String getSourceString() {
 		return source.toASCIIString();
@@ -42,6 +44,9 @@ public class ArtifactParameters {
 	}
 	public String getRecordParentName() {
 		return recordParentName;
+	}
+	public int getParentId() {
+		return parentId;
 	}
 	public String getRecordName() {
 		return recordName;
@@ -85,6 +90,7 @@ public class ArtifactParameters {
 					&& other.source.equals(source)
 					&& Objects.equals(other.recordName, recordName)
 					&& Objects.equals(other.recordParentName, recordParentName)
+					&& Objects.equals(other.parentId, parentId)
 					&& Objects.equals(other.title, title);
 		} else return false;
 	}
@@ -93,15 +99,48 @@ public class ArtifactParameters {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder buff = new StringBuilder(100);
-		buff.append("comments=\""); buff.append(comments); buff.append("\",");
-		buff.append("date=\""); buff.append(date); buff.append("\",");
-		buff.append("doi=\""); buff.append(doi); buff.append("\",");
-		buff.append("keywords=\""); buff.append(keywords); buff.append("\",");
-		buff.append("recordName=\""); buff.append(recordName); buff.append("\",");
-		buff.append("recordParentName=\""); buff.append(recordParentName); buff.append("\",");
-		buff.append("source=\""); buff.append(getSourceString()); buff.append("\",");
-		buff.append("title=\""); buff.append(title); buff.append("\"");
+		BufferBuilder buff = new BufferBuilder();
+		buff.append("comments", comments);
+		buff.append("date", date);
+		buff.append("doi", doi);
+		buff.append("keywords", keywords);
+		buff.append("recordName", recordName);
+		if (parentId != RecordId.NULL_RECORD_ID) {
+			buff.append("parentId", Integer.toString(parentId));
+		}
+		buff.append("recordParentName", recordParentName);
+		buff.append("source", getSourceString());
+		buff.append("title", title);
 		return buff.toString();
+	}
+	static class BufferBuilder {
+		private boolean first;
+		private StringBuilder buff;
+
+		BufferBuilder() {
+			first = true;
+			 buff = new StringBuilder(100);
+		}
+		
+		void append(String key, String value) {
+			if (Objects.nonNull(value) && !value.isEmpty()) {
+				if (!first) {
+					buff.append(", ");
+				}
+				first = false;
+				buff.append(key);
+				buff.append("=\""); 
+				buff.append(value);
+				buff.append("\"");		
+			}
+		}
+
+		@Override
+		public String toString() {
+			return buff.toString();
+		}
+	}
+	public void setParentId(int parentId) {
+		this.parentId = parentId;
 	}
 }

@@ -13,7 +13,7 @@ import javax.xml.stream.FactoryConfigurationError;
 import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.GenericDatabaseMetadata;
+import org.lasalledebain.libris.DatabaseMetadata;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
