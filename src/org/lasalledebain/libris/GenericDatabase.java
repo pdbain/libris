@@ -3,7 +3,10 @@ package org.lasalledebain.libris;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Objects;
+import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -19,6 +22,7 @@ import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
+import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
 public abstract class GenericDatabase<RecordType extends Record> implements XMLElement {
 	protected GroupManager<RecordType> groupMgr;
@@ -30,6 +34,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected boolean readOnly;
 	protected boolean isModified;
 	protected final LibrisFileManager fileMgr;
+	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 
 	public GenericDatabase(LibrisUi theUi, LibrisFileManager theFileManager) throws DatabaseException {
 		ui = theUi;
@@ -120,6 +125,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return ui;
 	}
 
+	public static LibrisXmlFactory getXmlFactory() {
+		return xmlFactory;
+	}
+	
 	public abstract RecordFactory<RecordType> getRecordFactory();
 
 	public LibrisFileManager getFileMgr() {

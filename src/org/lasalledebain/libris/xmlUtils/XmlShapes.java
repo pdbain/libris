@@ -21,13 +21,21 @@ public class XmlShapes implements LibrisXMLConstants {
 	public static final HashMap<String, ElementShape> xmlShapes = initializeXmlShapes();
 	public static final HashMap<String, ElementShape> importShapes = initializeImportShapes();
 	public enum  SHAPE_LIST {
-		DATABASE_SHAPES, IMPORTER_SHAPES
+		DATABASE_SHAPES, IMPORTER_SHAPES, ARTIFACTS_SHAPES
 	};
 	private HashMap<String, ElementShape> myShapes;
+
 	public XmlShapes(SHAPE_LIST shapeFamily) {
 		switch (shapeFamily) {
-		case DATABASE_SHAPES: myShapes = xmlShapes; break;
-		case IMPORTER_SHAPES: myShapes = importShapes; break;
+		case DATABASE_SHAPES:
+			myShapes = xmlShapes;
+			break;
+		case IMPORTER_SHAPES:
+			myShapes = importShapes;
+			break;
+		case ARTIFACTS_SHAPES:
+			myShapes = xmlShapes;
+			break;
 		}
 	}
 	private static String[] emptyList = new String[0];
@@ -40,6 +48,8 @@ public class XmlShapes implements LibrisXMLConstants {
 				new String[] {XML_DATABASE_SCHEMA_NAME_ATTR, XML_SCHEMA_VERSION_ATTR},
 				new String[][] {{XML_DATABASE_NAME_ATTR, "unknown"}, {XML_DATABASE_DATE_ATTR, ""},
 						{XML_DATABASE_SCHEMA_LOCATION_ATTR, ""}});
+		makeShape(shapes, XML_ARTIFACTS_TAG, new String[] {XML_RECORDS_TAG }, 
+				emptyRequiredAttributesList, emptyOptionalAttributesList);
 		makeShape(shapes, XML_METADATA_TAG, 
 				new String[] {XML_SCHEMA_TAG, XML_LAYOUTS_TAG}, emptyList, emptyListList);
 		makeShape(shapes, XML_INSTANCE_TAG, 

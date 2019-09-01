@@ -196,7 +196,7 @@ public class Utilities extends TestCase {
 		LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 		InputStreamReader xmlInput = new InputStreamReader(xmlInputStream);
 		try {
-			return xmlFactory.makeLibrisElementManager(xmlInput, 
+			return xmlFactory.makeElementManager(xmlInput, 
 					sourceFile, elementNameString, new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -208,7 +208,7 @@ public class Utilities extends TestCase {
 			Reader xmlSourceReader, String sourceFile, String elementNameString) {
 		LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 		try {
-			return xmlFactory.makeLibrisElementManager(xmlSourceReader, 
+			return xmlFactory.makeElementManager(xmlSourceReader, 
 					sourceFile, elementNameString, new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
 		} catch (Exception e) {
 			e.printStackTrace();

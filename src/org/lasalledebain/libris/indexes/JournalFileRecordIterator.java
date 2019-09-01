@@ -29,7 +29,7 @@ class JournalFileRecordIterator<RecordType extends Record> implements Iterator<R
 		try {
 			fileMgr = theMgr;
 			ipStream = fileMgr.getIpStream();
-			dbMgr = xmlFactory.makeLibrisElementManager(new InputStreamReader(ipStream), 
+			dbMgr = xmlFactory.makeElementManager(new InputStreamReader(ipStream), 
 					fileMgr.getPath(), LibrisJournalFileManager.XML_LIBRIS_TAG, new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
 			dbMgr.parseOpenTag(); /* database */
 			recsMgr = dbMgr.nextElement();

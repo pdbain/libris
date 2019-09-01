@@ -27,7 +27,7 @@ public class FilteringRecordImporter<RecordType extends Record> extends RecordIm
 			fieldImporters = new ArrayList<FilteringFieldImporter>();
 			InputStreamReader xmlFileReader = new InputStreamReader(librisImportFileMgr.getIpStream());
 			String initialElementName = LibrisXMLConstants.XML_LIBRISIMPORT_TAG;
-			ElementManager mgr = fact.makeLibrisElementManager(xmlFileReader, 
+			ElementManager mgr = fact.makeElementManager(xmlFileReader, 
 					librisImportFileMgr.getPath(), initialElementName, new XmlShapes(SHAPE_LIST.IMPORTER_SHAPES));
 			mgr.parseOpenTag();
 			for (ElementManager fmgr: mgr) {

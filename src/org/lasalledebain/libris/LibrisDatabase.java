@@ -38,10 +38,9 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.GroupManager;
-import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
-import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
@@ -55,11 +54,8 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
-
-import jdk.internal.org.objectweb.asm.tree.IntInsnNode;
 
 public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements LibrisXMLConstants, LibrisConstants, XMLElement {
 	/**
@@ -68,7 +64,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	private File myDatabaseFile;
 	private Schema mySchema;
 	public  LibrisException rebuildException;
-	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 	protected Repository documentRepository;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisDatabaseMetadata databaseMetadata;
@@ -497,13 +492,18 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 * @throws FileNotFoundException
 	 * @throws SchemaException
 	 */
-	public ElementManager makeLibrisElementManager(FileInputStream fileStream, String filePath) throws InputException {
+	public static ElementManager makeLibrisElementManager(FileInputStream fileStream, String filePath) throws InputException {
+		String initialElementName = LibrisXMLConstants.XML_LIBRIS_TAG;
+		return makeDatabaseElementManager(fileStream, filePath, initialElementName);
+	}
+
+	public static ElementManager makeDatabaseElementManager(FileInputStream fileStream, String filePath,
+			String initialElementName) throws InputException {
 		try {
 			InputStreamReader xmlFileReader = new InputStreamReader(fileStream);
 			fileStream.getChannel().position(0);
-			String initialElementName = LibrisXMLConstants.XML_LIBRIS_TAG;
 			Reader rdr = xmlFileReader;
-			ElementManager mgr = makeLibrisElementManager(rdr, initialElementName, filePath);
+			ElementManager mgr = makeElementManager(rdr, initialElementName, filePath);
 			return mgr;
 		} catch (IOException e) {
 			String msg = "error opening "+filePath; //$NON-NLS-1$
@@ -518,9 +518,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 * @return
 	 * @throws InputException 
 	 */
-	public ElementManager makeLibrisElementManager(Reader reader, String initialElementName, String filePath) throws
+	// TODO pull up
+	public static ElementManager makeElementManager(Reader reader, String initialElementName, String filePath) throws
 	InputException {
-		return getXmlFactory().makeLibrisElementManager(reader, 
+		return getXmlFactory().makeElementManager(reader, 
 				filePath, initialElementName, new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
 	}
 
@@ -558,7 +559,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				}
 			}
 			metadataReader = new InputStreamReader(schemaFileMgr.getIpStream());
-			ElementManager librisMgr = makeLibrisElementManager(metadataReader, XML_LIBRIS_TAG, schemaFileMgr.getPath());
+			ElementManager librisMgr = makeElementManager(metadataReader, XML_LIBRIS_TAG, schemaFileMgr.getPath());
 			librisMgr.parseOpenTag();
 			metadataMgr = librisMgr.nextElement();
 			return metadataMgr;
@@ -621,10 +622,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public Layouts getLayouts() {
 		return databaseMetadata.getLayouts();
 	}
-	public static LibrisXmlFactory getXmlFactory() {
-		return xmlFactory;
-	}
-	
 	public void viewRecord(int recordId) {
 		try {
 			ui.displayRecord(recordId);
