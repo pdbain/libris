@@ -128,7 +128,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			if (!databaseMetadata.isMetadataOkay()) {
 				throw new DatabaseException("Error in metadata");
 			}
-			makeDatabaseRecords();
+			getDatabaseRecords();
 			if (hasDocumentRepository()) {
 				// TODO open repo documentRepository = Repository.open(getUi(), new File(xmlAttributes.getRepositoryLocation()));
 			}
@@ -260,7 +260,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			loadDatabaseInfo(config.isLoadMetadata());
 			mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 			final File databaseFile = getDatabaseFile();
-			Records<DatabaseRecord> recs = makeDatabaseRecords();
+			Records<DatabaseRecord> recs = getDatabaseRecords();
 			try {
 				ElementManager librisMgr = this.makeLibrisElementManager(databaseFile);
 				librisMgr.parseOpenTag();
@@ -277,7 +277,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					nextElement = librisMgr.getNextId();	
 				}
 				ElementManager recordsMgr = librisMgr.nextElement();
-				buildIndexes(config, recs, recordsMgr);
+				recs.fromXml(recordsMgr);
+				buildIndexes(config);
 				librisMgr.closeFile();
 				this.closeDatabaseSource();
 			} catch (FactoryConfigurationError | FileNotFoundException e) {
@@ -473,7 +474,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 						return false;
 					}
 				}
-			} catch (InputException e) {
+			} catch (LibrisException e) {
 				// TODO throw error
 				log(Level.SEVERE, "error reading records", e); //$NON-NLS-1$
 				return false;
@@ -671,7 +672,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return id;
 	}
 
-	public void saveRecords(Iterable <Record> recList) throws DatabaseException, OutputException, InputException {
+	public void saveRecords(Iterable <Record> recList) throws LibrisException {
 
 		if (isIndexed()) {
 			saveMetadata();

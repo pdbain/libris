@@ -8,15 +8,14 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.ExactKeywordList;
@@ -25,7 +24,7 @@ import org.lasalledebain.libris.indexes.RecordKeywords;
 import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
-import static org.lasalledebain.Utilities.info;
+import junit.framework.TestCase;
 
 public class RecordTests extends TestCase {
 	private static final String FIELDNAME = "f1";
@@ -35,7 +34,7 @@ public class RecordTests extends TestCase {
 		try {
 			MockSchema dbSchema = new MockSchema();
 			dbSchema.addField(booleanTemplate);
-			RecordFactory rt = RecordTemplate.templateFactory(dbSchema, null);
+			RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(dbSchema, null);
 			Record ri = rt.makeRecord(false);
 			Field f = ri.getField(FIELDNAME);
 			assertNull("non-default field not null", f);
@@ -54,7 +53,7 @@ public class RecordTests extends TestCase {
 			String fieldNames[] = {"bool", "int", "string"};
 			FieldType fts[] = {FieldType.T_FIELD_BOOLEAN, FieldType.T_FIELD_INTEGER, FieldType.T_FIELD_STRING};
 
-			RecordFactory rt = Utilities.makeRecordTemplate(fieldNames, fts);
+			RecordFactory<DatabaseRecord> rt = Utilities.makeRecordTemplate(fieldNames, fts);
 			Record r1 = rt.makeRecord(false);
 			Record r2 = rt.makeRecord(false);
 			String r1Data[] = {"true", "1", "foo"};
@@ -88,7 +87,7 @@ public class RecordTests extends TestCase {
 			String fieldNames[] = {"bool", "int", "string"};
 			FieldType fts[] = {FieldType.T_FIELD_BOOLEAN, FieldType.T_FIELD_INTEGER, FieldType.T_FIELD_STRING};
 
-			RecordFactory rt = Utilities.makeRecordTemplate(fieldNames, fts);
+			RecordFactory<DatabaseRecord> rt = Utilities.makeRecordTemplate(fieldNames, fts);
 			Record r1 = rt.makeRecord(true);
 			boolean excThrown = false;
 			String r1Data[] = {"1", "foo", "true"};

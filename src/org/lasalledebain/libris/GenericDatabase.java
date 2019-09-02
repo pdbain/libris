@@ -51,10 +51,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		saveMetadata();
 	}
 
-	protected void buildIndexes(IndexConfiguration config, Records<RecordType> recs, ElementManager recordsMgr)
+	public void buildIndexes(IndexConfiguration config)
 			throws LibrisException {
-		recs.fromXml(recordsMgr);
-		indexMgr.buildIndexes(config, recs);
+		 Records<RecordType> myRecs = getDatabaseRecords();
+		indexMgr.buildIndexes(config, myRecs);
 		save();
 	}
 	
@@ -79,7 +79,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		if (!metadata.isMetadataOkay()) {
 			throw new DatabaseException("Error in metadata");
 		}
-		makeDatabaseRecords();
+		getDatabaseRecords();
 	}
 
 	public void save()  {
@@ -96,7 +96,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 				throw new DatabaseException(e);
 			}
 			setModified(false);
-		} catch (InputException | DatabaseException e) {
+		} catch (LibrisException e) {
 			ui.alert("Exception while saving record", e); //$NON-NLS-1$
 		}
 	}
@@ -135,11 +135,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return fileMgr;
 	}
 
-	public Records<RecordType> getDatabaseRecords() {
-		return databaseRecords;
-	}
-
-	protected Records<RecordType> makeDatabaseRecords() throws LibrisException {
+	public Records<RecordType> getDatabaseRecords() throws LibrisException {
 		if (null == databaseRecords) {
 			databaseRecords = new Records<RecordType>(this, fileMgr);
 		}

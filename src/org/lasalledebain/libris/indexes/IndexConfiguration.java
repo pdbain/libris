@@ -8,16 +8,18 @@ import org.lasalledebain.libris.util.Reporter;
 
 public class IndexConfiguration {
 
-	public static String SIGNATURE_LEVELS = "signature.levels";
-	public static String TERMCOUNT_BUCKETS = "termcount.buckets";
 	protected final LibrisUi myUi;
 	protected final Reporter indexingReporter;
 	protected final Properties config;
+	private Optional<Integer> signatureLevels;
+	private Optional<Integer> termcountBuckets;
 
 	public IndexConfiguration(LibrisUi theUi) {
 		myUi = theUi;
 		indexingReporter = new Reporter();
 		config = new Properties();
+		signatureLevels = Optional.empty();
+		termcountBuckets = Optional.empty();
 	}
 
 	public LibrisUi getDatabaseUi() {
@@ -28,17 +30,20 @@ public class IndexConfiguration {
 		return indexingReporter;
 	}
 
-	public Optional<Integer> getAttribute(final String attribute) {
-		if (config.containsKey(attribute)) {
-			final Optional<Integer> value = Optional.of(Integer.parseInt(config.getProperty(attribute)));
-			return value;
-		} else {
-			return Optional.empty();
-		}
+	public Optional<Integer> getSignatureLevels() {
+		return signatureLevels;
 	}
 
-	public void setAttribute(String attributeName, int value) {
-		config.setProperty(attributeName, Integer.toString(value));
+	public void setSignatureLevels(int signatureLevels) {
+		this.signatureLevels = Optional.of(signatureLevels);
+	}
+
+	public Optional<Integer> getTermcountBuckets() {
+		return termcountBuckets;
+	}
+
+	public void setTermcountBuckets(int termcountBuckets) {
+		this.termcountBuckets = Optional.of(termcountBuckets);
 	}
 
 }

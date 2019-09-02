@@ -11,6 +11,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import junit.framework.TestCase;
 
 import static org.lasalledebain.Utilities.trace;
+import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;
 
 public class TestFileRecordMap extends TestCase {
 	File workingDirectory;
@@ -19,7 +20,6 @@ public class TestFileRecordMap extends TestCase {
 	private static final int DEFAULT_NUM_ENTRIES = Integer.getInteger("libris.test.index.numentries", 25000);
 	private static final long RANDOM_SEED=20111001;
 	LibrisFileManager fileMgr;
-	boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
 	@Override
 	protected void setUp() throws Exception {
 		

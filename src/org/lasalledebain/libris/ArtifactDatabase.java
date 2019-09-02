@@ -16,7 +16,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
-import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -46,7 +45,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		mgr.parseOpenTag();
 		String nextId = mgr.getNextId();
 		if (LibrisXMLConstants.XML_RECORDS_TAG == nextId) {
-			Records<ArtifactRecord> recs = makeDatabaseRecords();
+			Records<ArtifactRecord> recs = getDatabaseRecords();
 			ElementManager recsMgr = mgr.nextElement();
 			recs.fromXml(recsMgr);
 		}
@@ -55,7 +54,6 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	@Override
 	public void toXml(ElementWriter outWriter) throws LibrisException {
 		LibrisAttributes recordsAttrs = new LibrisAttributes();
-		Iterable<ArtifactRecord> recordSource = getRecordReader();
 		outWriter.writeStartElement(getElementTag(), recordsAttrs, false);
 		databaseRecords.toXml(outWriter);
 		outWriter.writeEndElement(); /* records */

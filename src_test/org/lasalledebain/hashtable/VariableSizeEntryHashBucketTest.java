@@ -26,7 +26,6 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 	private File testFile;
 	private MockVariableSizeEntryBucket buck;
 	private RandomAccessFile backingStore;
-	boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
 	FileSpaceManager mgr;
 	private MockOverflowManager oversizeEntryManager;
 	private int oversizeThreshold;

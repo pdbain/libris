@@ -113,7 +113,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 				affiliateTempFiles[g].setDeleteOnExit();
 			}
 
-			termCounts = new TermCountIndex(termCountFileMgr, config.getAttribute(IndexConfiguration.TERMCOUNT_BUCKETS), false);
+			termCounts = new TermCountIndex(termCountFileMgr, config.getTermcountBuckets(), false);
 
 			RecordKeywords keywordList = RecordKeywords.createRecordKeywords(true, false);
 			IndexField[] ixFields = indexFields;

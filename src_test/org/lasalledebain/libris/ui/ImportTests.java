@@ -12,11 +12,11 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
+import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;;
 
 public class ImportTests extends TestCase {
 	private File testDatabaseFileCopy;
 	private LibrisDatabase db;
-	boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
 	private File workingDirectory;
 	
 	public void setUp() {
