@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
@@ -108,6 +109,11 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	public IndexField[] getIndexFields(String indexId) {
 		final IndexDef index = myIndexDefs.getIndex(indexId);
 		return Objects.isNull(index)? emptyIndexFieldList: index.getFieldList();
+	}
+
+	public void setIndexFields(String indexId, int[] theFields) {
+		final IndexDef index = new IndexDef(this, indexId, theFields);
+		myIndexDefs.addIndexDef(index);
 	}
 
 	public String[] getFieldTitles() {

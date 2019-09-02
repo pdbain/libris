@@ -20,6 +20,12 @@ public class IndexField extends EmptyXmlElement {
 		databaseSchema = schem;
 	}
 
+	public IndexField(Schema theSchema, int theFieldNum) {
+		super();
+		databaseSchema = theSchema;
+		fieldNum = theFieldNum;
+	}
+
 	public static String getXmlTag() {
 		return XML_INDEXFIELD_TAG;
 	}

@@ -844,22 +844,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return journalFile;
 	}
 
-	public FilteredRecordList<DatabaseRecord> makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
-			int searchList[], Collection<String> searchTerms) throws UserErrorException, IOException {
-		RecordList<DatabaseRecord> recList = new SignatureFilteredRecordList<DatabaseRecord>(this, searchTerms);
-		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, searchList, searchTerms);
-		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(recList, filter);
-		return filteredList;
-	}
-	
-	public FilteredRecordList<DatabaseRecord> makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
-			int searchList[], String searchTerm) throws UserErrorException, IOException {
-		Collection<String> searchTerms = Collections.singleton(searchTerm);
-		RecordList<DatabaseRecord> recList = new SignatureFilteredRecordList<DatabaseRecord>(this, searchTerms);
-		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, searchList, searchTerms);
-		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(recList, filter);
-		return filteredList;
-	}
 	public void incrementTermCount(String term) {
 		indexMgr.incrementTermCount(term);
 	}

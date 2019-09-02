@@ -191,6 +191,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		for (int i = 1; i < numFields; ++i) {
 			Repository.templateList[i] = theSchema.getFieldTemplate(i);
 		}
+		theSchema.setIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS, new int[] {Repository.TITLE_FIELD, Repository.KEYWORDS_FIELD});
 		return theSchema;
 	}
 	@Override

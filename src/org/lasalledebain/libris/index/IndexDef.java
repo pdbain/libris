@@ -24,6 +24,15 @@ public class IndexDef implements XMLElement {
 		databaseSchema = schem;
 	}
 
+	public IndexDef(Schema schem, String theId, int[] theFields) {
+		databaseSchema = schem;
+		indexId = theId;
+		fieldList = new IndexField[theFields.length];
+		for (int i = 0; i < theFields.length; ++i) {
+			fieldList[i] = new IndexField(databaseSchema,theFields[i]);
+		}
+	}
+
 	@Override
 	public LibrisAttributes getAttributes() {
 		return new LibrisAttributes(new String[][]{{XML_INDEXDEF_ID_ATTR, indexId}});

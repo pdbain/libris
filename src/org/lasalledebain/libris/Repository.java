@@ -48,13 +48,13 @@ public class Repository extends Libris {
 	static final String ID_COMMENTS = "ID_comments";
 
 	GenericDatabase<DatabaseRecord> repoDatabase;
-	static int GROUP_FIELD;
-	static int TITLE_FIELD;
-	static int SOURCE_FIELD;
-	static int DOI_FIELD;
-	static int DATE_FIELD;
-	static int KEYWORDS_FIELD;
-	static int COMMENTS_FIELD;
+	public static int GROUP_FIELD;
+	public static int TITLE_FIELD;
+	public static int SOURCE_FIELD;
+	public static int DOI_FIELD;
+	public static int DATE_FIELD;
+	public static int KEYWORDS_FIELD;
+	public static int COMMENTS_FIELD;
 	static final int FANOUT = 100;
 
 	File root;

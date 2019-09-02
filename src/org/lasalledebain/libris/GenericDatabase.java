@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.logging.Level;
 
@@ -20,6 +22,8 @@ import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.RecordPositions;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.Records;
+import org.lasalledebain.libris.search.KeywordFilter;
+import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
@@ -145,6 +149,23 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	public NamedRecordList<RecordType> getNamedRecords() {
 		NamedRecordList<RecordType> l = new NamedRecordList<RecordType>(this);
 		return l;
+	}
+
+	public FilteredRecordList<RecordType> makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
+			int fieldList[], Collection<String> searchTerms) throws UserErrorException, IOException {
+		RecordList<RecordType> recList = new SignatureFilteredRecordList<RecordType>(this, searchTerms);
+		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, fieldList, searchTerms);
+		FilteredRecordList<RecordType> filteredList = new FilteredRecordList<RecordType>(recList, filter);
+		return filteredList;
+	}
+	
+	public FilteredRecordList<RecordType> makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
+			int fieldList[], String searchTerm) throws UserErrorException, IOException {
+		Collection<String> searchTerms = Collections.singleton(searchTerm);
+		RecordList<RecordType> recList = new SignatureFilteredRecordList<RecordType>(this, searchTerms);
+		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, fieldList, searchTerms);
+		FilteredRecordList<RecordType> filteredList = new FilteredRecordList<RecordType>(recList, filter);
+		return filteredList;
 	}
 
 	public synchronized ModifiedRecordList<RecordType> getModifiedRecords() {

@@ -27,17 +27,6 @@ public class IndexDefs implements XMLElement {
 		fromXml(mgr);
 	}
 
-	public void fromXml(Schema schem, ElementManager mgr) throws InputException {
-		mgr.parseOpenTag(getXmlTag());
-		while (mgr.hasNext()) {
-			ElementManager indexMgr = mgr.nextElement();
-			IndexDef def = new IndexDef(databaseSchema);
-			def.fromXml(indexMgr);
-			indexList.put(def.getId(), def);
-		}
-		mgr.parseClosingTag();
-	}
-
 	public static String getXmlTag() {
 		return XML_INDEXDEFS_TAG;
 	}
@@ -48,7 +37,19 @@ public class IndexDefs implements XMLElement {
 
 	@Override
 	public void fromXml(ElementManager mgr) throws InputException  {
-		fromXml(databaseSchema, mgr);
+		mgr.parseOpenTag(getXmlTag());
+		while (mgr.hasNext()) {
+			ElementManager indexMgr = mgr.nextElement();
+			IndexDef def = new IndexDef(databaseSchema);
+			IndexDef theDef = def;
+			theDef.fromXml(indexMgr);
+			addIndexDef(theDef);
+		}
+		mgr.parseClosingTag();
+	}
+
+	public void addIndexDef(IndexDef theDef) {
+		indexList.put(theDef.getId(), theDef);
 	}
 
 	@Override
