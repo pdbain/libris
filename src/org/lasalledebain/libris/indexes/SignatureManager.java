@@ -9,9 +9,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
-import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.util.StringUtils;
@@ -81,7 +81,7 @@ public class SignatureManager implements LibrisConstants {
 
 	private void initializeFiles() {
 		signatureFileManagers = new FileAccessManager[sigLevels];
-		LibrisFileManager fileMgr = database.getFileMgr();
+		FileManager fileMgr = database.getFileMgr();
 		for (int sigLevel = 0; sigLevel < sigLevels; ++sigLevel) {
 			final FileAccessManager sigFileMgr = fileMgr.getAuxiliaryFileMgr(SIGNATURE_FILENAME_ROOT+sigLevel);
 			signatureFileManagers[sigLevel] = sigFileMgr;
@@ -119,7 +119,7 @@ public class SignatureManager implements LibrisConstants {
 	}
 
 	public boolean isIndexed() {
-		LibrisFileManager fileMgr = database.getFileMgr();
+		FileManager fileMgr = database.getFileMgr();
 		return fileMgr.getAuxiliaryFileMgr(SIGNATURE_FILENAME_ROOT+0).exists();
 	}
 

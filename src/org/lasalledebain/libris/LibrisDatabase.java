@@ -15,8 +15,6 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -40,13 +38,10 @@ import org.lasalledebain.libris.indexes.AffiliateList;
 import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
-import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.records.XmlRecordsReader;
-import org.lasalledebain.libris.search.KeywordFilter;
-import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.ui.Messages;
@@ -71,6 +66,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	protected DatabaseAttributes xmlAttributes;
 	private boolean dbOpen;
 	private FileAccessManager databaseFileMgr;
+	private FileAccessManager schemaFileMgr;
 	
 	public LibrisDatabase(File databaseFile, boolean readOnly, LibrisUi ui) throws LibrisException  {
 		this(databaseFile, readOnly, ui, null);
@@ -534,16 +530,15 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	protected ElementManager makeMetadataMgr(String schemaName, String schemaLocation) throws InputException {
 		InputStreamReader metadataReader = null;
 		ElementManager metadataMgr = null;
-		FileAccessManager schemaFileMgr = fileMgr.getSchemaAccessMgr();
 		try {
 			if (null == schemaFileMgr) {
 				if (null == schemaLocation) {
 					File schemaFile = new File(schemaName+FILENAME_XML_FILES_SUFFIX);
 					try {
-						if (!fileMgr.setSchemaAccessMgr(schemaFile)) {
+						if (!setSchemaAccessMgr(fileMgr, schemaFile)) {
 							schemaFile = new File(getUi().SelectSchemaFile(schemaName));
 						}
-						fileMgr.setSchemaAccessMgr(schemaFile);
+						setSchemaAccessMgr(fileMgr, schemaFile);
 					} catch (DatabaseException e) {
 						throw new InputException(LibrisConstants.COULD_NOT_OPEN_SCHEMA_FILE+schemaFile.getPath(), e);
 					}
@@ -555,7 +550,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 						if (!schemaFile.isAbsolute()) {
 							schemaFile = new File(getDatabaseDirectoryPath(), metaPath);
 						}
-						fileMgr.setSchemaAccessMgr(schemaFile);
+						setSchemaAccessMgr(fileMgr, schemaFile);
 					}
 				}
 			}
@@ -567,6 +562,14 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		} catch (FileNotFoundException | DatabaseException | MalformedURLException e) {
 			throw new InputException(LibrisConstants.COULD_NOT_OPEN_SCHEMA_FILE+schemaLocation, e);
 		}
+	}
+
+	public synchronized boolean setSchemaAccessMgr(FileManager fileMgr, File schemaFile) throws DatabaseException {
+		if (null != schemaFileMgr) {
+			throw new DatabaseException("schema file already set");
+		}
+		schemaFileMgr = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.SCHEMA_NAME);
+		return schemaFile.exists() && (schemaFile.length() > 0);
 	}
 
 	public  File getDatabaseFile() {
@@ -837,13 +840,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 	}
 
-	public LibrisJournalFileManager<DatabaseRecord> getJournalFileMgr() throws LibrisException {
-		if (null == journalFile) {
-			journalFile = new LibrisJournalFileManager<DatabaseRecord>(this, fileMgr.getJournalFileMgr(), RecordTemplate.templateFactory(getSchema(), null));
-		}
-		return journalFile;
-	}
-
 	public void incrementTermCount(String term) {
 		indexMgr.incrementTermCount(term);
 	}
@@ -856,7 +852,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return documentRepository;
 	}
 	
-	@Deprecated
 	public void setDocumentRepository(Repository documentRepository) {
 		this.documentRepository = documentRepository;
 		databaseMetadata.hasDocumentRepository(true);

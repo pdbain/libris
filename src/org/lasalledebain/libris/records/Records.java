@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.DatabaseMetadata;
 import org.lasalledebain.libris.LibrisConstants;
@@ -32,7 +33,7 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 	private LibrisRecordsFileManager<RecordType> recMgr;
 	GenericDatabase<RecordType> myDatabase;
 
-	public Records(GenericDatabase<RecordType> db, LibrisFileManager fileMgr) throws LibrisException {
+	public Records(GenericDatabase<RecordType> db, FileManager fileMgr) throws LibrisException {
 		recMgr = db.getRecordsFileMgr();
 		myDatabase = db;
 	}
@@ -78,7 +79,7 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 			int lastId = 0;
 			int numAdded = 0;
 			metadata.setSavedRecords(0);
-			LibrisFileManager fileMgr = myDatabase.getFileMgr();
+			FileManager fileMgr = myDatabase.getFileMgr();
 			FileAccessManager recordsFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME);
 			RecordPositions recPosns = myDatabase.getRecordPositions();
 			BulkImporter importer = new BulkImporter(myDatabase.getSchema(), recordsFileMgr.getOpStream(), recPosns);

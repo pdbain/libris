@@ -36,7 +36,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 public class IndexManager<RecordType extends Record> implements LibrisConstants {
 
 	private GenericDatabase<RecordType> database;
-	private LibrisFileManager fileMgr;
+	private FileManager fileMgr;
 
 	private Boolean indexed = null;
 	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
@@ -66,7 +66,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 	 *            set true to prevent updates
 	 * @throws DatabaseException
 	 */
-	public IndexManager(GenericDatabase<RecordType> theDatabase, LibrisFileManager fileMgr)
+	public IndexManager(GenericDatabase<RecordType> theDatabase, FileManager fileMgr)
 			throws DatabaseException {
 		database = theDatabase;
 		this.fileMgr = fileMgr;

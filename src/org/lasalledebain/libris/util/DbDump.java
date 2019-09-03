@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisFileManager;
@@ -32,7 +33,7 @@ public class DbDump {
 			System.exit(1);
 		}
 		out = System.out;
-		LibrisFileManager fm;
+		FileManager fm;
 		try {
 			fm = new LibrisFileManager(LibrisDatabase.getDatabaseAuxDirectory(dbFileObj, LibrisDatabase.DATABASE_AUX_DIRECTORY_NAME));
 			dumpRecords(fm);
@@ -41,7 +42,7 @@ public class DbDump {
 		}
 	}
 
-	private static void dumpRecords(LibrisFileManager fm) {
+	private static void dumpRecords(FileManager fm) {
 		FileAccessManager rf = fm.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME);
 		try {
 			RandomAccessFile recordsFileStore = rf.getReadOnlyRandomAccessFile();

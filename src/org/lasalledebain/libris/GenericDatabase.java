@@ -3,12 +3,9 @@ package org.lasalledebain.libris;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -25,7 +22,6 @@ import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.search.KeywordFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.ui.LibrisUi;
-import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
 public abstract class GenericDatabase<RecordType extends Record> implements XMLElement {
@@ -33,7 +29,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected IndexManager<RecordType> indexMgr;
 	protected final LibrisUi ui;
 	protected ModifiedRecordList<RecordType> modifiedRecords;
-	protected LibrisJournalFileManager<RecordType> journalFile;
+	/**
+	 * XML representation of database records added
+	 */
+	protected LibrisJournalFileManager<RecordType> journalFileMgr;
 	protected Records<RecordType> databaseRecords;
 	protected boolean readOnly;
 	protected boolean isModified;
@@ -135,7 +134,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	
 	public abstract RecordFactory<RecordType> getRecordFactory();
 
-	public LibrisFileManager getFileMgr() {
+	public FileManager getFileMgr() {
 		return fileMgr;
 	}
 
@@ -177,10 +176,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	}
 	
 	public LibrisJournalFileManager<RecordType> getJournalFileMgr() throws LibrisException {
-		if (null == journalFile) {
-			journalFile = new LibrisJournalFileManager<RecordType>(this, fileMgr.getJournalFileMgr(), getRecordFactory());
+		if (null == journalFileMgr) {
+			FileAccessManager journalFile = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.JOURNAL_FILENAME);
+			journalFileMgr = new LibrisJournalFileManager<RecordType>(this, journalFile, getRecordFactory());
 		}
-		return journalFile;
+		return journalFileMgr;
 	}
 	
 	public int getLastRecordId() {

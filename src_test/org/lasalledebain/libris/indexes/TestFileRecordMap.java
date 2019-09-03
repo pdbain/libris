@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 
@@ -19,7 +20,7 @@ public class TestFileRecordMap extends TestCase {
 	FileRecordMap index;
 	private static final int DEFAULT_NUM_ENTRIES = Integer.getInteger("libris.test.index.numentries", 25000);
 	private static final long RANDOM_SEED=20111001;
-	LibrisFileManager fileMgr;
+	FileManager fileMgr;
 	@Override
 	protected void setUp() throws Exception {
 		

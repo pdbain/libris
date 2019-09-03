@@ -22,6 +22,7 @@ import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordTemplate;
@@ -46,7 +47,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 	private final int NUM_ENUM_CHOICES = 10;
 	private static FileAccessManager testRecordsFile;
 	private File testDatabaseFile;
-	LibrisFileManager fileMgr;
+	FileManager fileMgr;
 
 	public void testAddRecord() {
 		LibrisRecordsFileManager<DatabaseRecord> recFile = makeRecFileMgr();
