@@ -1,18 +1,17 @@
 package org.lasalledebain.libris.indexes;
 
+import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;
+import static org.lasalledebain.Utilities.trace;
+
 import java.io.File;
 import java.util.Random;
 
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.FileManager;
-import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 import junit.framework.TestCase;
-
-import static org.lasalledebain.Utilities.trace;
-import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;
 
 public class TestFileRecordMap extends TestCase {
 	File workingDirectory;
@@ -28,7 +27,7 @@ public class TestFileRecordMap extends TestCase {
 		Utilities.deleteRecursively(workingDirectory);
 		workingDirectory.mkdirs();
 		indexFile = new File(workingDirectory, "testIndexFile");
-		fileMgr  = new LibrisFileManager(workingDirectory);
+		fileMgr  = new FileManager(workingDirectory);
 		FileAccessManager indexFileMgr = fileMgr.makeAccessManager(getName(), indexFile);
 		index = new FileRecordMap(indexFileMgr, false);
 	}

@@ -28,6 +28,7 @@ import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
@@ -61,10 +62,14 @@ public class LibrisGui extends LibrisWindowedUi {
 		com.apple.eawt.Application.getApplication().setQuitHandler(new QuitHandler() {
 			@Override
 			public void handleQuitRequestWith(QuitEvent quitEvt, QuitResponse quitResp) {
-				if ((null == currentDatabase) || currentDatabase.closeDatabase(false)) {
-					quitResp.performQuit();
-				} else {
-					quitResp.cancelQuit();
+				try {
+					if ((null == currentDatabase) || currentDatabase.closeDatabase(false)) {
+						quitResp.performQuit();
+					} else {
+						quitResp.cancelQuit();
+					}
+				} catch (DatabaseException e) {
+					throw new DatabaseError(e);
 				}
 			}});
 		databaseSelected = isDatabaseSelected();

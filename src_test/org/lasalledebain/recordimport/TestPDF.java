@@ -10,10 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,6 +45,7 @@ public class TestPDF extends TestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		
 		workingDirectory = Utilities.makeTempTestDirectory();
 		repoRoot = new File(workingDirectory, "repo_root");
 		assertTrue("Could not create "+repoRoot.getPath(), repoRoot.mkdir());

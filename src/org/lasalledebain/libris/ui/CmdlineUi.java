@@ -110,7 +110,7 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 	}
 
 	@Override
-	public boolean closeDatabase(boolean force) {
+	public boolean closeDatabase(boolean force) throws DatabaseException {
 		if (!currentDatabase.closeDatabase(force)) {
 			alert("Database not closed"); // TODO 4 improve cmdLineUi close database checking
 			return false;
@@ -120,7 +120,7 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 	}
 
 	@Override
-	protected boolean checkAndCloseDatabase(boolean force) {
+	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		// TODO write checkAndCloseDatabase
 		return currentDatabase.closeDatabase(force);
 	}

@@ -11,7 +11,7 @@ import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.DatabaseMetadata;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisFileManager;
+import org.lasalledebain.libris.ReservationManager;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;

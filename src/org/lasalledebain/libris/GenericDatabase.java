@@ -36,10 +36,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected Records<RecordType> databaseRecords;
 	protected boolean readOnly;
 	protected boolean isModified;
-	protected final LibrisFileManager fileMgr;
+	protected final FileManager fileMgr;
 	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 
-	public GenericDatabase(LibrisUi theUi, LibrisFileManager theFileManager) throws DatabaseException {
+	public GenericDatabase(LibrisUi theUi, FileManager theFileManager) throws DatabaseException {
 		ui = theUi;
 		fileMgr = theFileManager;
 		indexMgr = new IndexManager<RecordType>(this, fileMgr);

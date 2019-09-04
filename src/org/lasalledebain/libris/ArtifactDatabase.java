@@ -27,13 +27,13 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	static final DynamicSchema artifactsSchema = ArtifactDatabase.makeSchema();
 	private final DatabaseMetadata myMetadata;
-	public ArtifactDatabase(LibrisUi theUi, LibrisFileManager theFileManager) throws DatabaseException {
+	public ArtifactDatabase(LibrisUi theUi, FileManager theFileManager) throws DatabaseException {
 		super(theUi, theFileManager);
 		myMetadata = new DatabaseMetadata();
 	}
 	
 	public ArtifactDatabase(LibrisUi theUi, File workingDirectory) throws DatabaseException {
-		this(theUi, new LibrisFileManager(new File(workingDirectory, LibrisConstants.REPOSITORY_AUX_DIRECTORY_NAME)));
+		this(theUi, new FileManager(new File(workingDirectory, LibrisConstants.REPOSITORY_AUX_DIRECTORY_NAME)));
 	}
 	@Override
 	public String getElementTag() {

@@ -23,7 +23,7 @@ import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.FileManager;
-import org.lasalledebain.libris.LibrisFileManager;
+import org.lasalledebain.libris.ReservationManager;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
@@ -419,7 +419,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 		if (null == workingDirectory) {
 			fail("could not create working directory ");
 		}
-		fileMgr  = new LibrisFileManager(workingDirectory);
+		fileMgr  = new FileManager(workingDirectory);
 		testRecordsFile = fileMgr.makeAccessManager(getName(), new File(workingDirectory, "tempRecordsFile"));
 
 		if (null == schem) {

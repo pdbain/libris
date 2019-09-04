@@ -95,7 +95,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		return currentDatabase;
 	}
 	@Override
-	public boolean closeDatabase(boolean force) {
+	public boolean closeDatabase(boolean force) throws DatabaseException {
 		boolean result = false;
 		if (Objects.nonNull(currentDatabase)) {
 			result = checkAndCloseDatabase(force);
@@ -106,10 +106,10 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		}
 		return result;
 	}
-	protected abstract boolean checkAndCloseDatabase(boolean force);
+	protected abstract boolean checkAndCloseDatabase(boolean force) throws DatabaseException;
 
 	@Override
-	public boolean quit(boolean force) {
+	public boolean quit(boolean force) throws DatabaseException {
 		return closeDatabase(force);
 	}
 

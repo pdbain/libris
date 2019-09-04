@@ -67,13 +67,15 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	private boolean dbOpen;
 	private FileAccessManager databaseFileMgr;
 	private FileAccessManager schemaFileMgr;
+	private final ReservationManager reservationMgr;
 	
 	public LibrisDatabase(File databaseFile, boolean readOnly, LibrisUi ui) throws LibrisException  {
 		this(databaseFile, readOnly, ui, null);
 	}
 	
 	public LibrisDatabase(File theDatabaseFile, boolean readOnly, LibrisUi ui, Schema schem) throws LibrisException  {
-		super(ui,new LibrisFileManager(getDatabaseAuxDirectory(theDatabaseFile, DATABASE_AUX_DIRECTORY_NAME)));
+		super(ui,new FileManager(getDatabaseAuxDirectory(theDatabaseFile, DATABASE_AUX_DIRECTORY_NAME)));
+		reservationMgr = new ReservationManager(getFileMgr());
 		myDatabaseFile = theDatabaseFile;
 		databaseMetadata = new LibrisDatabaseMetadata(this);
 		isModified = false;
@@ -131,26 +133,23 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 	}
 
-	public boolean reserveDatabase() {
-		return fileMgr.reserveDatabase();
-	}
-
-	public void freeDatabase() {
-		fileMgr.freeDatabase();
+	public boolean reserveDatabase() throws DatabaseException {
+		return reservationMgr.reserveDatabase();
 	}
 
 	public boolean isDatabaseReserved() {
-		return Objects.nonNull(fileMgr) && fileMgr.isDatabaseReserved();
+		return Objects.nonNull(reservationMgr) && reservationMgr.isDatabaseReserved();
 	}
 
 	/**
 	 * @param force close without saving
 	 * @return true if database is not modified or force is true.
+	 * @throws DatabaseException  if database is not reserved
 	 */
-	public boolean closeDatabase(boolean force) {
+	public boolean closeDatabase(boolean force) throws DatabaseException {
 		myDatabaseFile = null;
 		if (isDatabaseReserved()) {
-			freeDatabase();
+			reservationMgr.freeDatabase();
 		}
 		if (!dbOpen) {
 			return true;
@@ -170,10 +169,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			}
 			indexMgr = null;
 			if (null != fileMgr) {
-				fileMgr.freeDatabase();
 				fileMgr.close();
 			}
-			freeDatabase();
 			databaseRecords = null;
 			dbOpen = false;
 			return true;
@@ -282,7 +279,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				LibrisDatabase.log(Level.SEVERE, msg, e); //$NON-NLS-1$
 				throw new DatabaseException(msg); //$NON-NLS-1$
 			}
-			freeDatabase();
+			reservationMgr.freeDatabase();
 		}
 		return result;
 	}
@@ -753,6 +750,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	}
 	public static void log(Level severity, String msg, Object param) {
 		librisLogger.log(severity, msg, param);
+	}
+	
+	public static void setLogLevel(Level severity) {
+		librisLogger.setLevel(severity);
 	}
 
 	public static Record[] importDelimitedTextFile(LibrisDatabase db, 

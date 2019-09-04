@@ -10,7 +10,7 @@ import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisFileManager;
+import org.lasalledebain.libris.ReservationManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.RecordHeader;
 
@@ -35,7 +35,7 @@ public class DbDump {
 		out = System.out;
 		FileManager fm;
 		try {
-			fm = new LibrisFileManager(LibrisDatabase.getDatabaseAuxDirectory(dbFileObj, LibrisDatabase.DATABASE_AUX_DIRECTORY_NAME));
+			fm = new FileManager(LibrisDatabase.getDatabaseAuxDirectory(dbFileObj, LibrisDatabase.DATABASE_AUX_DIRECTORY_NAME));
 			dumpRecords(fm);
 		} catch (DatabaseException e) {
 			System.err.println("Cannot open database: "+e.getMessage());

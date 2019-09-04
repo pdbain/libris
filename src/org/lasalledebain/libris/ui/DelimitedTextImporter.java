@@ -37,7 +37,7 @@ import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisFileManager;
+import org.lasalledebain.libris.ReservationManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;

@@ -11,6 +11,7 @@
 	schemalocation NMTOKEN #IMPLIED
 	databasename NMTOKEN #IMPLIED
 	date CDATA #IMPLIED
+	repositorylocation NMTOKEN #IMPLIED
 	locked %boolean #IMPLIED">
 	
 <!ATTLIST libris  %databaseAttributes; >

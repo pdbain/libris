@@ -23,6 +23,8 @@ import javax.swing.JPanel;
 import org.lasalledebain.libris.DatabaseAttributes;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.exception.DatabaseError;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.index.GroupDef;
 
 public abstract class LibrisWindowedUi extends LibrisUiGeneric {	
@@ -33,7 +35,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	public abstract void closeWindow(boolean allWindows);
 
 	@Override
-	protected boolean checkAndCloseDatabase(boolean force) {
+	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		boolean result = false;
 		if (!force && currentDatabase.isModified()) {
 			int choice = confirmWithCancel(Messages.getString("LibrisDatabase.save_database_before_close")); //$NON-NLS-1$
@@ -122,7 +124,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	}
 	
 	@Override
-	public boolean quit(boolean force) {
+	public boolean quit(boolean force) throws DatabaseException {
 		destroyWindow(false);
 		return super.quit(force);
 	}
@@ -191,7 +193,11 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		@Override
 		public void windowClosing(WindowEvent e) {
 			if (null != currentDatabase) {
-				quit(false);
+				try {
+					quit(false);
+				} catch (DatabaseException e1) {
+					throw new DatabaseError(e1);
+				}
 			}
 		}
 	}

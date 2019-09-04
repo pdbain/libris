@@ -42,7 +42,7 @@ public class ChildUi extends LibrisUiGeneric {
 	}
 
 	@Override
-	protected boolean checkAndCloseDatabase(boolean force) {
+	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		return parent.closeDatabase(force);
 	}
 
