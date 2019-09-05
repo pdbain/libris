@@ -10,7 +10,6 @@ import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.ReservationManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.RecordHeader;
 

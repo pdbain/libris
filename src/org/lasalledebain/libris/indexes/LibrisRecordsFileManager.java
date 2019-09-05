@@ -16,7 +16,6 @@ import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.ReservationManager;
 import org.lasalledebain.libris.ModifiedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;

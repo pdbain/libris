@@ -63,7 +63,7 @@ public class FileManager {
 	public synchronized void releaseAccessManager(FileAccessManager mgr) {
 		checkLock();
 		mgr.close();
-		activeManagers.remove(mgr);
+		activeManagers.remove(mgr.getManagerName());
 	}
 
 	void checkLock() throws DatabaseError {

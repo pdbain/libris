@@ -11,9 +11,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.FileLock;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -75,7 +78,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	
 	public LibrisDatabase(File theDatabaseFile, boolean readOnly, LibrisUi ui, Schema schem) throws LibrisException  {
 		super(ui,new FileManager(getDatabaseAuxDirectory(theDatabaseFile, DATABASE_AUX_DIRECTORY_NAME)));
-		reservationMgr = new ReservationManager(getFileMgr());
+		reservationMgr = new ReservationManager();
 		myDatabaseFile = theDatabaseFile;
 		databaseMetadata = new LibrisDatabaseMetadata(this);
 		isModified = false;
@@ -272,6 +275,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				ElementManager recordsMgr = librisMgr.nextElement();
 				recs.fromXml(recordsMgr);
 				buildIndexes(config);
+				nextElement = librisMgr.getNextId();
+				if (XmlRecordsReader.XML_ARTIFACTS_TAG.equals(nextElement)) {
+					ElementManager artifactsMgr = librisMgr.nextElement();
+				}
 				librisMgr.closeFile();
 				this.closeDatabaseSource();
 			} catch (FactoryConfigurationError | FileNotFoundException e) {
@@ -856,6 +863,63 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public void setDocumentRepository(Repository documentRepository) {
 		this.documentRepository = documentRepository;
 		databaseMetadata.hasDocumentRepository(true);
+	}
+	
+	class ReservationManager {
+
+		private FileAccessManager lockFile;
+		private FileLock dbLock;
+		private boolean databaseReserved;
+
+		public ReservationManager() {
+			lockFile = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.LOCK_FILENAME);
+		}
+
+		public synchronized boolean reserveDatabase() throws DatabaseException {
+			LibrisDatabase.log(Level.INFO, " > lock database lock file " + lockFile.getPath());
+			if (databaseReserved) {
+				throw new DatabaseException("Database already reserved");
+			}
+			try {
+				lockFile.createNewFile();
+				FileOutputStream lockFileStream = lockFile.getOpStream();
+				dbLock = lockFileStream.getChannel().tryLock();
+				if (null != dbLock) {
+					String dateString = "Reserved " + DateFormat.getDateInstance().format(new Date());
+					lockFileStream.write(dateString.getBytes());
+					databaseReserved = true;
+					return true;
+				} else {
+					lockFileStream.close();
+				}
+			} catch (IOException e) {
+				LibrisDatabase.log(Level.SEVERE, "Error creating lock file", e);
+			}
+			return false;
+		}
+
+		public boolean isDatabaseReserved() {
+			return databaseReserved;
+		}
+
+		public synchronized void freeDatabase() throws DatabaseException {
+			LibrisDatabase.log(Level.INFO, "< free database lock file " + lockFile.getPath());
+			if (!databaseReserved) {
+				throw new DatabaseException("Database not reserved");
+			}
+			if (null != dbLock) {
+				try {
+					dbLock.release();
+					RandomAccessFile lckFile = lockFile.getReadWriteRandomAccessFile();
+					lckFile.setLength(0);
+					lckFile.close();
+					databaseReserved = false;
+				} catch (IOException e) {
+					LibrisDatabase.log(Level.SEVERE, "Error unlocking file", e);
+				}
+			}
+		}
+
 	}
 	
 }

@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 import org.lasalledebain.libris.FileAccessManager;
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -18,10 +18,10 @@ import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
-public class FilteringRecordImporter<RecordType extends Record> extends RecordImporter implements LibrisXMLConstants {
+public class FilteringRecordImporter<RecordType extends Record> extends RecordImporter<RecordType> implements LibrisXMLConstants {
 
 	ArrayList<FilteringFieldImporter> fieldImporters;
-	public FilteringRecordImporter(LibrisDatabase db, LibrisXmlFactory fact, FileAccessManager librisImportFileMgr) throws InputException {
+	public FilteringRecordImporter(GenericDatabase<RecordType> db, LibrisXmlFactory fact, FileAccessManager librisImportFileMgr) throws InputException {
 		super(db);
 		try {
 			fieldImporters = new ArrayList<FilteringFieldImporter>();
@@ -44,9 +44,9 @@ public class FilteringRecordImporter<RecordType extends Record> extends RecordIm
 		}
 	}
 	@Override
-	public Record importRecord(FieldValueStringList[] fields)
+	public RecordType importRecord(FieldValueStringList[] fields)
 	throws LibrisException {
-		Record rec = db.newRecord();
+		RecordType rec = db.newRecord();
 		for (FilteringFieldImporter fi: fieldImporters) {
 			fi.addFieldValues(rec, fields);
 		}
