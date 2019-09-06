@@ -109,7 +109,7 @@ public class Libris {
 			if (!buildResult) {
 				return false;
 			}
-			return db.closeDatabase(false);
+			return db.closeDatabase(true);
 		} else {
 			return false;
 		}

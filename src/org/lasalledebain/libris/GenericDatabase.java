@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -25,6 +26,7 @@ import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
 public abstract class GenericDatabase<RecordType extends Record> implements XMLElement {
+	protected boolean dbOpen;
 	protected GroupManager<RecordType> groupMgr;
 	protected IndexManager<RecordType> indexMgr;
 	protected final LibrisUi ui;
@@ -61,7 +63,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		save();
 	}
 	
-	public void openDatabase() throws LibrisException {
+	public synchronized void openDatabase() throws LibrisException {
+		if (dbOpen) {
+			throw new DatabaseException("Database already open");
+		}
 		DatabaseMetadata metadata = getMetadata();
 		FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.PROPERTIES_FILENAME);
 		synchronized (propsMgr) {
@@ -83,6 +88,37 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 			throw new DatabaseException("Error in metadata");
 		}
 		getDatabaseRecords();
+		dbOpen = true;
+	}
+
+	public boolean closeDatabase(boolean force) throws DatabaseException {
+		
+		if (!isOkayToClose(force)) {
+			return false;
+		} else {
+			databaseRecords = null;
+			if (null != indexMgr) {
+				try {
+					indexMgr.close();
+				} catch (InputException | DatabaseException | IOException e) {
+					LibrisDatabase.log(Level.SEVERE, "error destroying database", e);
+				}
+			}
+			indexMgr = null;
+			if (null != fileMgr) {
+				fileMgr.close();
+			}
+			databaseRecords = null;
+			dbOpen = false;
+			return true;
+		}
+	}
+
+	public boolean isOkayToClose(boolean force) throws DatabaseException {
+		if (!force && !dbOpen) {
+			throw new DatabaseException("Database not open");
+		}
+		return !isModified() || force;
 	}
 
 	public void save()  {

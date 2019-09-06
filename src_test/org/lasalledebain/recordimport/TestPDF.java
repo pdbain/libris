@@ -131,7 +131,6 @@ public class TestPDF extends TestCase {
 			ui.saveDatabase();
 			File dumpFile = new File(workingDirectory, "dump.libr");
 			db.exportDatabaseXml(new FileOutputStream(dumpFile), true, true, false);
-			ui.closeDatabase(false);
 			
 		} catch (LibrisException e) {
 			e.printStackTrace();

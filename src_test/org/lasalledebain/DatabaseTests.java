@@ -299,72 +299,59 @@ public class DatabaseTests extends TestCase {
 		}
 	}
 
-	public void testFork() {
-		try {
-			File dbInstance = new File(workingDirectory, "database_instance.xml");
-			{
-				rootDb = buildTestDatabase(getTestDatabase());
-				File copyDbXml = new File (workingDirectory, "database_copy.xml");
-				testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
-				copyDbXml.deleteOnExit();
-				dbInstance.deleteOnExit();
-				FileOutputStream instanceStream = new FileOutputStream(dbInstance);
-				testLogger.log(Level.INFO,getName()+": copy database to "+dbInstance);
-				rootDb.exportDatabaseXml(instanceStream, true, true, true);
-				instanceStream.close();
-			}
-			int lastId = rootDb.getLastRecordId();
-			forkDb = Libris.buildAndOpenDatabase(dbInstance);
-			assertNotNull("Error rebuilding database copy", forkDb);
-			assertTrue("database copy does not match original", forkDb.equals(rootDb));
-			
-			rootDb.closeDatabase(false);
-			DatabaseInstance inst = forkDb.getMetadata().getInstanceInfo();
-			assertNotNull("Database instance information missing", inst);
-			assertEquals("Wrong base ID", lastId, inst.getRecordIdBase());
-			final int numRecs = 10;
-			for (int i = lastId+1; i <= numRecs; ++i) {
-				DatabaseRecord rec = forkDb.newRecord();
-				int recNum = forkDb.putRecord(rec);
-				assertEquals("wrong ID for new record",  i, recNum);
-			}
-			forkDb.save();
-			checkRecords(forkDb, lastId);
-
-			for (int i = 1; i <= numRecs; ++i) {
-				try {
-					DatabaseRecord r = forkDb.getRecord(i);
-					assertNotNull("Cannot find record "+i, r);
-					assertEquals("Wrong record ID",  i, r.getRecordId());
-					boolean readOnly = forkDb.isRecordReadOnly(i);
-					assertEquals("read-only status of record "+i+" incorrect", i <= lastId, readOnly);
-					r.addFieldValue(ID_AUTH, "new value "+i);
-					int resultId;
-					if (i <= lastId) {
-						try {
-							resultId = forkDb.putRecord(r);
-							fail("record " + resultId + " from root database not read-only");
-						} catch (DatabaseException e) {
-
-						}
-					} else {
-						resultId = forkDb.putRecord(r);
-						assertEquals("record from fork database wrong ID", i, resultId);
-					}
-				} catch (InputException e) {
-					e.printStackTrace();
-					fail("unexpected exception "+e.getMessage());
-				}
-			}
-		
-			rootDb.closeDatabase(false);
-;
-			forkDb.closeDatabase(false);
-			dbInstance.delete();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception");
+	public void testFork() throws IOException, LibrisException {
+		File dbInstance = new File(workingDirectory, "database_instance.xml");
+		{
+			rootDb = buildTestDatabase(getTestDatabase());
+			File copyDbXml = new File (workingDirectory, "database_copy.xml");
+			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
+			copyDbXml.deleteOnExit();
+			dbInstance.deleteOnExit();
+			FileOutputStream instanceStream = new FileOutputStream(dbInstance);
+			testLogger.log(Level.INFO,getName()+": copy database to "+dbInstance);
+			rootDb.exportDatabaseXml(instanceStream, true, true, true);
+			instanceStream.close();
 		}
+		int lastId = rootDb.getLastRecordId();
+		forkDb = Libris.buildAndOpenDatabase(dbInstance);
+		assertNotNull("Error rebuilding database copy", forkDb);
+		assertTrue("database copy does not match original", forkDb.equals(rootDb));
+		
+		rootDb.closeDatabase(false);
+		DatabaseInstance inst = forkDb.getMetadata().getInstanceInfo();
+		assertNotNull("Database instance information missing", inst);
+		assertEquals("Wrong base ID", lastId, inst.getRecordIdBase());
+		final int numRecs = 10;
+		for (int i = lastId+1; i <= numRecs; ++i) {
+			DatabaseRecord rec = forkDb.newRecord();
+			int recNum = forkDb.putRecord(rec);
+			assertEquals("wrong ID for new record",  i, recNum);
+		}
+		forkDb.save();
+		checkRecords(forkDb, lastId);
+
+		for (int i = 1; i <= numRecs; ++i) {
+			DatabaseRecord r = forkDb.getRecord(i);
+			assertNotNull("Cannot find record "+i, r);
+			assertEquals("Wrong record ID",  i, r.getRecordId());
+			boolean readOnly = forkDb.isRecordReadOnly(i);
+			assertEquals("read-only status of record "+i+" incorrect", i <= lastId, readOnly);
+			r.addFieldValue(ID_AUTH, "new value "+i);
+			int resultId;
+			if (i <= lastId) {
+				try {
+					resultId = forkDb.putRecord(r);
+					fail("record " + resultId + " from root database not read-only");
+				} catch (DatabaseException e) {
+
+				}
+			} else {
+				resultId = forkDb.putRecord(r);
+				assertEquals("record from fork database wrong ID", i, resultId);
+			}
+		}
+		forkDb.closeDatabase(false);
+		dbInstance.delete();
 	}
 
 	public void testIncrement() {
@@ -651,15 +638,10 @@ public class DatabaseTests extends TestCase {
 		assertFalse("too few records", expectedRecordIterator.hasNext());
 	}
 
-	private LibrisDatabase buildTestDatabase(File testDatabaseFileCopy) throws IOException {			
+	private LibrisDatabase buildTestDatabase(File testDatabaseFileCopy) throws IOException, LibrisException {			
 		rootDb = null;
-		try {
-			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
-			rootDb.getUi();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("Cannot open database");
-		}
+		rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		rootDb.getUi();
 		return rootDb;
 	}
 

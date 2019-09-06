@@ -65,4 +65,5 @@ public interface LibrisConstants {
 	static final String TEMP_AFFILIATE_FILE = TEMP_ROOT+"affiliate_";
 	public static final String CSV_FILE = "CSV_FILE";
 	public static final int MAX_BLOOM_FILTER_LEVELS = 6;
+	public static final String ARTIFACTS_DIRECTORY = "artifacts_directory";
 }

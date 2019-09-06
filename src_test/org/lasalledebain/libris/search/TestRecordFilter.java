@@ -93,7 +93,7 @@ public class TestRecordFilter extends TestCase {
 				filter);
 		Integer[] ids = new Integer[] { 1, 4, newId };
 		checkReturnedRecords(filteredList, Arrays.asList(ids));
-		db.closeDatabase(true);
+		db.save();
 	}
 
 	public void testGetIndexFields() throws FileNotFoundException, IOException {

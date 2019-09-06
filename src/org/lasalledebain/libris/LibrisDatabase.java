@@ -11,12 +11,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.channels.FileLock;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,7 +64,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	protected LibrisDatabaseMetadata databaseMetadata;
 	private static final Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());
 	protected DatabaseAttributes xmlAttributes;
-	private boolean dbOpen;
 	private FileAccessManager databaseFileMgr;
 	private FileAccessManager schemaFileMgr;
 	private final ReservationManager reservationMgr;
@@ -78,7 +74,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	
 	public LibrisDatabase(File theDatabaseFile, boolean readOnly, LibrisUi ui, Schema schem) throws LibrisException  {
 		super(ui,new FileManager(getDatabaseAuxDirectory(theDatabaseFile, DATABASE_AUX_DIRECTORY_NAME)));
-		reservationMgr = new ReservationManager();
+		FileAccessManager lockFileManager = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.LOCK_FILENAME);
+		reservationMgr = new ReservationManager(lockFileManager);
 		myDatabaseFile = theDatabaseFile;
 		databaseMetadata = new LibrisDatabaseMetadata(this);
 		isModified = false;
@@ -90,6 +87,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	}
 
 	public void openDatabase() throws LibrisException {
+		if (dbOpen) {
+			throw new DatabaseException("Database already open");
+		}
 		if (!reserveDatabase()) {
 			throw new UserErrorException("database is in use");
 		}
@@ -150,34 +150,16 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 * @throws DatabaseException  if database is not reserved
 	 */
 	public boolean closeDatabase(boolean force) throws DatabaseException {
+		if (!isOkayToClose(force)) {
+			return false;
+		}
 		myDatabaseFile = null;
 		if (isDatabaseReserved()) {
 			reservationMgr.freeDatabase();
 		}
-		if (!dbOpen) {
-			return true;
-		}
-		if (isModified() && !force) {
-			return false;
-		} else {
-			databaseRecords = null;
-			databaseMetadata = null;
-			mySchema = null;
-			if (null != indexMgr) {
-				try {
-					indexMgr.close();
-				} catch (InputException | DatabaseException | IOException e) {
-					log(Level.SEVERE, "error destroying database", e);
-				}
-			}
-			indexMgr = null;
-			if (null != fileMgr) {
-				fileMgr.close();
-			}
-			databaseRecords = null;
-			dbOpen = false;
-			return true;
-		}
+		databaseMetadata = null;
+		mySchema = null;
+		return super.closeDatabase(force);
 	}
 
 	public boolean isDatabaseOpen() {
@@ -863,63 +845,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public void setDocumentRepository(Repository documentRepository) {
 		this.documentRepository = documentRepository;
 		databaseMetadata.hasDocumentRepository(true);
-	}
-	
-	class ReservationManager {
-
-		private FileAccessManager lockFile;
-		private FileLock dbLock;
-		private boolean databaseReserved;
-
-		public ReservationManager() {
-			lockFile = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.LOCK_FILENAME);
-		}
-
-		public synchronized boolean reserveDatabase() throws DatabaseException {
-			LibrisDatabase.log(Level.INFO, " > lock database lock file " + lockFile.getPath());
-			if (databaseReserved) {
-				throw new DatabaseException("Database already reserved");
-			}
-			try {
-				lockFile.createNewFile();
-				FileOutputStream lockFileStream = lockFile.getOpStream();
-				dbLock = lockFileStream.getChannel().tryLock();
-				if (null != dbLock) {
-					String dateString = "Reserved " + DateFormat.getDateInstance().format(new Date());
-					lockFileStream.write(dateString.getBytes());
-					databaseReserved = true;
-					return true;
-				} else {
-					lockFileStream.close();
-				}
-			} catch (IOException e) {
-				LibrisDatabase.log(Level.SEVERE, "Error creating lock file", e);
-			}
-			return false;
-		}
-
-		public boolean isDatabaseReserved() {
-			return databaseReserved;
-		}
-
-		public synchronized void freeDatabase() throws DatabaseException {
-			LibrisDatabase.log(Level.INFO, "< free database lock file " + lockFile.getPath());
-			if (!databaseReserved) {
-				throw new DatabaseException("Database not reserved");
-			}
-			if (null != dbLock) {
-				try {
-					dbLock.release();
-					RandomAccessFile lckFile = lockFile.getReadWriteRandomAccessFile();
-					lckFile.setLength(0);
-					lckFile.close();
-					databaseReserved = false;
-				} catch (IOException e) {
-					LibrisDatabase.log(Level.SEVERE, "Error unlocking file", e);
-				}
-			}
-		}
-
 	}
 	
 }
