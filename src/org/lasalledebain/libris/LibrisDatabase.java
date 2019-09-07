@@ -838,11 +838,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return documentRepository;
 	}
 	
-	public void setDocumentRepository(Repository documentRepository) {
-		this.documentRepository = documentRepository;
-		databaseMetadata.hasDocumentRepository(true);
-	}
-	
 }
 
 

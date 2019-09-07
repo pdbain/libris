@@ -99,7 +99,7 @@ public class Repository extends Libris {
 
 	public int importFile(org.lasalledebain.libris.ArtifactParameters artifactParameters)
 			throws LibrisException, IOException {
-		final URI sourceUri = artifactParameters.source;
+		final URI sourceUri = artifactParameters.getSourcePath();
 		File sourceFile = new File(sourceUri);
 		if (!sourceFile.isFile()) {
 			throw new UserErrorException(sourceUri.toString() + " is not a file");
@@ -145,14 +145,14 @@ public class Repository extends Libris {
 			final Record record = repoDatabase.getRecord(artifactId);
 			String uriString = record.getFieldValue(ArtifactDatabase.SOURCE_FIELD).getMainValueAsString();
 			ArtifactParameters result = new ArtifactParameters(new URI(uriString));
-			result.date = record.getFieldValue(ArtifactDatabase.ID_DATE).getMainValueAsString();
-			result.comments = record.getFieldValue(ArtifactDatabase.ID_COMMENTS).getMainValueAsString();
-			result.doi = record.getFieldValue(ArtifactDatabase.ID_DOI).getMainValueAsString();
-			result.keywords = record.getFieldValue(ArtifactDatabase.ID_KEYWORDS).getMainValueAsString();
-			result.title = record.getFieldValue(ArtifactDatabase.ID_TITLE).getMainValueAsString();
+			result.setDate(record.getFieldValue(ArtifactDatabase.ID_DATE).getMainValueAsString());
+			result.setComments(record.getFieldValue(ArtifactDatabase.ID_COMMENTS).getMainValueAsString());
+			result.setDoi(record.getFieldValue(ArtifactDatabase.ID_DOI).getMainValueAsString());
+			result.setKeywords(record.getFieldValue(ArtifactDatabase.ID_KEYWORDS).getMainValueAsString());
+			result.setTitle(record.getFieldValue(ArtifactDatabase.ID_TITLE).getMainValueAsString());
 			result.recordName = record.getName();
 			if (record.hasAffiliations()) {
-				result.recordParentName = repoDatabase.getRecordName(record.getParent(0));
+				result.setRecordParentName(repoDatabase.getRecordName(record.getParent(0)));
 			}
 			return result;
 		} catch (InputException | URISyntaxException e) {
@@ -164,24 +164,25 @@ public class Repository extends Libris {
 	public int putArtifactInfo(ArtifactParameters artifactParameters) throws LibrisException {
 		DatabaseRecord rec = repoDatabase.newRecord();
 		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.getSourceString());
-		rec.addFieldValue(ArtifactDatabase.ID_DATE, artifactParameters.date);
-		rec.addFieldValue(ArtifactDatabase.ID_DOI, artifactParameters.doi);
-		rec.addFieldValue(ArtifactDatabase.ID_KEYWORDS, artifactParameters.keywords);
-		rec.addFieldValue(ArtifactDatabase.ID_COMMENTS, artifactParameters.comments);
-		String title = artifactParameters.title;
-		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.source.toString());
+		rec.addFieldValue(ArtifactDatabase.ID_DATE, artifactParameters.getDate());
+		rec.addFieldValue(ArtifactDatabase.ID_DOI, artifactParameters.getDoi());
+		rec.addFieldValue(ArtifactDatabase.ID_KEYWORDS, artifactParameters.getKeywords());
+		rec.addFieldValue(ArtifactDatabase.ID_COMMENTS, artifactParameters.getComments());
+		String title = artifactParameters.getTitle();
+		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.getSourceString());
 		if (!artifactParameters.recordName.isEmpty()) {
 			rec.setName(artifactParameters.recordName);
 		}
 		if (Objects.isNull(title) || title.isEmpty()) {
-			File sourceFile = new File(artifactParameters.source);
+			File sourceFile = new File(artifactParameters.getSourcePath());
 			title = sourceFile.getName();
 		}
 		rec.addFieldValue(ArtifactDatabase.ID_TITLE, title);
-		if (!artifactParameters.recordParentName.isEmpty()) {
-			Record parent = repoDatabase.getRecord(artifactParameters.recordParentName);
+		String recordParentName = artifactParameters.getRecordParentName();
+		if (!recordParentName.isEmpty()) {
+			Record parent = repoDatabase.getRecord(recordParentName);
 			if (Objects.isNull(parent)) {
-				throw new InputException("Cannot locate record " + artifactParameters.recordParentName);
+				throw new InputException("Cannot locate record " + recordParentName);
 			}
 			rec.setParent(0, parent.getRecordId());
 		}

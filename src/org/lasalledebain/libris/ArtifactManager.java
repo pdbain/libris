@@ -69,7 +69,7 @@ public class ArtifactManager {
 	public synchronized int importFile(ArtifactParameters artifactParameters)
 			throws LibrisException, IOException {
 		int id = myDb.newRecordId();
-		final URI sourceUri = artifactParameters.source;
+		final URI sourceUri = artifactParameters.getSourcePath();
 		File sourceFile = new File(sourceUri);
 		if (!sourceFile.isFile()) {
 			throw new UserErrorException(sourceUri.toString() + " is not a file");

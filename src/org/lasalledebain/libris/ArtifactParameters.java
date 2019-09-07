@@ -3,41 +3,35 @@ package org.lasalledebain.libris;
 import java.net.URI;
 import java.util.Objects;
 
-import org.lasalledebain.libris.exception.DatabaseException;
-
 public class ArtifactParameters {
-	String date;
-	String title;
-	String comments;
-	String keywords;
-	String doi;
-	String recordParentName;
-	int parentId;
+	private String date;
+	private String title;
+	private String comments;
+	private String keywords;
+	private String doi;
+	private String recordParentName;
+	private int parentId;
 	String recordName;
-	URI source;
-	URI archivepath;
+	private final URI sourcePath;
+	private URI archivepath;
 	public ArtifactParameters(URI source) {
-		super();
-		this.source = source;
+		this.sourcePath = source;
 		recordName = "";
 		recordParentName = "";
 		date = LibrisMetadata.getCurrentDateAndTimeString();
 		parentId = RecordId.NULL_RECORD_ID;
 	}
 	public String getSourceString() {
-		if (null == source) {
+		if (null == sourcePath) {
 			return null;
 		}
-		return source.toASCIIString();
+		return sourcePath.toASCIIString();
 	}
 	public String getArchivePathString() {
 		if (null == archivepath) {
 			return null;
 		}
 		return archivepath.toASCIIString();
-	}
-	public URI getSource() {
-		return source;
 	}
 	public String getDate() {
 		return date;
@@ -84,9 +78,6 @@ public class ArtifactParameters {
 	public void setRecordName(String recordName) {
 		this.recordName = recordName;
 	}
-	public void setSource(URI source) {
-		this.source = source;
-	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -99,7 +90,7 @@ public class ArtifactParameters {
 					&& Objects.equals(other.date, date)
 					&& Objects.equals(other.doi, doi)
 					&& Objects.equals(other.keywords, keywords)
-					&& other.source.equals(source)
+					&& other.sourcePath.equals(sourcePath)
 					&& Objects.equals(other.archivepath, archivepath)
 					&& Objects.equals(other.recordName, recordName)
 					&& Objects.equals(other.recordParentName, recordParentName)
@@ -162,5 +153,8 @@ public class ArtifactParameters {
 	}
 	public void setArchivepPath(URI archivepath) {
 		this.archivepath = archivepath;
+	}
+	public URI getSourcePath() {
+		return sourcePath;
 	}
 }

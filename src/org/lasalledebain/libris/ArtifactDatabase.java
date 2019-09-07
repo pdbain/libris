@@ -100,32 +100,35 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		ArtifactRecord rec = newRecord();
 		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
 		rec.addFieldValue(ID_ARCHIVEPATH, artifactParameters.getArchivePathString());
-		rec.addFieldValue(ArtifactDatabase.ID_DATE, artifactParameters.date);
-		rec.addFieldValue(ArtifactDatabase.ID_DOI, artifactParameters.doi);
-		rec.addFieldValue(ArtifactDatabase.ID_KEYWORDS, artifactParameters.keywords);
-		rec.addFieldValue(ArtifactDatabase.ID_COMMENTS, artifactParameters.comments);
-		String title = artifactParameters.title;
+		rec.addFieldValue(ID_DATE, artifactParameters.getDate());
+		rec.addFieldValue(ID_DOI, artifactParameters.getDoi());
+		rec.addFieldValue(ID_KEYWORDS, artifactParameters.getKeywords());
+		rec.addFieldValue(ID_COMMENTS, artifactParameters.getComments());
+		String title = artifactParameters.getTitle();
 		if (!artifactParameters.recordName.isEmpty()) {
 			rec.setName(artifactParameters.recordName);
 		}
 		if (Objects.isNull(title) || title.isEmpty()) {
-			File sourceFile = new File(artifactParameters.source);
+			File sourceFile = new File(artifactParameters.getSourcePath());
 			title = sourceFile.getName();
 		}
-		rec.addFieldValue(ArtifactDatabase.ID_TITLE, title);
-		int parentId = artifactParameters.parentId;
+		rec.addFieldValue(ID_TITLE, title);
+		int parentId = artifactParameters.getParentId();
 		if (parentId != RecordId.NULL_RECORD_ID) {
 			Record parent = getRecord(parentId);
 			if (Objects.isNull(parent)) {
 				throw new InputException("Cannot locate record " + parentId);
 			}
 			rec.setParent(0, parent.getRecordId());
-		} else if (!artifactParameters.recordParentName.isEmpty()) {
-			Record parent = getRecord(artifactParameters.recordParentName);
-			if (Objects.isNull(parent)) {
-				throw new InputException("Cannot locate record " + artifactParameters.recordParentName);
+		} else {
+			String recordParentName = artifactParameters.getRecordParentName();
+			if (!recordParentName.isEmpty()) {
+				Record parent = getRecord(recordParentName);
+				if (Objects.isNull(parent)) {
+					throw new InputException("Cannot locate record " + recordParentName);
+				}
+				rec.setParent(0, parent.getRecordId());
 			}
-			rec.setParent(0, parent.getRecordId());
 		}
 		return rec;
 	}
@@ -154,15 +157,15 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 			final ArtifactRecord record = getRecord(artifactId);
 			String uriString = record.getFieldValue(ID_SOURCE).getMainValueAsString();
 			ArtifactParameters result = new ArtifactParameters(new URI(uriString));
-			result.date = record.getFieldValue(ArtifactDatabase.ID_DATE).getMainValueAsString();
-			result.comments = record.getFieldValue(ArtifactDatabase.ID_COMMENTS).getMainValueAsString();
-			result.doi = record.getFieldValue(ArtifactDatabase.ID_DOI).getMainValueAsString();
-			result.keywords = record.getFieldValue(ArtifactDatabase.ID_KEYWORDS).getMainValueAsString();
-			result.title = record.getFieldValue(ArtifactDatabase.ID_TITLE).getMainValueAsString();
+			result.setDate(record.getFieldValue(ID_DATE).getMainValueAsString());
+			result.setComments(record.getFieldValue(ID_COMMENTS).getMainValueAsString());
+			result.setDoi(record.getFieldValue(ID_DOI).getMainValueAsString());
+			result.setKeywords(record.getFieldValue(ID_KEYWORDS).getMainValueAsString());
+			result.setTitle(record.getFieldValue(ID_TITLE).getMainValueAsString());
 			result.recordName = record.getName();
 			if (record.hasAffiliations()) {
 				int parent = record.getParent(0);
-				result.recordParentName = getRecordName(parent);
+				result.setRecordParentName(getRecordName(parent));
 				result.setParentId(parent);
 			}
 			return result;
@@ -196,17 +199,17 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	}
 	static DynamicSchema makeSchema() {
 		DynamicSchema theSchema = new DynamicSchema();
-		GroupDef grp = new GroupDef(theSchema, ArtifactDatabase.ID_GROUPS, "", 0);
+		GroupDef grp = new GroupDef(theSchema, ID_GROUPS, "", 0);
 		GROUP_FIELD = theSchema.addField(grp);
 		GroupDefs defs = theSchema.getGroupDefs();
 		defs.addGroup(grp);
-		TITLE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ArtifactDatabase.ID_TITLE, "", T_FIELD_STRING));
+		TITLE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_TITLE, "", T_FIELD_STRING));
 		SOURCE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_SOURCE, "", T_FIELD_LOCATION));
 		ARCHIVEPATH_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_ARCHIVEPATH, "", T_FIELD_LOCATION));
-		DOI_FIELD = theSchema.addField(new FieldTemplate(theSchema, ArtifactDatabase.ID_DOI, "", T_FIELD_STRING));
-		DATE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ArtifactDatabase.ID_DATE, "", T_FIELD_STRING));
-		KEYWORDS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ArtifactDatabase.ID_KEYWORDS, "", T_FIELD_STRING));
-		COMMENTS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ArtifactDatabase.ID_COMMENTS, "", T_FIELD_STRING));
+		DOI_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DOI, "", T_FIELD_STRING));
+		DATE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DATE, "", T_FIELD_STRING));
+		KEYWORDS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_KEYWORDS, "", T_FIELD_STRING));
+		COMMENTS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_COMMENTS, "", T_FIELD_STRING));
 		int numFields = COMMENTS_FIELD + 1;
 		Repository.templateList = new FieldTemplate[numFields];
 		for (int i = 1; i < numFields; ++i) {
