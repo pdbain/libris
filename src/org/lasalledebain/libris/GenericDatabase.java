@@ -316,6 +316,10 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return readOnly;
 	}
 
+	public boolean isDatabaseOpen() {
+		return dbOpen;
+	}
+
 	public boolean isIndexed() {
 		return indexMgr.isIndexed();
 	}

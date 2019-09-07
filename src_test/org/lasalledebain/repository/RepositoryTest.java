@@ -103,6 +103,7 @@ public class RepositoryTest  extends TestCase {
 				Files.write(testFile, fileContent);
 				URI theUri = repo.copyFileToRepo(testFile.toFile(), i);
 				uris.add(theUri);
+				Files.delete(testFile);
 			}
 			checkDirectorySize(repoRoot);
 			for (int i = 1; i <= numFiles; ++i) {

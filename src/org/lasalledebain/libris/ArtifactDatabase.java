@@ -27,6 +27,11 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	static final DynamicSchema artifactsSchema = ArtifactDatabase.makeSchema();
 	private final DatabaseMetadata myMetadata;
+	static final String ID_SOURCE = "ID_source";
+	static final String ID_ARCHIVEPATH = "ID_archivepath";
+	public static int SOURCE_FIELD;
+	public static int TITLE_FIELD;
+	public static int ARCHIVEPATH_FIELD;
 	public ArtifactDatabase(LibrisUi theUi, FileManager theFileManager) throws DatabaseException {
 		super(theUi, theFileManager);
 		myMetadata = new DatabaseMetadata();
@@ -82,7 +87,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	
 	public ArtifactRecord newRecord(ArtifactParameters artifactParameters) throws LibrisException {
 		ArtifactRecord rec = newRecord();
-		rec.addFieldValue(Repository.ID_SOURCE, artifactParameters.getSourceString());
+		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
 		rec.addFieldValue(Repository.ID_DATE, artifactParameters.date);
 		rec.addFieldValue(Repository.ID_DOI, artifactParameters.doi);
 		rec.addFieldValue(Repository.ID_KEYWORDS, artifactParameters.keywords);
@@ -115,6 +120,9 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	@Override
 	public int putRecord(ArtifactRecord rec) throws LibrisException {
+		if (!isDatabaseOpen()) {
+			throw new DatabaseException("putRecord: database closed");
+		}
 		int id = genericPutRecord(myMetadata, rec);
 		int[] affiliations = rec.getAffiliates(0);
 		if (affiliations.length != 0) {
@@ -132,7 +140,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	public ArtifactParameters getArtifactInfo(int artifactId) {
 		try {
 			final ArtifactRecord record = getRecord(artifactId);
-			String uriString = record.getFieldValue(Repository.SOURCE_FIELD).getMainValueAsString();
+			String uriString = record.getFieldValue(ID_SOURCE).getMainValueAsString();
 			ArtifactParameters result = new ArtifactParameters(new URI(uriString));
 			result.date = record.getFieldValue(Repository.ID_DATE).getMainValueAsString();
 			result.comments = record.getFieldValue(Repository.ID_COMMENTS).getMainValueAsString();
@@ -180,8 +188,9 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		Repository.GROUP_FIELD = theSchema.addField(grp);
 		GroupDefs defs = theSchema.getGroupDefs();
 		defs.addGroup(grp);
-		Repository.TITLE_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_TITLE, "", T_FIELD_STRING));
-		Repository.SOURCE_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_SOURCE, "", T_FIELD_LOCATION));
+		TITLE_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_TITLE, "", T_FIELD_STRING));
+		SOURCE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_SOURCE, "", T_FIELD_LOCATION));
+		ARCHIVEPATH_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_ARCHIVEPATH, "", T_FIELD_LOCATION));
 		Repository.DOI_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_DOI, "", T_FIELD_STRING));
 		Repository.DATE_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_DATE, "", T_FIELD_STRING));
 		Repository.KEYWORDS_FIELD = theSchema.addField(new FieldTemplate(theSchema, Repository.ID_KEYWORDS, "", T_FIELD_STRING));
@@ -191,7 +200,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		for (int i = 1; i < numFields; ++i) {
 			Repository.templateList[i] = theSchema.getFieldTemplate(i);
 		}
-		theSchema.setIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS, new int[] {Repository.TITLE_FIELD, Repository.KEYWORDS_FIELD});
+		theSchema.setIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS, new int[] {ArtifactDatabase.TITLE_FIELD, Repository.KEYWORDS_FIELD});
 		return theSchema;
 	}
 	@Override

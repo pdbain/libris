@@ -76,6 +76,9 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	}
 
 	public LibrisDatabase openDatabase() throws DatabaseException {
+		if (!isDatabaseSelected()) {
+			throw new DatabaseException("Database file not set");
+		}
 		if (isDatabaseOpen()) {
 			alert("Cannot open "+databaseFile.getAbsolutePath()+" because "+currentDatabase.getDatabaseFile().getAbsolutePath()+" is open");
 		}

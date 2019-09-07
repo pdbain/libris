@@ -42,15 +42,11 @@ public class Repository extends Libris {
 
 	static final String ID_KEYWORDS = "ID_keywords";
 
-	static final String ID_SOURCE = "ID_source";
-
 	static final String ID_TITLE = "ID_title";
 	static final String ID_COMMENTS = "ID_comments";
 
 	GenericDatabase<DatabaseRecord> repoDatabase;
 	public static int GROUP_FIELD;
-	public static int TITLE_FIELD;
-	public static int SOURCE_FIELD;
 	public static int DOI_FIELD;
 	public static int DATE_FIELD;
 	public static int KEYWORDS_FIELD;
@@ -150,7 +146,7 @@ public class Repository extends Libris {
 	public File getArtifactFile(int artifactId) {
 		try {
 			Record record = repoDatabase.getRecord(artifactId);
-			final FieldValue sourceField = record.getFieldValue(SOURCE_FIELD);
+			final FieldValue sourceField = record.getFieldValue(ArtifactDatabase.SOURCE_FIELD);
 			String uriString = sourceField.getMainValueAsString();
 			File result = new File(new URI(uriString));
 			return result;
@@ -162,7 +158,7 @@ public class Repository extends Libris {
 	public ArtifactParameters getArtifactInfo(int artifactId) {
 		try {
 			final Record record = repoDatabase.getRecord(artifactId);
-			String uriString = record.getFieldValue(SOURCE_FIELD).getMainValueAsString();
+			String uriString = record.getFieldValue(ArtifactDatabase.SOURCE_FIELD).getMainValueAsString();
 			ArtifactParameters result = new ArtifactParameters(new URI(uriString));
 			result.date = record.getFieldValue(ID_DATE).getMainValueAsString();
 			result.comments = record.getFieldValue(ID_COMMENTS).getMainValueAsString();
@@ -182,13 +178,13 @@ public class Repository extends Libris {
 
 	public int putArtifactInfo(ArtifactParameters artifactParameters) throws LibrisException {
 		DatabaseRecord rec = repoDatabase.newRecord();
-		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
+		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.getSourceString());
 		rec.addFieldValue(ID_DATE, artifactParameters.date);
 		rec.addFieldValue(ID_DOI, artifactParameters.doi);
 		rec.addFieldValue(ID_KEYWORDS, artifactParameters.keywords);
 		rec.addFieldValue(ID_COMMENTS, artifactParameters.comments);
 		String title = artifactParameters.title;
-		rec.addFieldValue(ID_SOURCE, artifactParameters.source.toString());
+		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.source.toString());
 		if (!artifactParameters.recordName.isEmpty()) {
 			rec.setName(artifactParameters.recordName);
 		}

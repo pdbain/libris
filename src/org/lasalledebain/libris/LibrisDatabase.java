@@ -62,7 +62,13 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	protected Repository documentRepository;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisDatabaseMetadata databaseMetadata;
-	private static final Logger librisLogger = Logger.getLogger(LibrisDatabase.class.getName());
+	private static final Logger librisLogger = setupLogger();
+
+	private static Logger setupLogger() {
+		Logger myLogger = Logger.getLogger(LibrisDatabase.class.getName());
+		myLogger.setLevel(Level.SEVERE);
+		return myLogger;
+	}
 	protected DatabaseAttributes xmlAttributes;
 	private FileAccessManager databaseFileMgr;
 	private FileAccessManager schemaFileMgr;
@@ -162,9 +168,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return super.closeDatabase(force);
 	}
 
-	public boolean isDatabaseOpen() {
-		return dbOpen;
-	}
 	private void loadDatabaseInfo(boolean doLoadMetadata) throws LibrisException {
 		try {
 			databaseFileMgr = fileMgr.makeAccessManager(LibrisConstants.DATABASE_NAME, myDatabaseFile);
@@ -495,13 +498,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 	}
 
-	/**
-	 * @param initialElementName
-	 * @param reader
-	 * @return
-	 * @throws InputException 
-	 */
-	// TODO pull up
 	public static ElementManager makeElementManager(Reader reader, String initialElementName, String filePath) throws
 	InputException {
 		return getXmlFactory().makeElementManager(reader, 

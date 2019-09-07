@@ -112,7 +112,7 @@ public class DatabaseMetadata implements LibrisXMLConstants {
 	public void setModifiedRecords(int modifiedRecords) {
 		this.modifiedRecords = modifiedRecords;
 	}
-	public void adjustModifiedRecords(int numAdded) {
+	void adjustModifiedRecords(int numAdded) {
 		this.modifiedRecords += numAdded;
 	}
 

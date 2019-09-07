@@ -22,6 +22,10 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 		super(databaseFile, readOnly);
 	}
 
+	public HeadlessUi() {
+		super(null, false);
+	}
+
 	// TODO write headless UI
 	// use logging interface for messages, store results
 	@Override

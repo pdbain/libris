@@ -194,7 +194,7 @@ public class ArtifactTest extends TestCase {
 			IndexConfiguration config = new IndexConfiguration(myUi);
 			config.setSignatureLevels(2);
 			db.buildIndexes(config);
-			FilteredRecordList<ArtifactRecord> filteredList = db.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, new int[] {Repository.TITLE_FIELD}, TITLE_PREFIX+3);
+			FilteredRecordList<ArtifactRecord> filteredList = db.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, new int[] {ArtifactDatabase.TITLE_FIELD}, TITLE_PREFIX+3);
 			int recordCount = 0;
 			for (ArtifactRecord rec: filteredList) {
 				++recordCount;

@@ -21,7 +21,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 public class ArtifactRecord extends Record {
-	private static final int NUM_FIELDS = 7;
+	private static final int NUM_FIELDS = 8;
 	final Schema mySchema;
 	GroupMember affiliations;
 

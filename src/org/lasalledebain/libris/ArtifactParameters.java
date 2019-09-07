@@ -13,6 +13,7 @@ public class ArtifactParameters {
 	int parentId;
 	String recordName;
 	URI source;
+	URI archivepath;
 	public ArtifactParameters(URI source) {
 		super();
 		this.source = source;
@@ -23,6 +24,9 @@ public class ArtifactParameters {
 	}
 	public String getSourceString() {
 		return source.toASCIIString();
+	}
+	public String getArchivePathString() {
+		return archivepath.toASCIIString();
 	}
 	public URI getSource() {
 		return source;
@@ -88,6 +92,7 @@ public class ArtifactParameters {
 					&& Objects.equals(other.doi, doi)
 					&& Objects.equals(other.keywords, keywords)
 					&& other.source.equals(source)
+					&& Objects.equals(other.archivepath, archivepath)
 					&& Objects.equals(other.recordName, recordName)
 					&& Objects.equals(other.recordParentName, recordParentName)
 					&& Objects.equals(other.parentId, parentId)
@@ -110,6 +115,7 @@ public class ArtifactParameters {
 		}
 		buff.append("recordParentName", recordParentName);
 		buff.append("source", getSourceString());
+		buff.append("archivePath", getArchivePathString());
 		buff.append("title", title);
 		return buff.toString();
 	}
@@ -142,5 +148,11 @@ public class ArtifactParameters {
 	}
 	public void setParentId(int parentId) {
 		this.parentId = parentId;
+	}
+	public URI getArchivepath() {
+		return archivepath;
+	}
+	public void setArchivepPath(URI archivepath) {
+		this.archivepath = archivepath;
 	}
 }
