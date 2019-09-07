@@ -355,7 +355,7 @@ public class ArtifactRecord extends Record {
 		}
 	}
 	private static void checkGroupId(String groupId) {
-		assertTrueError("Invalid group "+groupId+" for artifact database", Repository.ID_GROUPS.equals(groupId));
+		assertTrueError("Invalid group "+groupId+" for artifact database", ArtifactDatabase.ID_GROUPS.equals(groupId));
 	}
 
 	private static void checkGroupNum(int groupNum) {

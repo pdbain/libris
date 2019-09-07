@@ -95,13 +95,12 @@ public class ArtifactManagerTest  extends TestCase {
 				Path testFile = Paths.get(originalRoot, "f"+i);
 				Files.write(testFile, fileContent);
 				repo.importFile(testFile.toFile());
-				Files.delete(testFile);
 			}
 			checkDirectorySize(repoRoot);
 			for (int i = 1; i <= numFiles; ++i) {
 				Path testFile = Paths.get(originalRoot, "f"+i);
 				File sourceFile = repo.getArtifactSourceFile(i);
-				assertEquals("source files do not match",  testFile, sourceFile);
+				assertEquals("source files do not match",  testFile.toFile(), sourceFile);
 				Files.delete(testFile);
 				byte[] expectedContent = makeTestData(i);
 				File archiveFile = repo.getArtifactArchiveFile(i);

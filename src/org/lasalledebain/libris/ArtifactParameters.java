@@ -3,6 +3,8 @@ package org.lasalledebain.libris;
 import java.net.URI;
 import java.util.Objects;
 
+import org.lasalledebain.libris.exception.DatabaseException;
+
 public class ArtifactParameters {
 	String date;
 	String title;
@@ -23,9 +25,15 @@ public class ArtifactParameters {
 		parentId = RecordId.NULL_RECORD_ID;
 	}
 	public String getSourceString() {
+		if (null == source) {
+			return null;
+		}
 		return source.toASCIIString();
 	}
 	public String getArchivePathString() {
+		if (null == archivepath) {
+			return null;
+		}
 		return archivepath.toASCIIString();
 	}
 	public URI getSource() {

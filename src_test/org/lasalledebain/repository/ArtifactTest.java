@@ -21,7 +21,6 @@ import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.ArtifactRecord;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
@@ -201,7 +200,7 @@ public class ArtifactTest extends TestCase {
 				assertEquals("wrong record returned", 3, rec.getRecordId());
 			}
 			assertEquals("wrong number of records returned", 1, recordCount);
-			filteredList = db.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, new int[] {Repository.KEYWORDS_FIELD}, 
+			filteredList = db.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, new int[] {ArtifactDatabase.KEYWORDS_FIELD}, 
 					EVEN_KEYWORD);
 			recordCount = 0;
 			for (ArtifactRecord rec: filteredList) {

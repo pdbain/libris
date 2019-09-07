@@ -33,24 +33,9 @@ public class Repository extends Libris {
 
 	private static final String ARTIFACT_PREFIX = "A_";
 
-	static final String ID_GROUPS = "ID_groups";
-
 	private static final String REPOSITORY = "Repository";
 
-	static final String ID_DATE = "ID_date";
-	static final String ID_DOI = "ID_doi";
-
-	static final String ID_KEYWORDS = "ID_keywords";
-
-	static final String ID_TITLE = "ID_title";
-	static final String ID_COMMENTS = "ID_comments";
-
 	GenericDatabase<DatabaseRecord> repoDatabase;
-	public static int GROUP_FIELD;
-	public static int DOI_FIELD;
-	public static int DATE_FIELD;
-	public static int KEYWORDS_FIELD;
-	public static int COMMENTS_FIELD;
 	static final int FANOUT = 100;
 
 	File root;
@@ -160,11 +145,11 @@ public class Repository extends Libris {
 			final Record record = repoDatabase.getRecord(artifactId);
 			String uriString = record.getFieldValue(ArtifactDatabase.SOURCE_FIELD).getMainValueAsString();
 			ArtifactParameters result = new ArtifactParameters(new URI(uriString));
-			result.date = record.getFieldValue(ID_DATE).getMainValueAsString();
-			result.comments = record.getFieldValue(ID_COMMENTS).getMainValueAsString();
-			result.doi = record.getFieldValue(ID_DOI).getMainValueAsString();
-			result.keywords = record.getFieldValue(ID_KEYWORDS).getMainValueAsString();
-			result.title = record.getFieldValue(ID_TITLE).getMainValueAsString();
+			result.date = record.getFieldValue(ArtifactDatabase.ID_DATE).getMainValueAsString();
+			result.comments = record.getFieldValue(ArtifactDatabase.ID_COMMENTS).getMainValueAsString();
+			result.doi = record.getFieldValue(ArtifactDatabase.ID_DOI).getMainValueAsString();
+			result.keywords = record.getFieldValue(ArtifactDatabase.ID_KEYWORDS).getMainValueAsString();
+			result.title = record.getFieldValue(ArtifactDatabase.ID_TITLE).getMainValueAsString();
 			result.recordName = record.getName();
 			if (record.hasAffiliations()) {
 				result.recordParentName = repoDatabase.getRecordName(record.getParent(0));
@@ -179,10 +164,10 @@ public class Repository extends Libris {
 	public int putArtifactInfo(ArtifactParameters artifactParameters) throws LibrisException {
 		DatabaseRecord rec = repoDatabase.newRecord();
 		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.getSourceString());
-		rec.addFieldValue(ID_DATE, artifactParameters.date);
-		rec.addFieldValue(ID_DOI, artifactParameters.doi);
-		rec.addFieldValue(ID_KEYWORDS, artifactParameters.keywords);
-		rec.addFieldValue(ID_COMMENTS, artifactParameters.comments);
+		rec.addFieldValue(ArtifactDatabase.ID_DATE, artifactParameters.date);
+		rec.addFieldValue(ArtifactDatabase.ID_DOI, artifactParameters.doi);
+		rec.addFieldValue(ArtifactDatabase.ID_KEYWORDS, artifactParameters.keywords);
+		rec.addFieldValue(ArtifactDatabase.ID_COMMENTS, artifactParameters.comments);
 		String title = artifactParameters.title;
 		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.source.toString());
 		if (!artifactParameters.recordName.isEmpty()) {
@@ -192,7 +177,7 @@ public class Repository extends Libris {
 			File sourceFile = new File(artifactParameters.source);
 			title = sourceFile.getName();
 		}
-		rec.addFieldValue(ID_TITLE, title);
+		rec.addFieldValue(ArtifactDatabase.ID_TITLE, title);
 		if (!artifactParameters.recordParentName.isEmpty()) {
 			Record parent = repoDatabase.getRecord(artifactParameters.recordParentName);
 			if (Objects.isNull(parent)) {

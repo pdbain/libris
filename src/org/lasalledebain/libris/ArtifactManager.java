@@ -145,7 +145,7 @@ public class ArtifactManager {
 	public File getArtifactSourceFile(int artifactId) {
 		try {
 			Record record = myDb.getRecord(artifactId);
-			final FieldValue sourceField = record.getFieldValue(ArtifactDatabase.SOURCE_FIELD);
+			final FieldValue sourceField = record.getFieldValue(ArtifactDatabase.ID_SOURCE);
 			String uriString = sourceField.getMainValueAsString();
 			File result = new File(new URI(uriString));
 			return result;
@@ -157,8 +157,8 @@ public class ArtifactManager {
 	public File getArtifactArchiveFile(int artifactId) {
 		try {
 			Record record = myDb.getRecord(artifactId);
-			final FieldValue sourceField = record.getFieldValue(ArtifactDatabase.ARCHIVEPATH_FIELD);
-			String uriString = sourceField.getMainValueAsString();
+			final FieldValue archivePathField = record.getFieldValue(ArtifactDatabase.ID_ARCHIVEPATH);
+			String uriString = archivePathField.getMainValueAsString();
 			File result = new File(new URI(uriString));
 			return result;
 		} catch (InputException | URISyntaxException e) {
