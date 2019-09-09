@@ -7,6 +7,7 @@ import org.lasalledebain.libris.ui.LibrisUi;
 
 public class LibrisIndexConfiguration extends IndexConfiguration {
 	private File databaseFile;
+	private File artifactDirectory;
 	boolean loadMetadata;
 	public LibrisIndexConfiguration(LibrisUi theUi) {
 		super(theUi);
@@ -16,6 +17,9 @@ public class LibrisIndexConfiguration extends IndexConfiguration {
 		this(databaseUi);
 		loadMetadata = true;
 		this.databaseFile = databaseFile;
+		File parentDirectory = databaseFile.getParentFile();
+		String artifactDirectoryName = databaseFile.getName() + "_artifacts";
+		artifactDirectory = new File(parentDirectory, artifactDirectoryName);
 	}
 
 	public LibrisIndexConfiguration(File databaseFile) {
@@ -33,5 +37,13 @@ public class LibrisIndexConfiguration extends IndexConfiguration {
 
 	public File getDatabaseFile() {
 		return databaseFile;
+	}
+
+	public File getArtifactDirectory() {
+		return artifactDirectory;
+	}
+
+	public void setArtifactDirectory(File artifactDirectory) {
+		this.artifactDirectory = artifactDirectory;
 	}
 }

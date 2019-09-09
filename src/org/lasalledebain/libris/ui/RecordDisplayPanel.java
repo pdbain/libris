@@ -178,7 +178,7 @@ public class RecordDisplayPanel extends JPanel {
 					int artifactId = currentRecord.getArtifactId();
 					File recordArtifact = database.getArtifactFile(artifactId);
 					if (!Objects.isNull(recordArtifact)) {
-						File result = database.getDocumentRepository().getArtifactFile(artifactId);
+						File result = database.getArtifactFile(artifactId);
 					}
 				}
 			}

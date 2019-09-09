@@ -18,6 +18,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.ui.Dialogue;
 import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 public class ArtifactManager {
 	private static final String LEVEL_PREFIX = "_L";
@@ -168,6 +169,10 @@ public class ArtifactManager {
 
 	public ArtifactParameters getArtifactInfo(int artifactId) {
 		return myDb.getArtifactInfo(artifactId);
+	}
+
+	public void fromXml(ElementManager artifactsMgr) throws LibrisException {
+		myDb.fromXml(artifactsMgr);
 	}
 
 }

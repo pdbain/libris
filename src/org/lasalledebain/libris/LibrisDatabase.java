@@ -59,7 +59,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	private File myDatabaseFile;
 	private Schema mySchema;
 	public  LibrisException rebuildException;
-	protected Repository documentRepository;
+	protected ArtifactManager documentRepository;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisDatabaseMetadata databaseMetadata;
 	private static final Logger librisLogger = setupLogger();
@@ -263,6 +263,12 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				nextElement = librisMgr.getNextId();
 				if (XmlRecordsReader.XML_ARTIFACTS_TAG.equals(nextElement)) {
 					ElementManager artifactsMgr = librisMgr.nextElement();
+					File artifactDirectory = config.getArtifactDirectory();
+					FileManager artifactFileMgr = new FileManager(getDatabaseAuxDirectory(config.getDatabaseFile(), 
+							REPOSITORY_AUX_DIRECTORY_NAME));
+					documentRepository = new ArtifactManager(config.getDatabaseUi(), artifactDirectory, artifactFileMgr);
+					documentRepository.initialize(true);
+					documentRepository.fromXml(artifactsMgr);
 				}
 				librisMgr.closeFile();
 				this.closeDatabaseSource();
@@ -812,7 +818,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	public File getArtifactFile(int artifact) {
 		if (hasDocumentRepository() && !RecordId.isNull(artifact)) {
-			return documentRepository.getArtifactFile(artifact);
+			return documentRepository.getArtifactArchiveFile(artifact);
 		} else {
 			return null;
 		}
@@ -834,10 +840,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		terms.sorted().distinct()
 		.forEach(term -> indexMgr.incrementTermCount(term));
 	}
-	public Repository getDocumentRepository() {
-		return documentRepository;
-	}
-	
 }
 
 
