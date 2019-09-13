@@ -1,7 +1,11 @@
 package org.lasalledebain.repository;
 
+import static org.lasalledebain.Utilities.testLogger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -9,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
@@ -17,6 +22,10 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.ArtifactManager;
 import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.FileManager;
+import org.lasalledebain.libris.Libris;
+import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -80,6 +89,37 @@ public class ArtifactManagerTest  extends TestCase {
 	public void testImportFile(){
 		importAndCheckFiles(10);
 	}
+
+	public void testDatabaseWithDocumentRepo() throws FileNotFoundException, IOException, LibrisException {
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workdir);
+		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		db.addDocumentRepository(null); // use default
+		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_PDFs);
+		String[] testFileNames = testPdfDirectory.list();
+		assertTrue("wrong number of test files", testFileNames.length >= 4);
+		for (int i = 1; i <= 4; ++i) {
+			db.addArtifact(1, new File(testPdfDirectory, testFileNames[i - 1]));
+		}
+		db.save();
+		checkRecordArtifacts(db);
+		File copyDbXml = new File (workdir, "database_copy.xml");
+		copyDbXml.deleteOnExit();
+		FileOutputStream copyStream = new FileOutputStream(copyDbXml);
+		testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
+		 
+		db.exportDatabaseXml(copyStream);
+		db = Libris.buildAndOpenDatabase(copyDbXml);
+		checkRecordArtifacts(db);
+	}
+
+	private void checkRecordArtifacts(LibrisDatabase db) throws InputException, DatabaseException {
+		for (int i = 1; i <= 4; ++i) {
+			File result = db.getArtifactFileForRecord(i);
+			assertNotNull("No artifact file for record "+i, result);
+			assertTrue("Artifact file "+result.getAbsolutePath()+" does not exist", result.exists());
+		}
+	}
+
 
 	protected void importAndCheckFiles(final int numFiles) {
 		File originalFiles = new File(workdir, "originals");

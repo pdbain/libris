@@ -2,6 +2,8 @@ package org.lasalledebain.libris.indexes;
 
 import java.io.File;
 
+import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisUi;
 
@@ -13,13 +15,21 @@ public class LibrisIndexConfiguration extends IndexConfiguration {
 		super(theUi);
 	}
 
-	public LibrisIndexConfiguration(File databaseFile, LibrisUi databaseUi) {
+	public LibrisIndexConfiguration(File databaseFile, LibrisUi databaseUi) throws DatabaseException {
 		this(databaseUi);
 		loadMetadata = true;
 		this.databaseFile = databaseFile;
-		File parentDirectory = databaseFile.getParentFile();
-		String artifactDirectoryName = databaseFile.getName() + "_artifacts";
-		artifactDirectory = new File(parentDirectory, artifactDirectoryName);
+		File artifactDirectoryFile = getDefautlArtifactsDirectory(databaseFile);
+		artifactDirectory = artifactDirectoryFile;
+	}
+
+	public static File getDefautlArtifactsDirectory(File databaseFile) throws DatabaseException {
+		File artifactDirectoryFile =LibrisDatabase.getDatabaseAuxDirectory(databaseFile, "artifacts");
+		return artifactDirectoryFile;
+	}
+
+	public static String foo(File databaseFile) {
+		return databaseFile.getName() + "_artifacts";
 	}
 
 	public LibrisIndexConfiguration(File databaseFile) {

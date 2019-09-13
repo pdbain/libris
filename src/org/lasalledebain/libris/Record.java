@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
@@ -70,6 +71,14 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	 */
 	public String getName() {
 		return name;
+	}
+	
+	public int getArtifactId() {
+		return RecordId.NULL_RECORD_ID;
+	}
+
+	public void setArtifactId(int artifactId) {
+		throw new DatabaseError("artifact ID field not defined for this record type");
 	}
 
 	public void setName(String newName) throws InputException {

@@ -44,12 +44,14 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	/**
 	 * @return id of the related file in the artifact database
 	 */
+	@Override
 	public int getArtifactId() {
 		return artifactId;
 	}
 	/**
 	 * @param artifactId id of the related file in the artifact database
 	 */
+	@Override
 	public void setArtifactId(int artifactId) {
 		this.artifactId = artifactId;
 	}

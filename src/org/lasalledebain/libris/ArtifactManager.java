@@ -65,6 +65,7 @@ public class ArtifactManager {
 
 	public void close(boolean force) throws DatabaseException {
 		myDb.closeDatabase(force);
+		reservationMgr.freeDatabase();
 	}
 	
 	public synchronized int importFile(ArtifactParameters artifactParameters)

@@ -51,6 +51,8 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 	 * 		bit 2: hasArtifact
 	 * 	if record has name
 	 * 		name
+	 *  if record has artifact
+	 *  	artifact (4 bytes)
 	 *  if hasArtifact
 	 *  	artifact ID (4 bytes)
 	 *  if record has groups
@@ -252,6 +254,11 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 		if (null != recName) {
 			flags |= LibrisConstants.RECORD_HAS_NAME;
 		}
+		int artifactId = recData.getArtifactId();
+		boolean hasArtifact = RecordId.isNull(artifactId);
+		if (!hasArtifact) {
+			flags |= LibrisConstants.RECORD_HAS_ARTIFACT;
+		}
 		if (hasGroups) {
 			flags |= LibrisConstants.RECORD_HAS_GROUPS;
 			int numGroups = dbSchema.getGroupDefs().getNumGroups();
@@ -266,9 +273,7 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 							groupBufferStream.writeInt(id);
 						}
 					}
-				} catch (IOException e) {
-					throw new OutputException("error writing group "+dbSchema.getGroupId(groupNum), e);
-				} catch (InputException e) {
+				} catch (IOException | InputException e) {
 					throw new OutputException("error writing group "+dbSchema.getGroupId(groupNum), e);
 				}			
 			}
@@ -348,6 +353,9 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 			if (null != recName) {
 				recordBufferStream.writeUTF(recName);
 			}
+			if (hasArtifact) {
+				recordBufferStream.writeInt(artifactId);
+			}
 			if (hasGroups) {
 				recordBufferStream.write(groupBuffer.toByteArray());
 			}
@@ -401,12 +409,17 @@ public void removeRecord(int rid) throws DatabaseException {
 			r.setRecordId(recId);
 
 			byte flags = recordsFileStore.readByte();
-			if (0 != (flags & LibrisConstants.RECORD_HAS_NAME)) {
+			if (checkBit(flags, LibrisConstants.RECORD_HAS_NAME)) {
 				String recName = recordsFileStore.readUTF();
 				r.setName(recName);
 			}
 
-			if (0 != (flags & LibrisConstants.RECORD_HAS_GROUPS)) {
+			if (checkBit(flags, LibrisConstants.RECORD_HAS_ARTIFACT)) {
+				int artifactId = recordsFileStore.readInt();
+				r.setArtifactId(artifactId);
+			}
+
+			if (checkBit(flags, LibrisConstants.RECORD_HAS_GROUPS)) {
 				int numGroups = dbSchema.getGroupDefs().getNumGroups();
 				for (int groupNum=0; groupNum < numGroups; ++groupNum) {
 					int numAffiliates = recordsFileStore.readByte() & 0x000000ff;
@@ -503,6 +516,10 @@ public void removeRecord(int rid) throws DatabaseException {
 		} catch (IOException e) {
 			throw new InputException(e);
 		}
+	}
+
+	private boolean checkBit(byte flags, byte testBit) {
+		return 0 != (flags & testBit);
 	}
 
 

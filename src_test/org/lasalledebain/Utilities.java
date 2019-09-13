@@ -85,6 +85,7 @@ public class Utilities extends TestCase {
 	public static final String EXAMPLE_ARTIFACT_PDF = "example_artifact.pdf";
 	public static final String EXAMPLE_LARGE_PDF = "mesa.pdf";
 	public static final String EXAMPLE_DOCS_ZIP = "example_docs.zip";
+	public static final String EXAMPLE_PDFs = "example_pdfs";
 	
 	static RecordFactory<DatabaseRecord> makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {
@@ -109,8 +110,7 @@ public class Utilities extends TestCase {
 		return testDir;
 	}
 
-	// TODO rename getTestDatabase to getTestFile()
-	private static File getTestDatabase(String testFile) {
+	private static File getTestFile(String testFile) {
 		File testDir = getTestDataDirectory();
 		return new File(testDir, testFile);
 	}
@@ -250,7 +250,7 @@ public class Utilities extends TestCase {
 
 	public static File copyTestDatabaseFile(String testDbName, File targetDirectory)
 			throws FileNotFoundException, IOException {
-		File testDatabaseFile = getTestDatabase(testDbName);
+		File testDatabaseFile = getTestFile(testDbName);
 		File testDatabaseFileCopy = new File(targetDirectory, testDatabaseFile.getName());
 		copyFile(testDatabaseFile, testDatabaseFileCopy);
 		return testDatabaseFileCopy;
@@ -266,7 +266,7 @@ public class Utilities extends TestCase {
 	}
 
 	public static void deleteTestDatabaseFiles(final String dbName) {
-		File testDatabaseFile = getTestDatabase(dbName);
+		File testDatabaseFile = getTestFile(dbName);
 		File testDatabaseFileCopy = new File(System.getProperty("java.io.tmpdir"), testDatabaseFile.getName());
 		testDatabaseFileCopy.delete();
 		File auxFiles = new File(testDatabaseFileCopy.getParent(), ".libris_auxfiles_"+dbName);

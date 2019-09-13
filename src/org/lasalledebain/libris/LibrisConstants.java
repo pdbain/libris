@@ -29,6 +29,7 @@ public interface LibrisConstants {
 	public static final short ENUM_VALUE_OUT_OF_RANGE = -1;
 	public static final byte RECORD_HAS_GROUPS = 1 << 0;
 	public static final byte RECORD_HAS_NAME = 1 << 2;
+	public static final byte RECORD_HAS_ARTIFACT = 1 << 3;
 	
 	String DATABASE_NAME = "DATABASE";
 	int NULL_GROUP = -1;
