@@ -137,7 +137,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			}
 			getDatabaseRecords();
 			if (hasDocumentRepository()) {
-				// TODO open repo documentRepository = Repository.open(getUi(), new File(xmlAttributes.getRepositoryLocation()));
+				FileManager artifactFileMgr = new FileManager(getDatabaseAuxDirectory(myDatabaseFile, 
+						REPOSITORY_AUX_DIRECTORY_NAME));
+				documentRepository = new ArtifactManager(getUi(), databaseMetadata.getRepositoryRoot(), artifactFileMgr);
 			}
 		}
 	}
@@ -158,6 +160,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public boolean closeDatabase(boolean force) throws DatabaseException {
 		if (!isOkayToClose(force)) {
 			return false;
+		}
+		if (!isDatabaseOpen() && force) {
+			return true;
 		}
 		myDatabaseFile = null;
 		if (isDatabaseReserved()) {
@@ -270,7 +275,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					LibrisUi databaseUi = config.getDatabaseUi();
 					initializeDocumentRepository(databaseUi, artifactDirectory);
 					documentRepository.fromXml(artifactsMgr);
+					documentRepository.buildIndexes(config);
 				}
+				saveMetadata();
 				librisMgr.closeFile();
 				this.closeDatabaseSource();
 			} catch (FactoryConfigurationError | FileNotFoundException e) {
@@ -290,6 +297,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		documentRepository = new ArtifactManager(databaseUi, artifactDirectory, artifactFileMgr);
 		documentRepository.initialize(true);
 		databaseMetadata.hasDocumentRepository(true);
+		databaseMetadata.setRepositoryRoot(artifactDirectory);
 	}
 
 	public String getElementTag() {
@@ -299,6 +307,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public String getXmlTag() {
 		return XML_LIBRIS_TAG;
 	}
+	
 	@Override
 	public void fromXml(ElementManager librisMgr) throws LibrisException {
 		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
@@ -332,6 +341,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		outWriter.writeStartElement(XML_LIBRIS_TAG, getAttributes(), false);
 		databaseMetadata.toXml(outWriter);
 		databaseRecords.toXml(outWriter);
+		if (hasDocumentRepository()) {
+			documentRepository.toXml(outWriter);
+		}
 		outWriter.writeEndElement(); /* database */	
 		outWriter.flush();
 	}
@@ -673,7 +685,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 * @throws LibrisException 
 	 */
 	public int putRecord(DatabaseRecord rec) throws LibrisException {
-			LibrisMetadata metaData = getMetadata();
+		LibrisMetadata metaData = getMetadata();
 		int id = genericPutRecord(metaData, rec);
 		for (int g = 0; g < mySchema.getNumGroups(); ++g) {
 			int[] affiliations = rec.getAffiliates(g);
@@ -696,6 +708,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		if (Objects.isNull(rec)) {
 			throw new DatabaseException("Record "+recordId+" not found");
 		}
+		if (!rec.isEditable()) {
+			throw new DatabaseException("Record "+recordId+" is read-only");
+		}
 		if (!artifactSourceFile.exists()) {
 			throw new DatabaseException("File "+artifactSourceFile.getAbsolutePath()+" not found");
 		}
@@ -705,6 +720,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		ArtifactParameters params = new ArtifactParameters(artifactSourceFile.toURI());
 		int artifactId = documentRepository.importFile(params);
 		rec.setArtifactId(artifactId);
+		putRecord(rec);
 	}
 	public void saveRecords(Iterable <Record> recList) throws LibrisException {
 
@@ -873,7 +889,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			throw new DatabaseException("Record "+recordId+" not found");
 		}
 		File result = null;
-			int artifactId = rec.getArtifactId();
+		int artifactId = rec.getArtifactId();
 		if (hasDocumentRepository() && !RecordId.isNull(artifactId)) {
 			result =  documentRepository.getArtifactArchiveFile(artifactId);
 		}

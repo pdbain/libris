@@ -38,7 +38,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public static ElementShape getShape() {
 		ElementShape shape = new ElementShape(elementTag);
 		shape.setRequiredAttributeNames(new String[] {XML_RECORD_ID_ATTR});
-		shape.setOptionalAttributeNames(new String[][] {{"name", ""}});
+		shape.setOptionalAttributeNames(new String[][] {{"name", ""}, {"artifact", ""}});
 		shape.setHasContent(false);
 		shape.setSubElementNames(new String[] {XML_MEMBER_TAG, XML_FIELD_TAG});
 		return shape;

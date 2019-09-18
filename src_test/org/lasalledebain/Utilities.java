@@ -85,7 +85,7 @@ public class Utilities extends TestCase {
 	public static final String EXAMPLE_ARTIFACT_PDF = "example_artifact.pdf";
 	public static final String EXAMPLE_LARGE_PDF = "mesa.pdf";
 	public static final String EXAMPLE_DOCS_ZIP = "example_docs.zip";
-	public static final String EXAMPLE_PDFs = "example_pdfs";
+	public static final String EXAMPLE_FILES = "example_pdfs";
 	
 	static RecordFactory<DatabaseRecord> makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {

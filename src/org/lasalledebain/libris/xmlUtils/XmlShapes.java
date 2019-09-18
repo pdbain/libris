@@ -44,7 +44,7 @@ public class XmlShapes implements LibrisXMLConstants {
 	private static HashMap<String, ElementShape> initializeXmlShapes() {
 		HashMap<String, ElementShape> shapes = new HashMap<String, ElementShape>();
 
-		makeShape(shapes, XML_LIBRIS_TAG, new String[] {XML_INSTANCE_TAG, XML_METADATA_TAG, XML_RECORDS_TAG }, 
+		makeShape(shapes, XML_LIBRIS_TAG, new String[] {XML_INSTANCE_TAG, XML_METADATA_TAG, XML_RECORDS_TAG, XML_ARTIFACTS_TAG}, 
 				new String[] {XML_DATABASE_SCHEMA_NAME_ATTR, XML_SCHEMA_VERSION_ATTR},
 				new String[][] {{XML_DATABASE_NAME_ATTR, "unknown"}, {XML_DATABASE_DATE_ATTR, ""},
 						{XML_DATABASE_SCHEMA_LOCATION_ATTR, ""},

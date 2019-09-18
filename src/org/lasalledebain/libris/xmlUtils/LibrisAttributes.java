@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
@@ -161,6 +162,7 @@ public class LibrisAttributes implements Iterable<String[]> {
 	}
 	
 	public boolean contains(String attrName) {
-		return attributeList.containsKey(attrName);
+		String value = attributeList.get(attrName);
+		return Objects.nonNull(value) && !value.isEmpty();
 	}
 }

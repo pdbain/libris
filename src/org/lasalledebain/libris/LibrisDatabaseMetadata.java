@@ -23,13 +23,6 @@ public class LibrisDatabaseMetadata extends LibrisMetadata {
 		uiLayouts.fromXml(layoutsMgr);
 		metadataMgr.parseClosingTag();
 	}
-	public boolean hasDocumentRepository() {
-		return hasDocRepo;
-	}
-
-	public void hasDocumentRepository(boolean hasRepo) {
-		this.hasDocRepo = hasRepo;
-	}
 
 	@Override
 	public boolean equals(Object comparand) {
@@ -43,6 +36,5 @@ public class LibrisDatabaseMetadata extends LibrisMetadata {
 					&& (hasDocRepo == otherMetadat.hasDocRepo);
 		}
 	}
-
 
 }

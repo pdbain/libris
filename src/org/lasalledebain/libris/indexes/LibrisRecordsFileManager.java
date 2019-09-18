@@ -255,8 +255,8 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 			flags |= LibrisConstants.RECORD_HAS_NAME;
 		}
 		int artifactId = recData.getArtifactId();
-		boolean hasArtifact = RecordId.isNull(artifactId);
-		if (!hasArtifact) {
+		boolean hasArtifact = !RecordId.isNull(artifactId);
+		if (hasArtifact) {
 			flags |= LibrisConstants.RECORD_HAS_ARTIFACT;
 		}
 		if (hasGroups) {
@@ -416,7 +416,9 @@ public void removeRecord(int rid) throws DatabaseException {
 
 			if (checkBit(flags, LibrisConstants.RECORD_HAS_ARTIFACT)) {
 				int artifactId = recordsFileStore.readInt();
-				r.setArtifactId(artifactId);
+				if (!RecordId.isNull(artifactId)) { // TODO DEBUG
+					r.setArtifactId(artifactId);
+				}
 			}
 
 			if (checkBit(flags, LibrisConstants.RECORD_HAS_GROUPS)) {

@@ -24,6 +24,7 @@ import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -91,14 +92,79 @@ public class ArtifactManagerTest  extends TestCase {
 	}
 
 	public void testDatabaseWithDocumentRepo() throws FileNotFoundException, IOException, LibrisException {
+		File repoRoot = new File(workdir, "TestRoot");
+		repoRoot.mkdir();
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workdir);
 		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
-		db.addDocumentRepository(null); // use default
-		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_PDFs);
-		String[] testFileNames = testPdfDirectory.list();
+		db.addDocumentRepository(repoRoot); // use default
+		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
+		String[] testFileNames = filterTestFilenames(testPdfDirectory);
 		assertTrue("wrong number of test files", testFileNames.length >= 4);
 		for (int i = 1; i <= 4; ++i) {
-			db.addArtifact(1, new File(testPdfDirectory, testFileNames[i - 1]));
+			File artifactSourceFile = new File(testPdfDirectory, testFileNames[i - 1]);
+			db.addArtifact(i, artifactSourceFile);
+		}
+		db.save();
+		assertTrue("Repository missing", repoRoot.exists());
+		File[] rootDirs = repoRoot.listFiles();
+		assertTrue("Repository first-level directory missing", (rootDirs.length == 1) && rootDirs[0].isDirectory());
+		File[] artifactFiles = rootDirs[0].listFiles();
+		Arrays.sort(artifactFiles, (f, g) -> f.getName().compareTo(g.getName()));
+		for (int i = 0; i < 4; ++i) {
+			String artifactSourceFileName = testFileNames[i];
+			String artifactName = artifactFiles[i].getName();
+			assertTrue("Wrong artifact returned", artifactName.contains(artifactSourceFileName));
+		}
+		checkRecordArtifacts(db);
+		File copyDbXml = new File (workdir, "database_copy.xml");
+		copyDbXml.deleteOnExit();
+		FileOutputStream copyStream = new FileOutputStream(copyDbXml);
+		testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
+		 
+		db.exportDatabaseXml(copyStream);
+		LibrisDatabase db2 = Libris.buildAndOpenDatabase(copyDbXml);
+		checkRecordArtifacts(db2);
+		
+		for (Record r: db.getRecords()) {
+			int recId = r.getRecordId();
+			Record actualRec = db2.getRecord(recId);
+			assertEquals("Mismatch on record "+recId, r, actualRec);
+		}
+		
+		for (int i = 1; i <= 4; ++i) {
+			String artifactSourceFileName = testFileNames[i - 1];
+			File artifact = db2.getArtifactFileForRecord(i);
+			assertTrue("Wrong artifact returned", artifact.getName().contains(artifactSourceFileName));
+		}
+	}
+
+	public String[] filterTestFilenames(File testPdfDirectory) {
+		int readPointer = 0;
+		int writePointer = 0;
+		String[] testFileNames = testPdfDirectory.list();
+		while (readPointer < testFileNames.length) {
+			while ((readPointer < testFileNames.length) && !testFileNames[readPointer].endsWith("pdf")) {
+				++readPointer;
+			}
+			if (readPointer < testFileNames.length) {
+				testFileNames[writePointer] = testFileNames[readPointer];
+			}
+			++readPointer;
+		}
+		return testFileNames;
+	}
+
+	public void testDatabaseWithDefaultDocumentRepo() throws FileNotFoundException, IOException, LibrisException {
+		File repoRoot = null;
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workdir);
+		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		db.addDocumentRepository(repoRoot); // use default
+		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
+		String[] testFileNames = filterTestFilenames(testPdfDirectory);
+		assertTrue("wrong number of test files", testFileNames.length >= 4);
+		for (int i = 1; i <= 4; ++i) {
+			File artifactSourceFile = new File(testPdfDirectory, testFileNames[i - 1]);
+			db.addArtifact(i, artifactSourceFile);
 		}
 		db.save();
 		checkRecordArtifacts(db);
@@ -108,8 +174,20 @@ public class ArtifactManagerTest  extends TestCase {
 		testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
 		 
 		db.exportDatabaseXml(copyStream);
-		db = Libris.buildAndOpenDatabase(copyDbXml);
-		checkRecordArtifacts(db);
+		LibrisDatabase db2 = Libris.buildAndOpenDatabase(copyDbXml);
+		checkRecordArtifacts(db2);
+		
+		for (Record r: db.getRecords()) {
+			int recId = r.getRecordId();
+			Record actualRec = db2.getRecord(recId);
+			assertEquals("Mismatch on record "+recId, r, actualRec);
+		}
+		
+		for (int i = 1; i <= 4; ++i) {
+			String artifactSourceFileName = testFileNames[i - 1];
+			File artifact = db2.getArtifactFileForRecord(i);
+			assertTrue("Wrong artifact returned", artifact.getName().contains(artifactSourceFileName));
+		}
 	}
 
 	private void checkRecordArtifacts(LibrisDatabase db) throws InputException, DatabaseException {

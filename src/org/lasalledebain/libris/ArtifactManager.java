@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.DatabaseError;
@@ -16,9 +17,11 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 import org.lasalledebain.libris.ui.Dialogue;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
+import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
 public class ArtifactManager {
 	private static final String LEVEL_PREFIX = "_L";
@@ -63,9 +66,15 @@ public class ArtifactManager {
 		myDb.openDatabase();
 	}
 
+	public boolean isDatabaseReserved() {
+		return Objects.nonNull(reservationMgr) && reservationMgr.isDatabaseReserved();
+	}
+	
 	public void close(boolean force) throws DatabaseException {
 		myDb.closeDatabase(force);
-		reservationMgr.freeDatabase();
+		if (isDatabaseReserved()) {
+			reservationMgr.freeDatabase();
+		}
 	}
 	
 	public synchronized int importFile(ArtifactParameters artifactParameters)
@@ -174,6 +183,14 @@ public class ArtifactManager {
 
 	public void fromXml(ElementManager artifactsMgr) throws LibrisException {
 		myDb.fromXml(artifactsMgr);
+	}
+
+	public void toXml(ElementWriter outWriter) throws LibrisException {
+		myDb.toXml(outWriter);
+	}
+
+	public void buildIndexes(LibrisIndexConfiguration config) throws LibrisException {
+		myDb.buildIndexes(config);
 	}
 
 }
