@@ -1,7 +1,7 @@
 package org.lasalledebain.libris;
 
+import java.io.File;
 import java.util.Objects;
-import java.util.Properties;
 
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LastFilterSettings;
@@ -55,6 +55,22 @@ public abstract class LibrisMetadata extends DatabaseMetadata implements XMLElem
 
 	public LastFilterSettings getLastFilterSettings() {
 		return lastFiltSettings;
+	}
+
+	public boolean hasDocumentRepository() {
+		return Boolean.parseBoolean(usageProperties.getProperty(LibrisConstants.PROPERTY_HAS_REPOSITORY));
+	}
+
+	public void hasDocumentRepository(boolean hasRepo) {
+		usageProperties.setProperty(LibrisConstants.PROPERTY_HAS_REPOSITORY, Boolean.toString(hasRepo));
+	}
+	
+	public void setRepositoryRoot(File repositoryRoot) {
+		usageProperties.setProperty(LibrisConstants.PROPERTY_REPOSITORY_ROOT, repositoryRoot.getAbsolutePath());
+	}
+
+	public File  getRepositoryRoot() {
+		return new File(usageProperties.getProperty(LibrisConstants.PROPERTY_REPOSITORY_ROOT));
 	}
 
 	@Override

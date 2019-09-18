@@ -91,8 +91,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 			}
 			currentDatabase.openDatabase();
 		} catch (Exception e) {
-			alert("Error opening database", e);
-			return currentDatabase;
+			throw new DatabaseException("Error opening database", e);
 		}
 		getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
 		return currentDatabase;
@@ -100,7 +99,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	@Override
 	public boolean closeDatabase(boolean force) throws DatabaseException {
 		boolean result = false;
-		if (Objects.nonNull(currentDatabase)) {
+		if (Objects.nonNull(currentDatabase) && currentDatabase.isDatabaseOpen()) {
 			result = checkAndCloseDatabase(force);
 		}
 		if (result) {

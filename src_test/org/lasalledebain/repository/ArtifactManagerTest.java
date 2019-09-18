@@ -21,9 +21,11 @@ import javax.xml.stream.XMLStreamException;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.ArtifactManager;
 import org.lasalledebain.libris.ArtifactParameters;
+import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -94,11 +96,12 @@ public class ArtifactManagerTest  extends TestCase {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workdir);
 		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 		db.addDocumentRepository(null); // use default
-		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_PDFs);
+		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
 		String[] testFileNames = testPdfDirectory.list();
 		assertTrue("wrong number of test files", testFileNames.length >= 4);
 		for (int i = 1; i <= 4; ++i) {
-			db.addArtifact(1, new File(testPdfDirectory, testFileNames[i - 1]));
+			File artifactSourceFile = new File(testPdfDirectory, testFileNames[i - 1]);
+			db.addArtifact(i, artifactSourceFile);
 		}
 		db.save();
 		checkRecordArtifacts(db);
@@ -108,8 +111,20 @@ public class ArtifactManagerTest  extends TestCase {
 		testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
 		 
 		db.exportDatabaseXml(copyStream);
-		db = Libris.buildAndOpenDatabase(copyDbXml);
-		checkRecordArtifacts(db);
+		LibrisDatabase db2 = Libris.buildAndOpenDatabase(copyDbXml);
+		checkRecordArtifacts(db2);
+		
+		for (Record r: db.getRecords()) {
+			int recId = r.getRecordId();
+			Record actualRec = db2.getRecord(recId);
+			assertEquals("Mismatch on record "+recId, r, actualRec);
+		}
+		
+		for (int i = 1; i <= 4; ++i) {
+			String artifactSourceFileName = testFileNames[i - 1];
+			File artifact = db2.getArtifactFileForRecord(i);
+			assertTrue("Wrong artifact returned", artifact.getName().contains(artifactSourceFileName));
+		}
 	}
 
 	private void checkRecordArtifacts(LibrisDatabase db) throws InputException, DatabaseException {

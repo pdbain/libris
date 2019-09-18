@@ -14,6 +14,7 @@ public interface LibrisConstants {
 	public static final String PROPERTY_LAST_OPENED = "libris.database.lastopened";
 	public static final String PROPERTY_LAST_SAVED = "libris.database.lastsaved";
 	public static final String PROPERTY_HAS_REPOSITORY = "libris.database.hasrepository";
+	public static final String PROPERTY_REPOSITORY_ROOT = "libris.database.repositoryroot";
 	public static final String PROPERTY_SIGNATURE_LEVELS = "libris.database.signaturelevels";
 	public static final String FILENAME_JOURNAL_SUFFIX = "lbrj";
 	public static final String FILENAME_NATIVE_RECORDS_SUFFIX = "lbrn";

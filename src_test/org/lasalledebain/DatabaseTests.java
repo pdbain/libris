@@ -24,7 +24,6 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -64,23 +63,19 @@ public class DatabaseTests extends TestCase {
 		}
 	}
 
-	public void testGetRecords() {
+	public void testGetRecords() throws IOException, LibrisException {
 
 		final int NUM_RECORDS = 3;
-		try {
-			File testDatabaseFileCopy = getTestDatabase();
-			rootDb = buildTestDatabase(testDatabaseFileCopy);
+		File testDatabaseFileCopy = getTestDatabase();
+		rootDb = buildTestDatabase(testDatabaseFileCopy);
 
-			for (int i = 1; i <= NUM_RECORDS; ++i) {
-				Record rec = rootDb.getRecord(i);
-				assertNotNull("Cannot locate "+i, rec);
-				String f = rec.getField(ID_AUTH).getValuesAsString();
-				assertEquals("Authors field does not match", authors[i], f);
-			}
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception "+e);
+		for (int i = 1; i <= NUM_RECORDS; ++i) {
+			Record rec = rootDb.getRecord(i);
+			assertNotNull("Cannot locate "+i, rec);
+			String f = rec.getField(ID_AUTH).getValuesAsString();
+			assertEquals("Authors field does not match", authors[i], f);
 		}
+	
 	}
 
 	public void testEnterRecord() {
@@ -134,19 +129,13 @@ public class DatabaseTests extends TestCase {
 		}
 	}
 
-	public void testOpenAndImmediatelyCloseDatabase() {
-		try {
-			File testDatabaseFileCopy = getTestDatabase();
-			rootDb = buildTestDatabase(testDatabaseFileCopy);
-			LibrisUi testUi = rootDb.getUi();
-			testUi.closeDatabase(false);
-			rootDb = testUi.openDatabase();
-			testUi.closeDatabase(false);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception");
-		}
-
+	public void testOpenAndImmediatelyCloseDatabase() throws IOException, LibrisException {
+		File testDatabaseFileCopy = getTestDatabase();
+		rootDb = buildTestDatabase(testDatabaseFileCopy);
+		LibrisUi testUi = rootDb.getUi();
+		testUi.closeDatabase(false);
+		rootDb = testUi.openDatabase();
+		testUi.closeDatabase(false);
 	}
 
 	public void testOpenIndexAndImmediatelyCloseDatabase() {
@@ -618,7 +607,9 @@ public class DatabaseTests extends TestCase {
 	@Override
 	protected void tearDown() throws Exception {
 		if (null != rootDb) {
-			rootDb.closeDatabase(true);
+			if (rootDb.isDatabaseOpen()) {
+				rootDb.closeDatabase(true);
+			}
 			rootDb = null;
 		}
 		if (null != forkDb) {
