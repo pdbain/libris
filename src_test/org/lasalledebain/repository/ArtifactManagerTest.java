@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamException;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.ArtifactManager;
 import org.lasalledebain.libris.ArtifactParameters;
+import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -136,6 +137,7 @@ public class ArtifactManagerTest  extends TestCase {
 			File artifact = db2.getArtifactFileForRecord(i);
 			assertTrue("Wrong artifact returned", artifact.getName().contains(artifactSourceFileName));
 		}
+<<<<<<< HEAD
 	}
 
 	public String[] filterTestFilenames(File testPdfDirectory) {

@@ -16,12 +16,14 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
+import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 import org.lasalledebain.libris.ui.Dialogue;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 public class ArtifactManager {
 	private static final String LEVEL_PREFIX = "_L";
