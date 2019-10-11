@@ -69,15 +69,10 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		String emessage = "";
 		buff.append(e.getClass().getSimpleName());
 		
-		String excMsg = e.getMessage();
-		if (Objects.nonNull(excMsg)) {
-			buff.append(": ");
-			buff.append(excMsg);
-			buff.append("\n");
-		}
 		if (null != e) {
 			emessage = LibrisUiGeneric.formatConciseStackTrace(e, buff);
 		}
+		
 		String errorString = buff.toString();
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		e.printStackTrace(new PrintStream(bos));
@@ -85,11 +80,6 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 			LibrisDatabase.log(Level.WARNING, bos.toString(Charset.defaultCharset().name()));
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
-		}
-		Throwable c = e;
-		errorString += e.getClass().getSimpleName() + "\n";
-		while (null != ( c = c.getCause())) {
-			errorString += '\n'+c.getMessage();
 		}
 		LibrisDatabase.log(Level.FINE, emessage, e);
 		return errorString;

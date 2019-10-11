@@ -161,7 +161,6 @@ public class RecordDisplayPanel extends JPanel {
 		layoutSelector = new JComboBox<String>();
 		buttonBar.add(layoutSelector);
 		layoutSelector.addActionListener(new layoutSelectionListener());
-		add(buttonBar, BorderLayout.NORTH);
 		
 		buttonBar.add(prevButton = new JButton("Previous"));
 		prevButton.addActionListener(new prevNextListener(false));
@@ -183,6 +182,7 @@ public class RecordDisplayPanel extends JPanel {
 				}
 			}
 		});
+		add(buttonBar, BorderLayout.NORTH);
 	}
 
 	private class prevNextListener implements ActionListener {

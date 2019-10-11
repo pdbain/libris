@@ -708,8 +708,15 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		if (Objects.isNull(rec)) {
 			throw new DatabaseException("Record "+recordId+" not found");
 		}
+		addArtifact(rec, artifactSourceFile);
+	}
+
+	public void addArtifact(DatabaseRecord rec, File artifactSourceFile) throws LibrisException, IOException {
+		if (Objects.isNull(rec)) {
+			throw new DatabaseException("Record is null");
+		}
 		if (!rec.isEditable()) {
-			throw new DatabaseException("Record "+recordId+" is read-only");
+			throw new DatabaseException("Record "+rec.getRecordId()+" is read-only");
 		}
 		if (!artifactSourceFile.exists()) {
 			throw new DatabaseException("File "+artifactSourceFile.getAbsolutePath()+" not found");
@@ -722,6 +729,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		rec.setArtifactId(artifactId);
 		putRecord(rec);
 	}
+	
 	public void saveRecords(Iterable <Record> recList) throws LibrisException {
 
 		if (isIndexed()) {

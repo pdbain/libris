@@ -43,7 +43,8 @@ public interface LibrisConstants {
 	String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
 	int MINIMUM_TERM_LENGTH = 2;
 	int[] emptyIntList = new int[0];
-	String DATABASE_FILE = "DATABASE_FILE"; //$NON-NLS-1$
+	String DATABASE_FILE = "DATABASE_FILE";
+	String LAST_ARTIFACT_SOURCE_DIR = "ARTIFACT_DIR";
 	String REPO_DB = "repo_db";
 	public static final String SCHEMA_NAME = "SCHEMA";
 	public static final String DATABASE_AUX_DIRECTORY_NAME = ".libris_db_files";

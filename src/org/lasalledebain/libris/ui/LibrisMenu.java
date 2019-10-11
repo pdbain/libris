@@ -4,8 +4,10 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -20,6 +22,7 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.Record;
@@ -67,7 +70,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	private final ArrayList<JMenuItem> editMenuFieldValueCommands;
 	private final ArrayList<JMenuItem> editMenuRecordCommands;
 	private JMenuItem duplicateRecord;
-	private JMenuItem childRecord;
 	private JMenuItem searchRecords;
 	private HashSet<JMenuItem> databaseAccessCommands;
 
@@ -196,17 +198,12 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		editMenuRecordCommands.add(paste);
 
 		JMenuItem recordName = new JMenuItem("Record name...");
-		recordName.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					database.getUi().setRecordName(database.getNamedRecords());
-				} catch (InputException exc) {
-					throw new DatabaseError("Error setting name", exc);
-				}
+		recordName.addActionListener(e ->  {
+			try {
+				database.getUi().setRecordName(database.getNamedRecords());
+			} catch (InputException exc) {
+				throw new DatabaseError("Error setting name", exc);
 			}
-			
 		});
 		edMenu.add(recordName);
 		recordName.setAccelerator(getAcceleratorKeystroke('N', java.awt.event.InputEvent.CTRL_DOWN_MASK));
@@ -252,6 +249,25 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		pasteToField.addActionListener(new PasteListener(true));
 		edMenu.add(pasteToField);
 		editMenuFieldValueCommands.add(pasteToField);
+		
+		JMenuItem addArtifact = new JMenuItem("Add artifact...");
+		addArtifact.addActionListener(e -> {
+			RecordWindow rw = guiMain.getCurrentRecordWindow();
+			if (null != rw) {
+				File artifactSourceFile;
+				try {
+					artifactSourceFile = selectArtifactFile();
+					if (null != artifactSourceFile) {
+						DatabaseRecord rec = rw.getRecord();
+						database.addArtifact(rec, artifactSourceFile);
+					}
+				} catch (BackingStoreException | LibrisException | IOException e1) {
+					throw new DatabaseError(e1);
+				}
+			}
+		});
+		edMenu.add(addArtifact);
+		editMenuRecordCommands.add(addArtifact);
 		
 		edMenu.add("Delete");
 		enableFieldValueOperations(false);
@@ -302,19 +318,18 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		duplicateRecord.setEnabled(false);
 		duplicateRecord.addActionListener(new DuplicateRecordListener());
 		
-		childRecord = new JMenuItem("New child record");
+		JMenuItem childRecord = new JMenuItem("New child record");
 		recMenu.add(childRecord);
 		childRecord.setEnabled(false);
-		childRecord.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				RecordWindow rw = guiMain.getCurrentRecordWindow();
-				if (null != rw) {
-					Record rec = rw.getRecord();
-					guiMain.newChildRecord(rec, guiMain.getSelectedGroup().getGroupNum());
-				}
+		childRecord.addActionListener(e -> {
+			RecordWindow rw = guiMain.getCurrentRecordWindow();
+			if (null != rw) {
+				Record rec = rw.getRecord();
+				guiMain.newChildRecord(rec, guiMain.getSelectedGroup().getGroupNum());
 			}
-		});
+		}
+	);
+		
 		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord};
 		return recMenu;
 	}
@@ -447,11 +462,11 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	}
 
 	private void openDatabaseImpl(File dbFile) {
-		
+		guiMain.setDatabaseFile(dbFile);
 		try {
 			database = guiMain.openDatabase();
 		} catch (Exception e) {
-			guiMain.alert("Error opening database", e);
+			guiMain.alert("Error opening database\n", e);
 			return;
 		}
 		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
@@ -518,6 +533,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 				editRecord.setState(!result);
 				if (wasEditable && !result)
 					guiMain.alert(LibrisConstants.DATABASE_OR_RECORD_ARE_READ_ONLY);
+				enableFieldValueOperations(!wasEditable);
 			} catch (LibrisException e) {
 				guiMain.alert("Problem toggling editable", e);
 			}
@@ -566,6 +582,22 @@ public class LibrisMenu extends AbstractLibrisMenu {
 
 	public void setRecordDuplicateRecordEnabled(boolean enabled) {
 		duplicateRecord.setEnabled(enabled);
+	}
+	
+	private File selectArtifactFile() throws BackingStoreException {
+		File result = null;
+		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+		String userDir = System.getProperty("user.dir");
+		String lastArtifactDirectory = librisPrefs.get(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, userDir);
+		JFileChooser chooser = new JFileChooser(lastArtifactDirectory);
+		int option = chooser.showOpenDialog(Objects.nonNull(guiMain)? guiMain.mainFrame: null);
+		if (JFileChooser.APPROVE_OPTION == option) {
+			result = chooser.getSelectedFile();
+			lastArtifactDirectory = result.getParent();
+			librisPrefs.put(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, lastArtifactDirectory);
+			librisPrefs.flush();
+		}
+		return result;
 	}
 }
 
