@@ -55,6 +55,7 @@ public interface LibrisUi {
 	void setSelectedField(UiField selectedField);
 
 	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException;
+	public void setRecordArtifact();
 	
 	public abstract void arrangeValues();
 

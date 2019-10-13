@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamException;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.ArtifactManager;
 import org.lasalledebain.libris.ArtifactParameters;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -187,6 +188,25 @@ public class ArtifactManagerTest  extends TestCase {
 			String artifactSourceFileName = testFileNames[i - 1];
 			File artifact = db2.getArtifactFileForRecord(i);
 			assertTrue("Wrong artifact returned", artifact.getName().contains(artifactSourceFileName));
+		}
+	}
+
+	public void testPutGet() throws FileNotFoundException, IOException, LibrisException {
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workdir);
+		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
+		String[] testFileNames = filterTestFilenames(testPdfDirectory);
+		assertTrue("wrong number of test files", testFileNames.length >= 4);
+		for (int i = 1; i <= 4; ++i) {
+			File artifactSourceFile = new File(testPdfDirectory, testFileNames[i - 1]);
+			DatabaseRecord rec = db.getRecord(i);
+			db.addArtifact(rec, artifactSourceFile);
+			db.putRecord(rec);
+		}
+		for (int i = 1; i <= 4; ++i) {
+			DatabaseRecord rec = db.getRecord(i);
+			int artifactId = rec.getArtifactId();
+			assertEquals("wrong artifactId", i, artifactId);
 		}
 	}
 

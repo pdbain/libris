@@ -114,6 +114,7 @@ public class ArtifactManager {
 			throw new InputException(dir.getAbsolutePath() + " is not a directory");
 		}
 		String originalName = original.getName();
+		originalName.replaceAll("\\s", "_");
 		String nameWithId = ARTIFACT_PREFIX + Integer.toString(id) + "_" + originalName;
 		Path destinationPath = Paths.get(dir.getAbsolutePath(), nameWithId);
 		Files.copy(original.toPath(), destinationPath);

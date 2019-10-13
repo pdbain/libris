@@ -105,6 +105,11 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
 	}
 
+	@Override
+	public void setRecordArtifact() {
+		throw new InternalError(getClass().getName()+".setRecordArtifact() not implemented");
+	}
+
 	public boolean isDatabaseReadOnly() {
 		return false;
 	}

@@ -1,9 +1,15 @@
 package org.lasalledebain.libris.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -14,12 +20,12 @@ import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.exception.DatabaseError;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 @SuppressWarnings("serial")
 public class RecordWindow extends JPanel {
-	private final JButton leftPointer = new JButton("\u25C4");
-	private final JButton rightPointer = new JButton("\u25BA");
 	LibrisWindowedUi ui;
 	Layout recordLayout;
 	private String title;
@@ -54,20 +60,36 @@ public class RecordWindow extends JPanel {
 		recordPanel = new JPanel();
 		layOutFields(layout, rec, recordPanel, modTracker);
 		navPanel.add(recordPanel, BorderLayout.CENTER);
-		navPanel.add(leftPointer, BorderLayout.WEST);
-		navPanel.add(rightPointer, BorderLayout.EAST);
 		String recordName = rec.getName();
 		if (null != recordName) {
 			navPanel.add(new JLabel(recordName));
 		}
 		ArtifactParameters artifactInfo = ui.currentDatabase.getArtifactInfo(rec.getArtifactId());
 		if (null != artifactInfo) {
-			artifactButton = new JButton(artifactInfo.getTitle());
-			navPanel.add(artifactButton, BorderLayout.SOUTH);
+			addArtiFactButton(artifactInfo);
 		}
 		recordPanel.setVisible(true);
 		ui.fieldSelected(false);
 		ui.setSelectedField(null);
+	}
+
+	public void addArtiFactButton(ArtifactParameters artifactInfo) {
+		if (Objects.nonNull(artifactButton)) {
+			navPanel.remove(artifactButton);
+		}
+		if (Objects.nonNull(artifactInfo)) {
+			URI archivepath = artifactInfo.getArchivepath();
+			final File artifactFile = new File(archivepath);
+			artifactButton = new JButton(artifactInfo.getTitle());
+			navPanel.add(artifactButton, BorderLayout.SOUTH);
+			artifactButton.addActionListener(e -> {
+				try {
+					Desktop.getDesktop().open(artifactFile);
+				} catch (IOException e1) {
+					throw new DatabaseError(e1);
+				}
+			});
+		}
 	}
 
 	public void refresh() throws LibrisException {

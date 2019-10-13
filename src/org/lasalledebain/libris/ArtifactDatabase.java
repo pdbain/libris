@@ -14,6 +14,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
+import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.records.Records;
@@ -157,6 +158,13 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 			final ArtifactRecord record = getRecord(artifactId);
 			String uriString = record.getFieldValue(ID_SOURCE).getMainValueAsString();
 			ArtifactParameters result = new ArtifactParameters(new URI(uriString));
+			FieldValue fieldValue = record.getFieldValue(ID_ARCHIVEPATH);
+			if (fieldValue != null) { // TODO debug
+				String artifactPath = fieldValue.getMainValueAsString();
+				if (Objects.nonNull(artifactPath)) {
+					result.setArchivepPath(new URI(artifactPath));
+				}
+			}
 			result.setDate(record.getFieldValue(ID_DATE).getMainValueAsString());
 			result.setComments(record.getFieldValue(ID_COMMENTS).getMainValueAsString());
 			result.setDoi(record.getFieldValue(ID_DOI).getMainValueAsString());

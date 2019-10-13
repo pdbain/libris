@@ -4,7 +4,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
@@ -22,9 +21,9 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
+import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
@@ -198,6 +197,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		editMenuRecordCommands.add(paste);
 
 		JMenuItem recordName = new JMenuItem("Record name...");
+		editMenuFieldValueCommands.add(recordName);
 		recordName.addActionListener(e ->  {
 			try {
 				database.getUi().setRecordName(database.getNamedRecords());
@@ -207,8 +207,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		});
 		edMenu.add(recordName);
 		recordName.setAccelerator(getAcceleratorKeystroke('N', java.awt.event.InputEvent.CTRL_DOWN_MASK));
-
-		editMenuRecordCommands.add(recordName);
 		recordName.setEnabled(false);
 
 		JMenuItem newValue = new JMenuItem("New field value");
@@ -224,12 +222,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		newValue.setEnabled(false);
 		
 		JMenuItem removeValue = new JMenuItem("Remove field value");
-		removeValue.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {	
-				database.getUi().removeFieldValue();
-			}
-		});
+		removeValue.addActionListener(e -> database.getUi().removeFieldValue());
 		edMenu.add(removeValue);
 		removeValue.setAccelerator(getAcceleratorKeystroke('X', java.awt.event.InputEvent.SHIFT_DOWN_MASK));
 		editMenuFieldValueCommands.add(removeValue);
@@ -250,24 +243,10 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		edMenu.add(pasteToField);
 		editMenuFieldValueCommands.add(pasteToField);
 		
-		JMenuItem addArtifact = new JMenuItem("Add artifact...");
-		addArtifact.addActionListener(e -> {
-			RecordWindow rw = guiMain.getCurrentRecordWindow();
-			if (null != rw) {
-				File artifactSourceFile;
-				try {
-					artifactSourceFile = selectArtifactFile();
-					if (null != artifactSourceFile) {
-						DatabaseRecord rec = rw.getRecord();
-						database.addArtifact(rec, artifactSourceFile);
-					}
-				} catch (BackingStoreException | LibrisException | IOException e1) {
-					throw new DatabaseError(e1);
-				}
-			}
-		});
-		edMenu.add(addArtifact);
-		editMenuRecordCommands.add(addArtifact);
+		addArtifactMenuItem = new JMenuItem("Add artifact...");
+		addArtifactMenuItem.addActionListener(e -> database.getUi().setRecordArtifact());
+		edMenu.add(addArtifactMenuItem);
+		editMenuFieldValueCommands.add(addArtifactMenuItem);
 		
 		edMenu.add("Delete");
 		enableFieldValueOperations(false);
@@ -278,8 +257,13 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	 * @param enabled
 	 */
 	void editMenuEnableModify(boolean enabled) {
+		LibrisDatabase currentDatabase = guiMain.currentDatabase;
+		boolean hasRepo = enabled && Objects.nonNull(currentDatabase) && currentDatabase.hasDocumentRepository();
 		for (Component i: editMenuRecordCommands) {
 			i.setEnabled(enabled);
+		}
+		if (!hasRepo) {
+			addArtifactMenuItem.setEnabled(false);
 		}
 		editMenu.setEnabled(enabled);
 	}
@@ -574,6 +558,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 
 	private EditRecordListenerImpl editRecordListener;
 	private JMenuItem recordWindowItems[];
+	private JMenuItem addArtifactMenuItem;
 	public void enableFieldValueOperations(boolean selected) {
 		for (JMenuItem m: editMenuFieldValueCommands) {
 			m.setEnabled(selected);
@@ -582,22 +567,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 
 	public void setRecordDuplicateRecordEnabled(boolean enabled) {
 		duplicateRecord.setEnabled(enabled);
-	}
-	
-	private File selectArtifactFile() throws BackingStoreException {
-		File result = null;
-		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
-		String userDir = System.getProperty("user.dir");
-		String lastArtifactDirectory = librisPrefs.get(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, userDir);
-		JFileChooser chooser = new JFileChooser(lastArtifactDirectory);
-		int option = chooser.showOpenDialog(Objects.nonNull(guiMain)? guiMain.mainFrame: null);
-		if (JFileChooser.APPROVE_OPTION == option) {
-			result = chooser.getSelectedFile();
-			lastArtifactDirectory = result.getParent();
-			librisPrefs.put(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, lastArtifactDirectory);
-			librisPrefs.flush();
-		}
-		return result;
 	}
 }
 

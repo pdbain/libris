@@ -709,6 +709,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			throw new DatabaseException("Record "+recordId+" not found");
 		}
 		addArtifact(rec, artifactSourceFile);
+		putRecord(rec);
 	}
 
 	public void addArtifact(DatabaseRecord rec, File artifactSourceFile) throws LibrisException, IOException {
@@ -727,7 +728,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		ArtifactParameters params = new ArtifactParameters(artifactSourceFile.toURI());
 		int artifactId = documentRepository.importFile(params);
 		rec.setArtifactId(artifactId);
-		putRecord(rec);
 	}
 	
 	public void saveRecords(Iterable <Record> recList) throws LibrisException {

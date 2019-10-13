@@ -28,7 +28,13 @@ public class ChildUi extends LibrisUiGeneric {
 
 	@Override
 	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException {
-		return;
+		throw new InternalError(getClass().getName()+".setRecordArtifact() not implemented");
+	}
+
+	@Override
+	public void setRecordArtifact() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override

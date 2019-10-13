@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -21,8 +22,10 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 
+import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
@@ -503,12 +506,12 @@ public class LibrisGui extends LibrisWindowedUi {
 					} else {
 						String oldName = rec.getName();
 						if (!newName.equals(oldName)) {
-						if ((null != oldName) && !oldName.isEmpty()) {
-							namedRecs.remove(oldName);
-						}
-						currentRecordWindow.setModified(true);
-						rec.setName(newName);
-						resultsPanel.removeRecord(rec);
+							if ((null != oldName) && !oldName.isEmpty()) {
+								namedRecs.remove(oldName);
+							}
+							currentRecordWindow.setModified(true);
+							rec.setName(newName);
+							resultsPanel.removeRecord(rec);
 						}
 						displayPanel.setCurrentRecordName(newName);
 						repaint();
@@ -518,7 +521,52 @@ public class LibrisGui extends LibrisWindowedUi {
 		}
 	}
 
-	public RecordWindow getCurrentRecordWindow() {
+	@Override
+	public void setRecordArtifact() {
+		RecordWindow currentRecordWindow = getCurrentRecordWindow();
+		if (null != currentRecordWindow){
+			DatabaseRecord rec = currentRecordWindow.getRecord();
+			int artifactId = rec.getArtifactId();
+			if (!RecordId.isNull(artifactId)) {
+				int choice = confirm("Record has an artifact.  Replace it?");
+				if (Dialogue.YES_OPTION != choice) {
+					return;
+				}
+			}
+
+			File artifactSourceFile;
+			try {
+				artifactSourceFile = selectArtifactFile();
+				if (null != artifactSourceFile) {
+					currentDatabase.addArtifact(rec, artifactSourceFile);
+					artifactId = rec.getArtifactId();
+				}
+				currentRecordWindow.setModified(true);
+			} catch (BackingStoreException | LibrisException | IOException e1) {
+				throw new DatabaseError(e1);
+			}
+			ArtifactParameters artifactInfo = currentDatabase.getArtifactInfo(artifactId);
+			currentRecordWindow.addArtiFactButton(artifactInfo);
+		}
+	}
+
+private File selectArtifactFile() throws BackingStoreException {
+	File result = null;
+	Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+	String userDir = System.getProperty("user.dir");
+	String lastArtifactDirectory = librisPrefs.get(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, userDir);
+	JFileChooser chooser = new JFileChooser(lastArtifactDirectory);
+	int option = chooser.showOpenDialog(this.mainframeContents);
+	if (JFileChooser.APPROVE_OPTION == option) {
+		result = chooser.getSelectedFile();
+		lastArtifactDirectory = result.getParent();
+		librisPrefs.put(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, lastArtifactDirectory);
+		librisPrefs.flush();
+	}
+	return result;
+}
+
+public RecordWindow getCurrentRecordWindow() {
 		RecordWindow currentRecordWindow = displayPanel.getCurrentRecordWindow();
 		return currentRecordWindow;
 	} 

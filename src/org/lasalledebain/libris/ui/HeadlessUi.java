@@ -103,6 +103,13 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	}
 
 	@Override
+	public void setRecordArtifact() {
+		// TODO Auto-generated method stub
+		throw new InternalError(getClass().getName()+".setRecordArtifact() not implemented");
+		
+	}
+
+	@Override
 	public void closeWindow(boolean allWindows) {
 		return;
 	}

@@ -38,7 +38,6 @@ public class RecordDisplayPanel extends JPanel {
 	private JButton nextButton;
 	private JButton newButton;
 	private JButton enterButton;
-	private JButton openDocumentButton;
 	private LibrisDatabase database;
 	private Layout recLayout;
 	private Layout titleLayout;
@@ -146,6 +145,7 @@ public class RecordDisplayPanel extends JPanel {
 	private void addButtonBar(LibrisGui mainGui) {
 		buttonBar = new JPanel();
 		
+		buttonBar.add(prevButton = new JButton("\u2190"));
 		buttonBar.add(newButton = new JButton("New"));
 		NewRecordListener newRecordHandler = mainGui.menu.getNewRecordHandler();
 		newButton.addActionListener(newRecordHandler);
@@ -155,33 +155,13 @@ public class RecordDisplayPanel extends JPanel {
 		buttonBar.add(closeButton = new JButton("Close"));
 		closeButton.addActionListener(new closeListener(false));
 		enterButton.setEnabled(true);
-		JLabel layoutLabel = new JLabel("Layout");
-		layoutLabel.setLabelFor(layoutSelector);
-		buttonBar.add(layoutLabel);
 		layoutSelector = new JComboBox<String>();
 		buttonBar.add(layoutSelector);
 		layoutSelector.addActionListener(new layoutSelectionListener());
 		
-		buttonBar.add(prevButton = new JButton("Previous"));
 		prevButton.addActionListener(new prevNextListener(false));
-		buttonBar.add(nextButton = new JButton("Next"));
+		buttonBar.add(nextButton = new JButton("\u2192"));
 		nextButton.addActionListener(new prevNextListener(true));
-		buttonBar.add(openDocumentButton = new JButton("Open document"));
-		openDocumentButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int selectedRecordIndex = openRecordPanes.getSelectedIndex();
-				if (selectedRecordIndex >= 0) {
-					DatabaseRecord currentRecord = openRecords.get(selectedRecordIndex).getRecord();
-					int artifactId = currentRecord.getArtifactId();
-					File recordArtifact = database.getArtifactFile(artifactId);
-					if (!Objects.isNull(recordArtifact)) {
-						File result = database.getArtifactFile(artifactId);
-					}
-				}
-			}
-		});
 		add(buttonBar, BorderLayout.NORTH);
 	}
 
