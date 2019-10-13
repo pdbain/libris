@@ -3,7 +3,6 @@ package org.lasalledebain.libris.ui;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +20,6 @@ import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
-import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 @SuppressWarnings("serial")

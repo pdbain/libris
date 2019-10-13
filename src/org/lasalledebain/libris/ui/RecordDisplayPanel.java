@@ -4,13 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -256,7 +253,10 @@ public class RecordDisplayPanel extends JPanel {
 		RecordWindow w = getCurrentRecordWindow();
 		if (null != w) {
 			boolean modified = w.isModified();
-			enterButton.setEnabled(modified);
+
+			DatabaseRecord theRecord = w.getRecord();
+			menu.enableFieldValueOperations(theRecord.isEditable());
+					enterButton.setEnabled(modified);
 			mainGui.setRecordEnterRecordEnabled(modified);
 			closeButton.setEnabled(true);
 		} else {
