@@ -567,7 +567,7 @@ private File selectArtifactFile() throws BackingStoreException {
 }
 
 public RecordWindow getCurrentRecordWindow() {
-		RecordWindow currentRecordWindow = displayPanel.getCurrentRecordWindow();
+		RecordWindow currentRecordWindow = (null == displayPanel) ? null: displayPanel.getCurrentRecordWindow();
 		return currentRecordWindow;
 	} 
 	

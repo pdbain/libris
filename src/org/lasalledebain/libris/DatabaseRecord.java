@@ -27,7 +27,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	GroupMember affiliations[];
 	private RecordTemplate template;
 	private int artifactId;
-	// TODO 1 save artifactId in native file
 
 	public DatabaseRecord(RecordTemplate recordTemplate) {
 		super();
@@ -284,7 +283,8 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		if (null != name) {
 			attrs.setAttribute(XML_RECORD_NAME_ATTR, name);
 		}
-		final int myArtifactId = getArtifactId();
+		
+		int myArtifactId = getArtifactId();
 		if (!RecordId.isNull(myArtifactId)) {
 			attrs.setAttribute(XML_RECORD_ARTIFACT_ATTR, myArtifactId);
 		}
@@ -460,6 +460,11 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 			}
 		}
 		return false;
+	}
+	
+	public boolean hasArtifact() {
+		int myArtifactId = getArtifactId();
+		return !RecordId.isNull(myArtifactId);
 	}
 
 	@Override
