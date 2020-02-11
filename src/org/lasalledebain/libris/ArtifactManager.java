@@ -194,4 +194,7 @@ public class ArtifactManager {
 		myDb.buildIndexes(config);
 	}
 
+	public void save() {
+		myDb.save();
+	}
 }

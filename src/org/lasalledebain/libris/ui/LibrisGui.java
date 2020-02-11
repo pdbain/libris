@@ -294,6 +294,16 @@ public class LibrisGui extends LibrisWindowedUi {
 			displayPanel.close(allWindows);
 		}
 	}
+	
+	@Override
+	public boolean closeDatabase(boolean force) throws DatabaseException {
+		boolean result = super.closeDatabase(force);
+		if (result) {
+			closeWindow(true);
+		}
+		mainWindow.removeAll();
+		return result;
+	}
 
 	public boolean isEditable() {
 		RecordWindow rw = null;
@@ -538,15 +548,14 @@ public class LibrisGui extends LibrisWindowedUi {
 			try {
 				artifactSourceFile = selectArtifactFile();
 				if (null != artifactSourceFile) {
-					currentDatabase.addArtifact(rec, artifactSourceFile);
-					artifactId = rec.getArtifactId();
+					artifactId = currentDatabase.addArtifact(rec, artifactSourceFile);
+					ArtifactParameters artifactInfo = currentDatabase.getArtifactInfo(artifactId);
+					currentRecordWindow.setModified(true);
+					currentRecordWindow.addArtiFactButton(artifactInfo);
 				}
-				currentRecordWindow.setModified(true);
 			} catch (BackingStoreException | LibrisException | IOException e1) {
 				throw new DatabaseError(e1);
 			}
-			ArtifactParameters artifactInfo = currentDatabase.getArtifactInfo(artifactId);
-			currentRecordWindow.addArtiFactButton(artifactInfo);
 		}
 	}
 

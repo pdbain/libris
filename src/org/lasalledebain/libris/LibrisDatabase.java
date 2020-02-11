@@ -401,6 +401,14 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		toXml(outWriter); 
 	}
 
+	public void exportDatabaseXml(File destination) throws LibrisException {
+		try {
+			FileOutputStream outStream = new FileOutputStream(destination);
+			exportDatabaseXml(outStream);
+		} catch (FileNotFoundException e) {
+			throw new OutputException("File not found: "+destination.getAbsolutePath(), e); //$NON-NLS-1$
+		}
+	}
 	/**
 	 * Read records from a database forked instance and merge them to the current database.
 	 * @param instanceReader reader for the XML of the exported records
@@ -712,7 +720,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		putRecord(rec);
 	}
 
-	public void addArtifact(DatabaseRecord rec, File artifactSourceFile) throws LibrisException, IOException {
+	public int addArtifact(DatabaseRecord rec, File artifactSourceFile) throws LibrisException, IOException {
 		if (Objects.isNull(rec)) {
 			throw new DatabaseException("Record is null");
 		}
@@ -728,8 +736,17 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		ArtifactParameters params = new ArtifactParameters(artifactSourceFile.toURI());
 		int artifactId = documentRepository.importFile(params);
 		rec.setArtifactId(artifactId);
+		return artifactId;
 	}
 	
+	@Override
+	public void save() {
+		if (hasDocumentRepository()) {
+			documentRepository.save();;
+		}
+		super.save();
+	}
+
 	public void saveRecords(Iterable <Record> recList) throws LibrisException {
 
 		if (isIndexed()) {

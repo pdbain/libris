@@ -572,8 +572,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		for (JMenuItem m: editMenuFieldValueCommands) {
 			m.setEnabled(selected);
 		}
-		DatabaseRecord rec = getCurrentRecord();
-		addArtifactMenuItem.setEnabled(selected && Objects.nonNull(rec) && !rec.hasArtifact());
 	}
 
 	public void setRecordDuplicateRecordEnabled(boolean enabled) {

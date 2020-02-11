@@ -3,6 +3,10 @@ package org.lasalledebain.libris;
 import java.net.URI;
 import java.util.Objects;
 
+import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.field.FieldValue;
+import static java.util.Objects.nonNull;
+
 public class ArtifactParameters {
 	private String date;
 	private String title;
@@ -66,12 +70,30 @@ public class ArtifactParameters {
 	public void setComments(String comments) {
 		this.comments = comments;
 	}
+	public void setComments(FieldValue comments) throws FieldDataException {
+		if (nonNull(comments)) {
+			this.comments = comments.getMainValueAsString();
+		}
+	}
+	public void setKeywords(FieldValue keywords) throws FieldDataException {
+		if (nonNull(keywords)) {
+			this.keywords = keywords.getMainValueAsString();
+		}
+	}
 	public void setKeywords(String keywords) {
 		this.keywords = keywords;
 	}
+
 	public void setDoi(String doi) {
 		this.doi = doi;
 	}
+
+	public void setDoi(FieldValue doi) throws FieldDataException {
+		if (nonNull(doi)) {
+			this.doi = doi.getMainValueAsString();
+		}
+	}
+
 	public void setRecordParentName(String recordParentName) {
 		this.recordParentName = recordParentName;
 	}
@@ -124,9 +146,9 @@ public class ArtifactParameters {
 
 		BufferBuilder() {
 			first = true;
-			 buff = new StringBuilder(100);
+			buff = new StringBuilder(100);
 		}
-		
+
 		void append(String key, String value) {
 			if (Objects.nonNull(value) && !value.isEmpty()) {
 				if (!first) {

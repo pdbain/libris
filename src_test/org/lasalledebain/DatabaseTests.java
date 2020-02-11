@@ -6,6 +6,7 @@ import static org.lasalledebain.Utilities.checkRecords;
 import static org.lasalledebain.Utilities.testLogger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
+import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -39,6 +41,44 @@ public class DatabaseTests extends TestCase {
 	private LibrisDatabase forkDb;
 	private File workingDirectory;
 	// TODO override auxiliary directory
+
+	public void testBuildWithRepo() throws FileNotFoundException, IOException, LibrisException {
+		File exportedFile;
+		{
+			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
+			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			assertTrue("No repo in original database", db.hasDocumentRepository());
+			exportedFile = new File(workingDirectory, "exportedFile.xml");
+			db.exportDatabaseXml(exportedFile);
+			assertTrue("error closing database", db.closeDatabase(false));
+		}
+		LibrisDatabase dbx = Libris.buildAndOpenDatabase(exportedFile);
+		assertTrue("No repo in original database", dbx.hasDocumentRepository());
+		assertTrue("error closing exported database", dbx.closeDatabase(false));
+		exportedFile.delete();
+	}
+
+	public void testAddArtifact() throws FileNotFoundException, IOException, LibrisException {
+
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
+		File myArtifact = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_ARTIFACT_PDF, workingDirectory);
+		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		LibrisUi myUi = db.getUi();
+		DatabaseRecord rec = db.getRecord(1);
+		rec.setEditable(true);
+		db.addArtifact(rec, myArtifact);
+		db.putRecord(rec);
+		db.save();
+		int artifactId = rec.getArtifactId();
+		assertFalse("artifact is missing in original database", RecordId.isNull(artifactId));
+		assertTrue("error closing database", db.closeDatabase(false));
+		db = myUi.openDatabase();
+		rec = db.getRecord(1);
+		artifactId = rec.getArtifactId();
+		assertFalse("artifact is missing in re-opened database", RecordId.isNull(artifactId));
+		db.getArtifactInfo(artifactId);
+	}
+
 	public void testReadRecordsFromSingleFile() {
 		try {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
@@ -75,7 +115,7 @@ public class DatabaseTests extends TestCase {
 			String f = rec.getField(ID_AUTH).getValuesAsString();
 			assertEquals("Authors field does not match", authors[i], f);
 		}
-	
+
 	}
 
 	public void testEnterRecord() {
@@ -202,7 +242,7 @@ public class DatabaseTests extends TestCase {
 		}
 
 	}
-	
+
 	public void testXmlExportAll() {
 		try {
 			rootDb = buildTestDatabase(getTestDatabase());
@@ -305,7 +345,7 @@ public class DatabaseTests extends TestCase {
 		forkDb = Libris.buildAndOpenDatabase(dbInstance);
 		assertNotNull("Error rebuilding database copy", forkDb);
 		assertTrue("database copy does not match original", forkDb.equals(rootDb));
-		
+
 		rootDb.closeDatabase(false);
 		DatabaseInstance inst = forkDb.getMetadata().getInstanceInfo();
 		assertNotNull("Database instance information missing", inst);
@@ -366,7 +406,7 @@ public class DatabaseTests extends TestCase {
 			forkDb = Libris.buildAndOpenDatabase(dbIncrement);
 			assertNotNull("Error rebuilding database copy", forkDb);
 			assertTrue("database copy does not match original", forkDb.equals(rootDb));
-			
+
 			DatabaseInstance inst = forkDb.getMetadata().getInstanceInfo();
 			assertNotNull("Database instance information missing", inst);
 			assertEquals("Wrong base ID", lastId, inst.getRecordIdBase());
@@ -384,7 +424,7 @@ public class DatabaseTests extends TestCase {
 			rootDb.importIncrement(dbIncrement);
 			checkDbRecords(rootDb, expectedRecords);
 			rootDb.closeDatabase(false);
-;
+			;
 			forkDb.closeDatabase(false);
 			dbInstance.delete();
 		} catch (Throwable e) {
@@ -401,7 +441,7 @@ public class DatabaseTests extends TestCase {
 			ArrayList<File> incrementFiles = new ArrayList<>();
 			int newRecordNumber;
 			File dbInstance = new File(workingDirectory, "database_instance.xml");
-				dbInstance.deleteOnExit();
+			dbInstance.deleteOnExit();
 			rootDb = buildTestDatabase(getTestDatabase());
 			for (Record rec: rootDb.getRecords()) {
 				expectedRecords.add(rec);
@@ -447,12 +487,12 @@ public class DatabaseTests extends TestCase {
 				incrementFiles.add(dbIncrement);
 				++incrementNumber;			
 			}
-			
+
 			for (File incFile: incrementFiles) {
 				rootDb.importIncrement(incFile);	
 				rootDb.save();
 			}
-			
+
 			checkDbRecords(rootDb, expectedRecords);
 		} catch (IOException | LibrisException e) {
 			e.printStackTrace();
@@ -484,7 +524,7 @@ public class DatabaseTests extends TestCase {
 			newRootRec.addFieldValue("ID_title", "Record"+newRecordNumber++);
 			rootDb.putRecord(newRootRec);
 			rootDb.save();
-						
+
 			forkDb = Libris.buildAndOpenDatabase(dbInstance);
 			assertNotNull("Error rebuilding database copy", forkDb);
 
@@ -492,12 +532,12 @@ public class DatabaseTests extends TestCase {
 			newForkRec1.addFieldValue("ID_title", "Record"+newRecordNumber++);
 			newForkRec1.setParent(0, baseAffiliate);
 			int newRecNum = forkDb.putRecord(newForkRec1);
-			
+
 			DatabaseRecord newForkRec2 = forkDb.newRecord();
 			newForkRec2.addFieldValue("ID_title", "Record"+newRecordNumber++);
 			newForkRec2.setParent(0, newRecNum);
 			forkDb.putRecord(newForkRec2);
-					
+
 			forkDb.save();
 			forkDb.exportIncrement(new FileOutputStream(dbIncrement));
 			rootDb.importIncrement(dbIncrement);
@@ -515,9 +555,9 @@ public class DatabaseTests extends TestCase {
 				newForkRec2.setAffiliates(0, affiliates);
 				assertEquals("new root record wrong", newForkRec2, rec);
 			}
-			
+
 			rootDb.closeDatabase(false);
-;
+			;
 			forkDb.closeDatabase(false);
 			dbInstance.delete();
 		} catch (Throwable e) {
@@ -561,11 +601,11 @@ public class DatabaseTests extends TestCase {
 			}
 			checkDbRecords(rootDb, rootExpectedRecords);
 			rootDb.save();
-						
+
 			forkDb = Libris.buildAndOpenDatabase(dbInstance);
 			assertNotNull("Error rebuilding database copy", forkDb);
 			assertFalse("database copy not changed from original", forkDb.equals(rootDb));
-			
+
 			DatabaseInstance inst = forkDb.getMetadata().getInstanceInfo();
 			assertNotNull("Database instance information missing", inst);
 			assertEquals("Wrong base ID", baseId, inst.getRecordIdBase());
@@ -585,11 +625,11 @@ public class DatabaseTests extends TestCase {
 			for (Record r: incrementExpectedRecords) {
 				r.setRecordId(r.getRecordId() + extraBaseRecords);
 			}
-			
+
 			rootExpectedRecords.addAll(rootExpectedRecords.size(), incrementExpectedRecords);
 			checkDbRecords(rootDb, rootExpectedRecords);
 			rootDb.closeDatabase(false);
-;
+			;
 			forkDb.closeDatabase(false);
 			dbInstance.delete();
 		} catch (Throwable e) {

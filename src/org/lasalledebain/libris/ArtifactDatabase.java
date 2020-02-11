@@ -156,6 +156,9 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	public ArtifactParameters getArtifactInfo(int artifactId) {
 		try {
 			final ArtifactRecord record = getRecord(artifactId);
+			if (Objects.isNull(record)) {
+				throw new DatabaseError("Cannot find artifact record "+artifactId);
+			}
 			String uriString = record.getFieldValue(ID_SOURCE).getMainValueAsString();
 			ArtifactParameters result = new ArtifactParameters(new URI(uriString));
 			FieldValue fieldValue = record.getFieldValue(ID_ARCHIVEPATH);
@@ -166,9 +169,9 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 				}
 			}
 			result.setDate(record.getFieldValue(ID_DATE).getMainValueAsString());
-			result.setComments(record.getFieldValue(ID_COMMENTS).getMainValueAsString());
-			result.setDoi(record.getFieldValue(ID_DOI).getMainValueAsString());
-			result.setKeywords(record.getFieldValue(ID_KEYWORDS).getMainValueAsString());
+			result.setComments(record.getFieldValue(ID_COMMENTS));
+			result.setDoi(record.getFieldValue(ID_DOI));
+			result.setKeywords(record.getFieldValue(ID_KEYWORDS));
 			result.setTitle(record.getFieldValue(ID_TITLE).getMainValueAsString());
 			result.recordName = record.getName();
 			if (record.hasAffiliations()) {

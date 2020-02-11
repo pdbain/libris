@@ -37,20 +37,20 @@ import junit.framework.TestCase;
 public class ArtifactManagerTest  extends TestCase {
 
 	private static final String RECORD = "record_";
-	private File workdir;
+	private File workingDirectory;
 	private File repoRoot;
 	private FileManager fileMgr;
 
 	@Override
 	protected void setUp() throws Exception {
-		workdir = Utilities.makeTempTestDirectory();
-		repoRoot = new File(workdir, "root");
+		workingDirectory = Utilities.makeTempTestDirectory();
+		repoRoot = new File(workingDirectory, "root");
 		fileMgr = new FileManager(new File("auxiliary"));
 	}
 
 	public void testRepoSanity() throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError{
 		ArtifactManager mgr = createManager();
-		File testArtifact = new File(workdir, "test_artifact");
+		File testArtifact = new File(workingDirectory, "test_artifact");
 		testArtifact.deleteOnExit();
 		URI originalUri = testArtifact.toURI();
 		int id = mgr.putArtifactInfo(originalUri);
@@ -65,7 +65,7 @@ public class ArtifactManagerTest  extends TestCase {
 		for (int i = 0; i < numArtifacts; ++i) {
 			final int expectedId = i + 1;
 			final String fName = "test_artifact_"+expectedId;
-			File testFile = new File(workdir, fName);
+			File testFile = new File(workingDirectory, fName);
 			testFile.deleteOnExit();
 			URI originalUri = testFile.toURI();
 			ArtifactParameters params = new ArtifactParameters(originalUri);
@@ -93,9 +93,9 @@ public class ArtifactManagerTest  extends TestCase {
 	}
 
 	public void testDatabaseWithDocumentRepo() throws FileNotFoundException, IOException, LibrisException {
-		File repoRoot = new File(workdir, "TestRoot");
+		File repoRoot = new File(workingDirectory, "TestRoot");
 		repoRoot.mkdir();
-		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workdir);
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
 		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 		db.addDocumentRepository(repoRoot); // use default
 		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
@@ -117,7 +117,7 @@ public class ArtifactManagerTest  extends TestCase {
 			assertTrue("Wrong artifact returned", artifactName.contains(artifactSourceFileName));
 		}
 		checkRecordArtifacts(db);
-		File copyDbXml = new File (workdir, "database_copy.xml");
+		File copyDbXml = new File (workingDirectory, "database_copy.xml");
 		copyDbXml.deleteOnExit();
 		FileOutputStream copyStream = new FileOutputStream(copyDbXml);
 		testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
@@ -157,7 +157,7 @@ public class ArtifactManagerTest  extends TestCase {
 
 	public void testDatabaseWithDefaultDocumentRepo() throws FileNotFoundException, IOException, LibrisException {
 		File repoRoot = null;
-		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workdir);
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
 		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 		db.addDocumentRepository(repoRoot); // use default
 		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
@@ -169,7 +169,7 @@ public class ArtifactManagerTest  extends TestCase {
 		}
 		db.save();
 		checkRecordArtifacts(db);
-		File copyDbXml = new File (workdir, "database_copy.xml");
+		File copyDbXml = new File (workingDirectory, "database_copy.xml");
 		copyDbXml.deleteOnExit();
 		FileOutputStream copyStream = new FileOutputStream(copyDbXml);
 		testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
@@ -192,7 +192,7 @@ public class ArtifactManagerTest  extends TestCase {
 	}
 
 	public void testPutGet() throws FileNotFoundException, IOException, LibrisException {
-		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workdir);
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
 		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
 		String[] testFileNames = filterTestFilenames(testPdfDirectory);
@@ -220,7 +220,7 @@ public class ArtifactManagerTest  extends TestCase {
 
 
 	protected void importAndCheckFiles(final int numFiles) {
-		File originalFiles = new File(workdir, "originals");
+		File originalFiles = new File(workingDirectory, "originals");
 		originalFiles.mkdir();
 		repoRoot.mkdir();
 		String originalRoot = originalFiles.getAbsolutePath();
@@ -297,7 +297,7 @@ public class ArtifactManagerTest  extends TestCase {
 	}
 	@Override
 	protected void tearDown() throws Exception {
-		Utilities.deleteRecursively(workdir);
+		Utilities.deleteRecursively(workingDirectory);
 	}
 
 }
