@@ -216,6 +216,9 @@ public class RecordDisplayPanel extends JPanel {
 				if (enter) {
 					currentRecordWindow.enter();
 					database.putRecord(currentRecord);
+					if (currentRecordWindow.isModified()) {
+						database.setModified(true);
+					}
 					mainGui.put(currentRecord);
 				} else {
 					int result = currentRecordWindow.checkClose();
@@ -271,7 +274,7 @@ public class RecordDisplayPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			recordModified();
-			mainGui.updateUITitle(true);
+// TODO delete this?			mainGui.updateUITitle();
 		}
 	}
 	

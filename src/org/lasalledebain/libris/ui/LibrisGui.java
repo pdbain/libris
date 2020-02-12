@@ -101,7 +101,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		menu.editMenuEnableModify(readOnly);
 		destroyWindow(true);
 		createPanes(false);
-		updateUITitle(false);
+		updateUITitle();
 
 		displayPanel.addLayouts(currentDatabase.getLayouts());
 		RecordList<DatabaseRecord> list = currentDatabase.getRecords();
@@ -274,6 +274,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	@Override
 	public void put(Record newRecord) throws DatabaseException {
 		resultsPanel.addRecord(newRecord);
+		updateUITitle();
 	}
 
 	public void displayRecord(int recId) throws LibrisException {

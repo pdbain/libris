@@ -52,7 +52,7 @@ public class ModificationTracker {
 	}
 
 	public synchronized void setModified(boolean modified) {
-		if ((this.modified != modified) && (null != modificationListener)) {
+ 		if ((this.modified != modified) && (null != modificationListener)) {
 			this.modified = modified;
 			modificationListener.actionPerformed(null);
 		}

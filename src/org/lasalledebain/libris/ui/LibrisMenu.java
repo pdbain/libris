@@ -479,7 +479,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 					database.getUi().alert("save as not implemented");
 				} else {
 					database.save();
-					guiMain.updateUITitle(false);
+					guiMain.updateUITitle();
 				}
 			}
 		}

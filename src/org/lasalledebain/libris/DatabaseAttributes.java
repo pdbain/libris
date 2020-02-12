@@ -37,6 +37,9 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	public String getDatabaseName() {
 		return databaseName;
 	}
+	public String setDatabaseName(String databaseName) {
+		return databaseName;
+	}
 	public void setModificationDate() {
 		modificationDate = new Date();
 	}

@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.Objects;
 import java.util.logging.Level;
 
 import javax.swing.BoxLayout;
@@ -28,9 +27,12 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.index.GroupDef;
 
 public abstract class LibrisWindowedUi extends LibrisUiGeneric {	
+	private static final String NO_DATABASE_OPEN = "no database open";
+	private static final String DATABASE_MODIFIED = " (modified)";
 	protected JFrame mainFrame;
 	private GroupDef selectedGroupDef;
 	protected boolean databaseSelected = false;
+	protected String title = NO_DATABASE_OPEN;
 
 	public abstract void closeWindow(boolean allWindows);
 
@@ -98,12 +100,6 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		parentPanel.add(controlPanel);
 	}
 
-	public LibrisWindowedUi() {
-		super();
-		initializeUi();
-		selectedGroupDef = null;
-	}
-
 	public LibrisWindowedUi(File databaseFile, boolean readOnly) {
 		super(databaseFile, readOnly);
 		initializeUi();
@@ -139,7 +135,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	public void setTitle(String title) {
 		super.setTitle(title);
 		if (isDatabaseModified()) {
-			mainFrame.setTitle(title+"*");
+			mainFrame.setTitle(title+DATABASE_MODIFIED);
 		} else {
 			mainFrame.setTitle(title);
 		}
@@ -165,15 +161,12 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		return Dialogue.yesNoCancelDialog(mainFrame, msg);
 	}
 
-	public void updateUITitle(boolean isModified) {
-		String databaseName = "no database open";
+	public void updateUITitle() {
+		String databaseName = NO_DATABASE_OPEN;
 		if (null != currentDatabase) {
 			DatabaseAttributes databaseAttributes = currentDatabase.getDatabaseAttributes();
 			if (null != databaseAttributes) {
 				databaseName = databaseAttributes.getDatabaseName();
-				if (isModified) {
-					databaseName = databaseName+"*";
-				}
 			}
 		}
 		setTitle(databaseName);
