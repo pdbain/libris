@@ -9,15 +9,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Level;
 
 import org.junit.Test;
+import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;
@@ -52,9 +55,11 @@ public class DatabaseTests extends TestCase {
 			db.exportDatabaseXml(exportedFile);
 			assertTrue("error closing database", db.closeDatabase(false));
 		}
-		LibrisDatabase dbx = Libris.buildAndOpenDatabase(exportedFile);
-		assertTrue("No repo in original database", dbx.hasDocumentRepository());
-		assertTrue("error closing exported database", dbx.closeDatabase(false));
+		{
+			LibrisDatabase dbx = Libris.buildAndOpenDatabase(exportedFile);
+			assertTrue("No repo in original database", dbx.hasDocumentRepository());
+			assertTrue("error closing exported database", dbx.closeDatabase(false));
+		}
 		exportedFile.delete();
 	}
 
@@ -77,6 +82,34 @@ public class DatabaseTests extends TestCase {
 		artifactId = rec.getArtifactId();
 		assertFalse("artifact is missing in re-opened database", RecordId.isNull(artifactId));
 		db.getArtifactInfo(artifactId);
+	}
+
+	public void testExportArtifact() throws FileNotFoundException, IOException, LibrisException {
+		File exportedFile;
+		{
+			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
+			File myArtifact = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_ARTIFACT_PDF, workingDirectory);
+			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			DatabaseRecord rec = db.getRecord(1);
+			rec.setEditable(true);
+			db.addArtifact(rec, myArtifact);
+			db.putRecord(rec);
+			db.save();
+			int artifactId = rec.getArtifactId();
+			assertFalse("artifact is missing in original database", RecordId.isNull(artifactId));
+			exportedFile = new File(workingDirectory, "exportedFile.xml");
+			db.exportDatabaseXml(exportedFile);
+			assertTrue("error closing database", db.closeDatabase(false));
+		}
+		{
+			LibrisDatabase dbx = Libris.buildAndOpenDatabase(exportedFile);
+			DatabaseRecord rec = dbx.getRecord(1);
+			int artifactId = rec.getArtifactId();
+			assertFalse("artifact is missing in re-opened database", RecordId.isNull(artifactId));
+			ArtifactParameters result = dbx.getArtifactInfo(artifactId);
+			URI artifactPath = result.getSourcePath();
+			assertTrue("wrong path for artifact", (new File(artifactPath)).exists());
+		}
 	}
 
 	public void testReadRecordsFromSingleFile() {

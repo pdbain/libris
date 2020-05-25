@@ -167,18 +167,29 @@ public class LibrisGui extends LibrisWindowedUi {
 	void goToPrevOrNextRecord(boolean ifNext) {
 		int currentIndex = resultsPanel.getSelectedRecordIndex();
 		int increment = 0;
-		if (ifNext && (currentIndex < (resultsPanel.getNumRecords()-1))) {
+		int maxIndex = resultsPanel.getNumRecords()-1;
+		if (ifNext && (currentIndex < maxIndex)) {
 			increment = 1;
 		} else if (!ifNext && (currentIndex > 0)) {
 			increment = -1;
 		}
 		if (0 != increment) {
 			displayPanel.doClose(null, false);
-			resultsPanel.setSelectedRecordIndex(currentIndex+increment);
+			int index = currentIndex+increment;
+			displayPanel.enablePrevButton(index > 0);
+			displayPanel.enableNextButton(index < maxIndex);
+			resultsPanel.setSelectedRecordIndex(index);
 			resultsPanel.displaySelectedRecord();
 		}
 	}
 	
+	void enablePrevNext() {
+		int index = resultsPanel.getSelectedRecordIndex();
+		int maxIndex = resultsPanel.getNumRecords()-1;
+			displayPanel.enablePrevButton(index > 0);
+			displayPanel.enableNextButton(index < maxIndex);
+	}
+
 	@Override
 	 protected void destroyWindow(boolean retain) {
 		if (null != mainWindow) {
@@ -279,6 +290,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	public void displayRecord(int recId) throws LibrisException {
 		displayPanel.displayRecord(recId);
+		enablePrevNext();
 	}
 
 	FilterDialogue createSearchDialogue() {

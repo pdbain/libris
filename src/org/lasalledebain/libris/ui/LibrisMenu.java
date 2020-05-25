@@ -244,11 +244,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		edMenu.add(pasteToField);
 		editMenuFieldValueCommands.add(pasteToField);
 
-		addArtifactMenuItem = new JMenuItem("Set artifact...");
-		addArtifactMenuItem.addActionListener(e -> database.getUi().setRecordArtifact());
-		edMenu.add(addArtifactMenuItem);
-		editMenuFieldValueCommands.add(addArtifactMenuItem);
-
 		edMenu.add("Delete");
 		enableFieldValueOperations(false);
 		return edMenu;
@@ -314,7 +309,11 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		}
 				);
 
-		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord};
+		addArtifactMenuItem = new JMenuItem("Set artifact...");
+		addArtifactMenuItem.addActionListener(e -> database.getUi().setRecordArtifact());
+		recMenu.add(addArtifactMenuItem);
+
+		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord, addArtifactMenuItem};
 		return recMenu;
 	}
 

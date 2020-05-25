@@ -25,8 +25,6 @@ import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
 
 public class Repository extends Libris {
-	// TODO 1 Add Repository field to LibrisDatabase and add repository field to
-	// record
 	private static final String LEVEL_PREFIX = "_L";
 
 	private static final String DIRECTORY_PREFIX = "D_";

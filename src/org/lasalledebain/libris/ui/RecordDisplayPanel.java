@@ -95,6 +95,14 @@ public class RecordDisplayPanel extends JPanel {
 		return openRecords;
 	}
 
+	void enableNextButton(boolean enable) {
+		nextButton.setEnabled(enable);	
+	}
+
+	void enablePrevButton(boolean enable) {
+		prevButton.setEnabled(enable);	
+	}
+
 	public void addLayouts(Layouts layouts) {
 		layoutIds = layouts.getLayoutIds();
 		String lo = "";
@@ -157,7 +165,9 @@ public class RecordDisplayPanel extends JPanel {
 		layoutSelector.addActionListener(new layoutSelectionListener());
 		
 		prevButton.addActionListener(new prevNextListener(false));
+		prevButton.setEnabled(false);
 		buttonBar.add(nextButton = new JButton("\u2192"));
+		nextButton.setEnabled(false);
 		nextButton.addActionListener(new prevNextListener(true));
 		add(buttonBar, BorderLayout.NORTH);
 	}
@@ -274,7 +284,6 @@ public class RecordDisplayPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			recordModified();
-// TODO delete this?			mainGui.updateUITitle();
 		}
 	}
 	

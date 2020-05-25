@@ -338,14 +338,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	@Override
 	public void toXml(ElementWriter outWriter) throws LibrisException {
-		outWriter.writeStartElement(XML_LIBRIS_TAG, getAttributes(), false);
-		databaseMetadata.toXml(outWriter);
-		databaseRecords.toXml(outWriter);
-		if (hasDocumentRepository()) {
-			documentRepository.toXml(outWriter);
-		}
-		outWriter.writeEndElement(); /* database */	
-		outWriter.flush();
+		toXml(outWriter, true, databaseRecords, false);
 	}
 
 	private void toXml(ElementWriter outWriter, boolean includeMetadata,
@@ -369,6 +362,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			}
 			outWriter.writeEndElement(); /* records */
 		}
+		if (hasDocumentRepository()) {
+			documentRepository.toXml(outWriter);
+		}
 		outWriter.writeEndElement(); /* database */	
 		outWriter.flush();
 	}
@@ -384,7 +380,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		} catch (XMLStreamException e) {
 			throw new OutputException(Messages.getString("LibrisDatabase.exception_export_xml"), e); //$NON-NLS-1$
 		}
-		toXml(outWriter, includeSchema, getRecordReader(), addInstanceInfo); 
+		toXml(outWriter, includeSchema, getRecordReader(), addInstanceInfo);
 	}
 
 	public void exportDatabaseXml(OutputStream destination) throws LibrisException {
