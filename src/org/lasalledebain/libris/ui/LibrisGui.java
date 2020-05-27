@@ -60,7 +60,9 @@ public class LibrisGui extends LibrisWindowedUi {
 		System.setProperty("apple.eawt.quitStrategy system property", "CLOSE_ALL_WINDOWS");
 		initializeGui();
 	}
-
+// TODO 1 add menu option to edit artifact record
+	// TODO 1 menu option to auto-generate keywords
+	// TODO bulk import artifacts
 	protected void initializeGui() throws DatabaseException {
 		com.apple.eawt.Application.getApplication().setQuitHandler(new QuitHandler() {
 			@Override

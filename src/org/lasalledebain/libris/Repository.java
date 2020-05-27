@@ -19,7 +19,6 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
-import org.lasalledebain.libris.ui.ChildUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -40,7 +39,7 @@ public class Repository extends Libris {
 
 	static FieldTemplate[] templateList;
 
-	public Repository(ChildUi ui, GenericDatabase<DatabaseRecord> db, File theRoot) {
+	public Repository(GenericDatabase<DatabaseRecord> db, File theRoot) {
 		repoDatabase = db;
 		root = theRoot;
 	}
@@ -72,8 +71,9 @@ public class Repository extends Libris {
 	}
 
 	public static Repository open(LibrisUi parent, File repoRoot) throws FactoryConfigurationError, LibrisException {
-		ChildUi myUi = new ChildUi(getDatabaseFileFromRoot(repoRoot), parent.isDatabaseReadOnly(), parent);
-		Repository result = new Repository(myUi, myUi.openDatabase(), repoRoot);
+		HeadlessUi myUi = new HeadlessUi(getDatabaseFileFromRoot(repoRoot), parent.isDatabaseReadOnly());
+		LibrisDatabase db = myUi.openDatabase();
+		Repository result = new Repository(db, repoRoot);
 		return result;
 	}
 

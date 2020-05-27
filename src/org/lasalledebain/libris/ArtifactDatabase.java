@@ -2,6 +2,7 @@ package org.lasalledebain.libris;
 
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_LOCATION;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_STRING;
+import static java.util.Objects.nonNull;
 
 import java.io.File;
 import java.net.URI;
@@ -74,12 +75,6 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		outWriter.writeStartElement(getElementTag(), recordsAttrs, false);
 		databaseRecords.toXml(outWriter);
 		outWriter.writeEndElement(); /* records */
-	}
-
-	@Override
-	public LibrisAttributes getAttributes() throws XmlException {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -161,10 +156,10 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 			}
 			String uriString = record.getFieldValue(ID_SOURCE).getMainValueAsString();
 			ArtifactParameters result = new ArtifactParameters(new URI(uriString));
-			FieldValue fieldValue = record.getFieldValue(ID_ARCHIVEPATH);
-			if (fieldValue != null) { // TODO debug
-				String artifactPath = fieldValue.getMainValueAsString();
-				if (Objects.nonNull(artifactPath)) {
+			FieldValue fldValue = record.getFieldValue(ID_ARCHIVEPATH);
+			if (nonNull(fldValue)) {
+				String artifactPath = fldValue.getMainValueAsString();
+				if (nonNull(artifactPath)) {
 					result.setArchivepPath(new URI(artifactPath));
 				}
 			}

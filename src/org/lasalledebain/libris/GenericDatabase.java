@@ -12,6 +12,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
+import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.IndexConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
@@ -23,6 +24,7 @@ import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.search.KeywordFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
 public abstract class GenericDatabase<RecordType extends Record> implements XMLElement {
@@ -343,6 +345,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public void alert(String msg) {
 		getUi().alert(msg);
+	}
+
+	@Override
+	public LibrisAttributes getAttributes() throws XmlException {
+		return LibrisAttributes.getLibrisEmptyAttributes();
 	}
 
 }

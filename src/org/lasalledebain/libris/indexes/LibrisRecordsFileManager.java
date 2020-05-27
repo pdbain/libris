@@ -416,8 +416,10 @@ public void removeRecord(int rid) throws DatabaseException {
 
 			if (checkBit(flags, LibrisConstants.RECORD_HAS_ARTIFACT)) {
 				int artifactId = recordsFileStore.readInt();
-				if (!RecordId.isNull(artifactId)) { // TODO DEBUG
+				if (!RecordId.isNull(artifactId)) {
 					r.setArtifactId(artifactId);
+				} else {
+					throw new InputException("record artifact ID missing");
 				}
 			}
 
