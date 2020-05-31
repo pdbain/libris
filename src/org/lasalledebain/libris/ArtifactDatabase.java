@@ -1,8 +1,8 @@
 package org.lasalledebain.libris;
 
+import static java.util.Objects.nonNull;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_LOCATION;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_STRING;
-import static java.util.Objects.nonNull;
 
 import java.io.File;
 import java.net.URI;
@@ -14,7 +14,6 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
@@ -29,6 +28,8 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	static final DynamicSchema artifactsSchema = makeSchema();
 	private final DatabaseMetadata myMetadata;
+	
+	/* field IDs */
 	static final String ID_COMMENTS = "ID_comments";
 	static final String ID_TITLE = "ID_title";
 	static final String ID_KEYWORDS = "ID_keywords";
@@ -37,7 +38,9 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	static final String ID_GROUPS = "ID_groups";
 	static final String ID_SOURCE = "ID_source";
 	static final String ID_ARCHIVEPATH = "ID_archivepath";
-	private static int COMMENTS_FIELD;
+	
+	/* field numbers */
+	public static int COMMENTS_FIELD;
 	public static int KEYWORDS_FIELD;
 	public static int DATE_FIELD;
 	public static int DOI_FIELD;
@@ -45,6 +48,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	public static int SOURCE_FIELD;
 	public static int TITLE_FIELD;
 	public static int ARCHIVEPATH_FIELD;
+	public static int numFields;
 	public ArtifactDatabase(LibrisUi theUi, FileManager theFileManager) throws DatabaseException {
 		super(theUi, theFileManager);
 		myMetadata = new DatabaseMetadata();
@@ -216,7 +220,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		DATE_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_DATE, "", T_FIELD_STRING));
 		KEYWORDS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_KEYWORDS, "", T_FIELD_STRING));
 		COMMENTS_FIELD = theSchema.addField(new FieldTemplate(theSchema, ID_COMMENTS, "", T_FIELD_STRING));
-		int numFields = COMMENTS_FIELD + 1;
+		numFields = COMMENTS_FIELD + 1;
 		Repository.templateList = new FieldTemplate[numFields];
 		for (int i = 1; i < numFields; ++i) {
 			Repository.templateList[i] = theSchema.getFieldTemplate(i);

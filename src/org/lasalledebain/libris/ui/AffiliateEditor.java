@@ -28,7 +28,6 @@ public class AffiliateEditor {
 	JDialog dLog;
 	final Vector<KeyIntegerTuple> affInfo;
 	final JList<KeyIntegerTuple> affList;
-	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
 	private final GuiControl guiCtrl;
 	public AffiliateEditor(Record currentRecord, final GuiControl ctrl, LibrisWindowedUi ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
 			Vector<KeyIntegerTuple> affiliateInfo, JList<KeyIntegerTuple> affiliateList, GroupDef grpDef) {
@@ -36,7 +35,6 @@ public class AffiliateEditor {
 		affInfo = affiliateInfo;
 		affList = affiliateList;
 		this.ownerFrame = ui.getMainFrame();
-		namedRecordIndex = namedRecIndex;
 		dLog = new JDialog(ownerFrame, grpDef.getFieldTitle());
 		final JPanel optionPane = new JPanel();
 		optionPane.setLayout(new BorderLayout());

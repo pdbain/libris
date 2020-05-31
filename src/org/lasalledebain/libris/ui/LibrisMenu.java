@@ -72,6 +72,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	private JMenuItem duplicateRecord;
 	private JMenuItem searchRecords;
 	private HashSet<JMenuItem> databaseAccessCommands;
+	private JMenuItem viewArtifactMenuItem;
 
 	public LibrisMenu(LibrisGui gui) {
 		this();
@@ -310,15 +311,20 @@ public class LibrisMenu extends AbstractLibrisMenu {
 				);
 
 		addArtifactMenuItem = new JMenuItem("Set artifact...");
-		addArtifactMenuItem.addActionListener(e -> database.getUi().setRecordArtifact());
+		addArtifactMenuItem.addActionListener(e -> guiMain.setRecordArtifact());
 		recMenu.add(addArtifactMenuItem);
+		
+		viewArtifactMenuItem = new JMenuItem("Open artifact record");
+		viewArtifactMenuItem.addActionListener(e -> guiMain.viewArtifactRecord(getCurrentRecord()));
+		// TODO disable viewArtifactMenuItem if record has no artifact
+		recMenu.add(viewArtifactMenuItem);
 
 		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord, addArtifactMenuItem};
 		return recMenu;
 	}
 
 	public DatabaseRecord getCurrentRecord() {
-		RecordWindow rw = guiMain.getCurrentRecordWindow();
+		DatabaseRecordWindow rw = guiMain.getCurrentRecordWindow();
 		DatabaseRecord rec = null;
 		if (null != rw) {
 			rec = rw.getRecord();

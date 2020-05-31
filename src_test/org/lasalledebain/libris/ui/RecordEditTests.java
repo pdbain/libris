@@ -199,7 +199,7 @@ public class RecordEditTests extends TestCase {
 			gui.displaySelectedRecord();
 			pause("opened record");
 			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
-			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
+			DatabaseRecordWindow recWindow = dispPanel.getCurrentRecordWindow();
 			String ids[] = {ID_AUTH, ID_HARDCOPY, ID_PAGES, ID_PUB, ID_PAGES};
 			int counts[] = {2, 1, 1, 1, 1};
 			boolean editable = true;

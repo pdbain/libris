@@ -6,6 +6,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
 public interface Field extends XMLElement {
+	// TODO add T_FIELD_DATE
 	public enum FieldType {T_FIELD_UNKNOWN, 
 		T_FIELD_STRING, // short string
 		T_FIELD_TEXT, // long string

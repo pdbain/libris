@@ -1,11 +1,12 @@
 package org.lasalledebain.libris;
 
+import static java.util.Objects.nonNull;
+
 import java.net.URI;
 import java.util.Objects;
 
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
-import static java.util.Objects.nonNull;
 
 public class ArtifactParameters {
 	private String date;
@@ -18,6 +19,7 @@ public class ArtifactParameters {
 	String recordName;
 	private final URI sourcePath;
 	private URI archivepath;
+	
 	public ArtifactParameters(URI source) {
 		this.sourcePath = source;
 		recordName = "";
@@ -25,6 +27,7 @@ public class ArtifactParameters {
 		date = LibrisMetadata.getCurrentDateAndTimeString();
 		parentId = RecordId.NULL_RECORD_ID;
 	}
+	
 	public String getSourceString() {
 		if (null == sourcePath) {
 			return null;

@@ -30,7 +30,7 @@ public class RecordDisplayPanel extends JPanel {
 	private LibrisGui mainGui;
 	JPanel buttonBar;
 	private JTabbedPane openRecordPanes;
-	ArrayList<RecordWindow> openRecords;
+	ArrayList<DatabaseRecordWindow> openRecords;
 	private JButton prevButton;
 	private JButton nextButton;
 	private JButton newButton;
@@ -50,7 +50,7 @@ public class RecordDisplayPanel extends JPanel {
 		this.database = librisDatabase;
 		modListener = new ModificationListener();
 		setLayout(new BorderLayout());
-		openRecords = new ArrayList<RecordWindow>();
+		openRecords = new ArrayList<DatabaseRecordWindow>();
 		addButtonBar(mainGui);
 		openRecordPanes = new JTabbedPane();
 		openRecordPanes.addChangeListener(new PaneChangeListener());
@@ -60,10 +60,16 @@ public class RecordDisplayPanel extends JPanel {
 		menu = mainGui.getMenu();
 	}
 
-	RecordWindow addRecord(DatabaseRecord record, boolean editable) throws LibrisException {
-		RecordWindow rw = new RecordWindow(mainGui, recLayout, record, editable, modListener);
+	DatabaseRecordWindow addRecord(DatabaseRecord record, boolean editable) throws LibrisException {
+		DatabaseRecordWindow rw = new DatabaseRecordWindow(mainGui, recLayout, record, editable, modListener);
 		rw.setModified(false);
-		addRecordWindow(rw);
+		openRecords.add(rw);
+		String recordTitle = rw.createTitle(getTitleFieldIds());
+		final JScrollPane recordTab = new JScrollPane(rw);
+		openRecordPanes.add(recordTitle, recordTab);
+		recordModified();
+		rw.setVisible(true);
+		openRecordPanes.setSelectedComponent(recordTab);
 		menu.recordWindowOpened(editable);
 		return rw;
 	}
@@ -81,17 +87,7 @@ public class RecordDisplayPanel extends JPanel {
 		addRecord(rec, false);
 	}
 
-	public void addRecordWindow(RecordWindow rw) throws DatabaseException {
-		openRecords.add(rw);
-		String recordTitle = rw.createTitle(getTitleFieldIds());
-		final JScrollPane recordTab = new JScrollPane(rw);
-		openRecordPanes.add(recordTitle, recordTab);
-		recordModified();
-		rw.setVisible(true);
-		openRecordPanes.setSelectedComponent(recordTab);
-	}
-
-	public Iterable<RecordWindow> getOpenRecords() {
+	public Iterable<DatabaseRecordWindow> getOpenRecords() {
 		return openRecords;
 	}
 
@@ -131,7 +127,7 @@ public class RecordDisplayPanel extends JPanel {
 		return titleFieldIds;
 	}
 
-	RecordWindow getCurrentRecordWindow() {
+	DatabaseRecordWindow getCurrentRecordWindow() {
 		int currentRecordIndex = openRecordPanes.getSelectedIndex();
 		if (currentRecordIndex >= 0) {
 			return openRecords.get(currentRecordIndex);
@@ -220,7 +216,7 @@ public class RecordDisplayPanel extends JPanel {
 		int selectedRecordIndex = openRecordPanes.getSelectedIndex();
 		if (selectedRecordIndex >= 0) {
 			boolean closeWindow = false;
-			RecordWindow currentRecordWindow = openRecords.get(selectedRecordIndex);
+			DatabaseRecordWindow currentRecordWindow = openRecords.get(selectedRecordIndex);
 			DatabaseRecord currentRecord = currentRecordWindow.getRecord();
 			try {
 				if (enter) {
@@ -263,7 +259,7 @@ public class RecordDisplayPanel extends JPanel {
 	}		
 
 	private void recordModified() {
-		RecordWindow w = getCurrentRecordWindow();
+		DatabaseRecordWindow w = getCurrentRecordWindow();
 		if (null != w) {
 			boolean modified = w.isModified();
 

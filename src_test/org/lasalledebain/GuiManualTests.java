@@ -37,6 +37,7 @@ import org.lasalledebain.libris.ui.Layout;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisWindowedUi;
 import org.lasalledebain.libris.ui.RecordWindow;
+import org.lasalledebain.libris.ui.DatabaseRecordWindow;
 import org.lasalledebain.libris.ui.TextBox;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
@@ -161,7 +162,7 @@ public class GuiManualTests extends TestCase {
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
 			assertNotNull("could not load "+Utilities.LAYOUT2, myGuiLayout);
-			RecordWindow rWindow = new RecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), false, null);
+			RecordWindow rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), false, null);
 			rWindow.setVisible(true);
 			JFrame frame = new JFrame(getName());
 			frame.add(rWindow);
@@ -188,7 +189,7 @@ public class GuiManualTests extends TestCase {
 				fail("Cannot cast layout2 to FormLayout");
 			}
 			assertNotNull("could not load "+Utilities.LAYOUT2, myGuiLayout);
-			RecordWindow rWindow = new RecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), null);
+			RecordWindow rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), null);
 			JFrame frame = new JFrame(getName());
 			frame.add(rWindow);
 			rWindow.setVisible(true);
@@ -227,7 +228,7 @@ public class GuiManualTests extends TestCase {
 			assertNotNull("did not load "+LAYOUT1, myGuiLayout);
 			RecordWindow rWindow;
 			try {
-				rWindow = new RecordWindow(myUi, myGuiLayout, rec, false, null);
+				rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, false, null);
 				rWindow.setVisible(true);
 				guiPause();
 			} catch (Exception e) {
@@ -255,7 +256,7 @@ public class GuiManualTests extends TestCase {
 			assertNotNull("did not load "+LAYOUT1, myGuiLayout);
 			RecordWindow rWindow;
 			try {
-				rWindow = new RecordWindow(myUi, myGuiLayout, rec, false, null);
+				rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, false, null);
 				rWindow.setVisible(true);
 				guiPause();
 			} catch (Exception e) {
@@ -344,7 +345,7 @@ public class GuiManualTests extends TestCase {
 				fail("Cannot cast layout2 to FormLayout");
 			}
 			assertNotNull("could not load "+LAYOUT1A, myGuiLayout);
-			RecordWindow rWindow = new RecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), null);
+			RecordWindow rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), null);
 			JFrame frame = new JFrame(getName());
 			frame.add(rWindow);
 			rWindow.setVisible(true);
