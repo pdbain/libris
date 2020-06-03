@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.util;
 
+import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 import static org.lasalledebain.libris.util.LibrisStemmer.stem;
 
 import java.nio.charset.Charset;
@@ -171,5 +173,9 @@ public class StringUtils {
 			return newTaf;
 		});
 		return representativeTermStream.filter(tf -> tf.term.length() > 2).sorted().limit(limit).map(tf -> tf.term);
+	}
+
+	public static boolean isStringEmpty(String text) {
+		return isNull(text) || text.isEmpty();
 	}
 }

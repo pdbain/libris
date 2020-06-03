@@ -17,15 +17,20 @@ public class ArtifactParameters {
 	private String recordParentName;
 	private int parentId;
 	String recordName;
-	private final URI sourcePath;
+	private URI sourcePath;
 	private URI archivepath;
 	
-	public ArtifactParameters(URI source) {
-		this.sourcePath = source;
+	public ArtifactParameters() {
+		this.sourcePath = null;
 		recordName = "";
 		recordParentName = "";
-		date = LibrisMetadata.getCurrentDateAndTimeString();
 		parentId = RecordId.NULL_RECORD_ID;
+	}
+	
+	public ArtifactParameters(URI source) {
+		this();
+		this.sourcePath = source;
+		date = LibrisMetadata.getCurrentDateAndTimeString();
 	}
 	
 	public String getSourceString() {

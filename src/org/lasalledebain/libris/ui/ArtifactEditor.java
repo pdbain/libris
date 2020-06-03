@@ -16,117 +16,142 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.lasalledebain.libris.ArtifactParameters;
-import org.lasalledebain.libris.indexes.KeyIntegerTuple;
-import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
-import org.lasalledebain.libris.ui.AffiliateEditor.RecordSelectorByName;
+import static org.lasalledebain.libris.util.StringUtils.isStringEmpty;
+
 
 public class ArtifactEditor {
-	Frame ownerFrame;
-	JDialog dLog;
+	private Frame ownerFrame;
+	private JDialog dLog;
 	/* Editable fields */
-	JTextField title, doi;
-	JTextArea comments, keywords;
-	
+	private JTextField title, doi;
+	private JTextArea comments, keywords;
+
 	/* Fixed fields */
-	JTextField recordName, parentName, date, sourcePath;
-	boolean modified = false;
+	private JTextField recordName, parentName, date, sourcePath;
+	private boolean modified = false;
 	ArtifactParameters result = null;
+	private JButton closeButton;
+	private JButton saveButton;
 
 	/**
 	 * @param params information about the artifact.  May be modified
 	 * @param ui
 	 */
-	public ArtifactEditor(ArtifactParameters params, LibrisWindowedUi ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex) {
+	public ArtifactEditor(ArtifactParameters params, LibrisGui ui) {
+		boolean editable = ui.isEditable();
 		DocumentListener listener = new DocumentListener() {
-			
+			protected void modificationAction() {
+				modified = true;
+				closeButton.setText("Close and discard changes");
+				saveButton.setEnabled(true);
+			}
+
+
 			@Override
 			public void removeUpdate(DocumentEvent e) {
-				modified = true;
+				modificationAction();
 			}
-			
+
 			@Override
 			public void insertUpdate(DocumentEvent e) {
-				modified = true;
-				}
-			
+				modificationAction();
+			}
+
 			@Override
 			public void changedUpdate(DocumentEvent e) {
-				modified = true;
-				}
+				modificationAction();
+			}
 		};
 		ownerFrame = ui.getMainFrame();
 		dLog = new JDialog(ownerFrame, "Edit artifact information", true);
 		final JPanel fieldsPane = new JPanel();
 		fieldsPane.setLayout(new BoxLayout(fieldsPane, BoxLayout.Y_AXIS));
-		
-		title = new JTextField(params.getTitle());
-		fieldsPane.add(title);
-		title.setBorder(new TitledBorder("Title"));
-		title.getDocument().addDocumentListener(listener);
-		
-		recordName = new JTextField(params.getRecordName());
-		fieldsPane.add(recordName);
-		title.setBorder(new TitledBorder("Record name"));
-		recordName.setEditable(false);
 
-		parentName = new JTextField(params.getRecordParentName());
-		title.setBorder(new TitledBorder("Parent name"));
-		fieldsPane.add(parentName);
-		parentName.setEditable(false);
+		title = new JTextField(params.getTitle());
+		title.setBorder(new TitledBorder("Title"));
+		title.setEnabled(editable);
+		title.getDocument().addDocumentListener(listener);
+		fieldsPane.add(title);
+
+		String recName = params.getRecordName();
+		if (!isStringEmpty(recName)) {
+			recordName = new JTextField(recName);
+			recordName.setBorder(new TitledBorder("Record name"));
+			recordName.setEditable(false);
+			fieldsPane.add(recordName);
+		}
+
+		String recParentName = params.getRecordParentName();
+		if (!isStringEmpty(recParentName)) {
+			parentName = new JTextField(recParentName);
+			parentName.setBorder(new TitledBorder("Parent name"));
+			parentName.setEditable(false);
+			fieldsPane.add(parentName);
+		}
 
 		date = new JTextField(params.getDate());
 		date.setBorder(new TitledBorder("Date"));
 		date.setEditable(false);
 		fieldsPane.add(date);
-		
+
 		doi = new JTextField(params.getDoi());
 		fieldsPane.add(doi);
 		doi.setBorder(new TitledBorder("Digital Object Identifier"));
 		doi.getDocument().addDocumentListener(listener);
+		doi.setEnabled(editable);
 
 		sourcePath = new JTextField(params.getSourceString());
 		fieldsPane.add(sourcePath);
 		sourcePath.setBorder(new TitledBorder("Source path"));
 		sourcePath.setEditable(false);
-		
+
 		comments= new JTextArea(params.getComments());
 		fieldsPane.add(comments);
 		comments.setBorder(new TitledBorder("Comments"));
 		comments.getDocument().addDocumentListener(listener);
+		comments.setEnabled(editable);
 
 		keywords= new JTextArea(params.getKeywords());
 		keywords.setBorder(new TitledBorder("Keywords"));
 		keywords.getDocument().addDocumentListener(listener);
 		fieldsPane.add(keywords);
-		
+		keywords.setEnabled(editable);
+
 		JPanel buttonBar = new JPanel(new FlowLayout());
-		JButton closeButton = new JButton("Close");
-		ActionListener closeListener = e -> {
-			if (modified && Dialogue.yesNoDialog(ownerFrame, "Discard changes?") == Dialogue.YES_OPTION) return;
-			this.dialogueDispose();};
-		closeButton.addActionListener(closeListener
-		);
+		closeButton = new JButton("Close");
+		ActionListener closeListener = e -> this.dialogueDispose();
+		closeButton.addActionListener(closeListener);
 		buttonBar.add(closeButton);
-		JButton saveButton = new JButton("Save");
+
+		saveButton = new JButton("Save");
 		closeButton.addActionListener(e -> this.dialogueDispose());
-		buttonBar.add(closeButton);
+		saveButton.setEnabled(false);
+		buttonBar.add(saveButton);
 		ActionListener saveListener = new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!modified) return;
-				result = params;
-				result.setTitle(title.getText());
-				result.setRecordName(recordName.getText());
-				result.setRecordParentName(parentName.getText());
-				result.setDoi(doi.getText());
-				result.setComments(comments.getText());
-				result.setKeywords(keywords.getText());
+				result = new ArtifactParameters();
+				String tempText = title.getText();
+				if (!isStringEmpty(tempText)) result.setTitle(tempText);
+				tempText = doi.getText();
+				if (!isStringEmpty(tempText)) result.setDoi(tempText);
+				tempText = comments.getText();
+				if (!isStringEmpty(tempText)) result.setComments(tempText);
+				tempText = keywords.getText();
+				if (!isStringEmpty(tempText)) result.setKeywords(tempText);
 				dialogueDispose();
 			}
 		};
+		saveButton.addActionListener(saveListener);
+		fieldsPane.add(buttonBar);
+		dLog.setContentPane(fieldsPane);
+		dLog.pack();
+		dLog.setLocationRelativeTo(ownerFrame);
+		dLog.setVisible(true);
 	}
-	
+
 	private void dialogueDispose() {
 		dLog.setVisible(false);
 		dLog.dispose();

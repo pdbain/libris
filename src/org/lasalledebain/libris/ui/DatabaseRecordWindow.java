@@ -51,14 +51,14 @@ public class DatabaseRecordWindow extends RecordWindow {
 		}
 		ArtifactParameters artifactInfo = ui.currentDatabase.getArtifactInfo(rec.getArtifactId());
 		if (null != artifactInfo) {
-			addArtiFactButton(artifactInfo);
+			addArtifactButton(artifactInfo);
 		}
 		recordPanel.setVisible(true);
 		ui.fieldSelected(false);
 		ui.setSelectedField(null);
 	}
 
-	public void addArtiFactButton(ArtifactParameters artifactInfo) {
+	public void addArtifactButton(ArtifactParameters artifactInfo) {
 		if (Objects.nonNull(artifactButton)) {
 			navPanel.remove(artifactButton);
 		}

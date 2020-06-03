@@ -145,9 +145,15 @@ public class ArtifactManager {
 		myDb.putRecord(rec);
 	}
 	
-	public int putArtifactInfo(ArtifactParameters artifactParameters) throws LibrisException {
-		ArtifactRecord rec = myDb.newRecord(artifactParameters);
+	public int putArtifactInfo(ArtifactParameters params) throws LibrisException {
+		ArtifactRecord rec = myDb.newRecord(params);
 		return myDb.putRecord(rec);
+	}
+	
+	public void updateArtifactInfo(int artifactId, ArtifactParameters params) throws LibrisException {
+		ArtifactRecord artRecord = myDb.getRecord(artifactId);
+		myDb.setMutableFields(params, artRecord);
+		myDb.putRecord(artRecord);
 	}
 	
 	public int putArtifactInfo(URI sourceLocation) throws LibrisException {

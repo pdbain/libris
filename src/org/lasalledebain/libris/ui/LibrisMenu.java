@@ -72,7 +72,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	private JMenuItem duplicateRecord;
 	private JMenuItem searchRecords;
 	private HashSet<JMenuItem> databaseAccessCommands;
-	private JMenuItem viewArtifactMenuItem;
+	private JMenuItem openArtifactInfoMenuItem;
 
 	public LibrisMenu(LibrisGui gui) {
 		this();
@@ -245,6 +245,17 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		edMenu.add(pasteToField);
 		editMenuFieldValueCommands.add(pasteToField);
 
+
+		addArtifactMenuItem = new JMenuItem("Set artifact...");
+		addArtifactMenuItem.addActionListener(e -> guiMain.setRecordArtifact());
+		edMenu.add(addArtifactMenuItem);
+		editMenuFieldValueCommands.add(addArtifactMenuItem);
+		
+		openArtifactInfoMenuItem = new JMenuItem("Open artifact information...");
+		openArtifactInfoMenuItem.addActionListener(e -> guiMain.openArtifactInfo(getCurrentRecord()));
+		edMenu.add(openArtifactInfoMenuItem);
+		editMenuFieldValueCommands.add(openArtifactInfoMenuItem);
+		
 		edMenu.add("Delete");
 		enableFieldValueOperations(false);
 		return edMenu;
@@ -310,16 +321,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		}
 				);
 
-		addArtifactMenuItem = new JMenuItem("Set artifact...");
-		addArtifactMenuItem.addActionListener(e -> guiMain.setRecordArtifact());
-		recMenu.add(addArtifactMenuItem);
-		
-		viewArtifactMenuItem = new JMenuItem("Open artifact record");
-		viewArtifactMenuItem.addActionListener(e -> guiMain.viewArtifactRecord(getCurrentRecord()));
-		// TODO disable viewArtifactMenuItem if record has no artifact
-		recMenu.add(viewArtifactMenuItem);
-
-		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord, addArtifactMenuItem};
+		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord};
 		return recMenu;
 	}
 
@@ -573,14 +575,18 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	private EditRecordListenerImpl editRecordListener;
 	private JMenuItem recordWindowItems[];
 	private JMenuItem addArtifactMenuItem;
-	public void enableFieldValueOperations(boolean selected) {
+	public void enableFieldValueOperations(boolean enabled) {
 		for (JMenuItem m: editMenuFieldValueCommands) {
-			m.setEnabled(selected);
+			m.setEnabled(enabled);
 		}
 	}
 
 	public void setRecordDuplicateRecordEnabled(boolean enabled) {
 		duplicateRecord.setEnabled(enabled);
+	}
+
+	public void setOpenArtifactInfoEnabled(boolean enabled) {
+		openArtifactInfoMenuItem.setEnabled(enabled);
 	}
 }
 

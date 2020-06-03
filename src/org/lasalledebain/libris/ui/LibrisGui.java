@@ -572,7 +572,7 @@ public class LibrisGui extends LibrisWindowedUi {
 					artifactId = currentDatabase.addArtifact(rec, artifactSourceFile);
 					ArtifactParameters artifactInfo = currentDatabase.getArtifactInfo(artifactId);
 					currentRecordWindow.setModified(true);
-					currentRecordWindow.addArtiFactButton(artifactInfo);
+					currentRecordWindow.addArtifactButton(artifactInfo);
 				}
 			} catch (BackingStoreException | LibrisException | IOException e1) {
 				throw new DatabaseError(e1);
@@ -618,10 +618,23 @@ public class LibrisGui extends LibrisWindowedUi {
 		menu.sendChooseDatabase();
 	}
 
-	public void viewArtifactRecord(DatabaseRecord databaseRecord) {
+	public void openArtifactInfo(DatabaseRecord databaseRecord) {
 		if (nonNull(databaseRecord) && databaseRecord.hasArtifact()) {
-			ArtifactParameters artifactInfo = currentDatabase.getArtifactInfo(databaseRecord.getArtifactId());
+			int artifactId = databaseRecord.getArtifactId();
+			ArtifactParameters artifactInfo = currentDatabase.getArtifactInfo(artifactId);
+			ArtifactEditor ed = new ArtifactEditor(artifactInfo, this);
+			if (nonNull(ed.result)) {
+				try {
+					currentDatabase.updateArtifactInfo(artifactId, ed.result);
+				} catch (LibrisException e) {
+					alert("Error updating artifact information", e);
+				}
+			}
 		}
+	}
+
+	public void setOpenArtifactInfoEnabled(boolean hasArtifact) {
+		menu.setOpenArtifactInfoEnabled(hasArtifact);
 	}
 
 }

@@ -924,6 +924,15 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return null;
 		}
 	}
+	
+	public void updateArtifactInfo(int artifactId, ArtifactParameters params) throws LibrisException {
+		if (hasDocumentRepository() && !RecordId.isNull(artifactId)) {
+			documentRepository.updateArtifactInfo(artifactId, params);
+		} else {
+			throw new DatabaseException("No artifact repository or artifact ID invalid");
+		}
+		
+	}
 
 	public void incrementTermCount(String term) {
 		indexMgr.incrementTermCount(term);

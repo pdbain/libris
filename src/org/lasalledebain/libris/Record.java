@@ -15,6 +15,7 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.RecordKeywords;
+import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -110,12 +111,18 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	}
 	
 	public abstract Field addFieldValue(int fieldNum, String fieldData) throws InputException;
+	public abstract Field setFieldValue(int fieldNum, String fieldData) throws DatabaseException, InputException;
 	public abstract Field addFieldValue(int fieldNum, int mainValue, String extraValue) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, String mainValue, String extraValue) throws InputException;
 	public abstract Field addFieldValue(int fieldNum, int fieldData) throws InputException;
 	public Field getField(String fieldId) throws InputException {
 		return getField(getFieldNum(fieldId));
 	}
+
+	public Field setFieldValue(String fieldId, String fieldData) throws DatabaseException, InputException {
+		return setFieldValue(getFieldNum(fieldId), fieldData);
+	}
+
 	
 	public abstract Field getDefaultField(int fieldNum) throws InputException;
 	public abstract Field getField(int fieldNum) throws InputException;

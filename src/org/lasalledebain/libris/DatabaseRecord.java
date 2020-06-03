@@ -16,6 +16,7 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
+import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -65,6 +66,16 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		}
 	}
 	
+	@Override
+	public Field setFieldValue(int position, String fieldData) throws DatabaseException, InputException {
+		if (StringUtils.isStringEmpty(fieldData)){
+			return null;
+		}
+		Field newField = template.newField(position, fieldData);
+		setField(position, newField);
+		return newField;
+	}
+
 	@Override
 	public void setField(int fieldNum, Field values) throws DatabaseException {
 		if (isEditable() && (fieldNum < recordFields.length)) {

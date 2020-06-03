@@ -16,6 +16,7 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
+import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -75,6 +76,16 @@ public class ArtifactRecord extends Record {
 				throw new DatabaseException("Multiple field values not permitted in field "+fieldNum);
 			}
 		}
+	}
+
+	@Override
+	public Field setFieldValue(int position, String fieldData) throws DatabaseException, InputException {
+		if (StringUtils.isStringEmpty(fieldData)){
+			return null;
+		}
+		Field newField = ArtifactDatabase.newField(position, fieldData);
+		setField(position, newField);
+		return newField;
 	}
 
 	@Override

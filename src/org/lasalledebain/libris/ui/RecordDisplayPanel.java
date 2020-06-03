@@ -267,6 +267,7 @@ public class RecordDisplayPanel extends JPanel {
 			menu.enableFieldValueOperations(theRecord.isEditable());
 					enterButton.setEnabled(modified);
 			mainGui.setRecordEnterRecordEnabled(modified);
+			mainGui.setOpenArtifactInfoEnabled(theRecord.hasArtifact());
 			closeButton.setEnabled(true);
 		} else {
 			enterButton.setEnabled(false);

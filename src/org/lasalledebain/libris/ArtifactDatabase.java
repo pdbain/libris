@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
@@ -98,21 +99,18 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	
 	public ArtifactRecord newRecord(ArtifactParameters artifactParameters) throws LibrisException {
 		ArtifactRecord rec = newRecord();
+		setRecordFields(artifactParameters, rec);
+		return rec;
+	}
+
+	protected void setRecordFields(ArtifactParameters artifactParameters, ArtifactRecord rec)
+			throws InputException, FieldDataException, DatabaseException {
 		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
 		rec.addFieldValue(ID_ARCHIVEPATH, artifactParameters.getArchivePathString());
 		rec.addFieldValue(ID_DATE, artifactParameters.getDate());
-		rec.addFieldValue(ID_DOI, artifactParameters.getDoi());
-		rec.addFieldValue(ID_KEYWORDS, artifactParameters.getKeywords());
-		rec.addFieldValue(ID_COMMENTS, artifactParameters.getComments());
-		String title = artifactParameters.getTitle();
 		if (!artifactParameters.recordName.isEmpty()) {
 			rec.setName(artifactParameters.recordName);
 		}
-		if (Objects.isNull(title) || title.isEmpty()) {
-			File sourceFile = new File(artifactParameters.getSourcePath());
-			title = sourceFile.getName();
-		}
-		rec.addFieldValue(ID_TITLE, title);
 		int parentId = artifactParameters.getParentId();
 		if (parentId != RecordId.NULL_RECORD_ID) {
 			Record parent = getRecord(parentId);
@@ -130,7 +128,19 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 				rec.setParent(0, parent.getRecordId());
 			}
 		}
-		return rec;
+		setMutableFields(artifactParameters, rec);
+	}
+
+	protected void setMutableFields(ArtifactParameters artifactParameters, ArtifactRecord rec) throws InputException, DatabaseException {
+		String title = artifactParameters.getTitle();
+		if (Objects.isNull(title) || title.isEmpty()) {
+			File sourceFile = new File(artifactParameters.getSourcePath());
+			title = sourceFile.getName();
+		}
+		rec.setFieldValue(ID_TITLE, title);
+		rec.setFieldValue(ID_DOI, artifactParameters.getDoi());
+		rec.setFieldValue(ID_KEYWORDS, artifactParameters.getKeywords());
+		rec.setFieldValue(ID_COMMENTS, artifactParameters.getComments());
 	}
 
 	@Override
