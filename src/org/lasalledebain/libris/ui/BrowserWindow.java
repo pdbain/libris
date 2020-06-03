@@ -17,6 +17,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -44,10 +45,10 @@ public class BrowserWindow extends JPanel {
 	private JButton moreButton;
 	private JButton refreshButton;
 	private RandomAccessBrowserList recList;
-	private Iterator<Record> recordsIterator;
+	private Iterator<DatabaseRecord> recordsIterator;
 	private ImageIcon searchIcon;
 
-	private RecordList recordsSource;
+	private RecordList<DatabaseRecord> recordsSource;
 
 	private RecordFilter filter;
 
@@ -109,7 +110,7 @@ public class BrowserWindow extends JPanel {
 		moreButton.setVisible(true);
 	}
 
-	public void initialize(RecordList records) throws DatabaseException {
+	public void initialize(RecordList<DatabaseRecord> records) throws DatabaseException {
 		recordsSource = records;
 		enableNext(false);
 		final Layouts layouts = database.getLayouts();
@@ -137,7 +138,7 @@ public class BrowserWindow extends JPanel {
 		if (null != chosenRecord) {		
 			return chosenRecord.getRecordId();
 		} else {
-			return RecordId.getNullId();
+			return RecordId.NULL_RECORD_ID;
 		}
 	}
 
@@ -150,25 +151,19 @@ public class BrowserWindow extends JPanel {
 		chooser.setModel(recList);
 	}			
 
-	public void doRefresh(RecordList src, RecordFilter filter) {
+	public void doRefresh(RecordList<DatabaseRecord> src, RecordFilter filter) {
 		setFilter(filter);
-		FilteredRecordList filteredList = new FilteredRecordList(src, filter);
+		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(src, filter);
 		recordsIterator = filteredList.iterator();
 		recList = getRecords();
 		chooser.setModel(recList);
 	}
 
-	public void doRefresh(RecordList src) {
+	public void doRefresh(Iterable<DatabaseRecord> src) {
 		recordsIterator = src.iterator();
 		recList = getRecords();
 		chooser.setModel(recList);
 	}
-
-	public void doRefresh(Iterable<Record> src) {
-		recordsIterator = src.iterator();
-		recList = getRecords();
-		chooser.setModel(recList);
-}
 
 	public void setFilter(RecordFilter filter) {
 		this.filter = filter;

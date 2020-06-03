@@ -12,38 +12,29 @@ import java.util.logging.Level;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.hashfile.HashFile;
-import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
-import org.lasalledebain.libris.hashfile.NumericKeyHashBucketFactory;
-import org.lasalledebain.libris.hashfile.NumericKeyHashFile;
-import org.lasalledebain.libris.hashfile.VariableSizeEntryHashBucket;
+import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
-import org.lasalledebain.libris.index.AbstractNumericKeyHashEntry;
 import org.lasalledebain.libris.index.AbstractVariableSizeHashEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
+import org.lasalledebain.libris.indexes.MockVariableSizeEntryNumericKeyHashFile;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 public class VariableSizeHashFileTests extends TestCase {
+	private static final int oversizeThreshold = 42;
 	private File testFileObject;
-	private MockVariableSizeEntryFactory efactory = null;
 
 	@Test
 	public void testAddAndGet() {
 		try {
-			NumericKeyHashFile<MockVariableSizeHashEntry, NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory>
-			htable 
-			= new NumericKeyHashFile
-			<MockVariableSizeHashEntry, NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory>
-			(backingStore, 
-					getFactory(), efactory);
+			MockVariableSizeEntryNumericKeyHashFile htable = makeHashFile();
 			ArrayList<MockVariableSizeHashEntry> entries = new ArrayList<MockVariableSizeHashEntry>();
 
 			addEntries(htable, entries, 32, 0, true);
 
 			for (AbstractVariableSizeHashEntry e: entries) {
-				AbstractNumericKeyHashEntry f = htable.getEntry(e.getKey());
+				NumericKeyHashEntry f = htable.getEntry(e.getKey());
 				assertNotNull("Could not find entry", f);
 				assertEquals("Entry mismatch", e, f);
 			}
@@ -59,8 +50,7 @@ public class VariableSizeHashFileTests extends TestCase {
 	@Test
 	public void testOverflow() {
 		try {
-			NumericKeyHashFile<MockVariableSizeHashEntry, NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable 
-			= new NumericKeyHashFile<MockVariableSizeHashEntry,NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory>(backingStore, getFactory(), efactory);
+			MockVariableSizeEntryNumericKeyHashFile htable = makeHashFile();
 			ArrayList<MockVariableSizeHashEntry> entries = new ArrayList<MockVariableSizeHashEntry>();
 
 			int currentKey = 1;
@@ -69,7 +59,7 @@ public class VariableSizeHashFileTests extends TestCase {
 				print(currentKey+" entries added.  Checking...\n");
 				for (AbstractVariableSizeHashEntry e: entries) {
 					int key = e.getKey();
-					AbstractNumericKeyHashEntry f = htable.getEntry(key);
+					NumericKeyHashEntry f = htable.getEntry(key);
 					if (null == f) {
 						print("key="+key+" not found; ");
 						print("\n");
@@ -94,8 +84,7 @@ public class VariableSizeHashFileTests extends TestCase {
 	@Test
 	public void testVariableSizedEntries() {
 		try {
-			NumericKeyHashFile<MockVariableSizeHashEntry, VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable 
-			= new NumericKeyHashFile<MockVariableSizeHashEntry, VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory>(backingStore, getFactory(), efactory);
+			MockVariableSizeEntryNumericKeyHashFile htable = makeHashFile();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int currentKey = 1;
@@ -104,7 +93,7 @@ public class VariableSizeHashFileTests extends TestCase {
 				print(currentKey+" entries added.  Checking...\n");
 				for (VariableSizeHashEntry e: entries) {
 					int key = e.getKey();
-					VariableSizeHashEntry f = htable.getEntry(key);
+					NumericKeyHashEntry f = htable.getEntry(key);
 					if (null == f) {
 						print("key="+key+" not found; ");
 						print("\n");
@@ -129,21 +118,18 @@ public class VariableSizeHashFileTests extends TestCase {
 	@Test
 	public void testFlush() {
 		try {
-	//s		efactory = new MockVariableSizeEntryFactory(4096);
-			NumericKeyHashFile<MockVariableSizeHashEntry,VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> 
-			htable = new NumericKeyHashFile<MockVariableSizeHashEntry,VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory>(backingStore, getFactory(), efactory);
+			MockVariableSizeEntryNumericKeyHashFile htable = makeHashFile();
 			ArrayList<VariableSizeHashEntry> entries = new ArrayList<VariableSizeHashEntry>();
 
 			int currentKey = 1;
 
 			currentKey = addVariableSizeEntries(htable, entries, 20, currentKey, 1, 1024);
 			htable.flush();
-			NumericKeyHashFile<MockVariableSizeHashEntry,VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable2 
-			= new NumericKeyHashFile<MockVariableSizeHashEntry,VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory>(backingStore, getFactory(), efactory);
+			MockVariableSizeEntryNumericKeyHashFile htable2 = makeHashFile();
 			print(currentKey+" entries added.  Checking...\n");
 			for (VariableSizeHashEntry e: entries) {
 				int key = e.getKey();
-				VariableSizeHashEntry f = htable2.getEntry(key);
+				NumericKeyHashEntry f = htable2.getEntry(key);
 				if (null == f) {
 					print("key="+key+" not found; ");
 					print("\n");
@@ -164,12 +150,14 @@ public class VariableSizeHashFileTests extends TestCase {
 		}
 	}
 
+	private MockVariableSizeEntryNumericKeyHashFile makeHashFile() throws IOException {
+		return new MockVariableSizeEntryNumericKeyHashFile(backingStore, new MockOverflowManager(mgr));
+	}
+
 	@Test
 	public void testReplace() {
 		try {
-			NumericKeyHashFile<MockVariableSizeHashEntry,VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable 
-			= new NumericKeyHashFile<MockVariableSizeHashEntry,VariableSizeEntryHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory>
-			(backingStore, getFactory(), efactory);
+			MockVariableSizeEntryNumericKeyHashFile htable = makeHashFile();
 			ArrayList<MockVariableSizeHashEntry> entries = new ArrayList<MockVariableSizeHashEntry>();
 
 			for (MockVariableSizeHashEntry e: entries) {
@@ -181,7 +169,7 @@ public class VariableSizeHashFileTests extends TestCase {
 				htable.addEntry(e);
 				htable.flush();
 				int key = e.getKey();
-				VariableSizeHashEntry f = htable.getEntry(key);
+				NumericKeyHashEntry f = htable.getEntry(key);
 				assertNotNull("Could not find entry "+key, f);
 				assertEquals("Entry mismatch", e, f);
 			}
@@ -194,15 +182,15 @@ public class VariableSizeHashFileTests extends TestCase {
 		}
 	}
 
-	private int addVariableSizeEntries(
-			HashFile<MockVariableSizeHashEntry, ?, MockVariableSizeEntryFactory> htable,
+	private int addVariableSizeEntries(MockVariableSizeEntryNumericKeyHashFile htable,
 			ArrayList<VariableSizeHashEntry> entries, int numEntries, int keyBase, int minimum,
 			int maximum) throws DatabaseException, IOException {
 		int modulus = Math.max(1, numEntries/64);
 		Random r = new Random(keyBase);
+		MockVariableSizeEntryFactory efactory = new MockVariableSizeEntryFactory(28);
 		for (int i=0; i<numEntries; i++) {
 			int length = r.nextInt(maximum - minimum) + minimum;
-			MockVariableSizeHashEntry e = efactory.makeVariableSizeEntry(keyBase+i, length);
+			MockVariableSizeHashEntry e = makeVariableSizeEntry(keyBase+i, length);
 			htable.addEntry(e);
 			entries.add(e);
 			if ((i > 0) && (i%modulus == 0)) {
@@ -219,11 +207,22 @@ public class VariableSizeHashFileTests extends TestCase {
 	private FileSpaceManager mgr;
 	private StringBuffer logBuffer;
 
-	private int addEntries(HashFile<MockVariableSizeHashEntry, NumericKeyHashBucket<MockVariableSizeHashEntry>, MockVariableSizeEntryFactory> htable,
+	public MockVariableSizeHashEntry makeVariableSizeEntry(int key, int len) {
+		byte[] dat = new byte[len];
+		for (int i = 0; i < len; ++i) {
+			dat[i] = (byte) (key + i);
+		}
+		MockVariableSizeHashEntry newEntry = new MockVariableSizeHashEntry(key, dat);
+		newEntry.setOversize((oversizeThreshold > 0) && (len >= oversizeThreshold));
+		return newEntry;
+	}
+
+	private int addEntries(MockVariableSizeEntryNumericKeyHashFile htable,
 			ArrayList<MockVariableSizeHashEntry> entries, int numEntries, int keyBase, boolean countUp)
 	throws IOException, DatabaseException {
 		int modulus = Math.max(1, numEntries/64);
 
+		MockVariableSizeEntryFactory efactory = new MockVariableSizeEntryFactory(28);
 		for (int i=0; i<numEntries; i++) {
 			MockVariableSizeHashEntry e = efactory.makeEntry(countUp? (keyBase+i):(keyBase+numEntries-i));
 			htable.addEntry(e);
@@ -241,9 +240,6 @@ public class VariableSizeHashFileTests extends TestCase {
 	protected void setUp() throws Exception {
 		logBuffer = new StringBuffer();
 		testLogger.log(Level.INFO, "start "+getName());
-		if (null == efactory) {
-			efactory = new MockVariableSizeEntryFactory(28);
-		}
 		if (null == testFileObject) {
 			testFileObject = Utilities.makeTestFileObject("hashFile");
 		}
@@ -260,10 +256,6 @@ public class VariableSizeHashFileTests extends TestCase {
 			testFileObject.delete();
 		}
 		Utilities.destroyFileSpaceManager(mgr);
-	}
-
-	private NumericKeyHashBucketFactory getFactory() {
-		return VariableSizeEntryHashBucket.getFactory(new MockOverflowManager(mgr));
 	}
 
 	private void print(String msg) {

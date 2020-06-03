@@ -20,12 +20,16 @@ import java.util.logging.Logger;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
+import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
@@ -37,6 +41,8 @@ import org.lasalledebain.libris.exception.RecordDataException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -50,6 +56,8 @@ import junit.framework.TestCase;
 
 public class Utilities extends TestCase {
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
+	public static final String KEYWORD_DATABASE1_XML = "KeywordDatabase1.xml";
+	public static final String KEYWORD_DATABASE0_XML = "KeywordDatabase0.xml";
 	static final String LAYOUT_DECLARATIONS_XML_FILE = "layoutDeclarations.xml";
 	public static final String TEST_RECORD1_XML_FILE = "TestRecord1.xml";
 	public static final String TEST_RECORD2_XML_FILE = "TestRecord2.xml";
@@ -73,11 +81,14 @@ public class Utilities extends TestCase {
 	public static final String SCHEMA_WITH_DEFAULTS = "SchemaWithDefaults.xml";
 	public static final String DATABASE_WITH_GROUPS_XML = "DatabaseWithGroups.xml";
 	public static final String DATABASE_WITH_GROUPS_AND_RECORDS_XML = "DatabaseWithGroupsAndRecords.xml";
+	public static final String TEST_DATABASE_WITH_REPO = "testDatabaseWithRepo.xml";
 	public static final String TEST_DATABASE_UNORDERED_XML = "testDatabaseUnordered.xml";
 	public static final String EXAMPLE_ARTIFACT_PDF = "example_artifact.pdf";
 	public static final String EXAMPLE_LARGE_PDF = "mesa.pdf";
+	public static final String EXAMPLE_DOCS_ZIP = "example_docs.zip";
+	public static final String EXAMPLE_FILES = "example_pdfs";
 	
-	static RecordTemplate makeRecordTemplate(String[] fieldNames,
+	static RecordFactory<DatabaseRecord> makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {
 		Schema s = new MockSchema();
 		for (int i = 0; i < fts.length; ++i) {
@@ -85,7 +96,7 @@ public class Utilities extends TestCase {
 			FieldTemplate ft = createTemplate(id, fts[i]);
 			s.addField(ft);
 		}
-		RecordTemplate rt = RecordTemplate.templateFactory(s);
+		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		return rt;
 	}
 
@@ -100,10 +111,9 @@ public class Utilities extends TestCase {
 		return testDir;
 	}
 
-	// TODO rename getTestDatabase to getTestFile()
-	public static File getTestDatabase(String dbName) {
+	private static File getTestFile(String testFile) {
 		File testDir = getTestDataDirectory();
-		return new File(testDir, dbName);
+		return new File(testDir, testFile);
 	}
 
 	public static File makeTestDirectory() {
@@ -136,14 +146,14 @@ public class Utilities extends TestCase {
 		return myLayouts;
 	}
 
-	static Record loadRecordFromXml(File schemaFile, File recordFile)
+	static DatabaseRecord loadRecordFromXml(File schemaFile, File recordFile)
 	throws LibrisException, XMLStreamException,
 	LibrisException, RecordDataException,
 	FactoryConfigurationError, DatabaseException, FileNotFoundException {
 		Schema s = Utilities.loadSchema(schemaFile);
-		RecordTemplate rt = RecordTemplate.templateFactory(s);
+		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		ElementManager mgr = makeElementManagerFromFile(recordFile, "record");
-		Record rec = rt.makeRecord(true);
+		DatabaseRecord rec = rt.makeRecord(true);
 		rec.fromXml(mgr);
 		return rec;
 	}
@@ -151,7 +161,7 @@ public class Utilities extends TestCase {
 	static Record loadRecordFromXml(File schemaFile, InputStream xmlStream, File sourceFile) throws 
 		LibrisException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
 		Schema s = Utilities.loadSchema(schemaFile);
-		RecordTemplate rt = RecordTemplate.templateFactory(s);
+		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		String sourcePath = (null == sourceFile)? null : sourceFile.getPath();
 		ElementManager mgr = makeElementManagerFromInputStream(xmlStream, sourcePath, LibrisXMLConstants.XML_RECORD_TAG);
 		Record rec = rt.makeRecord(true);
@@ -187,7 +197,7 @@ public class Utilities extends TestCase {
 		LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 		InputStreamReader xmlInput = new InputStreamReader(xmlInputStream);
 		try {
-			return xmlFactory.makeLibrisElementManager(xmlInput, 
+			return xmlFactory.makeElementManager(xmlInput, 
 					sourceFile, elementNameString, new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -199,7 +209,7 @@ public class Utilities extends TestCase {
 			Reader xmlSourceReader, String sourceFile, String elementNameString) {
 		LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 		try {
-			return xmlFactory.makeLibrisElementManager(xmlSourceReader, 
+			return xmlFactory.makeElementManager(xmlSourceReader, 
 					sourceFile, elementNameString, new XmlShapes(SHAPE_LIST.DATABASE_SHAPES));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -231,45 +241,22 @@ public class Utilities extends TestCase {
 		}
 		copyFile.createNewFile();
 		copyFile.setWritable(true);
-		FileChannel original = null; 
-		FileChannel copy = null; 
-		try {
-			// TODO close FileInputStream
-			original = (new FileInputStream(originalFile)).getChannel();
-			copy = (new FileOutputStream(copyFile)).getChannel();
+		try (final FileInputStream originalStream = new FileInputStream(originalFile);
+				final FileOutputStream copyStream = new FileOutputStream(copyFile)){
+			FileChannel original = originalStream.getChannel();
+			FileChannel copy = copyStream.getChannel();
 			copy.transferFrom(original, 0, original.size());
-		} finally {
-			if (null != original) {
-				original.close();
-			}
 		}
 	}
-	/**
-	 * @return
-	 * @throws IOException 
-	 */
-	public static File copyTestDatabaseFile() throws IOException {
-		String testDbName = TEST_DB1_XML_FILE;
-		File testDatabaseFileCopy = copyTestDatabaseFile(testDbName);
-		return testDatabaseFileCopy;
-	}
 
-	public static File copyTestDatabaseFile(String testDbName)
+	public static File copyTestDatabaseFile(String testDbName, File targetDirectory)
 			throws FileNotFoundException, IOException {
-		File testDatabaseFile = getTestDatabase(testDbName);
-		File testDatabaseFileCopy = new File(getTempTestDirectory(), testDatabaseFile.getName());
+		File testDatabaseFile = getTestFile(testDbName);
+		File testDatabaseFileCopy = new File(targetDirectory, testDatabaseFile.getName());
 		copyFile(testDatabaseFile, testDatabaseFileCopy);
 		return testDatabaseFileCopy;
 	}
 	
-	public static File copyTestDatabaseFile(File workdir, String testDbName)
-	throws FileNotFoundException, IOException {
-		File testDatabaseFile = getTestDatabase(testDbName);
-		File testDatabaseFileCopy = new File(workdir, testDatabaseFile.getName());
-		copyFile(testDatabaseFile, testDatabaseFileCopy);
-		return testDatabaseFileCopy;
-	}
-
 	public static void deleteTestDatabaseFiles() {
 		deleteTestDatabaseFiles(TEST_DB1_XML_FILE);
 	}
@@ -280,7 +267,7 @@ public class Utilities extends TestCase {
 	}
 
 	public static void deleteTestDatabaseFiles(final String dbName) {
-		File testDatabaseFile = getTestDatabase(dbName);
+		File testDatabaseFile = getTestFile(dbName);
 		File testDatabaseFileCopy = new File(System.getProperty("java.io.tmpdir"), testDatabaseFile.getName());
 		testDatabaseFileCopy.delete();
 		File auxFiles = new File(testDatabaseFileCopy.getParent(), ".libris_auxfiles_"+dbName);
@@ -291,20 +278,36 @@ public class Utilities extends TestCase {
 			auxFiles.delete();
 		}
 	}
-	public static File getTempTestDirectory() {
+	
+	private static File getTempTestDirectory() {
 		File tempTestDirectory = new File(System.getProperty("java.io.tmpdir"), "libristest");
-		if (!tempTestDirectory.exists() && !tempTestDirectory.mkdir()) {
-			return null;
-		} else {
-			return tempTestDirectory;
-		}
+		return tempTestDirectory;
 	}
 
+	public static File makeTempTestDirectory() {
+		File tempTestDirectory = getTempTestDirectory();
+		deleteRecursively(tempTestDirectory);
+		assertTrue("Cannot create temporary test directory " + tempTestDirectory.getAbsolutePath(), tempTestDirectory.mkdir());
+		return tempTestDirectory;
+	}
+
+	public static File makeTempTestDirectory(String directoryName) {
+		File parent = makeTempTestDirectory();
+		File testDir = new File(parent, directoryName);
+		assertTrue("Cannot create temporary test directory " + testDir.getAbsolutePath(), testDir.mkdir());
+		return testDir;
+	}
+	
+	@Deprecated
 	public static FileSpaceManager makeFileSpaceManager(String managerName) {
-		File workDir = getTempTestDirectory();
+		File workDir = makeTempTestDirectory();
 		if (null == workDir) {
 			fail("could not create working directory ");
 		}
+		return makeFileSpaceManager(workDir, managerName);
+	}
+
+	public static FileSpaceManager makeFileSpaceManager(File workDir, String managerName) {
 		File testFile = new File(workDir, managerName);
 		if (!testFile.exists()) {
 			try {
@@ -354,6 +357,16 @@ public class Utilities extends TestCase {
 		return tup;
 	}
 
+	public static String makeRandomWord(Random r, int minLen, int maxLen) {
+		int wordSize = minLen + r.nextInt(maxLen - minLen);
+		StringBuilder b = new StringBuilder(wordSize);
+		while (wordSize > 0) {
+			b.append(alphanumChars[r.nextInt(alphanumChars.length)]);
+			--wordSize;
+		}
+		return b.toString();
+	}
+	
 	static String getRecordIdString(Record recData) {
 		return RecordId.toString(recData.getRecordId());
 	}
@@ -364,6 +377,10 @@ public class Utilities extends TestCase {
 		testLogger.setLevel(Boolean.getBoolean("org.lasalledebain.test.verbose")? Level.ALL: Level.WARNING);
 	}
 	
+	public static void trace(String msg) {
+		testLogger.fine(msg);
+	}
+	
 	public static void info(String msg) {
 		testLogger.info(msg);
 	}
@@ -372,9 +389,9 @@ public class Utilities extends TestCase {
 		testLogger.warning(msg);
 	}
 
-	public static LibrisDatabase buildTestDatabase(String databaseFileName)
+	public static LibrisDatabase buildTestDatabase(File workingDirectory, String databaseFileName)
 			throws FileNotFoundException, IOException {
-		File testDatabaseFileCopy = copyTestDatabaseFile(databaseFileName);			
+		File testDatabaseFileCopy = copyTestDatabaseFile(databaseFileName, workingDirectory);			
 		LibrisDatabase db = null;
 		try {
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
@@ -383,7 +400,22 @@ public class Utilities extends TestCase {
 			db = ui.openDatabase();
 		} catch (LibrisException e) {
 			e.printStackTrace();
-			fail("Error rebuilding database");
+			fail("Error rebuilding database: "+e.getMessage());
+		}
+		return db;
+	}
+
+	public static LibrisDatabase buildTestDatabase(LibrisIndexConfiguration config)
+			throws FileNotFoundException, IOException {
+		LibrisDatabase db = null;
+		try {
+			db = Libris.buildAndOpenDatabase(config);
+			LibrisUi ui = config.getDatabaseUi();
+			ui.closeDatabase(false);
+			db = ui.openDatabase();
+		} catch (LibrisException e) {
+			e.printStackTrace();
+			fail("Error rebuilding database: "+e.getMessage());
 		}
 		return db;
 	}
@@ -427,7 +459,7 @@ public class Utilities extends TestCase {
 	public static final String LIBRIS_TEST_LOGGER = "org.lasalledebain.LibrisTest";
 	public static Level defaultLoggingLevel = Level.WARNING;
 
-	public static void checkRecords(LibrisDatabase database, int lastId) {
+	public static void checkRecords(GenericDatabase<DatabaseRecord> database, int lastId) {
 		for (int i = 1; i <= lastId; ++i) {
 			try {
 				Record r = database.getRecord(i);
@@ -444,13 +476,26 @@ public class Utilities extends TestCase {
 	 * @param dirName 
 	 * 
 	 */
+	@Deprecated
 	public static File makeTestFileObject(String dirName) {
-		File workingDirectory = new File(getTempTestDirectory(), dirName);
+		File workingDirectory = new File(makeTempTestDirectory(), dirName);
 		deleteRecursively(workingDirectory);
 		workingDirectory.mkdirs();
 		File tf = new File(workingDirectory, "testIndexFile");
 		tf.deleteOnExit();
 		return tf;
+	}
+
+	public static File makeTestFileObject(File parentDirectory, String fileName) {
+		File tf = new File(parentDirectory, fileName);
+		tf.deleteOnExit();
+		return tf;
+	}
+
+	public static LibrisJournalFileManager<DatabaseRecord> createLibrisJournalFileManager(
+			GenericDatabase<DatabaseRecord> database, FileAccessManager journalFileMr) throws LibrisException {
+		RecordTemplate recFactory = RecordTemplate.templateFactory(database.getSchema(), null);
+		return new LibrisJournalFileManager<DatabaseRecord>(database, journalFileMr, recFactory);
 	}
 
 }

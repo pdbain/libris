@@ -13,24 +13,26 @@ import java.util.logging.Level;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.ModifiedRecordList;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordId;
-import org.lasalledebain.libris.RecordInstance;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.exception.Assertion;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.OutputException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
+import org.lasalledebain.libris.util.Reporter;
 
-public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstants {
+public class LibrisRecordsFileManager<RecordType extends Record> implements Iterable<RecordType>, LibrisConstants {
 
 	private static final long MINIMUM_RECORDS_FILE_LENGTH = 2*RecordHeader.getHeaderLength(); /* head & tail, record and free */
 // TODO test oversize records
@@ -46,8 +48,13 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 	 * 	1 byte flags
 	 * 		bit 0: isGroupMember: set if there is parent/affiliate data
 	 * 		bit 1: hasName: set if the record has a name
+	 * 		bit 2: hasArtifact
 	 * 	if record has name
 	 * 		name
+	 *  if record has artifact
+	 *  	artifact (4 bytes)
+	 *  if hasArtifact
+	 *  	artifact ID (4 bytes)
 	 *  if record has groups
 	 * 		Group data:
 	 * 		for each group:
@@ -73,32 +80,22 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 	private FileAccessManager recordsFile;
 	private Schema dbSchema;
 	protected RecordPositions recPosns;
-
+	RecordFactory<RecordType> myRecordFactory = null;
 	private RecordHeader recordList = null;
 	private RecordHeader freeList = null;
 	private RandomAccessFile recordsFileStore;
 	private boolean readOnly;
 
-	private LibrisDatabase database;
+	private GenericDatabase<RecordType> database;
 
-	/**
-	 * @param database
-	 * @param dbSchema
-	 * @param recordPositions
-	 * @param recordsFile
-	 * @param positionFile 
-	 * @throws LibrisException 
-	 */
-	public LibrisRecordsFileManager(LibrisDatabase db, boolean readOnly, Schema dbSchema, LibrisFileManager fileMgr) throws LibrisException {
-		this(db, readOnly, dbSchema, fileMgr.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME), new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.POSITION_FILENAME), readOnly));
-	}
-
-	public LibrisRecordsFileManager(LibrisDatabase db, boolean readOnly, Schema dbSchema, FileAccessManager recordsFile, RecordPositions recPosns) throws LibrisException {
+	public LibrisRecordsFileManager(GenericDatabase<RecordType> db, boolean readOnly,
+			Schema dbSchema, FileAccessManager recordsFile, RecordPositions recPosns) throws LibrisException {
 		this.database = db;
 		this.readOnly = readOnly;
 		this.dbSchema = dbSchema;
 		this.recPosns = recPosns;			
 		this.recordsFile = recordsFile;
+		myRecordFactory = db.getRecordFactory();
 		open();
 	}
 
@@ -147,7 +144,7 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		final RecordIterator iter = new RecordIterator();
 		return iter;
 	}
@@ -257,6 +254,11 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 		if (null != recName) {
 			flags |= LibrisConstants.RECORD_HAS_NAME;
 		}
+		int artifactId = recData.getArtifactId();
+		boolean hasArtifact = !RecordId.isNull(artifactId);
+		if (hasArtifact) {
+			flags |= LibrisConstants.RECORD_HAS_ARTIFACT;
+		}
 		if (hasGroups) {
 			flags |= LibrisConstants.RECORD_HAS_GROUPS;
 			int numGroups = dbSchema.getGroupDefs().getNumGroups();
@@ -271,9 +273,7 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 							groupBufferStream.writeInt(id);
 						}
 					}
-				} catch (IOException e) {
-					throw new OutputException("error writing group "+dbSchema.getGroupId(groupNum), e);
-				} catch (InputException e) {
+				} catch (IOException | InputException e) {
 					throw new OutputException("error writing group "+dbSchema.getGroupId(groupNum), e);
 				}			
 			}
@@ -281,9 +281,12 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 
 		for (Field f: recData.getFields()) {
 			try {
-				short fieldNum = dbSchema.getFieldNum(f.getFieldId());
+				int fieldNum = dbSchema.getFieldNum(f.getFieldId());
 				FieldType ft = f.getType();
 				for (FieldValue fv: f.getFieldValues()) { // FIXME NPE here
+					if (fv.isEmpty() ) {
+						continue;
+					}
 					int oldValueEnd = fieldValues.size();
 					indexStream.writeShort(fieldNum); 
 					switch (ft) {
@@ -313,8 +316,8 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 					case T_FIELD_STRING:
 					case T_FIELD_TEXT:
 						try {
-							indexStream.writeInt(oldValueEnd);
 							final String valueString = fv.getValueAsString();
+							indexStream.writeInt(oldValueEnd);
 							valuesStream.writeUTF(valueString);
 						} catch (UTFDataFormatException e) {
 							throw new DatabaseException("UTF format exception in "+getRecordIdString(recData)+" field "+fieldNum);
@@ -334,6 +337,10 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 							throw new DatabaseException("Invalid data in "+getRecordIdString(recData)+" field "+fieldNum);
 							}
 						break;
+					case T_FIELD_AFFILIATES:
+					case T_FIELD_UNKNOWN:
+					default:
+						throw new DatabaseException("Invalid field "+fieldNum);
 					}
 				}
 			} catch (IOException e) {
@@ -345,6 +352,9 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 			recordBufferStream.writeByte(flags);
 			if (null != recName) {
 				recordBufferStream.writeUTF(recName);
+			}
+			if (hasArtifact) {
+				recordBufferStream.writeInt(artifactId);
 			}
 			if (hasGroups) {
 				recordBufferStream.write(groupBuffer.toByteArray());
@@ -359,12 +369,12 @@ public class LibrisRecordsFileManager implements Iterable<Record>, LibrisConstan
 		}
 		return recordBuffer.toByteArray();
 	}
-	public Record getRecord(int id) throws InputException {
+	public RecordType getRecord(int id) throws InputException {
 		try {
 			long pos = recPosns.getRecordFilePosition(id);
 			if (pos > 0) {
 				recordsFileStore.seek(pos);
-				Record rec = readRecord(pos);
+				RecordType rec = readRecord(pos);
 				return rec;
 			}
 		} catch (IOException e) {
@@ -392,19 +402,28 @@ public void removeRecord(int rid) throws DatabaseException {
 	}
 }
 
-	private Record readRecord(long recordPosition) throws InputException, DatabaseException {
+	private RecordType readRecord(long recordPosition) throws InputException {
 		try {
 			int recId = recordsFileStore.readInt();
-			RecordInstance r = new RecordInstance(database.getMainRecordTemplate());
+			RecordType r = myRecordFactory.makeRecord(false);//
 			r.setRecordId(recId);
 
 			byte flags = recordsFileStore.readByte();
-			if (0 != (flags & LibrisConstants.RECORD_HAS_NAME)) {
+			if (checkBit(flags, LibrisConstants.RECORD_HAS_NAME)) {
 				String recName = recordsFileStore.readUTF();
 				r.setName(recName);
 			}
 
-			if (0 != (flags & LibrisConstants.RECORD_HAS_GROUPS)) {
+			if (checkBit(flags, LibrisConstants.RECORD_HAS_ARTIFACT)) {
+				int artifactId = recordsFileStore.readInt();
+				if (!RecordId.isNull(artifactId)) {
+					r.setArtifactId(artifactId);
+				} else {
+					throw new InputException("record artifact ID missing");
+				}
+			}
+
+			if (checkBit(flags, LibrisConstants.RECORD_HAS_GROUPS)) {
 				int numGroups = dbSchema.getGroupDefs().getNumGroups();
 				for (int groupNum=0; groupNum < numGroups; ++groupNum) {
 					int numAffiliates = recordsFileStore.readByte() & 0x000000ff;
@@ -428,7 +447,7 @@ public void removeRecord(int rid) throws DatabaseException {
 			ByteArrayInputStream fieldIndex = new ByteArrayInputStream(indexData);
 			DataInputStream indexStream = new DataInputStream(fieldIndex);
 
-			short fieldNum = LibrisConstants.NULL_FIELD_NUM;
+			int fieldNum = LibrisConstants.NULL_FIELD_NUM;
 			int indexCursor = 0;
 			int indexEnd = indexSize - 4; /* subtract padding */
 			try {
@@ -477,6 +496,7 @@ public void removeRecord(int rid) throws DatabaseException {
 						r.addFieldValue(fieldNum, fieldValue);
 					}
 					break;
+					case T_FIELD_LOCATION:
 					case T_FIELD_PAIR: {
 						long offset = indexStream.readInt() + valueBase;
 						indexCursor += 4;
@@ -485,6 +505,11 @@ public void removeRecord(int rid) throws DatabaseException {
 							String extraValue = recordsFileStore.readUTF();
 							r.addFieldValue(fieldNum, fieldValue, extraValue);
 					}
+					break;
+					case T_FIELD_AFFILIATES:
+					case T_FIELD_UNKNOWN:
+					default:
+						throw new DatabaseError("Invalid field "+fieldNum+" field type = "+ft.toString());
 					}
 				}
 			} catch (FieldDataException e) {
@@ -497,19 +522,24 @@ public void removeRecord(int rid) throws DatabaseException {
 		}
 	}
 
+	private boolean checkBit(byte flags, byte testBit) {
+		return 0 != (flags & testBit);
+	}
 
-	private class RecordIterator implements Iterator<Record> {
+
+	private class RecordIterator implements Iterator<RecordType> {
 		Iterator<RecordHeader> rhi;
 		private RecordHeader currentHeader;
-		private ModifiedRecordList modifiedRecords;
+		private ModifiedRecordList<RecordType> modifiedRecords;
 		int nextId;
-		final int lastId = database.getLastRecordId();
+		final int lastId;
 		private int currentId;
 
 		private RecordIterator() {
+			lastId = database.getLastRecordId();
 			currentHeader = null;
 			nextId = 1;
-			currentId = RecordId.getNullId();
+			currentId = RecordId.NULL_RECORD_ID;
 			rhi = recordList.iterator();
 			modifiedRecords = database.getModifiedRecords();
 		}
@@ -521,9 +551,9 @@ public void removeRecord(int rid) throws DatabaseException {
 
 		
 		@Override
-		public Record next() {
+		public RecordType next() {
 			try {
-				Record result = modifiedRecords.getRecord(nextId);
+				RecordType result = modifiedRecords.getRecord(nextId);
 				if (null == result) {
 					while ((currentId < nextId) && rhi.hasNext()) {
 						currentHeader = rhi.next();
@@ -534,10 +564,11 @@ public void removeRecord(int rid) throws DatabaseException {
 						result = getRecord(nextId);
 					}
 				}
+				Assertion.assertNotNullError("Record "+nextId, result);
 				++nextId;
 				return result;
-			} catch (Exception e) {
-				throw new InternalError("error in LibrisRecordsFileManager.next", e);
+			} catch (InputException e) {
+				throw new DatabaseError("error in LibrisRecordsFileManager.next", e);
 			}
 		}
 
@@ -554,4 +585,9 @@ public void removeRecord(int rid) throws DatabaseException {
 		}
 		return count;
 	}
+	
+	public void generateReport(Reporter rpt) {
+		recPosns.generateReport(rpt);
+	}
+
 }

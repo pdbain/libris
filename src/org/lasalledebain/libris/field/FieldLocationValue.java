@@ -6,8 +6,8 @@ import org.lasalledebain.libris.exception.FieldDataException;
 
 public class FieldLocationValue extends FieldValue {
 
-	String location;
-	String locationName;
+	final String location;
+	final String locationName;
 	public FieldLocationValue(String loc, String locName) {
 		location = loc;
 		locationName = locName;
@@ -59,8 +59,8 @@ public class FieldLocationValue extends FieldValue {
 
 	@Override
 	public FieldValue duplicate() {
-		// TODO write duplicate()
-		return null;
+		FieldLocationValue dup = new FieldLocationValue(location, locationName);
+		return dup;
 	}
 
 

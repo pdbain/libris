@@ -7,12 +7,12 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.util.ByteArraySlice;
 
 public abstract class StringKeyHashFile<EntryType extends StringKeyHashEntry, 
-BucketType extends StringKeyHashBucket<EntryType>, FactoryType extends EntryFactory<EntryType>> 
-extends HashFile<EntryType, BucketType, FactoryType> {
+BucketType extends StringKeyHashBucket<EntryType>> 
+extends HashFile<EntryType, BucketType> {
 
-	public StringKeyHashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact)
+	public StringKeyHashFile(RandomAccessFile backingStore)
 			throws IOException {
-		super(backingStore, bFact);
+		super(backingStore);
 	}
 
 	@Override
@@ -29,6 +29,13 @@ extends HashFile<EntryType, BucketType, FactoryType> {
 		return findHomeBucket(new ByteArraySlice(key));
 	}
 
+	/**
+	 * Looks up an entry based on a string key. Modifications to the entry affect the hashfile entry.
+	 * @param key string for the key
+	 * @return reference to the entry
+	 * @throws DatabaseException
+	 * @throws IOException
+	 */
 	public EntryType getEntry(String key) throws DatabaseException, IOException {
 		ByteArraySlice keyBytes = new ByteArraySlice(key);
 		int bucketNum = findHomeBucket(keyBytes);

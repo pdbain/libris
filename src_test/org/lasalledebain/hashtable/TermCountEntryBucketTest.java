@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.TermCountHashBucket;
-import org.lasalledebain.libris.hashfile.TermCountHashBucket.TermCountBucketFactory;
 import org.lasalledebain.libris.index.TermCountEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 
@@ -20,24 +19,22 @@ import junit.framework.TestCase;
 public class TermCountEntryBucketTest extends TestCase {
 	private static final String TESTSTRING1 = "teststring1";
 	private RandomAccessFile backingStore;
-	private File testFile;
+	private File testFile = null;
 	FileSpaceManager mgr;
 	private TermCountHashBucket buck;
 	@Before
 	protected void setUp() throws Exception {
-		if (null == testFile) {
-			testFile = Utilities.makeTestFileObject("termCountHashFile");
-		}
+		File workingDirectory = Utilities.makeTempTestDirectory("termCountHashFile");
+		testFile = Utilities.makeTestFileObject(workingDirectory, "testIndexFile");
 		backingStore = HashUtils.MakeHashFile(testFile);
-		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
-		TermCountBucketFactory bfact = new TermCountBucketFactory();
-		new TermCountEntry.TermCountEntryFactory();
-		buck = bfact.createBucket(backingStore, 0);
+		mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
+		buck = new TermCountHashBucket(backingStore, 0);
 	}
 
 	@After
 	protected void tearDown() throws Exception {
 		testFile.delete();
+		Utilities.deleteWorkingDirectory();
 	}
 
 	@Test

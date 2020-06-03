@@ -12,16 +12,19 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
+import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;;
 
 public class ImportTests extends TestCase {
 	private File testDatabaseFileCopy;
 	private LibrisDatabase db;
-	boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
+	private File workingDirectory;
 	
 	public void setUp() {
 		testDatabaseFileCopy = null;
+		workingDirectory = Utilities.makeTempTestDirectory();
 		try {
-			testDatabaseFileCopy = Utilities.copyTestDatabaseFile();
+			File testDatabaseFileCopy1 = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
+			testDatabaseFileCopy = testDatabaseFileCopy1;
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			fail("test database missing");
@@ -34,13 +37,13 @@ public class ImportTests extends TestCase {
 			fail("unexpected exception "+e);
 		}
 	}
-	public void testImportBasic() {
-		File importData = Utilities.getTestDatabase(Utilities.TEST_DELIM_TEXT_FILE_WITH_FIELD_IDS);
+	public void testImportBasic() throws FileNotFoundException, IOException {
+		File importData = Utilities.copyTestDatabaseFile(Utilities.TEST_DELIM_TEXT_FILE_WITH_FIELD_IDS, workingDirectory);
 		try {
 			Record[] recList = LibrisDatabase.importDelimitedTextFile(db, importData, null, ',');
 			db.save();
 			for (Record rec: recList) {
-				System.out.print(rec.toString());
+				Utilities.trace(rec.toString());
 			}
 			db.getUi().quit(true);
 		} catch (DatabaseException e) {

@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -75,7 +76,6 @@ class FilterDialogue {
 				createSearchDialogue(searchTypeSelector.getSelectedIndex());
 			}
 		});	
-;
 		searchTypeSelector.setSelectedIndex(lastSettings.lastSearchType);
 		createSearchDialogue(searchTypeSelector.getSelectedIndex());
 	}
@@ -253,7 +253,7 @@ class FilterDialogue {
 
 		int affiliateType = affiliatesChooser.getSelectedIndex();
 		lastSettings.lastAffiliatesExtent = affiliateType;
-		Iterable<Record> children;
+		Iterable<DatabaseRecord> children;
 		if (2 == affiliateType) {
 			children = database.getAffiliateRecords(parent, fieldNum);			
 		} else {

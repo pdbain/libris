@@ -2,6 +2,7 @@ package org.lasalledebain.libris.indexes;
 
 import java.util.AbstractSet;
 import java.util.HashSet;
+import java.util.stream.Stream;
 
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 
@@ -29,9 +30,18 @@ public class ExactKeywordList extends RecordKeywords {
 	protected AbstractSet<String> getKeywordList() {
 		return keywordList;
 	}
+	
+	public Stream<String> wordStream() {
+		return keywordList.stream();
+	}
 
 	@Override
 	public MATCH_TYPE getMatchType() {
 		return MATCH_TYPE.MATCH_EXACT;
+	}
+
+	@Override
+	public int estimateSize() {
+		return keywordList.size();
 	}
 }

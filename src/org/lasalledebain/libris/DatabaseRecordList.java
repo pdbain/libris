@@ -3,11 +3,12 @@ package org.lasalledebain.libris;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-class DatabaseRecordList extends RecordList {
-	Vector <Record> recordList;
+class DatabaseRecordList extends RecordList<DatabaseRecord> {
+	Vector <DatabaseRecord> recordList;
 	private LibrisDatabase database;
 	public DatabaseRecordList(LibrisDatabase db) {
 		database = db;
@@ -15,18 +16,18 @@ class DatabaseRecordList extends RecordList {
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
-		Iterator<Record> iter;
+	public Iterator<DatabaseRecord> iterator() {
+		Iterator<DatabaseRecord> iter;
 		try {
 			iter = database.getDatabaseRecords().iterator();
 		} catch (LibrisException e) {
-			return new ErrorIterator(e);
+			throw new DatabaseError(e);
 		}
 		return iter;
 	}
 
 	@Override
-	public Record getRecord(int id) throws InputException {
+	public DatabaseRecord getRecord(int id) throws InputException {
 		return database.getRecord(id);
 	}
 

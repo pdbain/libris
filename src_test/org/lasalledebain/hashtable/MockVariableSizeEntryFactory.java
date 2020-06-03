@@ -3,9 +3,7 @@ package org.lasalledebain.hashtable;
 import java.io.DataInput;
 import java.nio.ByteBuffer;
 
-import org.lasalledebain.libris.hashfile.VariableSizeEntryFactory;
-
-public class MockVariableSizeEntryFactory implements VariableSizeEntryFactory<MockVariableSizeHashEntry> {
+public class MockVariableSizeEntryFactory {
 
 	private int oversizeThreshold;
 	int length;
@@ -28,10 +26,6 @@ public class MockVariableSizeEntryFactory implements VariableSizeEntryFactory<Mo
 		return length+4;
 	}
 
-	public void setOversizeThreshold(int threshold) {
-		oversizeThreshold = threshold;
-	}
-
 	public MockVariableSizeHashEntry makeEntry(int currentKey) {
 		testData += currentKey;
 		MockVariableSizeHashEntry result = new MockVariableSizeHashEntry(currentKey, length, testData);
@@ -39,29 +33,17 @@ public class MockVariableSizeEntryFactory implements VariableSizeEntryFactory<Mo
 		return result;
 	}
 
-	@Override
 	public MockVariableSizeHashEntry makeEntry(int key, byte[] dat) {
 		return new MockVariableSizeHashEntry(key, dat);
 	}
 
-	@Override
 	public MockVariableSizeHashEntry makeEntry(int key, ByteBuffer src, int len) {
 		return new MockVariableSizeHashEntry(key, src, len);
 
 	}
 
-	@Override
 	public MockVariableSizeHashEntry makeEntry(DataInput backingStore) {
 		throw new UnsupportedOperationException();
 	}
 
-	public MockVariableSizeHashEntry makeVariableSizeEntry(int key, int len) {
-		byte[] dat = new byte[len];
-		for (int i = 0; i < len; ++i) {
-			dat[i] = (byte) (key + i);
-		}
-		MockVariableSizeHashEntry newEntry = new MockVariableSizeHashEntry(key, dat);
-		newEntry.setOversize((oversizeThreshold > 0) && (len >= oversizeThreshold));
-		return newEntry;
-	}
 }

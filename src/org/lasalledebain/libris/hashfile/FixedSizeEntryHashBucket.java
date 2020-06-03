@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.hashfile;
 
+import java.io.DataInput;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Iterator;
@@ -7,38 +8,17 @@ import java.util.TreeMap;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({ })
 public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> extends NumericKeyHashBucket<EntryType> {
 
 	protected TreeMap<Integer, EntryType> entries;
 	protected EntryFactory<EntryType> entryFact;
-	private FixedSizeEntryHashBucket(RandomAccessFile backingStore,
-			int bucketNum, EntryFactory eFact) {
+	public FixedSizeEntryHashBucket(RandomAccessFile backingStore, int bucketNum) {
 		super(backingStore, bucketNum);
-		entryFact = eFact;
 		entries = new TreeMap<Integer, EntryType>();
-
 		occupancy = 4;
 	}
 
-	public static FixedSizeEntryHashBucketFactory getFactory() {
-		return new FixedSizeEntryHashBucketFactory();
-	}
-	public static class FixedSizeEntryHashBucketFactory implements NumericKeyHashBucketFactory {
-
-		@Override
-		public NumericKeyHashBucket<NumericKeyHashEntry> createBucket(RandomAccessFile backingStore,
-				int bucketNum, EntryFactory fact) {
-			return new FixedSizeEntryHashBucket(backingStore, bucketNum, fact);
-		}
-
-		@Override
-		public NumericKeyHashBucket createBucket(RandomAccessFile backingStore, int bucketNum,
-				NumericKeyEntryFactory fact) {
-			return new FixedSizeEntryHashBucket(backingStore, bucketNum, fact);
-			}
-
-	}
 	
 	public EntryType getEntry(int key) {
 		EntryType result = entries.get(key);
@@ -78,12 +58,16 @@ public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> ext
 		backingStore.seek(filePosition);
 		int numEntries = backingStore.readInt();
 		for (int i = 0; i < numEntries; ++i) {
-			EntryType newEntry = entryFact.makeEntry(backingStore);
+			EntryType newEntry = makeEntry(backingStore);
 			addEntry(newEntry);
 		}
 		dirty = false;
 	}
 
+	protected EntryType makeEntry(DataInput backingStore) throws IOException {
+		return entryFact.makeEntry(backingStore);
+	}
+	
 	@Override
 	protected int getNumEntriesImpl() {
 		return entries.size();
@@ -110,11 +94,4 @@ public class FixedSizeEntryHashBucket <EntryType extends FixedSizeHashEntry> ext
 
 		dirty = false;
 	}
-
-	public static int entriesPerBucket(FixedSizeEntryFactory fact) {
-		int entrySize = fact.getEntrySize();
-		return getBucketSize()/entrySize;
-	}
-
-
 }

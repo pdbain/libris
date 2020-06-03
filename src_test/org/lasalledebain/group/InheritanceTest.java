@@ -12,6 +12,7 @@ import java.util.logging.Level;
 
 import org.junit.After;
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -26,6 +27,7 @@ public class InheritanceTest extends TestCase {
 	File testDatabaseFileCopy;
 	LibrisDatabase db;
 	String fieldNamesAndValues[][] = {{"",""}, {"ID_publisher", "Publisher1"}, {"ID_volume", "Volume 1"}, {"ID_title", "Title1"}};
+	private File workingDirectory;
 
 	public void testSanity() {
 		String dbFile = DATABASE_WITH_GROUPS_AND_RECORDS_XML;
@@ -86,9 +88,9 @@ public class InheritanceTest extends TestCase {
 		int childId = lastId+1;
 		final int parentId = 2;
 		try {
-			Record rec = db.newRecord();
+			DatabaseRecord rec = db.newRecord();
 			rec.setParent(0, parentId);
-			int recNum = db.put(rec);
+			int recNum = db.putRecord(rec);
 			assertEquals("wrong ID for new record",  childId, recNum);
 			checkChild(childId, parentId);
 
@@ -111,11 +113,11 @@ public class InheritanceTest extends TestCase {
 		try {
 			initializeExpectedChildren(expectedChildren, lastId);
 			for (int i = lastId+1; i <= numRecs; ++i) {
-				Record rec = db.newRecord();
+				DatabaseRecord rec = db.newRecord();
 				maxParent = (int) Math.sqrt(i);
 				minParent = Math.min(minParent, maxParent);
 				rec.setParent(0, maxParent);
-				int recNum = db.put(rec);
+				int recNum = db.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				addExpectedAffiliate(expectedChildren, maxParent, recNum);
 			}
@@ -147,12 +149,12 @@ public class InheritanceTest extends TestCase {
 		try {
 			initializeExpectedAffiliates(expectedChildren, lastId);
 			for (int i = lastId+1; i <= numRecs; ++i) {
-				Record rec = db.newRecord();
+				DatabaseRecord rec = db.newRecord();
 				maxAff = (int) Math.sqrt(i);
 				minAff = Math.min(minAff, maxAff);
 				rec.addAffiliate(0, maxAff);
 				rec.addAffiliate(0, maxAff/2);
-				int recNum = db.put(rec);
+				int recNum = db.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				addExpectedAffiliate(expectedChildren, maxAff, recNum);
 				addExpectedAffiliate(expectedChildren, maxAff/2, recNum);
@@ -249,11 +251,11 @@ public class InheritanceTest extends TestCase {
 		try {
 			initializeExpectedChildren(expectedChildren, lastId);
 			for (int i = lastId+1; i <= numRecs; ++i) {
-				Record rec = db.newRecord();
+				DatabaseRecord rec = db.newRecord();
 				maxParent = (int) Math.sqrt(i);
 				minParent = Math.min(minParent, maxParent);
 				rec.setParent(0, maxParent);
-				int recNum = db.put(rec);
+				int recNum = db.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				addExpectedAffiliate(expectedChildren, maxParent, recNum);
 			}
@@ -264,7 +266,7 @@ public class InheritanceTest extends TestCase {
 			lastId = db.getLastRecordId();
 			assertEquals("database has wrong number of records",numRecs, lastId);
 			for (int i = minParent; i <= maxParent; ++i) {
-				Iterable<Record> children = db.getChildRecords(i, 0, false);
+				Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
 				HashSet<Integer> childrenSet = expectedChildren.get(i);
 				if (null == childrenSet) {
 					assertNotNull("Record "+i+" has unexpected children");					
@@ -296,11 +298,11 @@ public class InheritanceTest extends TestCase {
 		try {
 			initializeExpectedChildren(expectedChildren, lastId);
 			for (int i = lastId+1; i <= numRecs; ++i) {
-				Record rec = db.newRecord();
+				DatabaseRecord rec = db.newRecord();
 				maxParent = (int) Math.sqrt(i);
 				minParent = Math.min(minParent, maxParent);
 				rec.setParent(0, maxParent);
-				int recNum = db.put(rec);
+				int recNum = db.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				addExpectedAffiliate(expectedChildren, maxParent, recNum);
 			}
@@ -311,7 +313,7 @@ public class InheritanceTest extends TestCase {
 		}
 		try {
 			for (int i = minParent; i <= maxParent; ++i) {
-				Iterable<Record> children = db.getChildRecords(i, 0, false);
+				Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
 				HashSet<Integer> childrenSet = expectedChildren.get(i);
 				if (null == childrenSet) {
 					assertNotNull("Record "+i+" has unexpected children");					
@@ -333,7 +335,7 @@ public class InheritanceTest extends TestCase {
 	}
 	private void setupDatabase(String dbFile) {
 		try {
-			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile);
+			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile, workingDirectory);
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
 		} catch (Exception e) {
@@ -346,7 +348,7 @@ public class InheritanceTest extends TestCase {
 		for (int i = 1; i <= lastId; ++i) {
 			HashSet s = new HashSet<>();
 			expectedChildren.put(i, s);
-			 Iterable<Record> children = db.getChildRecords(i, 0, false);
+			 Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
 			for (Record c: children) {
 				s.add(c.getRecordId());
 			}
@@ -357,7 +359,7 @@ public class InheritanceTest extends TestCase {
 		for (int i = 1; i <= lastId; ++i) {
 			HashSet s = new HashSet<>();
 			expectedAffiliates.put(i, s);
-			 Iterable<Record> affiliates = db.getAffiliateRecords(i, 0);
+			 Iterable<DatabaseRecord> affiliates = db.getAffiliateRecords(i, 0);
 			for (Record c: affiliates) {
 				s.add(c.getRecordId());
 			}
@@ -369,11 +371,11 @@ public class InheritanceTest extends TestCase {
 		int minParent = numRecs;
 		int maxParent = 0;
 		for (int i = lastId+1; i <= numRecs; ++i) {
-			Record rec = db.newRecord();
+			DatabaseRecord rec = db.newRecord();
 			maxParent = (int) Math.sqrt(i);
 			minParent = Math.min(minParent, maxParent);
 			rec.setParent(0, maxParent);
-			int recNum = db.put(rec);
+			int recNum = db.putRecord(rec);
 			assertEquals("wrong ID for new record",  i, recNum);
 			addExpectedAffiliate(expectedChildren, maxParent, recNum);
 		}
@@ -396,7 +398,7 @@ public class InheritanceTest extends TestCase {
 
 	private void checkChildren(final int numRecs, HashMap<Integer, HashSet<Integer>> expectedChildren) {
 		for (int i = 1; i <= numRecs; ++i) {
-			Iterable<Record> children = db.getChildRecords(i, 0, false);
+			Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
 			HashSet<Integer> childrenSet = expectedChildren.get(i);
 			if (null == childrenSet) {
 				assertNotNull("Record "+i+" has unexpected children");					
@@ -415,7 +417,7 @@ public class InheritanceTest extends TestCase {
 
 	private void checkAffiliates(final int numRecs, HashMap<Integer, HashSet<Integer>> expectedAffiliates) {
 		for (int i = 1; i <= numRecs; ++i) {
-			Iterable<Record> affiliates = db.getAffiliateRecords(i, 0);
+			Iterable<DatabaseRecord> affiliates = db.getAffiliateRecords(i, 0);
 			HashSet<Integer> childrenSet = expectedAffiliates.get(i);
 			if (null == childrenSet) {
 				assertNotNull("Record "+i+" has unexpected affiliates");					
@@ -442,11 +444,11 @@ public class InheritanceTest extends TestCase {
 		try {
 			initializeExpectedChildren(expectedDescendents, lastId);
 			for (int i = lastId+1; i <= numRecs; ++i) {
-				Record rec = db.newRecord();
+				DatabaseRecord rec = db.newRecord();
 				maxParent = (int) Math.sqrt(i);
 				minParent = Math.min(minParent, maxParent);
 				rec.setParent(0, maxParent);
-				int recNum = db.put(rec);
+				int recNum = db.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				addExpectedAffiliate(expectedDescendents, maxParent, recNum);
 			}
@@ -469,7 +471,7 @@ public class InheritanceTest extends TestCase {
 
 	private void checkDescendents(final int numRecs, HashMap<Integer, HashSet<Integer>> expectedDescendents) {
 		for (int i = 1; i <= numRecs; ++i) {
-			Iterable<Record> children = db.getChildRecords(i, 0, true);
+			Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, true);
 			HashSet<Integer> childrenSet = getExpectedDescendents(expectedDescendents, i);
 			if (null == childrenSet) {
 				assertNotNull("Record "+i+" has unexpected children");					
@@ -504,7 +506,8 @@ public class InheritanceTest extends TestCase {
 			for (int i = 1; i <= recId; ++i) {
 				FieldValue fv;
 				fv = rec.getFieldValue(fieldNamesAndValues[i][0]);
-				assertEquals("record "+i, fieldNamesAndValues[i][1], fv.getMainValueAsString());
+				String mainValue = fv.getMainValueAsString();
+				assertEquals("record "+rec.getRecordId()+" field "+i, fieldNamesAndValues[i][1], mainValue);
 			}
 		} catch (InputException e) {
 			e.printStackTrace();
@@ -521,7 +524,7 @@ public class InheritanceTest extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		testLogger.log(Level.INFO, "Starting "+getName());
-
+		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 
 }

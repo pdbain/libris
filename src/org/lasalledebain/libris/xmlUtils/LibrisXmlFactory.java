@@ -36,7 +36,7 @@ public class LibrisXmlFactory {
 	 * @throws FactoryConfigurationError
 	 * @throws SchemaException
 	 */
-	public ElementManager makeLibrisElementManager(Reader reader, 
+	public ElementManager makeElementManager(Reader reader, 
 			String sourceFile, String initialElementName, XmlShapes shapes) 
 	throws InputException {
 		ElementManager mgr;

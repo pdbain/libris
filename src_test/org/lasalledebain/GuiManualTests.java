@@ -21,8 +21,10 @@ import javax.xml.stream.XMLStreamException;
 
 import junit.framework.TestCase;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -35,16 +37,25 @@ import org.lasalledebain.libris.ui.Layout;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisWindowedUi;
 import org.lasalledebain.libris.ui.RecordWindow;
+import org.lasalledebain.libris.ui.DatabaseRecordWindow;
 import org.lasalledebain.libris.ui.TextBox;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
-
+import static org.lasalledebain.Utilities.testLogger;
 public class GuiManualTests extends TestCase {
+	/* (non-Javadoc)
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	@Override
+	protected void setUp() throws Exception {
+		myUi = new HeadlessUi(null, false);
+	}
+
 	private static final String LAYOUT1 = "layout1";
 	private static final String LAYOUT1A = "layout1a";
 	private Schema mySchema;
 	private Layout myGuiLayout;
-	private static LibrisWindowedUi myUi = new HeadlessUi();
+	private LibrisWindowedUi myUi;
 
 	public void testWindowSanity() {
 		JFrame frame = new JFrame("testWindowSanity");
@@ -148,10 +159,10 @@ public class GuiManualTests extends TestCase {
 		try {
 			Schema schem = Utilities.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
-			Record rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
+			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
 			assertNotNull("could not load "+Utilities.LAYOUT2, myGuiLayout);
-			RecordWindow rWindow = new RecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), false, null);
+			RecordWindow rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), false, null);
 			rWindow.setVisible(true);
 			JFrame frame = new JFrame(getName());
 			frame.add(rWindow);
@@ -171,14 +182,14 @@ public class GuiManualTests extends TestCase {
 		try {
 			Schema schem = Utilities.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
-			Record rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
+			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = (Layout) myLayouts.getLayout(Utilities.LAYOUT2);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout2 to FormLayout");
 			}
 			assertNotNull("could not load "+Utilities.LAYOUT2, myGuiLayout);
-			RecordWindow rWindow = new RecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), null);
+			RecordWindow rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), null);
 			JFrame frame = new JFrame(getName());
 			frame.add(rWindow);
 			rWindow.setVisible(true);
@@ -204,10 +215,10 @@ public class GuiManualTests extends TestCase {
 
 	public void testRecordWindowSanity() {
 		loadSchema();
-		RecordTemplate template = null;
+		RecordFactory<DatabaseRecord> template = null;
 		try {
 			template = RecordTemplate.templateFactory(mySchema);
-			Record rec = template.makeRecord(true);
+			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
 				myGuiLayout = (Layout) myLayouts.getLayout(LAYOUT1);
@@ -217,7 +228,7 @@ public class GuiManualTests extends TestCase {
 			assertNotNull("did not load "+LAYOUT1, myGuiLayout);
 			RecordWindow rWindow;
 			try {
-				rWindow = new RecordWindow(myUi, myGuiLayout, rec, false, null);
+				rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, false, null);
 				rWindow.setVisible(true);
 				guiPause();
 			} catch (Exception e) {
@@ -232,10 +243,10 @@ public class GuiManualTests extends TestCase {
 
 	public void testMultipleFieldValues() {
 		loadSchema();
-		RecordTemplate template = null;
+		RecordFactory<DatabaseRecord> template = null;
 		try {
 			template = RecordTemplate.templateFactory(mySchema);
-			Record rec = template.makeRecord(true);
+			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
 				myGuiLayout = (Layout) myLayouts.getLayout(LAYOUT1);
@@ -245,7 +256,7 @@ public class GuiManualTests extends TestCase {
 			assertNotNull("did not load "+LAYOUT1, myGuiLayout);
 			RecordWindow rWindow;
 			try {
-				rWindow = new RecordWindow(myUi, myGuiLayout, rec, false, null);
+				rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, false, null);
 				rWindow.setVisible(true);
 				guiPause();
 			} catch (Exception e) {
@@ -267,10 +278,10 @@ public class GuiManualTests extends TestCase {
 			try {
 				Thread.sleep(delay);
 			} catch (InterruptedException e) {
-				System.err.println("testcase interrupted");
+				testLogger.info("testcase interrupted");
 			}
 		} else {
-			System.out.print("waiting...");
+			testLogger.info("waiting...");
 			try {
 				System.in.read();
 			} catch (IOException e) {
@@ -327,14 +338,14 @@ public class GuiManualTests extends TestCase {
 		try {
 			Schema schem = Utilities.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
-			Record rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
+			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = myLayouts.getLayout(LAYOUT1A);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout2 to FormLayout");
 			}
 			assertNotNull("could not load "+LAYOUT1A, myGuiLayout);
-			RecordWindow rWindow = new RecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), null);
+			RecordWindow rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), null);
 			JFrame frame = new JFrame(getName());
 			frame.add(rWindow);
 			rWindow.setVisible(true);

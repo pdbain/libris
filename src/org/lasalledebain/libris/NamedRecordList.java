@@ -7,12 +7,12 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 
-public class NamedRecordList extends RecordList implements RecordIdNameMapper {
+public class NamedRecordList<RecordType extends Record> extends RecordList<RecordType> implements RecordIdNameMapper {
 
 	SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
-	private LibrisDatabase database;
+	private GenericDatabase<RecordType>  database;
 
-	public NamedRecordList(LibrisDatabase db) {
+	public NamedRecordList(GenericDatabase<RecordType> db) {
 		database = db;
 		namedRecordIndex = database.getNamedRecordIndex();
 	}
@@ -25,15 +25,15 @@ public class NamedRecordList extends RecordList implements RecordIdNameMapper {
 	@Override
 	public int getId(String recName) throws InputException {
 		 KeyIntegerTuple r = namedRecordIndex.getByName(recName);
-		return (null == r) ? RecordId.getNullId(): r.getValue();
+		return (null == r) ? RecordId.NULL_RECORD_ID: r.getValue();
 	}
 	
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		return new NamedRecordIterator();
 	}
 
-	class NamedRecordIterator implements Iterator<Record>{
+	class NamedRecordIterator implements Iterator<RecordType>{
 		private Iterator<KeyIntegerTuple> tupleIterator;
 
 		NamedRecordIterator() {
@@ -46,7 +46,7 @@ public class NamedRecordList extends RecordList implements RecordIdNameMapper {
 		}
 
 		@Override
-		public Record next() {
+		public RecordType next() {
 			KeyIntegerTuple tup = tupleIterator.next();
 			int numericId = tup.getValue();
 			try {
@@ -64,7 +64,7 @@ public class NamedRecordList extends RecordList implements RecordIdNameMapper {
 	}
 
 	@Override
-	public Record getRecord(int id) throws InputException {
+	public RecordType getRecord(int id) throws InputException {
 		return database.getRecord(id);
 	}
 

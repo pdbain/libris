@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
+import java.util.logging.Level;
 
 import org.lasalledebain.libris.FileAccessManager;
-import org.lasalledebain.libris.LibrisFileManager;
-import org.lasalledebain.libris.exception.UserErrorException;
+import org.lasalledebain.libris.FileManager;
+import org.lasalledebain.libris.LibrisConstants;
+import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.RecordHeader;
 
 public class DbDump {
@@ -29,17 +32,17 @@ public class DbDump {
 			System.exit(1);
 		}
 		out = System.out;
-		LibrisFileManager fm;
+		FileManager fm;
 		try {
-			fm = new LibrisFileManager(dbFileObj, null);
+			fm = new FileManager(LibrisDatabase.getDatabaseAuxDirectory(dbFileObj, LibrisDatabase.DATABASE_AUX_DIRECTORY_NAME));
 			dumpRecords(fm);
-		} catch (UserErrorException e) {
+		} catch (DatabaseException e) {
 			System.err.println("Cannot open database: "+e.getMessage());
 		}
 	}
 
-	private static void dumpRecords(LibrisFileManager fm) {
-		FileAccessManager rf = fm.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME);
+	private static void dumpRecords(FileManager fm) {
+		FileAccessManager rf = fm.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME);
 		try {
 			RandomAccessFile recordsFileStore = rf.getReadOnlyRandomAccessFile();
 			RecordHeader recordList = new RecordHeader(recordsFileStore, 0);
@@ -52,7 +55,7 @@ public class DbDump {
 			}
 			rf.releaseRaRoFile(recordsFileStore);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			LibrisDatabase.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 		}
 	}

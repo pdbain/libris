@@ -1,36 +1,35 @@
 package org.lasalledebain.libris.records;
 
+import static org.lasalledebain.libris.util.LibrisStemmer.stem;
+
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.net.URL;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.lasalledebain.libris.ArtifactParameters;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
-import org.lasalledebain.libris.Repository.ArtifactParameters;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.util.Stemmer;
+import org.lasalledebain.libris.util.StringUtils;
 
 public class PdfRecordImporter {
+	private static final int KEYWORD_LIMIT = 100;
 	private static final int MIN_ABSTRACT_LENGTH = 1000;
 	LibrisDatabase recordDatabase;
 	Repository artifactRepository;
-	short abstractField, keywordsField;
-	public void setAbstractField(short abstractField) {
-		this.abstractField = abstractField;
-		setAbstract = true;
-	}
-
-	public void setKeywordsField(short keywordsField) {
-		this.keywordsField = keywordsField;
-		setKeywords = true;
-	}
+	int abstractField, keywordsField;
 	boolean setAbstract;
 	boolean setKeywords;
+
 	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository) {
 		this.recordDatabase = recordDatabase;
 		this.artifactRepository = artifactRepository;
@@ -38,7 +37,7 @@ public class PdfRecordImporter {
 		setKeywords = false;
 	}
 	
-	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository, short keyField, short absField) {
+	public PdfRecordImporter(LibrisDatabase recordDatabase, Repository artifactRepository, int keyField, int absField) {
 		this.recordDatabase = recordDatabase;
 		this.artifactRepository = artifactRepository;
 		setAbstract = false;
@@ -46,26 +45,21 @@ public class PdfRecordImporter {
 		setKeywordsField(keyField);
 		setAbstractField(absField);
 	}
-	
-	public void importDocument(URI sourceFileUri, Record rec) throws LibrisException, IOException {
+
+	public void importDocument(URI sourceFileUri, Function<String, Integer> documentFrequency, DatabaseRecord rec) throws LibrisException, IOException {
 		
 		/* copy file to repository */
 		int artifactId = artifactRepository.importFile(new ArtifactParameters(sourceFileUri));
 		/* set repositoryIdField in rec*/
 		rec.setArtifactId(artifactId);
-		/* extract text */
-		PDDocument pdfDoc = PDDocument.load(sourceFileUri.toURL());
-		PDFTextStripper doc = new PDFTextStripper();
-		String docString = doc.getText(pdfDoc).trim();
-		pdfDoc.close();
+		String docString = pdfToText(sourceFileUri);
 		if (setKeywords) {
-			Set <String> terms = getTerms(docString);
-			StringBuilder keywordsString = new StringBuilder(5 * terms.size());
-			for (String s: terms) {
-				keywordsString.append(' ');
-				keywordsString.append(s);
+			 Stream<String> terms = StringUtils.chooseTerms(StringUtils.getTerms(docString, true), 
+					 documentFrequency, KEYWORD_LIMIT);
+			Optional<String> keywords = terms.reduce((s, t) -> s + ' ' + t);
+			if (keywords.isPresent()) {
+				rec.addFieldValue(keywordsField, keywords.get());
 			}
-			rec.addFieldValue(keywordsField, keywordsString.toString());
 		}
 		/* set abstract if field not null */
 		if (setAbstract) {
@@ -75,18 +69,42 @@ public class PdfRecordImporter {
 				endOfAbstract = MIN_ABSTRACT_LENGTH;
 			}
 				endOfAbstract = Math.min(endOfAbstract, docString.length());
-				rec.addFieldValue(abstractField, docString.substring(0, endOfAbstract));
+				rec.addFieldValue(abstractField, StringUtils.replaceNonwordOrSpaceChars(docString.substring(0, endOfAbstract), " "));
 		}
 	}
-// TODO limit strings based on term frequency/inverse document frequency
-	private Set<String> getTerms(String docString) {
-        HashSet<String> termSet = new HashSet<>(Arrays.asList(docString.toLowerCase().split("[\\p{Space}\\p{Punct}]+")));
-        HashSet<String> stems = new HashSet<>(termSet.size()/2);
-        for (String word: termSet) {
-        	Stemmer wordStemmer = new Stemmer(word.toCharArray());
-        	stems.add(wordStemmer.toString());
-        }
-        termSet.addAll(stems);
-		return termSet;
+
+	public void importPDFDocuments(Iterable<URI> sourceFiles, Record parentRecord) 
+			throws MalformedURLException, IOException, LibrisException {
+		final int parentId = parentRecord.getRecordId();
+		Function<String, Integer> documentFrequency = recordDatabase.getDocumentFrequencyFunction();
+		for (URI sourceFileUri: sourceFiles) {
+			final String documentText = pdfToText(sourceFileUri);
+			recordDatabase.incrementTermCounts(StringUtils.getTerms(documentText, true).map(w -> stem(w)));
+		}
+		for (URI sourceFileUri: sourceFiles) {
+			DatabaseRecord rec = recordDatabase.newRecord();
+			importDocument(sourceFileUri, documentFrequency, rec);
+			rec.setParent(0, parentId);
+			recordDatabase.putRecord(rec);
+		}
+	}
+
+	public void setAbstractField(int abstractField) {
+		this.abstractField = abstractField;
+		setAbstract = true;
+	}
+
+	public void setKeywordsField(int keywordsField) {
+		this.keywordsField = keywordsField;
+		setKeywords = true;
+	}
+
+	private static String pdfToText(URI sourceFileUri) throws IOException, MalformedURLException {
+		/* extract text */
+		PDDocument pdfDoc = PDDocument.load(new File(sourceFileUri));
+		PDFTextStripper doc = new PDFTextStripper();
+		String docString = doc.getText(pdfDoc).trim();
+		pdfDoc.close();
+		return docString;
 	}
 }

@@ -3,8 +3,8 @@ package org.lasalledebain.libris.ui;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.field.FieldValue;
 
 public class SingleControlUiField extends UiField {
@@ -39,7 +39,7 @@ public class SingleControlUiField extends UiField {
 		try {
 			return control.getFieldValues().iterator();
 		} catch (FieldDataException e) {
-			throw new InternalError("error getting field values", e);
+			throw new DatabaseError("error getting field values", e);
 		}
 	}
 

@@ -3,12 +3,7 @@ package org.lasalledebain.libris.indexes;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.BitSet;
-import java.util.Iterator;
 import java.util.Objects;
-
-import org.lasalledebain.libris.LibrisConstants;
-import org.lasalledebain.libris.util.Murmur3;
-import org.lasalledebain.libris.util.StringUtils;
 
 /**
  * This class implements keyword searching using a Bloom filter  There is one filter for 
@@ -26,14 +21,11 @@ public abstract class BloomFilterSection {
 	protected int bytesPerRange;
 	protected RandomAccessFile signatureFile;
 	protected final int recordsPerSet;
-	public int getRecordsPerSet() {
-		return recordsPerSet;
-	}
-
 	protected int currentBaseId;
 	protected BitSet recordSignature;
 	public final static int MAX_LEVEL = 4;
 	public static final int bytesPerLevel[] = getLevels(MAX_LEVEL);
+
 	static int[] getLevels(int max) {
 		int size = 1;
 		int result[] = new int[max + 1];
@@ -43,7 +35,12 @@ public abstract class BloomFilterSection {
 		}
 		return result;
 	}
+	
 	public BloomFilterSection(RandomAccessFile sigFile, int baseId, Iterable<String> terms, int level) throws IOException {
+		this(sigFile, level);
+	}
+
+	public BloomFilterSection(RandomAccessFile sigFile, int baseId, int level) throws IOException {
 		this(sigFile, level);
 	}
 
@@ -54,8 +51,8 @@ public abstract class BloomFilterSection {
 		bytesPerRange = BASIC_SET_SIZE_BYTES * recordsPerSet;
 	}
 
-	public int nextBit(SignatureBitList bitList) {
-		return bitList.next() & (setSize - 1);
+	public int getRecordsPerSet() {
+		return recordsPerSet;
 	}
 
 	public boolean isLoaded(int id) {
@@ -93,50 +90,8 @@ public abstract class BloomFilterSection {
 		}
 	}
 
-	static class SignatureBitList {
-		private byte[] currentTerm;
-		private int currentLength;
-		private Iterator<String> termList;
-		SignatureBitList(Iterable<String> terms) {
-			termList = terms.iterator();
-			startNextTerm();
-		}
-
-		boolean hasNext() {
-			return null != currentTerm;
-		}
-
-		int next() {
-			int result = Murmur3.hash32(currentTerm, currentLength);
-			if (currentLength < currentTerm.length) {
-				++currentLength;
-			} else {
-				startNextTerm();
-			}
-			return result;
-		}
-
-		public void startNextTerm() {
-			currentTerm = null;
-			while ((null == currentTerm) && termList.hasNext()) {
-				String nextTerm = termList.next();
-				if (nextTerm.length() < LibrisConstants.MINIMUM_TERM_LENGTH) {
-					continue;
-				}
-				currentTerm = StringUtils.toCanonicalBytes(nextTerm);
-				currentLength = LibrisConstants.MINIMUM_TERM_LENGTH;
-			}
-		}		
-	}
-
-	public static int calculateSignatureLevels(int numRecords) {
-		int levels = 1;
-		int numSigs = levels * BRANCH_FACTOR;
-		int numTopLevelSignatures = numRecords / BRANCH_FACTOR;
-		while (numSigs < numTopLevelSignatures) {
-			++levels;
-			numSigs *= BRANCH_FACTOR;
-		}
-		return levels;
+	protected int hashToBitNumber(int hash) {
+		final int bitNum = hash & (setSize - 1);
+		return bitNum;
 	}
 }

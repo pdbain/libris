@@ -244,7 +244,7 @@ public abstract class Layout implements XMLElement {
 			Layout otherLayout = (Layout) obj;
 			return otherLayout.getAttributes().equals(getAttributes());
 		} catch (ClassCastException e) {
-			LibrisDatabase.librisLogger.log(Level.WARNING, "Type mismatch in Layout.equals()", e);
+			LibrisDatabase.log(Level.WARNING, "Type mismatch in Layout.equals()", e);
 			return false;
 		}
 	}

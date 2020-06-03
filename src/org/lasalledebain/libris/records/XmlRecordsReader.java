@@ -11,45 +11,43 @@ import java.util.logging.Level;
 import javax.xml.stream.FactoryConfigurationError;
 
 import org.lasalledebain.libris.DatabaseInstance;
-import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.GenericDatabase;
+import org.lasalledebain.libris.DatabaseMetadata;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisFileManager;
-import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
-import org.lasalledebain.libris.indexes.BulkImporter;
-import org.lasalledebain.libris.indexes.RecordPositions;
 import org.lasalledebain.libris.ui.Messages;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-import static org.lasalledebain.libris.exception.DatabaseError.assertTrue; 
+import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants; 
 
 /**
  * Read records from an XML file.
  *
  */
-public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,LibrisXMLConstants {
+public class XmlRecordsReader<RecordType extends Record> implements Iterable<RecordType>, Iterator<RecordType>,LibrisXMLConstants {
 	ElementManager recsMgr;
-	private LibrisDatabase database;
+	private GenericDatabase<RecordType> database;
 
 	/**
 	 * @param database database object
 	 * @param recsMgr XML element manager for <record> element 
 	 * @throws DatabaseException 
 	 */
-	public XmlRecordsReader(LibrisDatabase database, ElementManager recsMgr) throws DatabaseException {
+	public XmlRecordsReader(GenericDatabase<RecordType> database, ElementManager recsMgr) throws DatabaseException {
 		this.database = database;
 		this.recsMgr = recsMgr;
 		// recsMgr.parseOpenTag();
 	}
 	
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		try {
-			XmlRecordsReader recs = new XmlRecordsReader(database, recsMgr);
+			XmlRecordsReader<RecordType> recs = new XmlRecordsReader<RecordType>(database, recsMgr);
 			recsMgr.parseOpenTag();
 			return recs;
 		} catch (LibrisException e) {
@@ -64,8 +62,8 @@ public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,Libr
 	}
 
 	@Override
-	public Record next() {
-		Record inputRecord = null;
+	public RecordType next() {
+		RecordType inputRecord = null;
 		ElementManager recMgr;
 
 		try {
@@ -85,127 +83,5 @@ public class XmlRecordsReader implements Iterable<Record>, Iterator<Record>,Libr
 	@Override
 	public void remove() {
 		return;
-	}
-
-	public int getFieldNum() {
-		return 0;
-	}
-
-	public String getId() {
-		return null;
-	}
-
-	public String getTitle() {
-		return null;
-	}
-
-	public static void importXmlRecords(LibrisDatabase database, File source) throws LibrisException {
-		LibrisMetadata metadata = database.getMetadata();
-		try {
-			int numAdded = 0;
-			ElementManager librisMgr = database.makeLibrisElementManager(source);
-			librisMgr.parseOpenTag();
-			String nextElement = librisMgr.getNextId();
-			if (XML_INSTANCE_TAG.equals(nextElement)) {
-				ElementManager instanceMgr = librisMgr.nextElement();
-				instanceMgr.flushElement();
-				nextElement = librisMgr.getNextId();
-			}
-			ElementManager metadataMgr;
-			if (XML_METADATA_TAG.equals(nextElement)) {
-				metadataMgr = librisMgr.nextElement();
-				metadataMgr.flushElement();
-				nextElement = librisMgr.getNextId();	
-			}
-			ElementManager recordsMgr = librisMgr.nextElement();
-			XmlRecordsReader recordsRdr = new XmlRecordsReader(database, recordsMgr);
-			int lastId = 0;
-			metadata.setSavedRecords(0);
-			LibrisFileManager fileMgr = database.getFileMgr();
-			FileAccessManager recordsFileMgr = fileMgr.getAuxiliaryFileMgr(LibrisFileManager.RECORDS_FILENAME);
-			RecordPositions recPosns = new RecordPositions(fileMgr.getAuxiliaryFileMgr(LibrisFileManager.POSITION_FILENAME), false);
-			BulkImporter importer = new BulkImporter(database.getSchema(), recordsFileMgr.getOpStream(), recPosns);
-			importer.initialize();
-			boolean nonEmpty = false;
-			for (Record r: recordsRdr) {
-				nonEmpty = true;
-				if (null == r) {
-					LibrisException e = LibrisException.getLastException();
-					throw e;
-				}
-				importer.putRecord(r);
-				++numAdded;
-				LibrisDatabase.log(Level.FINE, "importXmlRecords put record "+RecordId.toString(r.getRecordId())); //$NON-NLS-1$
-				int recId = r.getRecordId();
-				lastId = Math.max(lastId, recId);
-			}
-			metadata.setSavedRecords(numAdded);
-			importer.finish(nonEmpty);
-			recordsFileMgr.releaseOpStream();
-			recPosns.close();
-			librisMgr.closeFile();
-			database.closeDatabaseSource();
-			metadata.setLastRecordId(lastId);
-		} catch (XmlException e) {
-			throw new DatabaseException(Messages.getString("XmlRecordsReader.1"), e); //$NON-NLS-1$
-
-		} catch (FactoryConfigurationError e) {
-			String msg = Messages.getString("XmlRecordsReader.4"); //$NON-NLS-1$
-			LibrisDatabase.log(Level.SEVERE, msg, e); //$NON-NLS-1$
-			throw new DatabaseException(msg); //$NON-NLS-1$
-		} catch (IOException e) {
-			throw new DatabaseException(Messages.getString("XmlRecordsReader.6"), e); //$NON-NLS-1$
-
-			}
-	}
-	
-	public static void importIncrementFile(LibrisDatabase database, Reader source, String filePath) throws LibrisException {
-		LibrisMetadata metadata = database.getMetadata();
-		int lastMasterId = metadata.getLastRecordId();
-		try {
-			ElementManager librisMgr = database.makeLibrisElementManager(source, XML_LIBRIS_TAG, filePath);
-			librisMgr.parseOpenTag();
-			ElementManager instanceMgr = librisMgr.nextElement();
-			DatabaseInstance instanceInfo = new DatabaseInstance();
-			instanceInfo.fromXml(instanceMgr);
-			int idOffset = lastMasterId - instanceInfo.getRecordIdBase();
-			assertTrue("Increment starting record ID invalid", idOffset >= 0);
-			ElementManager recordsMgr = librisMgr.nextElement();
-			XmlRecordsReader recordsRdr = new XmlRecordsReader(database, recordsMgr);
-			int numGroups = database.getSchema().getNumGroups();
-			for (Record r: recordsRdr) {
-				if (null == r) {
-					LibrisException e = LibrisException.getLastException();
-					throw e;
-				}
-				if (idOffset > 0) {
-					int oldId = r.getRecordId();
-					r.setRecordId(oldId + idOffset);
-					for (int groupNum = 0; groupNum < numGroups; ++groupNum) {
-						int[] affiliates = r.getAffiliates(groupNum);
-						if (!Objects.isNull(affiliates)) {
-							final int affiliatesLength = affiliates.length;
-							int newAffiliates[] = Arrays.copyOf(affiliates, affiliatesLength);
-							for (int i = 0; i < affiliatesLength; ++i) {
-								if (newAffiliates[i] > lastMasterId) {
-									newAffiliates[i] += idOffset;
-								}
-							}
-							r.setAffiliates(groupNum, newAffiliates);
-						}
-					}
-				}
-				database.put(r);
-				LibrisDatabase.log(Level.FINE, "importXmlRecords put record "+RecordId.toString(r.getRecordId())); //$NON-NLS-1$
-			}
-			librisMgr.closeFile();
-		} catch (XmlException e) {
-			throw new DatabaseException(Messages.getString("XmlRecordsReader.1"), e); //$NON-NLS-1$
-
-		} catch (FactoryConfigurationError e) {
-			String msg = Messages.getString("XmlRecordsReader.4"); //$NON-NLS-1$
-			LibrisDatabase.log(Level.SEVERE, msg, e); //$NON-NLS-1$
-			throw new DatabaseException(msg); //$NON-NLS-1$
-		}
 	}
 }

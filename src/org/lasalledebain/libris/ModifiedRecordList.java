@@ -4,17 +4,18 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.UserErrorException;
 
-public class ModifiedRecordList extends RecordList {
+public class ModifiedRecordList<RecordType extends Record> extends RecordList<RecordType> {
 
-	TreeMap<Integer, Record> modifiedRecords;
+	TreeMap<Integer, RecordType> modifiedRecords;
 	public ModifiedRecordList() {
-		modifiedRecords = new TreeMap<Integer, Record>();
+		modifiedRecords = new TreeMap<Integer, RecordType>();
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
-		Iterator<Record> records = modifiedRecords.values().iterator();
+	public Iterator<RecordType> iterator() {
+		Iterator<RecordType> records = modifiedRecords.values().iterator();
 		return records;
 	}
 
@@ -22,8 +23,9 @@ public class ModifiedRecordList extends RecordList {
 	 * Add a record to the list.
 	 * @param rec
 	 * @return true if successful
+	 * @throws UserErrorException 
 	 */
-	public boolean addRecord(Record rec) {
+	public boolean addRecord(RecordType rec) throws UserErrorException {
 		modifiedRecords.put(rec.getRecordId(), rec);
 		return true;
 	}
@@ -33,7 +35,7 @@ public class ModifiedRecordList extends RecordList {
 	}
 
 	@Override
-	public Record getRecord(int id) throws InputException {
+	public RecordType getRecord(int id) throws InputException {
 		return modifiedRecords.get(id);
 	}
 }

@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.search;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.InputException;
@@ -12,11 +11,16 @@ import org.lasalledebain.libris.indexes.RecordKeywords;
 
 public class KeywordFilter implements RecordFilter {
 
-	private int[] fieldList;
-	private List<String> terms;
+	private int[] myFieldList;
+	private Iterable<String> terms;
 	private RecordKeywords recWords;
 
-	public KeywordFilter(MATCH_TYPE matchType, boolean caseSensitive, int searchList[], String searchTerms[]) {
+	public KeywordFilter(MATCH_TYPE matchType, boolean caseSensitive, int fieldList[], String searchTerms[]) {
+		this(matchType, caseSensitive, fieldList, Arrays.asList(searchTerms));
+	}
+	
+	public KeywordFilter(MATCH_TYPE matchType, boolean caseSensitive, int fieldList[], Iterable<String> searchTerms) {
+
 		switch (matchType) {
 		case MATCH_EXACT:
 			recWords = new ExactKeywordList(caseSensitive);
@@ -28,13 +32,13 @@ public class KeywordFilter implements RecordFilter {
 			recWords = new ContainsKeywords(caseSensitive);
 			break;
 		}
-		fieldList = searchList;
-		terms = Arrays.asList(searchTerms);
+		myFieldList = fieldList;
+		terms = searchTerms;
 	}
 
 	public boolean matches(Record rec) throws InputException {
 		recWords.clear();
-		rec.getKeywords(fieldList, recWords);
+		rec.getKeywords(myFieldList, recWords);
 		return recWords.contains(terms);
 	}
 	
@@ -51,6 +55,6 @@ public class KeywordFilter implements RecordFilter {
 	}
 
 	public int[] getFieldList() {
-		return fieldList;
+		return myFieldList;
 	}
 }

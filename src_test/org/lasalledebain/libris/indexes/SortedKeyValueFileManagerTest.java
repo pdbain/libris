@@ -28,18 +28,18 @@ public class SortedKeyValueFileManagerTest extends TestCase {
 	
 	@Before
 	public void setUp() {
-		System.out.println("Starting "+getName());
+		Utilities.trace("Starting "+getName());
 		int indexLevels = 1;
 		fileList = new ArrayList<FileAccessManager>(3);
 		if (multiLevelTests.contains(getName())) {
 			indexLevels = 2;
 		}
-		workDir = Utilities.getTempTestDirectory();
+		workDir = Utilities.makeTempTestDirectory();
 		if (null == workDir) {
 			fail("could not create working directory ");
 		}
 		FileAccessManager dataManager = new FileAccessManager(workDir, "data");
-		System.out.println(dataManager.getPath());
+		Utilities.trace(dataManager.getPath());
 		fileList.add(dataManager);
 		for (int i = 1; i <= indexLevels; ++i) {
 			FileAccessManager indexManager = new FileAccessManager(workDir, "index_"+i);
@@ -236,7 +236,7 @@ public class SortedKeyValueFileManagerTest extends TestCase {
 			enterTuples(tupleList);
 			String prefix = "";
 			char[] prefixChars = "a10234".toCharArray();
-			System.out.println("test prefix \""+prefix+"\"");
+			Utilities.trace("test prefix \""+prefix+"\"");
 			for (char c: prefixChars) {
 				ArrayList<KeyIntegerTuple> expectedTuples = new ArrayList<KeyIntegerTuple>();
 				for (KeyIntegerTuple t: tupleList) {

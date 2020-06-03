@@ -10,7 +10,7 @@ import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 import org.lasalledebain.libris.index.AbstractVariableSizeHashEntry;
 
-class MockVariableSizeHashEntry extends AbstractVariableSizeHashEntry implements VariableSizeHashEntry {
+public class MockVariableSizeHashEntry extends AbstractVariableSizeHashEntry implements VariableSizeHashEntry {
 
 	final byte data[];
 	/**

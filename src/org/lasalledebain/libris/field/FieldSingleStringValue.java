@@ -1,11 +1,11 @@
 package org.lasalledebain.libris.field;
 
 public class FieldSingleStringValue extends FieldValue {
+	private final String value;
 	@Override
 	public boolean isEmpty() {
 		return (null == value) || value.isEmpty();
 	}
-	String value;
 	public FieldSingleStringValue(String value) {
 		this.value = value;
 	}

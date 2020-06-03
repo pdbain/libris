@@ -11,31 +11,42 @@ import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.hashtable.HashUtils;
+import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.Libris;
+import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.hashfile.StringKeyHashFile;
 import org.lasalledebain.libris.hashfile.TermCountHashBucket;
-import org.lasalledebain.libris.hashfile.TermCountHashBucket.TermCountBucketFactory;
 import org.lasalledebain.libris.hashfile.TermCountHashFile;
+import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.index.TermCountEntry;
-import org.lasalledebain.libris.index.TermCountEntry.TermCountEntryFactory;
+import org.lasalledebain.libris.records.Records;
+import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.util.ByteArraySlice;
 import org.lasalledebain.libris.util.Lorem;
-
+import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import junit.framework.TestCase;
+
+import static org.lasalledebain.libris.util.StringUtils.normalize;
 
 public class TermcountHashfileTests extends TestCase {
 	private RandomAccessFile backingStore;
 	private File testFile;
 	FileSpaceManager mgr;
-	StringKeyHashFile<TermCountEntry, TermCountHashBucket, TermCountEntryFactory> hashFile;
+	StringKeyHashFile<TermCountEntry, TermCountHashBucket> hashFile;
+	private File workingDirectory;
 
 	@Before
 	protected void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 		if (null == testFile) {
-			testFile = Utilities.makeTestFileObject("termCountHashFile");
+			testFile = Utilities.makeTestFileObject(workingDirectory, "termCountHashFile");
 		}
 		backingStore = HashUtils.MakeHashFile(testFile);
-		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
+		mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
 		hashFile = new TermCountHashFile(backingStore);
 	}
 
@@ -43,6 +54,7 @@ public class TermcountHashfileTests extends TestCase {
 	protected void tearDown() throws Exception {
 		hashFile.clear();
 		testFile.delete();
+		Utilities.deleteWorkingDirectory();
 	}
 
 	@Test
@@ -116,4 +128,52 @@ public class TermcountHashfileTests extends TestCase {
 			assertEquals("key "+key+" wrong value", count.intValue(), entry.getTermCount());
 		}
 	}
+	
+	@Test
+	public void testTermCountIndex() throws DatabaseException, LibrisException, IOException {
+		File workDir = Utilities.makeTempTestDirectory();
+		if (null == workDir) {
+			fail("could not create working directory ");
+		}
+		File tcFile = new File(workDir, "TermCountTest");
+		tcFile.createNewFile();
+		FileAccessManager mgr = new FileAccessManager(tcFile);
+		TermCountIndex index = new TermCountIndex(mgr, true);
+		final String[] terms = new String[] {"One", "Two", "three", "four", "one", "two", "three"};
+		final int termCounts[] = new int[] {2, 2, 2, 1, 2, 2, 2};
+		for (int i = 0; i < terms.length; ++i) {
+			index.incrementTermCount(normalize(terms[i]));
+		}
+		for (int i = 0; i < terms.length; ++i) {
+			int tc = index.getTermCount(normalize(terms[i]));
+			assertEquals("wrong count for "+terms[i],  termCounts[i], tc);
+		}
+	}
+
+	public void testBuildIndex() {
+		try {
+			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE4_XML, workingDirectory);
+			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
+			IndexField[] indexFieldList = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
+			final LibrisUi myUi = db.getUi();
+			
+			assertTrue("Could not close database", myUi.closeDatabase(false));
+			db = myUi.openDatabase();
+			Records<DatabaseRecord> recs = db.getDatabaseRecords();	
+			for (Record r: recs) {
+				RecordKeywords kw = new ExactKeywordList(true);
+				r.getKeywords(indexFieldList, kw);
+				for (String term: kw.getKeywords()) {
+					int count = db.getTermCount(term);
+					assertTrue("Missing count for "+term, count > 0);
+				}
+			}
+			assertTrue("could not close database", db.closeDatabase(false));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("unexpected exception "+e.getMessage());
+		}
+	}
+	
+
 }

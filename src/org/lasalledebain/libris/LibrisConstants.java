@@ -13,6 +13,8 @@ public interface LibrisConstants {
 	public static final String PROPERTY_RECORD_COUNT = "libris.database.recordcount";
 	public static final String PROPERTY_LAST_OPENED = "libris.database.lastopened";
 	public static final String PROPERTY_LAST_SAVED = "libris.database.lastsaved";
+	public static final String PROPERTY_HAS_REPOSITORY = "libris.database.hasrepository";
+	public static final String PROPERTY_REPOSITORY_ROOT = "libris.database.repositoryroot";
 	public static final String PROPERTY_SIGNATURE_LEVELS = "libris.database.signaturelevels";
 	public static final String FILENAME_JOURNAL_SUFFIX = "lbrj";
 	public static final String FILENAME_NATIVE_RECORDS_SUFFIX = "lbrn";
@@ -22,20 +24,13 @@ public interface LibrisConstants {
 	public static final int MAX_RECORD_ID = Integer.MAX_VALUE;
 	public static String LIBRIS_LOGGING_LEVEL = "libris.logging.level";
 
-	/**
-	 * describe how the database is being used: GUI, command line, batch
-	 *
-	 */
-	public enum DatabaseUsageMode {
-		USAGE_BATCH, USAGE_CMDLINE, USAGE_GUI
-	}
-
 	enum DatabaseFormat {DBFMT_XML, DBFMT_CSV, DBFMT_NATIVE}
 
 	public static final short NULL_FIELD_NUM = -1;
 	public static final short ENUM_VALUE_OUT_OF_RANGE = -1;
 	public static final byte RECORD_HAS_GROUPS = 1 << 0;
 	public static final byte RECORD_HAS_NAME = 1 << 2;
+	public static final byte RECORD_HAS_ARTIFACT = 1 << 3;
 	
 	String DATABASE_NAME = "DATABASE";
 	int NULL_GROUP = -1;
@@ -47,8 +42,13 @@ public interface LibrisConstants {
 	String DATABASE_OR_RECORD_ARE_READ_ONLY = "Database or record are read-only";
 	String COULD_NOT_OPEN_SCHEMA_FILE = "could not open schema file "; //$NON-NLS-1$
 	int MINIMUM_TERM_LENGTH = 2;
+	int[] emptyIntList = new int[0];
+	String DATABASE_FILE = "DATABASE_FILE";
+	String LAST_ARTIFACT_SOURCE_DIR = "ARTIFACT_DIR";
+	String REPO_DB = "repo_db";
 	public static final String SCHEMA_NAME = "SCHEMA";
-	public static final String AUX_DIRECTORY_NAME = ".libris_auxfiles";
+	public static final String DATABASE_AUX_DIRECTORY_NAME = ".libris_db_files";
+	public static final String REPOSITORY_AUX_DIRECTORY_NAME = ".libris_repo_files";
 	public static final String POSITION_FILENAME = "positions";
 	public static final String PROPERTIES_FILENAME = "properties";
 	public static final String RECORDS_FILENAME = "records";
@@ -60,9 +60,13 @@ public interface LibrisConstants {
 	public static final String AFFILIATES_FILENAME_HASHTABLE_ROOT = AFFILIATES_FILENAME_ROOT+"hashstable_";
 	public static final String AFFILIATES_FILENAME_OVERFLOW_ROOT = AFFILIATES_FILENAME_ROOT+"overflow_";
 	public static final String KEYWORDS_FILTER_FILENAME_ROOT = "keywords_filter_";
+	public static final String TERM_COUNT_FILENAME_ROOT = "termcounts";
+	public static final String INDEXING_REPORT_FILE = "indexReport.txt";
+	public static final String IMPORT_REPORT_FILE = "importReport.txt";
 	static final String TEMP_ROOT = "_TEMP_";
 	static final String TEMP_CHILD_FILE = TEMP_ROOT+"child_";
 	static final String TEMP_AFFILIATE_FILE = TEMP_ROOT+"affiliate_";
 	public static final String CSV_FILE = "CSV_FILE";
 	public static final int MAX_BLOOM_FILTER_LEVELS = 6;
+	public static final String ARTIFACTS_DIRECTORY = "artifacts_directory";
 }

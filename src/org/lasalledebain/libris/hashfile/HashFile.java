@@ -8,35 +8,47 @@ import java.util.List;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
-public abstract class HashFile<EntryType extends HashEntry, 
-BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<EntryType>> {
+public abstract class HashFile<EntryType extends HashEntry, BucketType extends HashBucket<EntryType>> {
 
 	protected RandomAccessFile backingStore;
 	int numBuckets;
-	int bucketModulus = 0;
+	int bucketAge;
+	int bucketModulus;
 	private int bucketSize;
 	static final int CACHESIZE=8;
 	HashMap<Integer, BucketType> bucketCache;
 
-	int bucketAge = 0;
-	private HashBucketFactory<EntryType, BucketType, FactoryType> bucketFactory;
-	FactoryType entryFact;
+	private int expansionCount, bucketLoadCount, flushCount;
 
-	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact) throws IOException {
+	public HashFile(RandomAccessFile backingStore) throws IOException {
+		bucketAge = 0;
+		bucketModulus = 0;
 		this.backingStore = backingStore;
-		this.bucketFactory = bFact;
+		expansionCount = bucketLoadCount = flushCount = 0;
 		long fileLength = backingStore.length();
 		bucketSize = NumericKeyHashBucket.getBucketSize();
 		setNumBuckets((int) fileLength/bucketSize + 1);
 		bucketCache = new HashMap<Integer, BucketType>();
 	}
 
-	/**
-	 * @param backingStore
-	 * @throws IOException accessing backing store
-	 */
-	public HashFile(RandomAccessFile backingStore, HashBucketFactory<EntryType, BucketType, FactoryType> bFact, EntryFactory<EntryType> eFact) throws IOException {
-		this(backingStore, bFact);
+	public int getBucketLoadCount() {
+		return bucketLoadCount;
+	}
+
+	public void resetBucketLoadCount() {
+		bucketLoadCount = 0;
+	}
+
+	public int getExpansionCount() {
+		return expansionCount;
+	}
+
+	public void resetExpansionCount() {
+		this.expansionCount = 0;
+	}
+
+	public int getFlushCount() {
+		return flushCount;
 	}
 
 	/**
@@ -58,6 +70,10 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		}
 	}
 
+	public int getNumBuckets() {
+		return numBuckets;
+	}
+
 	/**
 	 * @param bucketNum
 	 * @return
@@ -77,16 +93,15 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 			}
 			buck = createBucket(bucketNum);
 			buck.read();
+			bucketLoadCount++;
 			bucketCache.put(bucketNum, buck);
 		}
 		buck.setAge(bucketAge);
 		return buck;
 	}
 
-	protected BucketType createBucket(int bucketNum) {
-		return bucketFactory.createBucket(backingStore, bucketNum, entryFact);
-	}
-	
+	protected abstract  BucketType createBucket(int bucketNum);
+
 	protected abstract int findHomeBucket(long key);
 	
 	public static int hash(long key) {
@@ -110,6 +125,7 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 	}
 
 	private void flush(boolean removeOldest) throws IOException, DatabaseException {
+		++flushCount;
 		HashBucket<EntryType> oldestBucket = null;
 		for (HashBucket<EntryType> b: bucketCache.values()) {
 			if ((null == oldestBucket) || (b.getAge() < oldestBucket.getAge())) {
@@ -172,15 +188,13 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		return true;
 	}
 
-	// TODO remove recursion level
-	protected int expandAndRehash(BucketType oldOverflowBucket) throws IOException, DatabaseException {
+	protected void expandAndRehash(BucketType oldOverflowBucket) throws IOException, DatabaseException {
 		ArrayList<EntryType> splitEntries = new ArrayList<EntryType>();
 		ArrayList<EntryType> oldOverflowNativeEntries = new ArrayList<EntryType>();
 		ArrayList<EntryType> newOverflowEntries = new ArrayList<EntryType>();
 		int oldOverflowBucketNum = numBuckets-1;
 		final int splitBucketNum = (2*bucketModulus == numBuckets)? 0: (numBuckets - bucketModulus);
 		setNumBuckets(numBuckets+1);
-		int recursionLevel = 0;
 		for (EntryType entry: oldOverflowBucket) {
 			int homeBucket = findHomeBucket(entry);
 			if (homeBucket == oldOverflowBucketNum) {
@@ -192,6 +206,7 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 			}
 		}
 
+		expansionCount++;
 		oldOverflowBucket.clear();
 		for (EntryType e: oldOverflowNativeEntries) {
 			oldOverflowBucket.addEntry(e);
@@ -226,13 +241,12 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 
 			if (lastIndex >= 0) { /* overflow bucket overflowed */
 				List<EntryType> remainder = newOverflowEntries.subList(lastIndex, newOverflowEntries.size());
-				recursionLevel = 1 + expandAndRehash(newOverflowBucket);
+				expandAndRehash(newOverflowBucket);
 				for (EntryType e: remainder) {
 					addEntry(e);
 				}
 			}
 		}
-		return recursionLevel;
 	}
 
 	protected abstract int findHomeBucket(EntryType entry);
@@ -243,7 +257,7 @@ BucketType extends HashBucket<EntryType>, FactoryType extends EntryFactory<Entry
 		if (!homeBucket.addEntry(entry)) {
 			BucketType overflowBucket = getBucket(numBuckets-1);
 			if (!overflowBucket.addEntry(entry)) {
-				int recursionLevel = expandAndRehash(overflowBucket);
+				expandAndRehash(overflowBucket);
 				homeBucket = overflowBucket = null;
 				addEntry(entry);
 			}

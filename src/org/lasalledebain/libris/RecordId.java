@@ -6,6 +6,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
  * Record ID
   */
 public class RecordId {
+	public static final int NULL_RECORD_ID = 0;
 
 	public static int toId(String idString) throws DatabaseException {
 		int result;
@@ -17,15 +18,14 @@ public class RecordId {
 		return result;
 	}
 
-	public static int getNullId() {
-		return 0;
-	}
-
 	public static String toString(int id) {
 		return Integer.toString(id);
 	}
 
 	public static boolean isNull(int id) {
 		return 0 == id;
+	}
+	public static boolean isNull(Record rec) {
+		return 0 == rec.id;
 	}
 }

@@ -53,16 +53,13 @@ public GroupDefs(ElementManager groupDefsManager) throws InputException {
 	@Override
 	public void fromXml(ElementManager mgr) throws InputException {
 		mgr.parseOpenTag();
-		int groupNum = 0;
 		while (mgr.hasNext()) {
-			GroupDef newGroup = new GroupDef(null, groupNum);
+			GroupDef newGroup = new GroupDef(null, numGroups);
 			ElementManager groupMgr = mgr.nextElement();
 			newGroup.fromXml(groupMgr);
 			String groupName = newGroup.getFieldId();
 			addGroup(newGroup);
-			++groupNum;
 		}
-		numGroups = groupNum;
 		mgr.parseClosingTag();
 	}
 
@@ -75,6 +72,7 @@ public GroupDefs(ElementManager groupDefsManager) throws InputException {
 		groupMap.put(id, newGroup);
 		groupIds.add(id);
 		defList.add(newGroup);
+		++numGroups;
 	}
 
 	@Override

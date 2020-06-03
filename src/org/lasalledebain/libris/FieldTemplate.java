@@ -14,7 +14,6 @@ import org.lasalledebain.libris.field.IntegerField;
 import org.lasalledebain.libris.field.PairField;
 import org.lasalledebain.libris.field.StringField;
 import org.lasalledebain.libris.index.GroupDef;
-import org.lasalledebain.libris.ui.LocationField;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -131,7 +130,7 @@ public class FieldTemplate implements XMLElement {
 		this.myGroup = grpDef;
 	}
 
-	public Field newField() throws InputException {
+	public Field newField() {
 		Field temp = factory.newField(this);
 		return temp;
 	}

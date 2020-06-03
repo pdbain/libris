@@ -6,26 +6,26 @@ import org.lasalledebain.libris.ArrayRecordIterator;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 
-class DescendentRecordIterator implements Iterable<Record> {
-	RecordList masterList;
+class DescendentRecordIterator<RecordType extends Record> implements Iterable<RecordType> {
+	RecordList<RecordType> masterList;
 	int root;
-	private AffiliateList parentList;
-	public DescendentRecordIterator(RecordList masterList, int root, AffiliateList parentList) {
+	private AffiliateList<RecordType> parentList;
+	public DescendentRecordIterator(RecordList<RecordType> masterList, int root, AffiliateList<RecordType> parentList) {
 		this.masterList = masterList;
 		this.parentList = parentList;
 		this.root = root;
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
+	public Iterator<RecordType> iterator() {
 		return new RecordIterator(root);
 	}
 
-	class RecordIterator implements Iterator<Record> {
-		private Iterator<Record> myIterator;
+	class RecordIterator implements Iterator<RecordType> {
+		private Iterator<RecordType> myIterator;
 
 		public RecordIterator(int currentRoot) {
-			myIterator = new ArrayRecordIterator(masterList, parentList.getChildren(currentRoot)).iterator();
+			myIterator = new ArrayRecordIterator<RecordType>(masterList, parentList.getChildren(currentRoot)).iterator();
 			subIterator = null;
 		}
 
@@ -47,8 +47,8 @@ class DescendentRecordIterator implements Iterable<Record> {
 		}
 
 		@Override
-		public Record next() {
-			Record result;
+		public RecordType next() {
+			RecordType result;
 			if (null == subIterator) {
 				result = myIterator.next();
 				subIterator = new RecordIterator(result.getRecordId());

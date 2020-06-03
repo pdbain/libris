@@ -16,6 +16,7 @@ import org.lasalledebain.libris.LibrisDatabase;
 public class RecordIdListTest extends TestCase {
 	File testDatabaseFileCopy;
 	LibrisDatabase db;
+	private File workingDirectory;
 
 	public void testNameList() {
 		SortedKeyValueFileManager<KeyIntegerTuple> nameList = db.getNamedRecordIndex();
@@ -28,7 +29,8 @@ public class RecordIdListTest extends TestCase {
 	
 	public void setUp() {
 		try {
-			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(DATABASE_WITH_GROUPS_XML);
+			workingDirectory = Utilities.makeTempTestDirectory();
+			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(DATABASE_WITH_GROUPS_XML, workingDirectory);
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			System.out.println("database rebuilt");
 		} catch (Exception e) {

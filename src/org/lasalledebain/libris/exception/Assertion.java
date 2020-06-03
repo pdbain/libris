@@ -13,6 +13,13 @@ public class Assertion {
 		return test;
 	}
 
+	public static boolean assertTrueError(String message, boolean test) {
+		if (!test) {
+			throw new DatabaseError("Error: "+message);
+		}
+		return test;
+	}
+
 	public static boolean assertEquals(LibrisUi ui, String message, Object expected, Object actual) {
 		boolean result = actual.equals(expected);
 		if (!result) {
@@ -38,6 +45,13 @@ public class Assertion {
 		boolean result = Objects.nonNull(actual);
 		if (!result) {
 			throw new InputException("Error: "+message+" is null");
+		}
+	}
+
+	public static void assertNotNullError(String message, Object actual) throws InputException {
+		boolean result = Objects.nonNull(actual);
+		if (!result) {
+			throw new DatabaseError("Error: "+message+" is null");
 		}
 	}
 

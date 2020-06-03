@@ -10,24 +10,18 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLConstants {
 	private Date modificationDate;
-	private final LibrisDatabase db;
 	private final String databaseName;
 	private boolean locked;
 	private final String schemaName;
 	private final String schemaLocation;
 
-	public LibrisDatabase getDatabase() {
-		return db;
-	}
-	
 	@Override
 	public void setAttribute(String key, String value) {
 		super.setAttribute(key, value);
 	}
 	
-	public DatabaseAttributes(LibrisDatabase db, Map<String, String> attrs) throws DatabaseException {
+	public DatabaseAttributes(Map<String, String> attrs) throws DatabaseException {
 		super(attrs);
-		this.db = db;
 		String schemaversion = attrs.get(XML_SCHEMA_VERSION_ATTR);
 		schemaName = attrs.get(XML_DATABASE_SCHEMA_NAME_ATTR);
 		schemaLocation = attrs.get(XML_DATABASE_SCHEMA_LOCATION_ATTR);
@@ -41,6 +35,9 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 		locked = Boolean.parseBoolean(lockedString);
 	}
 	public String getDatabaseName() {
+		return databaseName;
+	}
+	public String setDatabaseName(String databaseName) {
 		return databaseName;
 	}
 	public void setModificationDate() {
@@ -64,13 +61,6 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 
 	public String getSchemaName() {
 		return schemaName;
-	}
-
-	/**
-	 * @return the db
-	 */
-	public LibrisDatabase getDb() {
-		return db;
 	}
 
 	/**

@@ -1,15 +1,17 @@
 package org.lasalledebain.libris.indexes;
 
+import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;
+import static org.lasalledebain.Utilities.trace;
+
 import java.io.File;
 import java.util.Random;
 
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.FileAccessManager;
-import org.lasalledebain.libris.LibrisFileManager;
+import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 import junit.framework.TestCase;
-
 
 public class TestFileRecordMap extends TestCase {
 	File workingDirectory;
@@ -17,8 +19,7 @@ public class TestFileRecordMap extends TestCase {
 	FileRecordMap index;
 	private static final int DEFAULT_NUM_ENTRIES = Integer.getInteger("libris.test.index.numentries", 25000);
 	private static final long RANDOM_SEED=20111001;
-	LibrisFileManager fileMgr;
-	boolean ignoreUnimplemented = Boolean.getBoolean("org.lasalledebain.libris.test.IgnoreUnimplementedTests");
+	FileManager fileMgr;
 	@Override
 	protected void setUp() throws Exception {
 		
@@ -26,7 +27,7 @@ public class TestFileRecordMap extends TestCase {
 		Utilities.deleteRecursively(workingDirectory);
 		workingDirectory.mkdirs();
 		indexFile = new File(workingDirectory, "testIndexFile");
-		fileMgr  = new LibrisFileManager(workingDirectory, indexFile);
+		fileMgr  = new FileManager(workingDirectory);
 		FileAccessManager indexFileMgr = fileMgr.makeAccessManager(getName(), indexFile);
 		index = new FileRecordMap(indexFileMgr, false);
 	}
@@ -81,7 +82,7 @@ public class TestFileRecordMap extends TestCase {
 			index = new FileRecordMap(indexFileMgr, true);
 			index.putRecordPosition(69,31415926535L);
 		} catch (DatabaseException exc) {
-			System.out.println("caught expected exception: "+exc.getMessage());
+			trace("caught expected exception: "+exc.getMessage());
 			try {
 				index.close();
 			} catch (DatabaseException e) {
@@ -112,7 +113,7 @@ public class TestFileRecordMap extends TestCase {
 				try {
 					index.putRecordPosition(id, posn);
 					if ((iteration % 1000) == 0) {
-						System.out.println("id="+id+" position="+posn);
+						trace("id="+id+" position="+posn);
 					}
 					if (iteration > 1000) {
 						assertEquals(6, index.getRecordPosition(1789429131));
@@ -183,10 +184,9 @@ public class TestFileRecordMap extends TestCase {
 			posn = index.getRecordPosition(id);
 			assertEquals("incorrect position returned for record "+id, expectedPosn, posn);
 			if ((i % (numEntries/64)) == 0) {
-				System.out.print("<");
+				Utilities.trace("<");
 			}
 		}
-		System.out.print('\n');
 	}
 
 	/**
@@ -206,10 +206,10 @@ public class TestFileRecordMap extends TestCase {
 				fail("unexpected exception: "+exc);
 			}
 			if ((i % (numEntries/64)) == 0) {
-				System.out.print(">");
+				Utilities.trace(">");
 			}
 		}
-		System.out.println("\nindex populated");
+		trace("\nindex populated");
 		index.flush();
 	}
 

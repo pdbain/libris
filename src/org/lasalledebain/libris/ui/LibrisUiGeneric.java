@@ -10,45 +10,35 @@ import java.util.prefs.Preferences;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisDatabaseParameter;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XmlSchema;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 
 public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	
 	private static final String NO_DATABASE_OPENED = "No database opened";
-	protected boolean databaseOpen;
 	protected static Preferences librisPrefs;
 	protected static Object prefsSync = new Object();
 	private UiField selectedField;
 	protected String uiTitle;
 	protected LibrisDatabase currentDatabase;
-	protected File databaseFile;
-	protected File auxDirectory;
 	private XmlSchema mySchema;
-	LibrisDatabaseParameter params;
+	File databaseFile;
+	private boolean readOnly;
 
-	public LibrisUiGeneric(File dbFile, boolean readOnly) throws LibrisException {
+	public LibrisUiGeneric(File dbFile, boolean readOnly) {
 		this();
-		params = new LibrisDatabaseParameter(this, dbFile);
-		params.readOnly = readOnly;
 		setDatabaseFile(dbFile);
+		this.readOnly = readOnly;
 	}
 	public LibrisUiGeneric() {
-		databaseOpen = false;
 		fieldSelected(false);
 		setSelectedField(null);
 	}
 
-	/**
-	 * @return the params
-	 */
-	public LibrisDatabaseParameter getParameters() {
-		return params;
-	}
 	@Override
 	public LibrisDatabase getDatabase() {
 		return currentDatabase;
@@ -82,62 +72,58 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	 * @param openReadOnly the openReadOnly to set
 	 */
 	public void setOpenReadOnly(boolean openReadOnly) {
-		params.readOnly = openReadOnly;
+		readOnly = openReadOnly;
 	}
-	/**
-	 * @return the databaseFile
-	 */
-	public File getDatabaseFile() {
-		return databaseFile;
-	}
-	/**
-	 * @param databaseOpen the databaseOpen to set
-	 */
-	public void setDatabaseOpen(boolean databaseOpen) {
-		this.databaseOpen = databaseOpen;
-	}
+
 	public LibrisDatabase openDatabase() throws DatabaseException {
+		if (!isDatabaseSelected()) {
+			throw new DatabaseException("Database file not set");
+		}
 		if (isDatabaseOpen()) {
 			alert("Cannot open "+databaseFile.getAbsolutePath()+" because "+currentDatabase.getDatabaseFile().getAbsolutePath()+" is open");
 		}
 		try {
 			// TODO add option to open read-write
-			currentDatabase = new LibrisDatabase(params);
+			currentDatabase = new LibrisDatabase(databaseFile,readOnly, this, mySchema);
 			if (!currentDatabase.isIndexed()) {
 				alert("database "+databaseFile.getAbsolutePath()+" is not indexed.  Please re-index.");
 				return null;
 			}
-			currentDatabase.openDatabase(mySchema);
-			setDatabaseOpen(true);
+			currentDatabase.openDatabase();
 		} catch (Exception e) {
-			alert("Error opening database", e);
-			return currentDatabase;
+			throw new DatabaseException("Error opening database", e);
 		}
-		getLibrisPrefs().put(LibrisDatabase.DATABASE_FILE, databaseFile.getAbsolutePath());
+		getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
 		return currentDatabase;
 	}
 	@Override
-	public boolean closeDatabase(boolean force) {
+	public boolean closeDatabase(boolean force) throws DatabaseException {
 		boolean result = false;
-		if (Objects.nonNull(currentDatabase)) {
+		if (Objects.nonNull(currentDatabase) && currentDatabase.isDatabaseOpen()) {
 			result = checkAndCloseDatabase(force);
 		}
 		if (result) {
 			currentDatabase = null;
 			setTitle(NO_DATABASE_OPENED);
-			setDatabaseOpen(false);
 		}
 		return result;
 	}
-	protected abstract boolean checkAndCloseDatabase(boolean force);
-	
+	protected abstract boolean checkAndCloseDatabase(boolean force) throws DatabaseException;
+
+	@Override
+	public boolean quit(boolean force) throws DatabaseException {
+		return closeDatabase(force);
+	}
+
 	public boolean isDatabaseSelected() {
 		return (null != databaseFile);
 	}
+	
 	@Override
 	public boolean isDatabaseOpen() {
-		return databaseOpen;
+		return Objects.nonNull(currentDatabase) && currentDatabase.isDatabaseOpen();
 	}
+	
 	protected boolean isDatabaseModified() {
 		return (null != currentDatabase) && currentDatabase.isModified();
 	}
@@ -157,12 +143,12 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 	@Override
 	public void arrangeValues() {
-		throw new InternalError("LibrisUiGeneric.arrangeValues unimplemented");
+		throw new DatabaseError("LibrisUiGeneric.arrangeValues unimplemented");
 	}
 
 	@Override
-	public void addRecord(Record newRecord) throws DatabaseException {
-		throw new InternalError("LibrisUiGeneric.addRecord unimplemented");
+	public void addRecord(Record newRecord) throws DatabaseException{
+		throw new DatabaseError("LibrisUiGeneric.addRecord unimplemented");
 	}
 
 	@Override
@@ -181,7 +167,11 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	}
 
 	public void rebuildDatabase() throws LibrisException {
-		Libris.buildIndexes(databaseFile, new HeadlessUi());
+		Libris.buildIndexes(databaseFile, new HeadlessUi(databaseFile, false));
+	}
+
+	public void rebuildDatabase(LibrisIndexConfiguration config) throws LibrisException {
+		Libris.buildIndexes(config);
 	}
 
 	@Override
@@ -221,7 +211,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 
 	@Override
 	public void removeFieldValue() {
-		throw new InternalError("removeField not implemented");
+		throw new DatabaseError("removeField not implemented");
 	}
 
 	@Override
@@ -280,6 +270,10 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 				handler.setLevel(logLevel);
 			}
 		}
+	}
+	@Override
+	public void saveDatabase() {
+		currentDatabase.save();
 	}
 
 }

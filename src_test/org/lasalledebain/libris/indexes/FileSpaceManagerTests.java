@@ -203,20 +203,12 @@ public class FileSpaceManagerTests extends TestCase {
 
 	@Before
 	public void setUp() throws Exception {
-		workDir = Utilities.getTempTestDirectory();
-		if (null == workDir) {
-			fail("could not create working directory ");
-		}
-		testFile = new File(workDir, "tempRecordsFile");
-		if (!testFile.exists()) {
-			testFile.createNewFile();
-		}
+		workDir = Utilities.makeTempTestDirectory();
+		testFile = Utilities.makeTestFileObject(workDir, "tempRecordsFile");
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		if (null != testFile) {
-			testFile.delete();
-		}
+		Utilities.deleteWorkingDirectory();
 	}
 }

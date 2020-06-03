@@ -4,114 +4,57 @@ import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 
+@SuppressWarnings("serial")
 public class RecordWindow extends JPanel {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8603864809213149500L;
-	LibrisWindowedUi ui;
-	Layout recordLayout;
-	private String title;
-	private int recordId;
-	private JPanel recordPanel;
+
+	protected LibrisWindowedUi ui;
+	protected Layout recordLayout;
+	protected String title;
+	protected int recordId;
+	protected JPanel recordPanel;
+	protected ArrayList<UiField> guiFields = new ArrayList<UiField>();
 	private final Record record;
-	ArrayList<UiField> guiFields = new ArrayList<UiField>();
-	
-	public RecordWindow(LibrisWindowedUi ui, Layout layout, Record rec, boolean editable, 
-			ActionListener modificationListener) throws LibrisException {
-		this(ui, layout, rec, new Point(0, 0), editable, modificationListener);
-	}
+	protected ModificationTracker modTracker;
+	protected JPanel navPanel;
 
 	public RecordWindow(LibrisWindowedUi ui, Layout layout, Record rec, Point position, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
+		this.record = rec;
 		recordId = rec.getRecordId();
 		title = layout.getTitle();
-		this.record = rec;
 		this.recordLayout = layout;
 		this.setLocation(position);
 		this.ui = ui;
 		modTracker = new ModificationTracker(ui, modificationListener, this, "This record has been modified. Do you want to enter it?");
 		modTracker.setModifiable(editable);
-		recordPanel = new JPanel();
-		layOutFields(layout, rec, recordPanel, modTracker);
-		add(recordPanel);
-		recordPanel.setVisible(true);
-		ui.fieldSelected(false);
-		ui.setSelectedField(null);
+		layOutWindow(ui, layout, rec);
 		modTracker.setModified(false);
 	}
 
-	public void refresh() throws LibrisException {
+	protected void layOutWindow(LibrisWindowedUi ui, Layout layout, Record rec) throws LibrisException {
+		recordPanel = new JPanel();
+		layOutFields(layout, rec, recordPanel, modTracker);
+		recordPanel.setVisible(true);
 		ui.fieldSelected(false);
 		ui.setSelectedField(null);
-		recordPanel.setVisible(false);
-		remove(recordPanel);
-		recordPanel = new JPanel();
-		layOutFields(recordLayout, record, recordPanel, modTracker);
-		 add(recordPanel);
-		recordPanel.setVisible(true);
-	}
-	
-	public RecordWindow(LibrisWindowedUi ui, Layout myGuiLayout, Record rec, Point point, 
-			ActionListener modificationListener) throws LibrisException {
-		this(ui, myGuiLayout,  rec,  point, false, modificationListener);
 	}
 
-	ModificationTracker modTracker;
-	
-	public boolean isEditable() {
-		return modTracker.isModifiable();
-	}
-
-	/**
-	 * @param layout
-	 * @param rec
-	 * @param panelLayout
-	 * @param c
-	 * @param recordPanel
-	 * @param modTrk 
-	 * @throws LibrisException 
-	 */
-	private void layOutFields(Layout layout, Record rec, JPanel recordPanel, ModificationTracker modTrk)
-			throws LibrisException {
-		setSize(layout.getWidth(), layout.getHeight());
-		guiFields = layout.layOutFields(rec, ui, recordPanel, modTrk);
-	}
-	
 	public Record enter() throws LibrisException {
 		for (UiField f: guiFields) {
 			f.enterFieldValues();
 		}
-		return record;
-		
+		return record;	
 	}
 
-	JPanel makeFieldPanel(String title, JComponent fieldContent) {
-		JPanel p = new JPanel();
-		JLabel l = new JLabel(title);
-		l.setLabelFor(fieldContent);
-		p.add(l);
-		l.setLocation(0, 0);
-		p.add(fieldContent);
-		return p;
-	}
-
-	public int checkClose() {
-		return modTracker.checkClose();
-	}
-	
-	public void close() {
-		ui.fieldSelected(false);
-		setVisible(false);
+	public boolean isEditable() {
+		return modTracker.isModifiable();
 	}
 
 	public boolean setEditable(boolean isEditable) {
@@ -124,6 +67,26 @@ public class RecordWindow extends JPanel {
 			modTracker.unselect();
 		}
 		return true;
+	}
+	
+	public void refresh() throws LibrisException {
+		recordPanel.setVisible(false);
+		remove(navPanel);
+		layOutWindow(ui, recordLayout, record);
+	}
+	
+	public int checkClose() {
+		return modTracker.checkClose();
+	}
+	
+	public void close() {
+		ui.fieldSelected(false);
+		setVisible(false);
+	}
+
+	protected void layOutFields(Layout layout, Record rec, JPanel recordPanel, ModificationTracker modTrk) throws LibrisException {
+		setSize(layout.getWidth(), layout.getHeight());
+		guiFields = layout.layOutFields(rec, ui, recordPanel, modTrk);
 	}
 
 	public String getTitle() {
@@ -161,7 +124,7 @@ public class RecordWindow extends JPanel {
 	public boolean isModified() {
 		return modTracker.isModified() ;
 	}
-	
+
 	public void setModified(boolean mod) {
 		modTracker.setModified(mod);
 	}
@@ -177,4 +140,5 @@ public class RecordWindow extends JPanel {
 		}
 		return result;
 	}
+
 }

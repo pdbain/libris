@@ -21,12 +21,14 @@ public interface LibrisXMLConstants {
 	public static final String XML_GROUPDEF_STRUCTURE_FLAT = "flat";
 	public static final String XML_RECORD_ID_ATTR = "id";
 	public static final String XML_RECORD_NAME_ATTR = "name";
+	public static final String XML_RECORD_ARTIFACT_ATTR = "artifact";
 	public static final String XML_MEMBER_GROUP_ATTR = "group";
 	public static final String XML_MEMBER_PARENT_ATTR = "parent";
 	public static final String XML_INDEXDEF_ID_ATTR = "id";
 	public static final String XML_INDEXFIELD_ID_ATTR = "id";
 	public static final String XML_INDEXFIELD_STOPLIST_ATTR = "false";
 	public static final String XML_LIBRIS_TAG = "libris";
+	public static final String XML_ARTIFACTS_TAG = "artifacts";
 	public static final String XML_METADATA_TAG = "metadata";
 	public static final String XML_SCHEMA_TAG = "schema";
 	public static final String XML_RECORDS_TAG = "records";
@@ -41,6 +43,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_DATABASE_NAME_ATTR = "databasename";
 	public static final String XML_DATABASE_SCHEMA_NAME_ATTR = "schemaname";
 	public static final String XML_DATABASE_SCHEMA_LOCATION_ATTR = "schemalocation";
+	public static final String XML_DATABASE_REPOSITORY_LOCATION_ATTR = "repositorylocation";
 	
 	public static final String XML_FIELDDEF_ID_ATTR = "id";
 	public static final String XML_FIELDDEF_TITLE_ATTR = "title";
@@ -56,7 +59,6 @@ public interface LibrisXMLConstants {
 	public static final String XML_GROUPDEFS_TAG = "groupdefs";
 	public static final String XML_GROUPDEF_TAG = "groupdef";
 	public static final String XML_INDEXES_TAG = "indexes";
-	public static final String XML_RECORDS_LASTID_ATTR = "lastid";
 	public static final String XML_INDEXDEFS_TAG = "indexdefs";
 	public static final String XML_INDEXDEF_TAG = "indexdef";
 	public static final String XML_INDEXFIELD_TAG = "indexfield";

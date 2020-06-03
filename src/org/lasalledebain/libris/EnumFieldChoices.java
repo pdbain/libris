@@ -122,7 +122,7 @@ public class EnumFieldChoices implements XMLElement {
 				return choicevalues.equals(otherChoices.choicevalues);
 			}
 		} catch (ClassCastException e) {
-			LibrisDatabase.librisLogger.log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
+			LibrisDatabase.log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
 			return false;
 		}
 	}

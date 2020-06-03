@@ -2,7 +2,9 @@ package org.lasalledebain.libris.ui;
 import java.util.HashMap;
 
 import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 

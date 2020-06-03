@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -20,6 +21,7 @@ public class DatabaseStressTests extends TestCase {
 	static final int NUM_RECORDS = Integer.getInteger("org.lasalledebain.test.numrecords", 4000);
 	PrintStream out = System.out;
 	private Logger testLogger;
+	private File workingDirectory;
 
 	public void testHugeDatabase() {
 		try {
@@ -30,16 +32,16 @@ public class DatabaseStressTests extends TestCase {
 			testLogger.log(Level.INFO, "add records");
 			long startTime = System.currentTimeMillis();
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
-				Record rec = db.newRecord();
+				DatabaseRecord rec = db.newRecord();
 				for (int f = 0; f < 4; ++f) {
 					rec.addFieldValue(0, "rec_"+i+"_field_"+f);
 				}
-				db.put(rec);
+				db.putRecord(rec);
 				assertEquals("Wrong record ID", i, rec.getRecordId());
 				expectedRecords.add(rec);
 				if (0 == (i % 64)) {
 					db.save();
-					out.print('.');
+					Utilities.trace(".");
 				}
 			}
 			long endTime = System.currentTimeMillis();
@@ -49,7 +51,7 @@ public class DatabaseStressTests extends TestCase {
 				Record expected = expectedRecords.get(i);
 				assertEquals("recovered record does not match", expected, actual);
 				if (0 == (i % 64)) {
-					out.print('.');
+					Utilities.trace(".");
 				}
 			}
 		} catch (Exception e) {
@@ -63,7 +65,7 @@ public class DatabaseStressTests extends TestCase {
 		Utilities.deleteTestDatabaseFiles(EMPTY_DATABASE_FILE);
 	}
 	private LibrisDatabase buildTestDatabase() throws IOException {
-		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(EMPTY_DATABASE_FILE);			
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(EMPTY_DATABASE_FILE, workingDirectory);			
 		LibrisDatabase db = null;
 		try {
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
@@ -77,6 +79,7 @@ public class DatabaseStressTests extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 		testLogger = Logger.getLogger(Utilities.LIBRIS_TEST_LOGGER);
 		testLogger.setLevel(Utilities.defaultLoggingLevel);
 	}

@@ -1,7 +1,5 @@
 package org.lasalledebain.libris.ui;
 
-import static org.lasalledebain.libris.LibrisDatabase.librisLogger;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -15,6 +13,7 @@ import java.util.logging.Level;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
@@ -23,12 +22,16 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 
+import org.lasalledebain.libris.ArtifactParameters;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
@@ -37,6 +40,8 @@ import org.lasalledebain.libris.exception.LibrisException;
 import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
+
+import static java.util.Objects.nonNull;
 
 public class LibrisGui extends LibrisWindowedUi {
 	private static final String CONTENT_PANE_HEIGHT = "CONTENT_PANE_HEIGHT";
@@ -51,23 +56,32 @@ public class LibrisGui extends LibrisWindowedUi {
 	private JPanel layoutEditPane;
 	private Clipboard systemClipboard;
 	private Component mainframeContents;
+
 	public LibrisGui(File databaseFile, boolean readOnly) throws LibrisException {
 		super(databaseFile, readOnly);
-		System.setProperty("apple.laf.useScreenMenuBar","true");
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("apple.eawt.quitStrategy system property", "CLOSE_ALL_WINDOWS");
 		initializeGui();
 	}
 
+	// TODO 1 add menu option to edit artifact record
+	// TODO 1 menu option to auto-generate keywords
+	// TODO bulk import artifacts
 	protected void initializeGui() throws DatabaseException {
 		com.apple.eawt.Application.getApplication().setQuitHandler(new QuitHandler() {
 			@Override
 			public void handleQuitRequestWith(QuitEvent quitEvt, QuitResponse quitResp) {
-				if ((null == currentDatabase) || currentDatabase.closeDatabase(false)) {
-					quitResp.performQuit();
-				} else {
-					quitResp.cancelQuit();
+				try {
+					if ((null == currentDatabase) || currentDatabase.closeDatabase(false)) {
+						quitResp.performQuit();
+					} else {
+						quitResp.cancelQuit();
+					}
+				} catch (DatabaseException e) {
+					throw new DatabaseError(e);
 				}
-			}});
+			}
+		});
 		databaseSelected = isDatabaseSelected();
 		systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		System.setProperty("Title", "Libris");
@@ -94,10 +108,10 @@ public class LibrisGui extends LibrisWindowedUi {
 		menu.editMenuEnableModify(readOnly);
 		destroyWindow(true);
 		createPanes(false);
-		updateUITitle(false);
+		updateUITitle();
 
 		displayPanel.addLayouts(currentDatabase.getLayouts());
-		RecordList list = currentDatabase.getRecords();
+		RecordList<DatabaseRecord> list = currentDatabase.getRecords();
 		resultsPanel.initialize(list);
 		recordsAccessible(!readOnly);
 		databaseModifiable(!readOnly);
@@ -109,9 +123,9 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	/**
-	 * @throws DatabaseException 
-	 * 	Icon made by http://www.simpleicon.com from www.flaticon.com
-	 *  licensed under Creative Commons BY 3.0
+	 * @throws DatabaseException Icon made by http://www.simpleicon.com from
+	 *                           www.flaticon.com licensed under Creative Commons BY
+	 *                           3.0
 	 */
 	private void createPanes(boolean empty) throws DatabaseException {
 		if (null != mainframeContents) {
@@ -156,24 +170,35 @@ public class LibrisGui extends LibrisWindowedUi {
 		mainframeContents = dummyWindow;
 		mainFrame.add(mainframeContents);
 	}
-	
+
 	void goToPrevOrNextRecord(boolean ifNext) {
 		int currentIndex = resultsPanel.getSelectedRecordIndex();
 		int increment = 0;
-		if (ifNext && (currentIndex < (resultsPanel.getNumRecords()-1))) {
+		int maxIndex = resultsPanel.getNumRecords() - 1;
+		if (ifNext && (currentIndex < maxIndex)) {
 			increment = 1;
 		} else if (!ifNext && (currentIndex > 0)) {
 			increment = -1;
 		}
 		if (0 != increment) {
 			displayPanel.doClose(null, false);
-			resultsPanel.setSelectedRecordIndex(currentIndex+increment);
+			int index = currentIndex + increment;
+			displayPanel.enablePrevButton(index > 0);
+			displayPanel.enableNextButton(index < maxIndex);
+			resultsPanel.setSelectedRecordIndex(index);
 			resultsPanel.displaySelectedRecord();
 		}
 	}
-	
+
+	void enablePrevNext() {
+		int index = resultsPanel.getSelectedRecordIndex();
+		int maxIndex = resultsPanel.getNumRecords() - 1;
+		displayPanel.enablePrevButton(index > 0);
+		displayPanel.enableNextButton(index < maxIndex);
+	}
+
 	@Override
-	 protected void destroyWindow(boolean retain) {
+	protected void destroyWindow(boolean retain) {
 		if (null != mainWindow) {
 			if (!isDatabaseReadOnly()) {
 				Preferences prefs = getLibrisPrefs();
@@ -186,10 +211,10 @@ public class LibrisGui extends LibrisWindowedUi {
 				try {
 					prefs.flush();
 				} catch (BackingStoreException e) {
-					librisLogger.log(Level.WARNING, "exception in destroyWindow", e);
+					LibrisDatabase.log(Level.WARNING, "exception in destroyWindow", e);
 				}
 			}
-			for (Component c: mainWindow.getComponents()) {
+			for (Component c : mainWindow.getComponents()) {
 				mainWindow.remove(c);
 			}
 			if (retain) {
@@ -204,12 +229,11 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	/**
-	 * edit the record layouts.
-	 * Hides the displayPanel and replaces it with an editor panel comprising:
-	 * - a field selector
-	 * - control type,size, and position controls
-	 * - preview of the layout.
-	 * @param b 
+	 * edit the record layouts. Hides the displayPanel and replaces it with an
+	 * editor panel comprising: - a field selector - control type,size, and position
+	 * controls - preview of the layout.
+	 * 
+	 * @param b
 	 */
 	public void editLayouts(boolean enabled) {
 		// TODO editLayouts
@@ -218,7 +242,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		} else {
 			contentPane.setBottomComponent(displayPanel);
 		}
-		
+
 	}
 
 	private Component getLayoutEditPane() {
@@ -231,18 +255,18 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	public Record newRecord() {
-		Record rec = null;
-		RecordWindow rw = newRecordWindow();
+	public DatabaseRecord newRecord() {
+		DatabaseRecord rec = null;
+		DatabaseRecordWindow rw = newRecordWindow();
 		if (null != rw) {
 			rec = rw.getRecord();
 		}
 		return rec;
 	}
-	
-	public RecordWindow newRecordWindow() {
-		Record record = null;
-		RecordWindow rw = null;
+
+	public DatabaseRecordWindow newRecordWindow() {
+		DatabaseRecord record = null;
+		DatabaseRecordWindow rw = null;
 		try {
 			record = currentDatabase.newRecord();
 			record.setEditable(!currentDatabase.isReadOnly());
@@ -256,26 +280,29 @@ public class LibrisGui extends LibrisWindowedUi {
 		}
 		return rw;
 	}
-	
+
 	@Override
 	public void addRecord(Record newRecord) throws DatabaseException {
 		if (null != currentDatabase) {
 			resultsPanel.addRecord(newRecord);
 		}
 	}
-	
+
 	@Override
 	public void put(Record newRecord) throws DatabaseException {
 		resultsPanel.addRecord(newRecord);
+		updateUITitle();
 	}
 
 	public void displayRecord(int recId) throws LibrisException {
 		displayPanel.displayRecord(recId);
+		enablePrevNext();
 	}
 
 	FilterDialogue createSearchDialogue() {
 		return new FilterDialogue(currentDatabase, getMainFrame(), resultsPanel);
 	}
+
 	public void fatalError(Exception e) {
 		String msg = "Fatal error: ";
 		fatalError(e, msg);
@@ -286,6 +313,16 @@ public class LibrisGui extends LibrisWindowedUi {
 		if (null != displayPanel) {
 			displayPanel.close(allWindows);
 		}
+	}
+
+	@Override
+	public boolean closeDatabase(boolean force) throws DatabaseException {
+		boolean result = super.closeDatabase(force);
+		if (result) {
+			closeWindow(true);
+		}
+		mainWindow.removeAll();
+		return result;
 	}
 
 	public boolean isEditable() {
@@ -299,18 +336,19 @@ public class LibrisGui extends LibrisWindowedUi {
 		}
 		return editable;
 	}
-	
+
 	/**
-	 * Sets the editability of the current record window.  The request may not be obeyed if the database or the record are read-only.
+	 * Sets the editability of the current record window. The request may not be
+	 * obeyed if the database or the record are read-only.
+	 * 
 	 * @param editable new state of record window
 	 * @return new state of record window
 	 * @throws LibrisException
 	 */
 	public boolean setRecordWindowEditable(boolean editable) throws LibrisException {
-		RecordWindow rw = getCurrentRecordWindow();
+		DatabaseRecordWindow rw = getCurrentRecordWindow();
 		if (editable) {
-			if (currentDatabase.isReadOnly()
-					|| currentDatabase.isRecordReadOnly(rw.getRecordId())) 
+			if (currentDatabase.isReadOnly() || currentDatabase.isRecordReadOnly(rw.getRecordId()))
 				return false;
 		}
 		boolean wasEditable = rw.isEditable();
@@ -378,7 +416,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	private void databaseModifiable(boolean modifiable) {
 		menu.fileMenuEnableModify(modifiable);
 		menu.editMenuEnableModify(modifiable);
-		menu.setOrganizeMenuEnableModify(modifiable);		
+		menu.setOrganizeMenuEnableModify(modifiable);
 	}
 
 	public void exportData(LibrisDatabase db) throws LibrisException {
@@ -403,7 +441,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	public void newFieldValue() {
 		RecordWindow currentRecordWindow = getCurrentRecordWindow();
 		final UiField selectedField = getSelectedField();
-		if ((null != selectedField) &&selectedField.isMultiControl()) {
+		if ((null != selectedField) && selectedField.isMultiControl()) {
 			GuiControl ctrl;
 			try {
 				ctrl = ((MultipleValueUiField) selectedField).addControl(true);
@@ -457,9 +495,9 @@ public class LibrisGui extends LibrisWindowedUi {
 			return false;
 		}
 		int rid = resultsPanel.getSelectedRecordId();
-		Record newRecord = null;
+		DatabaseRecord newRecord = null;
 		try {
-			Record originalRecord = currentDatabase.getRecord(rid);
+			DatabaseRecord originalRecord = currentDatabase.getRecord(rid);
 			newRecord = originalRecord.duplicate();
 			newRecord.setEditable(true);
 		} catch (LibrisException e1) {
@@ -480,47 +518,93 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	public void setRecordEnterRecordEnabled(boolean enabled) {
 		menu.setRecordEnterRecordEnabled(enabled);
-		
+
 	}
 
 	@Override
-	public void setRecordName(NamedRecordList namedRecs) throws InputException {
+	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException {
 		RecordWindow currentRecordWindow = getCurrentRecordWindow();
-		if (null != currentRecordWindow){
+		if (null != currentRecordWindow) {
 			Record rec = currentRecordWindow.getRecord();
 			String newName = JOptionPane.showInputDialog("New record name", rec.getName());
 			if ((null != newName) && !newName.isEmpty()) {
 				if (!Record.validateRecordName(newName)) {
-					alert(newName+": invalid record name");
+					alert(newName + ": invalid record name");
 				} else {
 					int recId = namedRecs.getId(newName);
 					if (!RecordId.isNull(recId)) {
-						alert(newName+" already used by record "+recId);
+						alert(newName + " already used by record " + recId);
 					} else {
 						String oldName = rec.getName();
 						if (!newName.equals(oldName)) {
-						if ((null != oldName) && !oldName.isEmpty()) {
-							namedRecs.remove(oldName);
+							if ((null != oldName) && !oldName.isEmpty()) {
+								namedRecs.remove(oldName);
+							}
+							currentRecordWindow.setModified(true);
+							rec.setName(newName);
+							resultsPanel.removeRecord(rec);
 						}
-						currentRecordWindow.setModified(true);
-						rec.setName(newName);
-						resultsPanel.removeRecord(rec);
-						}
-						// TODO change name in record browser and tab
+						displayPanel.setCurrentRecordName(newName);
+						repaint();
 					}
 				}
 			}
 		}
 	}
 
-	public RecordWindow getCurrentRecordWindow() {
-		RecordWindow currentRecordWindow = displayPanel.getCurrentRecordWindow();
+	@Override
+	public void setRecordArtifact() {
+		DatabaseRecordWindow currentRecordWindow = getCurrentRecordWindow();
+		if (null != currentRecordWindow) {
+			DatabaseRecord rec = currentRecordWindow.getRecord();
+			int artifactId = rec.getArtifactId();
+			if (!RecordId.isNull(artifactId)) {
+				int choice = confirm("Record has an artifact.  Replace it?");
+				if (Dialogue.YES_OPTION != choice) {
+					return;
+				}
+			}
+
+			File artifactSourceFile;
+			try {
+				artifactSourceFile = selectArtifactFile();
+				if (null != artifactSourceFile) {
+					artifactId = currentDatabase.addArtifact(rec, artifactSourceFile);
+					ArtifactParameters artifactInfo = currentDatabase.getArtifactInfo(artifactId);
+					currentRecordWindow.setModified(true);
+					currentRecordWindow.addArtifactButton(artifactInfo);
+				}
+			} catch (BackingStoreException | LibrisException | IOException e1) {
+				throw new DatabaseError(e1);
+			}
+		}
+	}
+
+	private File selectArtifactFile() throws BackingStoreException {
+		File result = null;
+		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+		String userDir = System.getProperty("user.dir");
+		String lastArtifactDirectory = librisPrefs.get(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, userDir);
+		JFileChooser chooser = new JFileChooser(lastArtifactDirectory);
+		int option = chooser.showOpenDialog(this.mainframeContents);
+		if (JFileChooser.APPROVE_OPTION == option) {
+			result = chooser.getSelectedFile();
+			lastArtifactDirectory = result.getParent();
+			librisPrefs.put(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, lastArtifactDirectory);
+			librisPrefs.flush();
+		}
+		return result;
+	}
+
+	public DatabaseRecordWindow getCurrentRecordWindow() {
+		DatabaseRecordWindow currentRecordWindow = (null == displayPanel) ? null
+				: displayPanel.getCurrentRecordWindow();
 		return currentRecordWindow;
-	} 
-	
+	}
+
 	public Record newChildRecord(Record currentRecord, int groupNum) {
 		RecordWindow rw = newRecordWindow();
-		 Record newRec = rw.getRecord();
+		Record newRec = rw.getRecord();
 		try {
 			newRec.setParent(groupNum, currentRecord.getRecordId());
 			rw.refresh();
@@ -532,6 +616,25 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	public void sendChooseDatabase() {
 		menu.sendChooseDatabase();
+	}
+
+	public void openArtifactInfo(DatabaseRecord databaseRecord) {
+		if (nonNull(databaseRecord) && databaseRecord.hasArtifact()) {
+			int artifactId = databaseRecord.getArtifactId();
+			ArtifactParameters artifactInfo = currentDatabase.getArtifactInfo(artifactId);
+			ArtifactEditor ed = new ArtifactEditor(artifactInfo, this);
+			if (nonNull(ed.result)) {
+				try {
+					currentDatabase.updateArtifactInfo(artifactId, ed.result);
+				} catch (LibrisException e) {
+					alert("Error updating artifact information", e);
+				}
+			}
+		}
+	}
+
+	public void setOpenArtifactInfoEnabled(boolean hasArtifact) {
+		menu.setOpenArtifactInfoEnabled(hasArtifact);
 	}
 
 }

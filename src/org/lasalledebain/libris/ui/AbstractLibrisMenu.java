@@ -9,6 +9,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.exception.DatabaseError;
+import org.lasalledebain.libris.exception.DatabaseException;
 
 public abstract class AbstractLibrisMenu {
 	static final String OPEN_DATABASE = "Open database...";
@@ -65,7 +67,11 @@ public abstract class AbstractLibrisMenu {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (null != database) {
-				guiMain.closeDatabase(false);
+				try {
+					guiMain.closeDatabase(false);
+				} catch (DatabaseException e) {
+					throw new DatabaseError(e);
+				}
 			}
 		}		
 	}
@@ -73,7 +79,11 @@ public abstract class AbstractLibrisMenu {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (null != database) {
-				guiMain.quit(false);
+				try {
+					guiMain.quit(false);
+				} catch (DatabaseException e) {
+					throw new DatabaseError(e);
+				}
 				// TODO check if there are new, modified records
 			}
 		}	

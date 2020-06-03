@@ -4,14 +4,15 @@
 <!ENTITY % usagetype "(newrecord|formdisplay|summarydisplay|formentry|tabledisplay)">
 <!ENTITY % groupstructure "(flat|hierarchical)">
 
-<!ELEMENT libris (instance?, metadata?, records?)>
+<!ELEMENT libris (instance?, metadata?, records?, artifacts?)>
 <!ENTITY % databaseAttributes	"
 	schemaname NMTOKEN #REQUIRED
 	schemaversion NMTOKEN #REQUIRED
 	schemalocation NMTOKEN #IMPLIED
 	databasename NMTOKEN #IMPLIED
 	date CDATA #IMPLIED
-	locked %boolean #IMPLIED" >
+	repositorylocation NMTOKEN #IMPLIED
+	locked %boolean #IMPLIED">
 	
 <!ATTLIST libris  %databaseAttributes; >
 
@@ -22,7 +23,6 @@
 	forkdate CDATA #REQUIRED
 	joindate CDATA #IMPLIED
 >
-
 
 <!ELEMENT schema (groupdefs, fielddefs, indexdefs) >
 
@@ -116,9 +116,11 @@ Define the indexes in the database
 Records section.
 -->
 <!ELEMENT records (record*)>
-<!ATTLIST records
-	lastid NMTOKEN #REQUIRED
->
+
+<!--
+Artifacts section.
+-->
+<!ELEMENT artifacts (record*)>
 <!--
 Represents a document or a index item
 -->
@@ -128,6 +130,7 @@ Represents a document or a index item
 	revision CDATA #IMPLIED
 	replaces IDREF #IMPLIED
 	name CDATA
+	artifact ID #IMPLIED
 >
 
 <!ELEMENT member (affiliation*) >

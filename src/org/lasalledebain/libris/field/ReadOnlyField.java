@@ -8,8 +8,8 @@ import java.util.Objects;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -19,12 +19,12 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 class ReadOnlyField implements Field {
 	@Override
 	public String getElementTag() {
-		throw new InternalError("Cannot call toXml on "+getClass().getName());
+		throw new DatabaseError("Cannot call toXml on "+getClass().getName());
 	}
 
 	@Override
-	public void fromXml(ElementManager mgr) throws LibrisException {
-		throw new InternalError("Cannot call toXml on "+getClass().getName());
+	public void fromXml(ElementManager mgr) {
+		throw new DatabaseError("Cannot call toXml on "+getClass().getName());
 	}
 
 	@Override
@@ -152,17 +152,17 @@ class ReadOnlyField implements Field {
 
 	@Override
 	public FieldValue removeValue() {
-		throw new InternalError("changing read-only field");
+		throw new DatabaseError("changing read-only field");
 	}
 
 	@Override
 	public void setValues(FieldValue[] valueArray) throws FieldDataException {
-		throw new InternalError("changing read-only field");
+		throw new DatabaseError("changing read-only field");
 	}
 
 	@Override
 	public void setValues(Iterable<FieldValue> values) throws FieldDataException {
-		throw new InternalError("changing read-only field");
+		throw new DatabaseError("changing read-only field");
 	}
 
 	@Override

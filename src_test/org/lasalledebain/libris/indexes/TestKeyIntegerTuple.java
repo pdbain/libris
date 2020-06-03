@@ -19,16 +19,13 @@ import org.lasalledebain.libris.exception.InputException;
 
 public class TestKeyIntegerTuple extends TestCase {
 	FileAccessManager dataManager;
-	private File workDir;
+	private File workingDirectory;
 	private RandomAccessFile dataStream;
 	private DataInput dataIp;
 	
 	protected void setUp() {
-		workDir = Utilities.getTempTestDirectory();
-		if (null == workDir) {
-			fail("could not create working directory ");
-		}
-		dataManager = new FileAccessManager(workDir, "data");
+		workingDirectory = Utilities.makeTempTestDirectory();
+		dataManager = new FileAccessManager(workingDirectory, "data");
 		try {
 			dataStream = dataManager.getReadWriteRandomAccessFile();
 			dataIp = new DataInputStream(dataManager.getIpStream());
@@ -240,6 +237,6 @@ public class TestKeyIntegerTuple extends TestCase {
 
 	protected void tearDown() {
 		dataManager.close();
-		Utilities.deleteRecursively(workDir);
+		Utilities.deleteRecursively(workingDirectory);
 	}
 }

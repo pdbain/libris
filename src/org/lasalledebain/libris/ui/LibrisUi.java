@@ -2,28 +2,31 @@ package org.lasalledebain.libris.ui;
 
 import java.io.File;
 
+import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisDatabaseParameter;
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 
 public interface LibrisUi {
 
-	public LibrisDatabaseParameter getParameters();
 	public void setSchema(XmlSchema mySchema);
 	public LibrisDatabase openDatabase() throws DatabaseException;
-	public boolean closeDatabase(boolean force);
-	public boolean quit(boolean force);
+	public void saveDatabase();
+	public boolean closeDatabase(boolean force) throws DatabaseException;
+	public boolean quit(boolean force) throws DatabaseException;
 
 	public void rebuildDatabase() throws LibrisException;
+	public void rebuildDatabase(LibrisIndexConfiguration config) throws LibrisException;
 	public boolean isDatabaseSelected();
 	public boolean isDatabaseOpen();
 	public boolean isDatabaseReadOnly();
-	public LibrisDatabase getDatabase();
+	public GenericDatabase<DatabaseRecord> getDatabase();
 	void setDatabaseFile(File dbFile);
 	public abstract String SelectSchemaFile(String schemaName) throws DatabaseException;
 	public void setTitle(String title);
@@ -51,7 +54,8 @@ public interface LibrisUi {
 
 	void setSelectedField(UiField selectedField);
 
-	public void setRecordName(NamedRecordList namedRecs) throws InputException;
+	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException;
+	public void setRecordArtifact();
 	
 	public abstract void arrangeValues();
 

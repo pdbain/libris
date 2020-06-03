@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libris date="2011-06-03 00:00:00 UTC" schemaname="KeywordDatabase" databasename="KeywordDatabase0" schemaversion="0.0">
+<metadata>
+	<schema>
+		<groupdefs />
+		<fielddefs>
+			<fielddef id="ID_auth" title="author"/>
+			<fielddef id="ID_keywords" datatype="string" />
+			<fielddef id="ID_hardcopy" datatype="boolean" />
+			<fielddef id="ID_text" datatype="string" />
+		</fielddefs>
+		<indexdefs>
+		<indexdef id="INDEX_RECORD_KEYWORDS">
+			<indexfield id="ID_auth"/>
+			<indexfield id="ID_keywords"/>
+			<indexfield id="ID_text"/>
+		</indexdef>
+		</indexdefs>
+	</schema>
+	<layouts/>
+	</metadata>
+	<records lastid="0">
+	</records>
+</libris>

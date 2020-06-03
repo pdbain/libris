@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.util.Reporter;
 
 public class RecordPositions {
 	
@@ -47,5 +48,8 @@ public class RecordPositions {
 
 	public void flush() throws DatabaseException {
 		recordMap.flush();
+	}
+	public void generateReport(Reporter rpt) {
+		recordMap.generateReport(rpt);
 	}
 }

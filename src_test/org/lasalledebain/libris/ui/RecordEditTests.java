@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.logging.Level;
 
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -36,6 +37,7 @@ public class RecordEditTests extends TestCase {
 	private static final String ID_PAGES = "ID_pages";
 	private static final String ID_HARDCOPY = "ID_hardcopy";
 	PrintStream out = System.out;
+	private File workingDirectory;
 	static int pauseDuration = Integer.getInteger("libris.test.pause", -1);
 	
 	public void testRecordSanity() {
@@ -124,7 +126,7 @@ public class RecordEditTests extends TestCase {
 			File dbFile = db.getDatabaseFile();
 			BrowserWindow resultsWindow = gui.getResultsWindow();
 			int recId = 0;
-			Record rec;
+			DatabaseRecord rec;
 			{
 				rec = gui.newRecord();
 				rec.setEditable(true);
@@ -135,7 +137,7 @@ public class RecordEditTests extends TestCase {
 				fld = rec.getField(ID_PUB);
 				fld.addIntegerValue(1);
 				fld.addValuePair(-1, TEST_PUBLISHER);
-				db.put(rec);
+				db.putRecord(rec);
 				recId = rec.getRecordId();
 				db.save();
 			}
@@ -143,7 +145,7 @@ public class RecordEditTests extends TestCase {
 			{
 				Field fld = rec.getField(ID_PUB);
 				fld.addValuePair(-1, "foobar");
-				db.put(rec);
+				db.putRecord(rec);
 				db.save();
 				assertTrue("Could not close database", db.closeDatabase(false));
 			}
@@ -170,7 +172,7 @@ public class RecordEditTests extends TestCase {
 		try {
 			TestGUI gui = rebuildAndOpenDatabase(getName(), TEST_DB_WITH_DEFAULTS_XML_FILE);
 			LibrisDatabase db = gui.getDatabase();
-			short pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
+			int pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
 			Record rec = gui.newRecord();
 			rec.setEditable(false);
 			Field fld = rec.getField("ID_auth");
@@ -197,7 +199,7 @@ public class RecordEditTests extends TestCase {
 			gui.displaySelectedRecord();
 			pause("opened record");
 			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
-			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
+			DatabaseRecordWindow recWindow = dispPanel.getCurrentRecordWindow();
 			String ids[] = {ID_AUTH, ID_HARDCOPY, ID_PAGES, ID_PUB, ID_PAGES};
 			int counts[] = {2, 1, 1, 1, 1};
 			boolean editable = true;
@@ -544,7 +546,7 @@ public class RecordEditTests extends TestCase {
 	private TestGUI rebuildAndOpenDatabase(String testName,
 			String databaseFileName) throws FileNotFoundException, IOException,
 			DatabaseException {
-		LibrisDatabase db = Utilities.buildTestDatabase(databaseFileName);
+		LibrisDatabase db = Utilities.buildTestDatabase(workingDirectory, databaseFileName);
 		File dbFile = db.getDatabaseFile();
 		assertTrue("Could not close database", db.closeDatabase(false));
 	
@@ -570,11 +572,12 @@ public class RecordEditTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		testLogger.log(Level.INFO, "Starting "+getName());
+		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
 		testLogger.log(Level.INFO, "Ending "+getName());
-		Utilities.deleteTestDatabaseFiles();
+		Utilities.deleteWorkingDirectory();
 	}
 }

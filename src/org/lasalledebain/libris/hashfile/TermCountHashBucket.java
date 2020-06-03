@@ -165,10 +165,6 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 			return new TermCountHashBucket(backingStore, bucketNum, entryFactory);
 		}
 
-		public TermCountHashBucket createBucket(RandomAccessFile backingStore, int bucketNum) {
-			return new TermCountHashBucket(backingStore, bucketNum, entryFactory);
-		}
-
 	}
 
 	@Override

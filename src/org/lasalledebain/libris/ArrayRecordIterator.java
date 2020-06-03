@@ -5,19 +5,19 @@ import java.util.Iterator;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 
-public class ArrayRecordIterator implements Iterable<Record> {
+public class ArrayRecordIterator<RecordType extends Record> implements Iterable<RecordType> {
 
 	private final int recList[];
-	private final RecordList parentList;
+	private final RecordList<RecordType> parentList;
 
-	public ArrayRecordIterator(RecordList masterList, int[] recList) {
+	public ArrayRecordIterator(RecordList<RecordType> masterList, int[] recList) {
 		this.parentList = masterList;
 		this.recList = recList;
 	}
 
 	@Override
-	public Iterator<Record> iterator() {
-		return new Iterator<Record>() {
+	public Iterator<RecordType> iterator() {
+		return new Iterator<RecordType>() {
 			int index = 0;
 			@Override
 			public boolean hasNext() {
@@ -25,8 +25,8 @@ public class ArrayRecordIterator implements Iterable<Record> {
 			}
 
 			@Override
-			public Record next() {
-				Record result = null;
+			public RecordType next() {
+				RecordType result = null;
 				try {
 					result = parentList.getRecord(recList[index]);
 					++index;

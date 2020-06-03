@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
@@ -22,7 +23,7 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	public static String currentVersion = "1.0";
 	protected TreeMap<String, EnumFieldChoices> enumSets;
 	protected ArrayList<FieldTemplate> fieldList;
-	HashMap <String, Short> fieldNumById;
+	HashMap<String, Integer> fieldNumById;
 	ArrayList<String> fieldIds;
 	ArrayList<String> fieldTitles;
 	String fieldIdArray[];
@@ -34,7 +35,7 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	public Schema() {
 		enumSets = new TreeMap<String, EnumFieldChoices>();
 		fieldList = new ArrayList<FieldTemplate>();
-		fieldNumById = new HashMap<String, Short>();
+		fieldNumById = new HashMap<String, Integer>();
 		fieldIds = new ArrayList<String>();
 		fieldTitles = new ArrayList<String>();
 	}
@@ -76,7 +77,7 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 		String fieldId = field.getFieldId();
 		fieldIds.add(fieldId);
 		fieldTitles.add(field.getFieldTitle());
-		fieldNumById.put(fieldId, (short) (fieldIds.size()-1));
+		fieldNumById.put(fieldId, (fieldIds.size()-1));
 		final int index = fieldIds.size()-1;
 		fieldList.add(index, field);
 		return index;
@@ -110,6 +111,11 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 		return Objects.isNull(index)? emptyIndexFieldList: index.getFieldList();
 	}
 
+	public void setIndexFields(String indexId, int[] theFields) {
+		final IndexDef index = new IndexDef(this, indexId, theFields);
+		myIndexDefs.addIndexDef(index);
+	}
+
 	public String[] getFieldTitles() {
 		if (null == fieldTitleArray) {
 			fieldTitleArray = new String[fieldTitles.size()];
@@ -123,12 +129,12 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	 * @param fieldId string name of the field
 	 * @return index of field in the list of fields, or -1 if the field is not found.
 	 */
-	public short getFieldNum(String fieldId) {
-		Short fieldIndex = fieldNumById.get(fieldId);
+	public int getFieldNum(String fieldId) {
+		Integer fieldIndex = fieldNumById.get(fieldId);
 		if (null == fieldIndex) {
 			return LibrisConstants.NULL_FIELD_NUM;
 		} else {
-			return fieldIndex.shortValue();
+			return fieldIndex.intValue();
 		}
 	}
 
@@ -145,13 +151,13 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	}
 
 	public FieldType getFieldType(String i) {
-		Short fieldNum = fieldNumById.get(i);
+		Integer fieldNum = fieldNumById.get(i);
 		FieldTemplate f = fieldList.get(fieldNum);
 		FieldType t = f.getFtype();
 		return t;
 	}
 
-	public FieldType getFieldType(short fieldNum) {
+	public FieldType getFieldType(int fieldNum) {
 		FieldTemplate f = fieldList.get(fieldNum);
 		return f.getFtype();
 	}
@@ -161,7 +167,7 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 	}
 
 	public String getGroupId(int groupNum) {
-		return fieldIdArray[groupNum];
+		return getFieldIds()[groupNum];
 	}
 
 	public Iterable<String> getGroupIds() {

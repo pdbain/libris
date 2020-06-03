@@ -8,15 +8,14 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisMenu.NewRecordListener;
@@ -31,7 +30,7 @@ public class RecordDisplayPanel extends JPanel {
 	private LibrisGui mainGui;
 	JPanel buttonBar;
 	private JTabbedPane openRecordPanes;
-	ArrayList<RecordWindow> openRecords;
+	ArrayList<DatabaseRecordWindow> openRecords;
 	private JButton prevButton;
 	private JButton nextButton;
 	private JButton newButton;
@@ -39,7 +38,7 @@ public class RecordDisplayPanel extends JPanel {
 	private LibrisDatabase database;
 	private Layout recLayout;
 	private Layout titleLayout;
-	private JComboBox layoutSelector;
+	private JComboBox<String> layoutSelector;
 	protected String[] layoutIds;
 	private String[] titleFieldIds;
 	private ModificationListener modListener;
@@ -51,7 +50,7 @@ public class RecordDisplayPanel extends JPanel {
 		this.database = librisDatabase;
 		modListener = new ModificationListener();
 		setLayout(new BorderLayout());
-		openRecords = new ArrayList<RecordWindow>();
+		openRecords = new ArrayList<DatabaseRecordWindow>();
 		addButtonBar(mainGui);
 		openRecordPanes = new JTabbedPane();
 		openRecordPanes.addChangeListener(new PaneChangeListener());
@@ -61,14 +60,19 @@ public class RecordDisplayPanel extends JPanel {
 		menu = mainGui.getMenu();
 	}
 
-	RecordWindow addRecord(Record record, boolean editable) throws LibrisException {
-		RecordWindow rw = new RecordWindow(mainGui, recLayout, record, editable, modListener);
+	DatabaseRecordWindow addRecord(DatabaseRecord record, boolean editable) throws LibrisException {
+		DatabaseRecordWindow rw = new DatabaseRecordWindow(mainGui, recLayout, record, editable, modListener);
 		rw.setModified(false);
-		addRecordWindow(rw);
+		openRecords.add(rw);
+		String recordTitle = rw.createTitle(getTitleFieldIds());
+		final JScrollPane recordTab = new JScrollPane(rw);
+		openRecordPanes.add(recordTitle, recordTab);
+		recordModified();
+		rw.setVisible(true);
+		openRecordPanes.setSelectedComponent(recordTab);
 		menu.recordWindowOpened(editable);
 		return rw;
 	}
-// FIXME summary view not shown
 
 	public void displayRecord(int recId) throws LibrisException {
 		for (int i= 0; i < openRecords.size(); ++i) {
@@ -79,28 +83,20 @@ public class RecordDisplayPanel extends JPanel {
 				return; /* already have the record */
 			}
 		}
-		Record rec = database.getRecord(recId);
+		DatabaseRecord rec = database.getRecord(recId);
 		addRecord(rec, false);
 	}
 
-	/**
-	 * @param record
-	 * @param titleFieldIds
-	 * @param rw
-	 * @throws DatabaseException 
-	 */
-	public void addRecordWindow(RecordWindow rw) throws DatabaseException {
-		openRecords.add(rw);
-		String recordTitle = rw.createTitle(getTitleFieldIds());
-		final JScrollPane recordTab = new JScrollPane(rw);
-		openRecordPanes.add(recordTitle, recordTab);
-		recordModified();
-		rw.setVisible(true);
-		openRecordPanes.setSelectedComponent(recordTab);
+	public Iterable<DatabaseRecordWindow> getOpenRecords() {
+		return openRecords;
 	}
 
-	public Iterable<RecordWindow> getOpenRecords() {
-		return openRecords;
+	void enableNextButton(boolean enable) {
+		nextButton.setEnabled(enable);	
+	}
+
+	void enablePrevButton(boolean enable) {
+		prevButton.setEnabled(enable);	
 	}
 
 	public void addLayouts(Layouts layouts) {
@@ -131,7 +127,7 @@ public class RecordDisplayPanel extends JPanel {
 		return titleFieldIds;
 	}
 
-	RecordWindow getCurrentRecordWindow() {
+	DatabaseRecordWindow getCurrentRecordWindow() {
 		int currentRecordIndex = openRecordPanes.getSelectedIndex();
 		if (currentRecordIndex >= 0) {
 			return openRecords.get(currentRecordIndex);
@@ -139,12 +135,18 @@ public class RecordDisplayPanel extends JPanel {
 		return null;
 	}
 	
+	public void setCurrentRecordName(String newName) {
+		int currentRecordIndex = openRecordPanes.getSelectedIndex();
+		openRecordPanes.setTitleAt(currentRecordIndex, newName);
+	}
+
 	/**
 	 * @param mainGui
 	 */
 	private void addButtonBar(LibrisGui mainGui) {
 		buttonBar = new JPanel();
 		
+		buttonBar.add(prevButton = new JButton("\u2190"));
 		buttonBar.add(newButton = new JButton("New"));
 		NewRecordListener newRecordHandler = mainGui.menu.getNewRecordHandler();
 		newButton.addActionListener(newRecordHandler);
@@ -154,18 +156,16 @@ public class RecordDisplayPanel extends JPanel {
 		buttonBar.add(closeButton = new JButton("Close"));
 		closeButton.addActionListener(new closeListener(false));
 		enterButton.setEnabled(true);
-		JLabel layoutLabel = new JLabel("Layout");
-		layoutLabel.setLabelFor(layoutSelector);
-		buttonBar.add(layoutLabel);
-		layoutSelector = new JComboBox();
+		layoutSelector = new JComboBox<String>();
 		buttonBar.add(layoutSelector);
 		layoutSelector.addActionListener(new layoutSelectionListener());
-		add(buttonBar, BorderLayout.NORTH);
 		
-		buttonBar.add(prevButton = new JButton("Previous"));
 		prevButton.addActionListener(new prevNextListener(false));
-		buttonBar.add(nextButton = new JButton("Next"));
+		prevButton.setEnabled(false);
+		buttonBar.add(nextButton = new JButton("\u2192"));
+		nextButton.setEnabled(false);
 		nextButton.addActionListener(new prevNextListener(true));
+		add(buttonBar, BorderLayout.NORTH);
 	}
 
 	private class prevNextListener implements ActionListener {
@@ -216,18 +216,21 @@ public class RecordDisplayPanel extends JPanel {
 		int selectedRecordIndex = openRecordPanes.getSelectedIndex();
 		if (selectedRecordIndex >= 0) {
 			boolean closeWindow = false;
-			RecordWindow currentRecordWindow = openRecords.get(selectedRecordIndex);
-			Record currentRecord = currentRecordWindow.getRecord();
+			DatabaseRecordWindow currentRecordWindow = openRecords.get(selectedRecordIndex);
+			DatabaseRecord currentRecord = currentRecordWindow.getRecord();
 			try {
 				if (enter) {
 					currentRecordWindow.enter();
-					database.put(currentRecord);
+					database.putRecord(currentRecord);
+					if (currentRecordWindow.isModified()) {
+						database.setModified(true);
+					}
 					mainGui.put(currentRecord);
 				} else {
 					int result = currentRecordWindow.checkClose();
 					switch (result) {
 					case Dialogue.CANCEL_OPTION: return;
-					case Dialogue.YES_OPTION: database.put(currentRecord);
+					case Dialogue.YES_OPTION: database.putRecord(currentRecord);
 					case Dialogue.NO_OPTION: closeWindow = true; break;
 					default: closeWindow = true;
 					}
@@ -256,11 +259,15 @@ public class RecordDisplayPanel extends JPanel {
 	}		
 
 	private void recordModified() {
-		RecordWindow w = getCurrentRecordWindow();
+		DatabaseRecordWindow w = getCurrentRecordWindow();
 		if (null != w) {
 			boolean modified = w.isModified();
-			enterButton.setEnabled(modified);
+
+			DatabaseRecord theRecord = w.getRecord();
+			menu.enableFieldValueOperations(theRecord.isEditable());
+					enterButton.setEnabled(modified);
 			mainGui.setRecordEnterRecordEnabled(modified);
+			mainGui.setOpenArtifactInfoEnabled(theRecord.hasArtifact());
 			closeButton.setEnabled(true);
 		} else {
 			enterButton.setEnabled(false);
@@ -274,7 +281,6 @@ public class RecordDisplayPanel extends JPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			recordModified();
-			mainGui.updateUITitle(true);
 		}
 	}
 	

@@ -8,7 +8,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.index.GroupDefs;
 
 
-public class RecordTemplate {
+public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 	/**
 	 * Array of the field templates in the order listed in the schema
 	 */
@@ -28,7 +28,7 @@ public class RecordTemplate {
 	// TODO test duplicate IDs
 	private Schema dbSchema;
 	private GroupDefs grpDefs;
-	public RecordList records;
+	public RecordList<DatabaseRecord> records;
 
 	public GroupDefs getGroupDefs() {
 		return grpDefs;
@@ -55,7 +55,7 @@ public class RecordTemplate {
 	public static RecordTemplate templateFactory(Schema s) throws InputException {
 		return templateFactory(s, null);
 	}
-	public static RecordTemplate templateFactory(Schema s, RecordList recs) throws InputException {
+	public static RecordTemplate templateFactory(Schema s, RecordList<DatabaseRecord> recs) throws InputException {
 		String[] fieldIds = s.getFieldIds();
 		RecordTemplate recTemplate = new RecordTemplate(s, fieldIds.length);
 		for (String id: fieldIds) {
@@ -90,12 +90,13 @@ public class RecordTemplate {
 		++numFields;
 	}
 
-	public Record makeRecord() {
-		return new RecordInstance(this);
+	public DatabaseRecord makeRecord() {
+		return new DatabaseRecord(this);
 	}
 
-	public Record makeRecord(boolean editable) throws FieldDataException {
-		Record rec = makeRecord();
+	@Override
+	public DatabaseRecord makeRecord(boolean editable) {
+		DatabaseRecord rec = makeRecord();
 		rec.setEditable(editable);
 		return rec;
 	}

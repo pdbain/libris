@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.Objects;
 import java.util.logging.Level;
 
 import javax.swing.BoxLayout;
@@ -23,18 +22,22 @@ import javax.swing.JPanel;
 import org.lasalledebain.libris.DatabaseAttributes;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.exception.DatabaseError;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.index.GroupDef;
 
 public abstract class LibrisWindowedUi extends LibrisUiGeneric {	
+	private static final String NO_DATABASE_OPEN = "no database open";
+	private static final String DATABASE_MODIFIED = " (modified)";
 	protected JFrame mainFrame;
 	private GroupDef selectedGroupDef;
 	protected boolean databaseSelected = false;
+	protected String title = NO_DATABASE_OPEN;
 
 	public abstract void closeWindow(boolean allWindows);
 
 	@Override
-	protected boolean checkAndCloseDatabase(boolean force) {
+	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		boolean result = false;
 		if (!force && currentDatabase.isModified()) {
 			int choice = confirmWithCancel(Messages.getString("LibrisDatabase.save_database_before_close")); //$NON-NLS-1$
@@ -68,29 +71,19 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		String emessage = "";
 		buff.append(e.getClass().getSimpleName());
 		
-		String excMsg = e.getMessage();
-		if (Objects.nonNull(excMsg)) {
-			buff.append(": ");
-			buff.append(excMsg);
-			buff.append("\n");
-		}
 		if (null != e) {
 			emessage = LibrisUiGeneric.formatConciseStackTrace(e, buff);
 		}
+		
 		String errorString = buff.toString();
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		e.printStackTrace(new PrintStream(bos));
 		try {
-			LibrisDatabase.librisLogger.log(Level.WARNING, bos.toString(Charset.defaultCharset().name()));
+			LibrisDatabase.log(Level.WARNING, bos.toString(Charset.defaultCharset().name()));
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 		}
-		Throwable c = e;
-		errorString += e.getClass().getSimpleName() + "\n";
-		while (null != ( c = c.getCause())) {
-			errorString += '\n'+c.getMessage();
-		}
-		LibrisDatabase.librisLogger.log(Level.FINE, emessage, e);
+		LibrisDatabase.log(Level.FINE, emessage, e);
 		return errorString;
 	}
 
@@ -107,13 +100,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		parentPanel.add(controlPanel);
 	}
 
-	public LibrisWindowedUi() {
-		super();
-		initializeUi();
-		selectedGroupDef = null;
-	}
-
-	public LibrisWindowedUi(File databaseFile, boolean readOnly) throws LibrisException {
+	public LibrisWindowedUi(File databaseFile, boolean readOnly) {
 		super(databaseFile, readOnly);
 		initializeUi();
 	}
@@ -123,9 +110,9 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	}
 	
 	@Override
-	public boolean quit(boolean force) {
+	public boolean quit(boolean force) throws DatabaseException {
 		destroyWindow(false);
-		return closeDatabase(force);
+		return super.quit(force);
 	}
 
 	protected abstract void destroyWindow(boolean b);
@@ -148,7 +135,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	public void setTitle(String title) {
 		super.setTitle(title);
 		if (isDatabaseModified()) {
-			mainFrame.setTitle(title+"*");
+			mainFrame.setTitle(title+DATABASE_MODIFIED);
 		} else {
 			mainFrame.setTitle(title);
 		}
@@ -174,13 +161,12 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		return Dialogue.yesNoCancelDialog(mainFrame, msg);
 	}
 
-	public void updateUITitle(boolean isModified) {
-		String databaseName = "no database open";
+	public void updateUITitle() {
+		String databaseName = NO_DATABASE_OPEN;
 		if (null != currentDatabase) {
-			DatabaseAttributes databaseAttributes = currentDatabase.getAttributes();
-			databaseName = databaseAttributes.getDatabaseName();
-			if (isModified) {
-				databaseName = databaseName+"*";
+			DatabaseAttributes databaseAttributes = currentDatabase.getDatabaseAttributes();
+			if (null != databaseAttributes) {
+				databaseName = databaseAttributes.getDatabaseName();
 			}
 		}
 		setTitle(databaseName);
@@ -190,7 +176,11 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		@Override
 		public void windowClosing(WindowEvent e) {
 			if (null != currentDatabase) {
-				quit(false);
+				try {
+					quit(false);
+				} catch (DatabaseException e1) {
+					throw new DatabaseError(e1);
+				}
 			}
 		}
 	}

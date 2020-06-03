@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
+
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -12,14 +14,13 @@ import javax.swing.ListSelectionModel;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 import org.lasalledebain.libris.field.FieldIntValue;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
-import org.lasalledebain.libris.indexes.KeyIntegerTuple;
+import org.lasalledebain.libris.indexes.KeyIntegerTuple;;
 
 public class NameList extends GuiControl {
 
@@ -33,9 +34,9 @@ public class NameList extends GuiControl {
 
 	private static KeyIntegerTuple makeNullTuple() {
 		try {
-			return new KeyIntegerTuple("<none>", RecordId.getNullId());
+			return new KeyIntegerTuple("<none>", NULL_RECORD_ID);
 		} catch (InputException e) {
-			throw new InternalError("Unexpected exception", e);
+			throw new DatabaseError("Unexpected exception", e);
 		}
 	}
 
@@ -132,7 +133,7 @@ public class NameList extends GuiControl {
 						boolean result = false;
 						if ((0 == i) && (1 == affiliateInfo.size())) {
 							KeyIntegerTuple entry = affiliateInfo.get(0);
-							result = (RecordId.getNullId() != entry.getValue());
+							result = (NULL_RECORD_ID != entry.getValue());
 						} else {
 							result = (i < affiliateInfo.size());
 						}

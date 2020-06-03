@@ -9,14 +9,21 @@ import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 public class IndexField extends EmptyXmlElement {
 
 	private Schema databaseSchema;
-	private short fieldNum;
+	private int fieldNum;
 
 	public IndexField(Schema schem) {
 		databaseSchema = schem;
+	}
+
+	public IndexField(Schema theSchema, int theFieldNum) {
+		super();
+		databaseSchema = theSchema;
+		fieldNum = theFieldNum;
 	}
 
 	public static String getXmlTag() {
@@ -41,7 +48,7 @@ public class IndexField extends EmptyXmlElement {
 			IndexField otherDef = (IndexField) comparand;
 			return otherDef.getAttributes().equals(getAttributes());
 		} catch (ClassCastException e) {
-			LibrisDatabase.librisLogger.log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
+			LibrisDatabase.log(Level.WARNING, "Incompatible comparand for "+getClass().getName()+".equals()", e);
 			return false;
 		}
 	}
@@ -49,5 +56,11 @@ public class IndexField extends EmptyXmlElement {
 	public int getFieldNum() {
 		return fieldNum;
 	}
+	
+	@Override
+	public LibrisAttributes getAttributes() {
+		return new LibrisAttributes(new String[][]{{XML_INDEXFIELD_ID_ATTR, databaseSchema.getFieldId(fieldNum)}});
+	}
+
 
 }

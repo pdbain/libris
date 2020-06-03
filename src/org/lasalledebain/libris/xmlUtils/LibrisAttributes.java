@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
@@ -16,6 +17,7 @@ import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 
 public class LibrisAttributes implements Iterable<String[]> {
 	private TreeMap<String, String> attributeList;
@@ -96,7 +98,6 @@ public class LibrisAttributes implements Iterable<String[]> {
 	}
 	
 	public static Date parseDate(String dbDateString) {
-		DateFormat dfmt = null;
 		if (null != dbDateString) {
 			try {
 				Date modDate = LibrisMetadata.parseDateString(dbDateString);
@@ -141,5 +142,27 @@ public class LibrisAttributes implements Iterable<String[]> {
 
 	public String get(String attrName) {
 		return attributeList.get(attrName);
+	}
+	
+	public int getInt(String attrName) throws InputException {
+		String attrString = attributeList.get(attrName);
+		try {
+			return Integer.parseInt(attrString);
+		} catch (NumberFormatException e) {
+			throw new InputException("malformed integer: "+attrString, e);
+		}
+	}
+	
+	public int getInt(String attrName, int defaultValue) throws InputException {
+		if (contains(attrName)) {
+			return getInt(attrName);
+		} else {
+			return defaultValue;
+		}
+	}
+	
+	public boolean contains(String attrName) {
+		String value = attributeList.get(attrName);
+		return Objects.nonNull(value) && !value.isEmpty();
 	}
 }

@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.indexes;
 
 import java.util.AbstractSet;
+import java.util.stream.Stream;
 
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 
@@ -20,6 +21,8 @@ public abstract class RecordKeywords {
 
 	protected final boolean caseSensitive;
 	protected abstract AbstractSet<String> getKeywordList();
+	public abstract Stream<String> wordStream();
+	public abstract int estimateSize();
 	
 	/**
 	 * Determine if the keyword list contains all words in wordList.

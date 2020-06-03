@@ -3,12 +3,15 @@ package org.lasalledebain.group;
 import static org.lasalledebain.Utilities.testLogger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
 import org.junit.Test;
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -31,6 +34,7 @@ public class GroupDefsTests extends TestCase {
 	private static final String ID_VOLUME = "ID_volume";
 	private static final String ID_PUBLISHER = "ID_publisher";
 	private static final String ID_AUTH = "ID_auth";
+	private File workingDirectory;
 
 	@Test
 	public void testFromXml() {
@@ -51,7 +55,7 @@ public class GroupDefsTests extends TestCase {
 		File inputFile = new File(testDir, Utilities.SCHEMA_WITH_GROUP_DEFS_XML);
 		try {
 			Schema schema = Utilities.loadSchema(inputFile);
-			File workdir = Utilities.getTempTestDirectory();
+			File workdir = Utilities.makeTempTestDirectory();
 			File exportedXml = new File (workdir, "schema_copy.xml");
 			exportedXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(exportedXml);
@@ -97,12 +101,12 @@ public class GroupDefsTests extends TestCase {
 	 */
 	public void testFieldInheritance() {
 		try {
-			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE);
+			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE, workingDirectory);
 			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
-			ArrayList<Record> recList = new ArrayList<Record>();
+			ArrayList<DatabaseRecord> recList = new ArrayList<DatabaseRecord>();
 			{
-				Record curr = db.newRecord();
+				DatabaseRecord curr = db.newRecord();
 				Record rec1 = curr =db.newRecord();
 				curr.addFieldValuePair(ID_PUBLISHER, "", "Publisher 1");
 				saveRecord(db, recList, curr);
@@ -188,8 +192,33 @@ public class GroupDefsTests extends TestCase {
 		}
 	}
 
+	public void testSetParent() throws FileNotFoundException, IOException, LibrisException {
+			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE, workingDirectory);
+			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			testLogger.log(Level.INFO, "database rebuilt");
+			ArrayList<DatabaseRecord> recList = new ArrayList<DatabaseRecord>();
+			{
+				DatabaseRecord curr = db.newRecord();
+				Record rec1 = curr =db.newRecord();
+				curr.addFieldValuePair(ID_PUBLISHER, "", "Publisher 1");
+				saveRecord(db, recList, curr);
+
+				curr = db.newRecord();
+				curr.setParent(GRP_ONE, rec1);
+				curr.setParent(0, rec1.getRecordId());
+				curr.setParent(GRP_ONE, rec1);
+			}
+			
+			{
+				DatabaseRecord child = db.getRecord(2);
+				int numAffiliates = child.getNumAffiliatesAndParent(0);
+				assertEquals("Wrong number of affiliates", 1, numAffiliates);
+			}
+	}
+
 	@Override
 	protected void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 		testLogger.log(Level.INFO, "Starting "+getName());
 	}
 
@@ -199,9 +228,9 @@ public class GroupDefsTests extends TestCase {
 
 	}
 
-	private void saveRecord(LibrisDatabase db, ArrayList<Record> recList,
-			Record curr) throws LibrisException {
-		db.put(curr);
+	private void saveRecord(LibrisDatabase db, ArrayList<DatabaseRecord> recList,
+			DatabaseRecord curr) throws LibrisException {
+		db.putRecord(curr);
 		recList.add(curr);
 	}
 

@@ -33,9 +33,10 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.LibrisFileManager;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
@@ -74,12 +75,13 @@ public class DelimitedTextImporter {
 		try {
 			dtfReader = new DelimitedTextRecordsReader(db, 
 					dataFile, separatorChar);
-			RecordImporter imp;
+			RecordImporter<DatabaseRecord> imp;
 			if  (null == importFilterFile) {
-				imp = new DirectRecordImporter(db);
+				imp = new DirectRecordImporter<DatabaseRecord>(db);
 			} else {
-				mgr = db.getFileMgr().makeAccessManager(LibrisFileManager.CSV_FILE, importFilterFile);
-				imp = new FilteringRecordImporter(db, new LibrisXmlFactory(),	mgr);
+				mgr = db.getFileMgr().makeAccessManager(LibrisConstants.CSV_FILE, importFilterFile);
+				FilteringRecordImporter<DatabaseRecord> filteringImporter = new FilteringRecordImporter<DatabaseRecord>(db, new LibrisXmlFactory(), mgr);
+				imp = filteringImporter;
 			}
 
 			dtfReader.importRecordsToDatabase(

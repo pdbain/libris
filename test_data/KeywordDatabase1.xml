@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libris date="2011-06-03 00:00:00 UTC" schemaname="KeywordDatabase"
+	databasename="KeywordDatabase1" schemaversion="0.0">
+	<metadata>
+		<schema>
+			<groupdefs>
+				<groupdef id="GRP_one" structure="hierarchical" title="First group" />
+			</groupdefs>
+			<fielddefs>
+				<fielddef id="ID_auth" title="author" />
+				<fielddef id="ID_keywords" datatype="string" />
+				<fielddef id="ID_hardcopy" datatype="boolean" />
+				<fielddef id="ID_text" datatype="string" />
+			</fielddefs>
+			<indexdefs>
+				<indexdef id="INDEX_RECORD_KEYWORDS">
+					<indexfield id="ID_auth" />
+					<indexfield id="ID_keywords" />
+					<indexfield id="ID_text" />
+				</indexdef>
+			</indexdefs>
+		</schema>
+		<layouts>
+			<layout id="LO_shortFormDisplay" title="Condensed form layout"
+				type="form" height="400" width="700">
+				<layoutfield title="Author" id="ID_auth" control="textfield" />
+			</layout>
+			<layout id="LO_formDisplay" title="Form layout" type="form"
+				height="400" width="700">
+				<layoutusage usedby="newrecord" />
+				<layoutfield title="Author" id="ID_auth" control="textfield" />
+				<layoutfield title="Text" id="ID_text" control="textfield"
+					return="true" />
+				<layoutfield title="Keywords" id="ID_keywords" control="textfield"
+					return="true" />
+			</layout>
+			<layout id="LO_browserDisplay" title="Summary" type="list"
+				height="400" width="700">
+				<layoutusage usedby="summarydisplay" />
+				<layoutfield title="Text" id="ID_text" control="textfield" />
+			</layout>
+		</layouts>
+	</metadata>
+	<records lastid="0">
+	</records>
+</libris>

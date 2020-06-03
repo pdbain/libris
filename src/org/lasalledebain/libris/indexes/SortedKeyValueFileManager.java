@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.indexes;
 
+import static org.lasalledebain.libris.exception.Assertion.assertTrueError;
+
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,12 +10,11 @@ import java.io.RandomAccessFile;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.InternalError;
 
 
 /**
@@ -42,9 +43,7 @@ public class SortedKeyValueFileManager <T extends KeyValueTuple> implements Iter
 	public SortedKeyValueFileManager(List<FileAccessManager> indexFiles, SortedKeyValueBucketFactory<T> bucketFactory) 
 	throws InputException {
 		dataManager = indexFiles.get(0);
-		if (null == dataManager) {
-			throw new InternalError("Wrong number of files for SortedKeyValueFileManager");
-		}
+		assertTrueError("Wrong number of files for SortedKeyValueFileManager", null != dataManager);
 		try {
 			dataFile = dataManager.getReadWriteRandomAccessFile();
 			indexLevel = indexFiles.size() - 1;
@@ -160,17 +159,13 @@ public class SortedKeyValueFileManager <T extends KeyValueTuple> implements Iter
 		SortedKeyValueBucket<T> firstBucket = newBucket(nextTuple, oldBucket.getFilePosition());
 		for (int i = 1; i <= size/2; ++i) {
 			nextTuple = tupleIterator.next();
-			if (!firstBucket.addElement(nextTuple)) {
-				throw new InternalError("Error splitting bucket");
-			}
+			assertTrueError("Error splitting bucket", firstBucket.addElement(nextTuple));
 		}
 		nextTuple = tupleIterator.next();
 		SortedKeyValueBucket<T> secondBucket = newBucket(nextTuple);
 		while (tupleIterator.hasNext()) {
 			nextTuple = tupleIterator.next();
-			if (!secondBucket.addElement(nextTuple)) {
-				throw new InternalError("Error splitting bucket");
-			}
+			assertTrueError("Error splitting bucket", secondBucket.addElement(nextTuple));
 		}
 	}
 
@@ -195,9 +190,7 @@ public class SortedKeyValueFileManager <T extends KeyValueTuple> implements Iter
 
 	private void addBucket(SortedKeyValueBucket<T> result) throws InputException {
 		KeyLongTuple descriptor = result.getDescriptor();
-		if (!bucketIndex.addElement(descriptor)) {
-			throw new InternalError("Cannot add "+result.getDescriptor()+" to bucket index");
-		}
+		assertTrueError("Cannot add "+result.getDescriptor()+" to bucket index", bucketIndex.addElement(descriptor));
 		cache.addBucket(result);
 	}
 
@@ -271,7 +264,7 @@ public class SortedKeyValueFileManager <T extends KeyValueTuple> implements Iter
 					tupleIterator = (null == prefix)? currentBucket.iterator(): currentBucket.iterator(prefix);
 					result = tupleIterator.hasNext();
 				} catch (Exception e) {
-					LibrisDatabase.librisLogger.log(Level.SEVERE, "error reading key-value file", e);
+					LibrisDatabase.logException("error reading key-value file", e);
 					break;
 				}
 			}
@@ -308,9 +301,7 @@ public class SortedKeyValueFileManager <T extends KeyValueTuple> implements Iter
 			SortedKeyValueBucket<T> result = cacheList.get(key);
 			if (null == result) {
 				KeyLongTuple bucketDescriptor = bucketIndex.getByName(key);
-				if (null == bucketDescriptor) {
-					throw new InternalError("Key "+key+" not in index");
-				}
+				assertTrueError("Key "+key+" not in index", null != bucketDescriptor);
 				long position = bucketDescriptor.value;
 				try {
 					dataFile.seek(position);
@@ -332,9 +323,7 @@ public class SortedKeyValueFileManager <T extends KeyValueTuple> implements Iter
 			if (cacheList.size() > cacheSize) {
 				String oldestKey = cacheList.keySet().iterator().next();
 				KeyLongTuple bucketDescriptor = bucketIndex.getByName(oldestKey);
-				if (null == bucketDescriptor) {
-					throw new InternalError("Key "+key+" not in index");
-				}
+				assertTrueError("Key "+key+" not in index", null != bucketDescriptor);
 				long position = bucketDescriptor.value;
 				try {
 					SortedKeyValueBucket<T> victim = cacheList.remove(oldestKey);

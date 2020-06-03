@@ -1,11 +1,12 @@
 package org.lasalledebain.libris;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Objects;
 
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.UserErrorException;
+import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
+import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -57,11 +58,10 @@ public class Libris {
 						auxDir = new File(auxDirpath);
 					}
 				}
-				LibrisGui ui = new LibrisGui(dbFile, readOnly);
-				LibrisDatabaseParameter params = ui.getParameters();
-				params.auxDir = auxDir;
+				// TODO configurable aux dir
+				LibrisGui ui = new LibrisGui(dbFile, readOnly);				
 				if (null != dbFile) {
-					ui.openDatabase();
+					LibrisDatabase db = ui.openDatabase();
 				} else {
 					ui.sendChooseDatabase();
 				}
@@ -81,6 +81,13 @@ public class Libris {
 		return result;
 	}
 
+	public static LibrisDatabase buildAndOpenDatabase(LibrisIndexConfiguration config) throws LibrisException {
+		buildIndexes(config);
+		
+		LibrisDatabase result = config.getDatabaseUi().openDatabase();
+		return result;
+	}
+
 	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi ui) throws LibrisException {
 		if (null == ui) {
 			ui = new HeadlessUi(databaseFile, false);
@@ -89,18 +96,29 @@ public class Libris {
 		return db;
 	}
 
-	public static boolean buildIndexes(File databaseFile, LibrisUi ui)
-			throws UserErrorException, DatabaseException, InputException,
-			LibrisException {
-		LibrisDatabase db = new LibrisDatabase(new LibrisDatabaseParameter(ui, databaseFile));
+	public static boolean buildIndexes(File databaseFile, LibrisUi ui) throws LibrisException {
+		LibrisIndexConfiguration config = new LibrisIndexConfiguration(databaseFile, ui);
+		return buildIndexes(config);
+	}
+
+	public static boolean buildIndexes(LibrisIndexConfiguration config) throws LibrisException {
+		LibrisDatabase db = new LibrisDatabase(config.getDatabaseFile(), false, config.getDatabaseUi());
+		config.setLoadMetadata(true);
 		if (!db.isDatabaseReserved()) {
-			if (!db.buildIndexes(true)) {
+			boolean buildResult = db.buildDatabase(config);
+			if (!buildResult) {
 				return false;
-			};
-			return db.closeDatabase(false);
+			}
+			return db.closeDatabase(true);
 		} else {
 			return false;
 		}
 	}
-
+	static {
+		URL props = PdfRecordImporter.class.getClassLoader().getResource("commons-logging.properties");
+		if (Objects.nonNull(props)) {
+			String path = props.getPath();
+			System.setProperty("java.util.logging.config.file", path);
+		}
+	}
 }
