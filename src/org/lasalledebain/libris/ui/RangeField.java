@@ -17,9 +17,7 @@ public class RangeField extends ValuePairField {
 		FlowLayout layout = new FlowLayout();
 		control.setLayout(layout);
 		layout.setHgap(0);
-		if (editable) {
-			copyValuesToControls();
-		}
+		addFields(editable, true);
 	}
 
 	@Override
@@ -52,31 +50,25 @@ public class RangeField extends ValuePairField {
 
 	@Override
 	protected void copyValuesToControls() {
-		if (editable) {
-			showEditableFields();
-		} else {
-			if (!extraValue.isEmpty()) {
-				mainControl = new JTextField(mainValue, width);
-				control.add(dashLabel);
-				extraControl = new JTextField(extraValue, width);
-				extraControl.setEditable(false);
-				control.add(extraControl);
-			} else {
-				mainControl = new JTextField(mainValue, 2*width);
-			}
-			mainControl.setEditable(false);
+		boolean bothFields = !extraValue.isEmpty();
+		addFields(editable, bothFields);
+		mainControl.setText(mainValue);
+		if (bothFields) {
+			extraControl.setText(extraValue);
 		}
 	}
 
-	protected void showEditableFields() {
-		mainControl = new JTextField(mainValue, width);
+	protected void addFields(boolean editable, boolean both) {
+		control.removeAll();
+		mainControl = new JTextField(mainValue, (both || editable)? width: 2 * width);
 		control.add(mainControl);
-		mainControl.setEditable(true);
-		control.add(dashLabel);
-		extraControl = new JTextField(extraValue, width);
-		extraControl.setEditable(true);
+		mainControl.setEditable(editable);
 		mainControl.getDocument().addDocumentListener(getModificationListener());
-		extraControl.getDocument().addDocumentListener(getModificationListener());
-		control.add(extraControl);
+		if (both || editable) {
+			control.add(dashLabel);
+			extraControl = new JTextField(extraValue, width);
+			extraControl.getDocument().addDocumentListener(getModificationListener());
+			control.add(extraControl);
+		}
 	}
 }
