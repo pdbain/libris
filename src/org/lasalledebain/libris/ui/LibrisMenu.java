@@ -448,9 +448,8 @@ public class LibrisMenu extends AbstractLibrisMenu {
 					}
 					guiMain.alert("Database successfully indexed");
 				} else {
-					openDatabaseImpl(sf);
+					result = openDatabaseImpl(sf);
 				}
-				result = true;
 			}
 			try {
 				librisPrefs.sync();
@@ -461,17 +460,19 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		return result;
 	}
 
-	private void openDatabaseImpl(File dbFile) {
+	private boolean openDatabaseImpl(File dbFile) {
 		guiMain.setDatabaseFile(dbFile);
 		try {
 			database = guiMain.openDatabase();
 		} catch (Exception e) {
 			guiMain.alert("Error opening database\n", e);
-			return;
+			return false;
 		}
+		if (null == database) return false;
 		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
 		librisPrefs.put(LibrisConstants.DATABASE_FILE, dbFile.getAbsolutePath());
 		guiMain.getMainFrame().toFront();
+		return true;
 	}
 
 	private class SaveListener implements ActionListener {

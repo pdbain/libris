@@ -64,7 +64,6 @@ public class LibrisGui extends LibrisWindowedUi {
 		initializeGui();
 	}
 
-	// TODO 1 add menu option to edit artifact record
 	// TODO 1 menu option to auto-generate keywords
 	// TODO bulk import artifacts
 	protected void initializeGui() throws DatabaseException {
@@ -101,7 +100,8 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	public LibrisDatabase openDatabase() throws DatabaseException {
-		super.openDatabase();
+		LibrisDatabase result = super.openDatabase();
+		if (null == result) return null;
 		menu.setDatabase(currentDatabase);
 		getMainFrame().toFront();
 		boolean readOnly = currentDatabase.isReadOnly();
