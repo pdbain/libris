@@ -100,8 +100,8 @@ public class FieldChooser extends JPanel {
 	 public int[] getFieldNums() {
 		 int[] selectedFields = fieldList.getSelectedIndices();
 		 int[] result = new int[selectedFields.length];
-		 for (int i: selectedFields) {
-			 FieldInfo fi = searchFieldList.get(i);
+		 for (int i = 0; i <  selectedFields.length; ++i) {
+			 FieldInfo fi = searchFieldList.get(selectedFields[i]);
 			 result[i] = fi.fieldNum;
 		 }
 		 return result;
