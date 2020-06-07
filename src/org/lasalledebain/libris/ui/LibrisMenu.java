@@ -439,6 +439,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 			roCheckbox.isSelected();
 			File sf = chooser.getSelectedFile();
 			if (sf != null) {
+				boolean openDatabase = true;
 				if (reIndexCheckbox.isSelected()) {
 					try {
 						Libris.buildIndexes(sf, guiMain);
@@ -446,10 +447,10 @@ public class LibrisMenu extends AbstractLibrisMenu {
 						guiMain.alert("Error building indexes", e);
 						return false;
 					}
-					guiMain.alert("Database successfully indexed");
-				} else {
-					result = openDatabaseImpl(sf);
+					openDatabase = (Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database successfully indexed\nOpen now?") == Dialogue.YES_OPTION);
 				}
+				if (openDatabase)
+					result = openDatabaseImpl(sf);
 			}
 			try {
 				librisPrefs.sync();
