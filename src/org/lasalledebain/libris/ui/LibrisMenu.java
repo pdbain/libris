@@ -30,12 +30,6 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-/**
- * @author pdbain
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 public class LibrisMenu extends AbstractLibrisMenu {
 
 	public class DuplicateRecordListener implements ActionListener {
@@ -69,6 +63,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	private HashSet <JMenuItem> fileMenuModifyCommands;
 	private final ArrayList<JMenuItem> editMenuFieldValueCommands;
 	private final ArrayList<JMenuItem> editMenuRecordCommands;
+	private final ArrayList<JMenuItem> editMenuArtifactCommands;
 	private JMenuItem duplicateRecord;
 	private JMenuItem searchRecords;
 	private HashSet<JMenuItem> databaseAccessCommands;
@@ -83,6 +78,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		this.database = null;
 		editMenuFieldValueCommands = new ArrayList<JMenuItem>(2);
 		editMenuRecordCommands = new ArrayList<JMenuItem>(2);
+		editMenuArtifactCommands = new ArrayList<JMenuItem>(2);
 	}
 
 	@Override
@@ -249,12 +245,12 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		addArtifactMenuItem = new JMenuItem("Set artifact...");
 		addArtifactMenuItem.addActionListener(e -> guiMain.setRecordArtifact());
 		edMenu.add(addArtifactMenuItem);
-		editMenuFieldValueCommands.add(addArtifactMenuItem);
+		editMenuArtifactCommands.add(addArtifactMenuItem);
 		
 		openArtifactInfoMenuItem = new JMenuItem("Open artifact information...");
 		openArtifactInfoMenuItem.addActionListener(e -> guiMain.openArtifactInfo(getCurrentRecord()));
 		edMenu.add(openArtifactInfoMenuItem);
-		editMenuFieldValueCommands.add(openArtifactInfoMenuItem);
+		editMenuArtifactCommands.add(openArtifactInfoMenuItem);
 		
 		edMenu.add("Delete");
 		enableFieldValueOperations(false);
@@ -265,15 +261,30 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	 * @param enabled
 	 */
 	void editMenuEnableModify(boolean enabled) {
-		LibrisDatabase currentDatabase = guiMain.currentDatabase;
-		boolean hasRepo = enabled && Objects.nonNull(currentDatabase) && currentDatabase.hasDocumentRepository();
+		boolean enableRepoCommands = hasRepo(enabled);
 		for (Component i: editMenuRecordCommands) {
 			i.setEnabled(enabled);
 		}
-		if (!hasRepo) {
-			addArtifactMenuItem.setEnabled(false);
+		for (Component i: editMenuArtifactCommands) {
+			i.setEnabled(enabled && enableRepoCommands);
 		}
 		editMenu.setEnabled(enabled);
+	}
+
+	public boolean hasRepo(boolean enabled) {
+		LibrisDatabase currentDatabase = guiMain.currentDatabase;
+		boolean hasRepo = enabled && Objects.nonNull(currentDatabase) && currentDatabase.hasDocumentRepository();
+		return hasRepo;
+	}
+
+	public void enableFieldValueOperations(boolean enabled) {
+		for (JMenuItem m: editMenuFieldValueCommands) {
+			m.setEnabled(enabled);
+		}
+		boolean enableRepoCommands = hasRepo(enabled);
+		for (Component i: editMenuArtifactCommands) {
+			i.setEnabled(enabled && enableRepoCommands);
+		}
 	}
 
 	private JMenu createRecordMenu() {
@@ -408,7 +419,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 
 	@Override
 	public boolean openDatabaseDialogue() {
-		// TODO keep a list of recent databases
 		boolean result = false;
 		JFileChooser chooser;
 		File dbLocation = null;
@@ -577,12 +587,6 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	private EditRecordListenerImpl editRecordListener;
 	private JMenuItem recordWindowItems[];
 	private JMenuItem addArtifactMenuItem;
-	public void enableFieldValueOperations(boolean enabled) {
-		for (JMenuItem m: editMenuFieldValueCommands) {
-			m.setEnabled(enabled);
-		}
-	}
-
 	public void setRecordDuplicateRecordEnabled(boolean enabled) {
 		duplicateRecord.setEnabled(enabled);
 	}
