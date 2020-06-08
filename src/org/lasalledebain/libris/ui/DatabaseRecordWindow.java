@@ -12,6 +12,7 @@ import java.util.Objects;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseRecord;
@@ -47,7 +48,7 @@ public class DatabaseRecordWindow extends RecordWindow {
 		add(navPanel);
 		navPanel.add(recordPanel, BorderLayout.CENTER);
 		if (null != recordName) {
-			navPanel.add(new JLabel(recordName));
+			navPanel.add(new JLabel(recordName, SwingConstants.CENTER), BorderLayout.NORTH);
 		}
 		ArtifactParameters artifactInfo = ui.currentDatabase.getArtifactInfo(rec.getArtifactId());
 		if (null != artifactInfo) {
