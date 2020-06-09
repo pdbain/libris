@@ -29,6 +29,8 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.index.GroupDef;
+import static java.util.Objects.nonNull;
 
 public class LibrisMenu extends AbstractLibrisMenu {
 
@@ -325,9 +327,17 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		recMenu.add(childRecord);
 		childRecord.setEnabled(false);
 		childRecord.addActionListener(e -> {
+			boolean success = false;
 			Record rec = getCurrentRecord();
 			if (null != rec) {
-				guiMain.newChildRecord(rec, guiMain.getSelectedGroup().getGroupNum());
+				GroupDef selectedGroup = guiMain.getSelectedGroup();
+				if (nonNull(selectedGroup)) {
+					guiMain.newChildRecord(rec, selectedGroup.getGroupNum());
+					success = true;
+				}
+			}
+			if (!success) {
+				guiMain.alert("Select record and group");
 			}
 		}
 				);

@@ -64,7 +64,7 @@ public class NameList extends GuiControl {
 		} else {
 			for (int i = 0; i < affLen; ++i) {
 				int recordNumber = affiliates[i];
-				affiliateInfo.add(new KeyIntegerTuple(dBase.getRecordName(recordNumber), recordNumber));
+				affiliateInfo.setElementAt(new KeyIntegerTuple(dBase.getRecordName(recordNumber), recordNumber), i);
 			}
 		}
 	}

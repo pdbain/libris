@@ -207,7 +207,11 @@ public class RecordDisplayPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent evt) {
-			doClose(evt, enter); 
+			try {
+				doClose(evt, enter);
+			} catch (Exception e) {
+				mainGui.alert("Unxpected exception closing record", e);
+			}
 		}
 
 	}
