@@ -122,7 +122,6 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 
 	@Override
 	public LibrisAttributes getAttributes() throws XmlException {
-		// TODO Auto-generated method stub
-		return null;
+		return LibrisAttributes.getLibrisEmptyAttributes();
 	}
 }

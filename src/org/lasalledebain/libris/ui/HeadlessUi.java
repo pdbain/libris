@@ -98,15 +98,12 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public void setRecordName(NamedRecordList namedRecs) throws InputException {
-		// TODO write setRecordName
 		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
 	}
 
 	@Override
 	public void setRecordArtifact() {
-		// TODO Auto-generated method stub
 		throw new InternalError(getClass().getName()+".setRecordArtifact() not implemented");
-		
 	}
 
 	@Override
@@ -121,14 +118,12 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 
 	@Override
 	public Record newChildRecord(Record currentRecord, int groupNum) {
-		// TODO Implement newChildRecord
-		return null;
+		throw new InternalError(getClass().getName()+".newChildRecord() not implemented");
 	}
 
 	@Override
 	public Dimension getDisplayPanelSize() {
-		// TODO Implement getDisplayPanelSize
-		return null;
+		throw new InternalError(getClass().getName()+".getDisplayPanelSize() not implemented");
 	}
 
 	public File getDatabaseFile() {

@@ -32,6 +32,7 @@ public class ArtifactEditor {
 	ArtifactParameters result = null;
 	private JButton closeButton;
 	private JButton saveButton;
+	private JTextField archivePath;
 
 	/**
 	 * @param params information about the artifact.  May be modified
@@ -104,6 +105,11 @@ public class ArtifactEditor {
 		fieldsPane.add(sourcePath);
 		sourcePath.setBorder(new TitledBorder("Source path"));
 		sourcePath.setEditable(false);
+
+		archivePath = new JTextField(params.getArchivePathString());
+		fieldsPane.add(archivePath);
+		archivePath.setBorder(new TitledBorder("Archive path"));
+		archivePath.setEditable(false);
 
 		comments= new JTextArea(params.getComments());
 		fieldsPane.add(comments);
