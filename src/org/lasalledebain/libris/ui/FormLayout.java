@@ -16,6 +16,7 @@ import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -105,6 +106,13 @@ public class FormLayout extends Layout {
 			guiFields.add(guiFld);
 		}
 		return guiFields;
+	}
+
+	@Override
+	ArrayList<UiField> layOutFields(RecordList recList, LibrisWindowedUi ui, JPanel recordPanel,
+			ModificationTracker modTrk) throws DatabaseException, LibrisException {
+		Record rec = recList.getFirstRecord();
+		return layOutFields(rec, ui, recordPanel, modTrk);
 	}
 
 }

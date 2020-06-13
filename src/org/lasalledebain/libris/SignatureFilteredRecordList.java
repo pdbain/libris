@@ -74,4 +74,9 @@ public class SignatureFilteredRecordList<RecordType extends Record> extends Reco
 		}
 
 	}
+
+	@Override
+	public int size() {
+		return -1;
+	}
 }

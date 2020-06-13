@@ -29,13 +29,16 @@ import org.lasalledebain.libris.index.GroupDef;
 public abstract class LibrisWindowedUi extends LibrisUiGeneric {	
 	private static final String NO_DATABASE_OPEN = "no database open";
 	private static final String DATABASE_MODIFIED = " (modified)";
-	protected JFrame mainFrame;
+	protected final JFrame mainFrame;
 	private GroupDef selectedGroupDef;
 	protected boolean databaseSelected = false;
 	protected String title = NO_DATABASE_OPEN;
 
 	public abstract void closeWindow(boolean allWindows);
 
+	public void pack() {
+		mainFrame.pack();
+	}
 	@Override
 	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		boolean result = false;
@@ -102,13 +105,9 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 
 	public LibrisWindowedUi(File databaseFile, boolean readOnly) {
 		super(databaseFile, readOnly);
-		initializeUi();
-	}
-
-	protected void initializeUi() {
 		mainFrame = new JFrame();
 	}
-	
+
 	@Override
 	public boolean quit(boolean force) throws DatabaseException {
 		destroyWindow(false);

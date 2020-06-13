@@ -38,4 +38,10 @@ public class ModifiedRecordList<RecordType extends Record> extends RecordList<Re
 	public RecordType getRecord(int id) throws InputException {
 		return modifiedRecords.get(id);
 	}
+
+	@Override
+	public int size() {
+		return modifiedRecords.size();
+	}
+
 }
