@@ -614,6 +614,9 @@ public class LibrisGui extends LibrisWindowedUi {
 		return newRec;
 	}
 
+	RecordList<DatabaseRecord> getResultRecords() {
+		return resultsPanel.getResultRecords();
+	}
 	public void sendChooseDatabase() {
 		menu.sendChooseDatabase();
 	}

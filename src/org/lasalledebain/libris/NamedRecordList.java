@@ -75,4 +75,9 @@ public class NamedRecordList<RecordType extends Record> extends RecordList<Recor
 	public void put(String newName, int recordId) throws InputException {
 		namedRecordIndex.addElement(new KeyIntegerTuple(newName, recordId));
 	}
+
+	@Override
+	public int size() {
+		return -1;
+	}
 }

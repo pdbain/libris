@@ -20,7 +20,7 @@ public class SingleRecordList<RecordType extends Record> extends RecordList<Reco
 
 	@Override
 	public boolean hasNext() {
-		return 1 == position;
+		return position == 0;
 	}
 
 	@Override
@@ -41,6 +41,11 @@ public class SingleRecordList<RecordType extends Record> extends RecordList<Reco
 		} else {
 			return null;
 		}
+	}
+
+	@Override
+	public int size() {
+		return 1;
 	}
 
 }

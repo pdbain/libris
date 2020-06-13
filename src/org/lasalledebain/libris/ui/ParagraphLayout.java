@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -71,6 +72,11 @@ public class ParagraphLayout extends Layout {
 	@Override
 	public String getLayoutType() {
 		return LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH;
+	}
+
+	@Override
+	protected void showRecord(int recId) {
+		return;
 	}
 
 }

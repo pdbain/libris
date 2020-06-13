@@ -151,6 +151,21 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 		}
 		return buff.toString();
 	}
+	
+	public String toString(String[] fieldIds) throws InputException {
+		StringBuffer buff = new StringBuffer();
+		affiliationInfoToString(buff);
+		for (String i: fieldIds) {
+			Field f = getField(i);
+			if (null == f) {
+				continue;
+			}
+			String fieldString = f.getValuesAsString();
+			buff.append(fieldString); 
+			buff.append('\n');
+		}
+		return buff.toString();
+	}
 	protected abstract void affiliationInfoToString(StringBuffer buff);
 
 	public abstract void fromXml(ElementManager recMgr) throws LibrisException;

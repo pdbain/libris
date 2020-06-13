@@ -6,16 +6,17 @@ package org.lasalledebain.libris.ui;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 
-class BrowserRow {
-	Record rec;
-	int recId;
-	private String recValue;
+// TODO type parameters
+class RecordInfo<RecordType extends Record> {
+	private final RecordType rec;
+	private final int recId;
+	private final String recValue;
 	/**
 	 * @param rec
 	 * @param fieldIds 
 	 * @throws FieldDataException 
 	 */
-	public BrowserRow(Record rec, String[] fieldIds) {
+	public RecordInfo(RecordType rec, String[] fieldIds) {
 		this.rec = rec;
 		recId = rec.getRecordId();
 		recValue = rec.generateTitle(fieldIds);
@@ -25,6 +26,10 @@ class BrowserRow {
 		return recValue;
 	}
 	
+	public RecordType getRecord() {
+		return rec;
+	}
+
 	public int getRecordId() {
 		return recId;
 	}

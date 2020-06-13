@@ -11,6 +11,7 @@ import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -22,7 +23,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class Layout implements XMLElement {
+public abstract class Layout<RecordType extends Record> implements XMLElement {
 	protected int height;
 	protected int width;
 	Schema mySchema = null;
@@ -48,6 +49,9 @@ public abstract class Layout implements XMLElement {
 		return id;
 	}
 
+	public boolean isSingleRecord() {
+		return true;
+	}
 
 	/**
 	 * @return height in pixels of the window
@@ -95,6 +99,11 @@ public abstract class Layout implements XMLElement {
 	abstract ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException;
 
+	ArrayList<UiField> layOutFields(RecordList recList, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
+			throws DatabaseException, LibrisException {
+		return 	layOutFields(recList.getFirstRecord(), ui,  recordPanel, modTrk);
+	};
+
 	public void setIdAndTitle(String myTitle, String myId) throws DatabaseException {
 		if (null == myId) {
 			throw new DatabaseException("missing id attribute in layout element");
@@ -111,16 +120,8 @@ public abstract class Layout implements XMLElement {
 		return fieldIds.toArray(new String[fieldIds.size()]);
 	}
 
-	public String getFieldTitle(String id) {
-		if (null == mySchema) {
-			return id;
-		} else {
-			return mySchema.getFieldTemplate(id).getFieldTitle();
-		}
-	}
-
-	public void getControlType(String id) {
-
+	public String getFieldTitle(int id) {
+		return bodyFieldList.get(id).title;
 	}
 
 	FieldPosition[] getFields() {
@@ -264,7 +265,5 @@ public abstract class Layout implements XMLElement {
 		return fld;
 	}
 
-	public int getFieldNum() {
-		return 0;
-	}
+	protected abstract void showRecord(int recId);
 }

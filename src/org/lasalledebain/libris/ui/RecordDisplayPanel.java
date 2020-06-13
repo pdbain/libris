@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.ui;
 
+import static java.util.Objects.nonNull;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -28,36 +30,42 @@ public class RecordDisplayPanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private LibrisGui mainGui;
-	JPanel buttonBar;
-	private JTabbedPane openRecordPanes;
+	private final JPanel buttonBar;
 	ArrayList<DatabaseRecordWindow> openRecords;
 	private JButton prevButton;
 	private JButton nextButton;
 	private JButton newButton;
 	private JButton enterButton;
-	private LibrisDatabase database;
-	private Layout recLayout;
-	private Layout titleLayout;
+	private LibrisDatabase myDatabase;
+	private Layout<DatabaseRecord> recLayout;
+	private Layout<DatabaseRecord> titleLayout;
 	private JComboBox<String> layoutSelector;
 	protected String[] layoutIds;
 	private String[] titleFieldIds;
 	private ModificationListener modListener;
 	private JButton closeButton;
 	private LibrisMenu menu;
+	private boolean singleRecordMode;
 
-	public RecordDisplayPanel(LibrisDatabase librisDatabase, LibrisGui mainGui) {
-		this.mainGui = mainGui;
-		this.database = librisDatabase;
+	private final JTabbedPane singleRecordView;
+	private final JPanel multipleRecordView;
+
+	public RecordDisplayPanel(LibrisDatabase librisDatabase, LibrisGui theGui) {
+		mainGui = theGui;
+		myDatabase = librisDatabase;
 		modListener = new ModificationListener();
 		setLayout(new BorderLayout());
 		openRecords = new ArrayList<DatabaseRecordWindow>();
-		addButtonBar(mainGui);
-		openRecordPanes = new JTabbedPane();
-		openRecordPanes.addChangeListener(new PaneChangeListener());
-		add(openRecordPanes);
+		buttonBar = new JPanel();
+		addButtonBar(theGui);
+		singleRecordView = new JTabbedPane();
+		multipleRecordView = new JPanel();
+		singleRecordView.addChangeListener(new PaneChangeListener());
+		add(singleRecordView);
 		setMinimumSize(new Dimension(200, 50));
 		setPreferredSize(new Dimension(890, 500));
-		menu = mainGui.getMenu();
+		menu = theGui.getMenu();
+		singleRecordMode = false;
 	}
 
 	DatabaseRecordWindow addRecord(DatabaseRecord record, boolean editable) throws LibrisException {
@@ -66,25 +74,29 @@ public class RecordDisplayPanel extends JPanel {
 		openRecords.add(rw);
 		String recordTitle = rw.createTitle(getTitleFieldIds());
 		final JScrollPane recordTab = new JScrollPane(rw);
-		openRecordPanes.add(recordTitle, recordTab);
+		singleRecordView.add(recordTitle, recordTab);
 		recordModified();
 		rw.setVisible(true);
-		openRecordPanes.setSelectedComponent(recordTab);
+		singleRecordView.setSelectedComponent(recordTab);
 		menu.recordWindowOpened(editable);
 		return rw;
 	}
 
 	public void displayRecord(int recId) throws LibrisException {
+		if (singleRecordMode) {
 		for (int i= 0; i < openRecords.size(); ++i) {
 			RecordWindow r = openRecords.get(i);
 			final int recordId = r.getRecordId();
 			if (recordId == recId) {
-				openRecordPanes.setSelectedIndex(i);
+				singleRecordView.setSelectedIndex(i);
 				return; /* already have the record */
 			}
 		}
-		DatabaseRecord rec = database.getRecord(recId);
+		DatabaseRecord rec = myDatabase.getRecord(recId);
 		addRecord(rec, false);
+		} else {
+			recLayout.showRecord(recId);
+		}
 	}
 
 	public Iterable<DatabaseRecordWindow> getOpenRecords() {
@@ -103,7 +115,7 @@ public class RecordDisplayPanel extends JPanel {
 		layoutIds = layouts.getLayoutIds();
 		String lo = "";
 		try {
-			lo = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_NEWRECORD).getId();
+			lo = myDatabase.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_NEWRECORD).getId();
 		} catch (DatabaseException e) {
 			mainGui.alert("exception "+e+" "+e.getMessage()+" reading layouts");
 		}
@@ -115,42 +127,59 @@ public class RecordDisplayPanel extends JPanel {
 		}
 	}
 
-	private synchronized void setRecLayout(Layout recLayout) {
-		this.recLayout = recLayout;
+	private synchronized void setRecLayout(Layout<DatabaseRecord> theLayout) throws DatabaseException, LibrisException {
+		recLayout = theLayout;
+		boolean oldMode = singleRecordMode;
+		singleRecordMode = theLayout.isSingleRecord();
+		if (singleRecordMode != oldMode) {
+			if (singleRecordMode) {
+				remove(multipleRecordView);
+				add(singleRecordView);
+				DatabaseRecordWindow currentRecordWindow = mainGui.getCurrentRecordWindow();
+				mainGui.getMenu().enableFieldValueOperations(nonNull(currentRecordWindow) && currentRecordWindow.isEditable());
+			} else {
+				remove(singleRecordView);
+				multipleRecordView.removeAll();
+				theLayout.layOutFields(mainGui.getResultRecords(), mainGui,multipleRecordView, null);
+				add(multipleRecordView);
+				mainGui.getMenu().enableFieldValueOperations(false);
+			}
+			mainGui.pack();
+			mainGui.repaint();
+		}
 	}
 
 	private synchronized String[] getTitleFieldIds() throws DatabaseException {
 		if (null == titleLayout) {
-			titleLayout = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
+			titleLayout = myDatabase.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
 			titleFieldIds = titleLayout.getFieldIds();
 		}
 		return titleFieldIds;
 	}
 
 	DatabaseRecordWindow getCurrentRecordWindow() {
-		int currentRecordIndex = openRecordPanes.getSelectedIndex();
+		int currentRecordIndex = singleRecordView.getSelectedIndex();
 		if (currentRecordIndex >= 0) {
 			return openRecords.get(currentRecordIndex);
 		}
 		return null;
 	}
-	
+
 	public void setCurrentRecordName(String newName) {
-		int currentRecordIndex = openRecordPanes.getSelectedIndex();
-		openRecordPanes.setTitleAt(currentRecordIndex, newName);
+		int currentRecordIndex = singleRecordView.getSelectedIndex();
+		singleRecordView.setTitleAt(currentRecordIndex, newName);
 	}
 
 	/**
 	 * @param mainGui
 	 */
 	private void addButtonBar(LibrisGui mainGui) {
-		buttonBar = new JPanel();
-		
+
 		buttonBar.add(prevButton = new JButton("\u2190"));
 		buttonBar.add(newButton = new JButton("New"));
 		NewRecordListener newRecordHandler = mainGui.menu.getNewRecordHandler();
 		newButton.addActionListener(newRecordHandler);
-		
+
 		buttonBar.add(enterButton = new JButton("Enter"));
 		enterButton.addActionListener(new closeListener(true));
 		buttonBar.add(closeButton = new JButton("Close"));
@@ -159,7 +188,7 @@ public class RecordDisplayPanel extends JPanel {
 		layoutSelector = new JComboBox<String>();
 		buttonBar.add(layoutSelector);
 		layoutSelector.addActionListener(new layoutSelectionListener());
-		
+
 		prevButton.addActionListener(new prevNextListener(false));
 		prevButton.setEnabled(false);
 		buttonBar.add(nextButton = new JButton("\u2192"));
@@ -179,26 +208,31 @@ public class RecordDisplayPanel extends JPanel {
 		}
 	}
 	private class layoutSelectionListener implements ActionListener {
-		
+
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			int selectedLayout = layoutSelector.getSelectedIndex();
 			if (selectedLayout >= 0) {
-				setRecLayout(database.getLayouts().getLayout(layoutIds[selectedLayout]));
-				RecordWindow w = getCurrentRecordWindow();
-				if (null != w) {
-					try {
-						w.setRecordLayout(recLayout);
-					} catch (LibrisException exc) {
-						mainGui.alert("exception "+exc+" "+exc.getMessage());
+				try {
+					Layout theLayout = myDatabase.getLayouts().getLayout(layoutIds[selectedLayout]);
+					setRecLayout(theLayout);
+					boolean singleRecordLayout = theLayout.isSingleRecord();
+					if (singleRecordLayout) {
+						RecordWindow w = getCurrentRecordWindow();
+						if (null != w) {
+							w.setRecordLayout(recLayout);
+						}
 					}
+				} catch (LibrisException exc) {
+					mainGui.alert("exception "+exc+" "+exc.getMessage());
 				}
 			}
 		}	
 	}
-	
+
 	private class closeListener implements ActionListener {
-		
+
 		private boolean enter;
 
 		public closeListener(boolean enter) {
@@ -215,9 +249,9 @@ public class RecordDisplayPanel extends JPanel {
 		}
 
 	}
-	
+
 	void doClose(ActionEvent evt, boolean enter) {
-		int selectedRecordIndex = openRecordPanes.getSelectedIndex();
+		int selectedRecordIndex = singleRecordView.getSelectedIndex();
 		if (selectedRecordIndex >= 0) {
 			boolean closeWindow = false;
 			DatabaseRecordWindow currentRecordWindow = openRecords.get(selectedRecordIndex);
@@ -225,16 +259,16 @@ public class RecordDisplayPanel extends JPanel {
 			try {
 				if (enter) {
 					currentRecordWindow.enter();
-					database.putRecord(currentRecord);
+					myDatabase.putRecord(currentRecord);
 					if (currentRecordWindow.isModified()) {
-						database.setModified(true);
+						myDatabase.setModified(true);
 					}
 					mainGui.put(currentRecord);
 				} else {
 					int result = currentRecordWindow.checkClose();
 					switch (result) {
 					case Dialogue.CANCEL_OPTION: return;
-					case Dialogue.YES_OPTION: database.putRecord(currentRecord);
+					case Dialogue.YES_OPTION: myDatabase.putRecord(currentRecord);
 					case Dialogue.NO_OPTION: closeWindow = true; break;
 					default: closeWindow = true;
 					}
@@ -246,7 +280,7 @@ public class RecordDisplayPanel extends JPanel {
 			int modifiers = (null == evt)? 0: evt.getModifiers();
 			if (closeWindow || (enter && (0 == (modifiers & ActionEvent.SHIFT_MASK)))) {
 				openRecords.remove(selectedRecordIndex);
-				openRecordPanes.remove(selectedRecordIndex);
+				singleRecordView.remove(selectedRecordIndex);
 				currentRecordWindow.close();
 				currentRecord.setEditable(false);
 			}
@@ -269,7 +303,7 @@ public class RecordDisplayPanel extends JPanel {
 
 			DatabaseRecord theRecord = w.getRecord();
 			menu.enableFieldValueOperations(theRecord.isEditable());
-					enterButton.setEnabled(modified);
+			enterButton.setEnabled(modified);
 			mainGui.setRecordEnterRecordEnabled(modified);
 			mainGui.setOpenArtifactInfoEnabled(theRecord.hasArtifact());
 			closeButton.setEnabled(true);
@@ -287,7 +321,7 @@ public class RecordDisplayPanel extends JPanel {
 			recordModified();
 		}
 	}
-	
+
 	public class PaneChangeListener implements ChangeListener {
 		public void stateChanged(ChangeEvent e) {
 			recordModified();
@@ -301,7 +335,7 @@ public class RecordDisplayPanel extends JPanel {
 				removeRecord(i);
 			}
 		} else {
-			int currentRecordIndex = openRecordPanes.getSelectedIndex();
+			int currentRecordIndex = singleRecordView.getSelectedIndex();
 			removeRecord(currentRecordIndex);
 		}
 		adjustMenusForWindowClose();
@@ -317,7 +351,7 @@ public class RecordDisplayPanel extends JPanel {
 			rw.close();
 		}
 		openRecords.remove(index);
-		openRecordPanes.remove(index);
+		singleRecordView.remove(index);
 
 	}
 }

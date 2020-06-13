@@ -44,7 +44,7 @@ public class BrowserWindow extends JPanel {
 	private JPanel filterView;
 	private JButton moreButton;
 	private JButton refreshButton;
-	private RandomAccessBrowserList recList;
+	private RandomAccessBrowserList<DatabaseRecord> resultRecords;
 	private Iterator<DatabaseRecord> recordsIterator;
 	private ImageIcon searchIcon;
 
@@ -98,8 +98,8 @@ public class BrowserWindow extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				recordsIterator = recordsSource.iterator();
-				recList = getRecords();
-				chooser.setModel(recList);
+				setResultList();
+				chooser.setModel(resultRecords);
 			}			
 		});
 		JPanel buttonBar = new JPanel(new FlowLayout());
@@ -117,8 +117,8 @@ public class BrowserWindow extends JPanel {
 		this.myLayout = layouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
 		fieldIds = myLayout.getFieldIds();
 		recordsIterator = recordsSource.iterator();
-		recList = getRecords();
-		chooser.setModel(recList);
+		setResultList();
+		chooser.setModel(resultRecords);
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class BrowserWindow extends JPanel {
 	}
 
 	public int getSelectedRecordId() {
-		BrowserRow chosenRecord = (BrowserRow) chooser.getSelectedValue();
+		RecordInfo<DatabaseRecord> chosenRecord = (RecordInfo) chooser.getSelectedValue();
 		if (null != chosenRecord) {		
 			return chosenRecord.getRecordId();
 		} else {
@@ -143,26 +143,26 @@ public class BrowserWindow extends JPanel {
 	}
 
 	public int getNumRecords() {
-		return recList.getSize();
+		return resultRecords.getSize();
 	}
 
 	void doRefresh() {
-		recList = getRecords(); // user records as ListModel
-		chooser.setModel(recList);
+		setResultList(); // user records as ListModel
+		chooser.setModel(resultRecords);
 	}			
 
 	public void doRefresh(RecordList<DatabaseRecord> src, RecordFilter filter) {
 		setFilter(filter);
 		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(src, filter);
 		recordsIterator = filteredList.iterator();
-		recList = getRecords();
-		chooser.setModel(recList);
+		setResultList();
+		chooser.setModel(resultRecords);
 	}
 
 	public void doRefresh(Iterable<DatabaseRecord> src) {
 		recordsIterator = src.iterator();
-		recList = getRecords();
-		chooser.setModel(recList);
+		setResultList();
+		chooser.setModel(resultRecords);
 	}
 
 	public void setFilter(RecordFilter filter) {
@@ -175,23 +175,23 @@ public class BrowserWindow extends JPanel {
 
 	public void addRecord(Record rec) throws DatabaseException {
 		removeRecord(rec);
-		if (null == recList) {
+		if (null == resultRecords) {
 			initialize(new SingleRecordList(rec));
 		} else {
-			int index =  recList.add(rec);
+			int index =  resultRecords.add(rec);
 			chooser.ensureIndexIsVisible(index);
 		}
 	}
 
 	public void removeRecord(Record rec) {
-		if (null != recList) {
-			int index =  recList.remove(rec);
+		if (null != resultRecords) {
+			int index =  resultRecords.remove(rec);
 			chooser.ensureIndexIsVisible(index);
 		}
 	}
 
-	private RandomAccessBrowserList getRecords() {
-		RandomAccessBrowserList list = new RandomAccessBrowserList(fieldIds);
+	public void setResultList() {
+		RandomAccessBrowserList<DatabaseRecord> list = new RandomAccessBrowserList<>(fieldIds);
 		int recordCount = 0;
 		while (recordsIterator.hasNext() && (LIST_LIMIT > recordCount)) {
 			Record r = recordsIterator.next();
@@ -206,7 +206,7 @@ public class BrowserWindow extends JPanel {
 		} else {
 			enableNext(false);
 		}
-		return list;
+		resultRecords = list;
 	}
 
 	private void enableNext(boolean b) {
@@ -214,7 +214,7 @@ public class BrowserWindow extends JPanel {
 	}
 
 	public void displaySelectedRecord() {
-		BrowserRow chosenRecord = (BrowserRow) chooser.getSelectedValue();
+		RecordInfo<DatabaseRecord> chosenRecord = (RecordInfo<DatabaseRecord>) chooser.getSelectedValue();
 		int recId = chosenRecord.getRecordId();
 		try {
 			gui.displayRecord(recId);
@@ -223,7 +223,7 @@ public class BrowserWindow extends JPanel {
 		}
 	}
 
-	Layout myLayout;
+	Layout<DatabaseRecord> myLayout;
 	private String[] fieldIds;
 
 	MouseListener chooserMouseListener = new MouseAdapter() {
@@ -241,6 +241,10 @@ public class BrowserWindow extends JPanel {
 
 	public void clearSelection() {
 		chooser.clearSelection();	
+	}
+
+	public RecordList<DatabaseRecord> getResultRecords() {
+		return resultRecords;
 	}
 
 }

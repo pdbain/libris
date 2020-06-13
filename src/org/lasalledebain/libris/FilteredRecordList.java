@@ -69,4 +69,10 @@ public class FilteredRecordList<RecordType extends Record> extends RecordList<Re
 			return;
 		}		
 	}
+
+	@Override
+	public int size() {
+		return -1;
+	}
+
 }

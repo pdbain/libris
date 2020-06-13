@@ -11,4 +11,10 @@ public abstract class RecordList<RecordType extends Record> implements Iterable<
 
 	public abstract RecordType getRecord(int id) throws InputException;
 
+	public RecordType getFirstRecord() throws InputException {
+		return iterator().next();
+	}
+
+	public abstract int size();
+
 }

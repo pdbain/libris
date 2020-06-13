@@ -8,7 +8,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 class DatabaseRecordList extends RecordList<DatabaseRecord> {
-	Vector <DatabaseRecord> recordList;
+
 	private LibrisDatabase database;
 	public DatabaseRecordList(LibrisDatabase db) {
 		database = db;
@@ -29,6 +29,11 @@ class DatabaseRecordList extends RecordList<DatabaseRecord> {
 	@Override
 	public DatabaseRecord getRecord(int id) throws InputException {
 		return database.getRecord(id);
+	}
+
+	@Override
+	public int size() {
+		return database.getLastRecordId();
 	}
 
 }

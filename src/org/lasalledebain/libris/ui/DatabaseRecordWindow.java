@@ -25,18 +25,18 @@ public class DatabaseRecordWindow extends RecordWindow {
 	final DatabaseRecord record;
 	private JButton artifactButton;
 	
-	public DatabaseRecordWindow(LibrisWindowedUi ui, Layout layout, DatabaseRecord rec, boolean editable, 
+	public DatabaseRecordWindow(LibrisWindowedUi ui, Layout<DatabaseRecord> layout, DatabaseRecord rec, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
 		this(ui, layout, rec, new Point(0, 0), editable, modificationListener);
 	}
 
-	public DatabaseRecordWindow(LibrisWindowedUi ui, Layout layout, DatabaseRecord rec, Point position, boolean editable, 
+	public DatabaseRecordWindow(LibrisWindowedUi ui, Layout<DatabaseRecord> layout, DatabaseRecord rec, Point position, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
 		super(ui, layout, rec, position, editable, modificationListener);
 		this.record = rec;
 	}
 
-	public DatabaseRecordWindow(LibrisWindowedUi ui, Layout myGuiLayout, DatabaseRecord rec, Point point, 
+	public DatabaseRecordWindow(LibrisWindowedUi ui, Layout<DatabaseRecord> myGuiLayout, DatabaseRecord rec, Point point, 
 			ActionListener modificationListener) throws LibrisException {
 		this(ui, myGuiLayout,  rec,  point, false, modificationListener);
 	}
