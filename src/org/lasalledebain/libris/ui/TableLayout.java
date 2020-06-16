@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.ui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public class TableLayout extends MultiRecordLayout<Record> {
 		recordTable.setGridColor(Color.BLACK);
 		recordTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		JScrollPane scrollPane = new JScrollPane(recordTable);
+		Dimension recordPanelSize = recordPanel.getSize();
+		scrollPane.setPreferredSize(recordPanelSize);
 		recordPanel.add(scrollPane);
 		recordPanel.setVisible(true);
 		return null;

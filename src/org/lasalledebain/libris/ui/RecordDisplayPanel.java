@@ -63,9 +63,15 @@ public class RecordDisplayPanel extends JPanel {
 		singleRecordView.addChangeListener(new PaneChangeListener());
 		add(singleRecordView);
 		setMinimumSize(new Dimension(200, 50));
-		setPreferredSize(new Dimension(890, 500));
+		setPreferredSize(new Dimension(1200, 750));
 		menu = theGui.getMenu();
 		singleRecordMode = false;
+		add(multipleRecordView);
+		mainGui.pack();
+		remove(singleRecordView);
+		add(multipleRecordView);
+		mainGui.pack();
+		remove(singleRecordView);
 	}
 
 	DatabaseRecordWindow addRecord(DatabaseRecord record, boolean editable) throws LibrisException {
