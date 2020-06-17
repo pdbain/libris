@@ -1,8 +1,11 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.libris.LibrisDatabase.log;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
 
@@ -23,6 +26,7 @@ public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
 
 	@Override
 	public void alert(String msg, Exception e) {
+		log(Level.SEVERE, msg, e);
 		String errorString = msg+": "+e.getMessage();
 		alert(errorString);
 		e.printStackTrace();

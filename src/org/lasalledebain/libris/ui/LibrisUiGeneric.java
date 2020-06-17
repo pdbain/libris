@@ -90,10 +90,11 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 				return null;
 			}
 			currentDatabase.openDatabase();
+			getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
 		} catch (Exception e) {
-			throw new DatabaseException("Error opening database", e);
+			alert("Error opening database", e);
+			return null;
 		}
-		getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
 		return currentDatabase;
 	}
 	@Override

@@ -95,16 +95,17 @@ public interface LibrisXMLConstants {
 	public static final String XML_LAYOUTUSAGE_TAG = "layoutusage";
 	public static final String XML_LAYOUT_ID_ATTR = "id";
 	public static final String XML_LAYOUT_TITLE_ATTR = "title";
+
 	public static final String XML_LAYOUT_TYPE_ATTR = "type";
 	public static final String XML_LAYOUT_TYPE_TABLE = "table";
+	public static final String XML_LAYOUT_TYPE_FORM = "form";
+	public static final String XML_LAYOUT_TYPE_LIST = "list";
+	public static final String XML_LAYOUT_TYPE_PARAGRAPH = "paragraph";
+	
 	public static final String XML_LAYOUT_USEDBY_ATTR = "usedby";
 	public static final String XML_LAYOUT_HEIGHT_ATTR = "height";
 	public static final String XML_LAYOUT_WIDTH_ATTR = "width";
 	public static final String XML_LAYOUT_USER_SUMMARYDISPLAY = "summarydisplay";
-	public static final String XML_LAYOUT_TYPE_FORM = "form";
-	public static final String XML_LAYOUT_TYPE_LIST = "list";
-	public static final String XML_LAYOUT_TYPE_PARAGRAPH = "paragraph";
-	public static final String XML_LAYOUT_USER_PARAGRAPH = "paragraph";
 	public static final String XML_LAYOUT_USER_NEWRECORD = "newrecord";
 	public static final String XML_SCHEMA_VERSION_ATTR = "schemaversion";
 

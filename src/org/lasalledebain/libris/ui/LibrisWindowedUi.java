@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.ui;
 
 import static javax.swing.JOptionPane.showMessageDialog;
+import static org.lasalledebain.libris.LibrisDatabase.log;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -73,6 +74,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 		LibrisDatabase.log(Level.WARNING, e.getMessage(), e);
 		String emessage = "";
 		buff.append(e.getClass().getSimpleName());
+		buff.append("\n");
 		
 		if (null != e) {
 			emessage = LibrisUiGeneric.formatConciseStackTrace(e, buff);

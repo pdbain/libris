@@ -321,7 +321,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		if (result) {
 			closeWindow(true);
 		}
-		mainWindow.removeAll();
+		if (nonNull(mainWindow)) mainWindow.removeAll();
 		return result;
 	}
 

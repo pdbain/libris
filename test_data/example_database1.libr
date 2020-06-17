@@ -108,6 +108,17 @@
 				<layoutfield control="enumfield" hspan="1" id="ID_month" return="true" title="Month" width="50"/>
 				<layoutfield control="rangefield" height="1" hspan="1" id="ID_pages" title="Pages" width="75"/>
 			</layout>
+			<layout height="2000" id="LO_listDisplay" title="List layout" type="list" width="3000">
+				<layoutfield control="textfield" hspan="1" id="ID_author" title="Author" width="150"/>
+				<layoutfield control="textfield" hspan="1" id="ID_title" return="true" title="Title" width="200"/>
+				<layoutfield control="enumfield" hspan="1" id="ID_journal" title="Journal" width="100"/>
+				<layoutfield control="enumfield" hspan="1" id="ID_publisher" return="true" title="Publisher" width="50"/>
+				<layoutfield control="textbox" height="1" hspan="1" id="ID_volume" title="Volume" width="25"/>
+				<layoutfield control="textbox" height="1" hspan="1" id="ID_issue" return="true" title="Issue" width="25"/>
+				<layoutfield control="textbox" height="1" hspan="1" id="ID_year" title="Year" width="25"/>
+				<layoutfield control="enumfield" hspan="1" id="ID_month" return="true" title="Month" width="50"/>
+				<layoutfield control="rangefield" height="1" hspan="1" id="ID_pages" title="Pages" width="75"/>
+			</layout>
 			<layout height="1400" id="LO_browserDisplay" title="Summary" type="list" width="700">
 				<layoutusage usedby="summarydisplay"/>
 				<layoutfield control="textfield" hspan="1" id="ID_author" title="Author" vspan="1"/>

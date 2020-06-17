@@ -95,6 +95,10 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 	public String getTitle() {
 		return title;
 	}
+	
+	public int getNumFields() {
+		return bodyFieldList.size();
+	}
 
 	abstract ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException;
@@ -265,5 +269,10 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 		return fld;
 	}
 
+	protected Field getField(Record rec, String fieldId)
+			throws LibrisException {
+		int fieldNum = mySchema.getFieldNum(fieldId);
+		return getField(rec, fieldNum);
+	}
 	protected abstract void showRecord(int recId);
 }

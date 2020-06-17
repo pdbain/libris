@@ -20,7 +20,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 public class TableLayout extends MultiRecordLayout<Record> {
 
-	private ListLayoutTableModel<Record> myTableModel;
+	private TableLayoutTableModel<Record> myTableModel;
 	private JTable recordTable;
 
 	public TableLayout(Schema schem) throws DatabaseException {
@@ -35,10 +35,10 @@ public class TableLayout extends MultiRecordLayout<Record> {
 	@Override
 	ArrayList<UiField> layOutFields(RecordList recList, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
 			throws DatabaseException {
-		myTableModel = new ListLayoutTableModel<Record>(recList, this, false);
+		myTableModel = new TableLayoutTableModel<Record>(recList, this);
 		recordTable = new JTable(myTableModel);
 		FontMetrics myFontMetrics = recordPanel.getFontMetrics(recordTable.getFont());
-		int columnWidth = myFontMetrics.stringWidth(ListLayoutTableModel.RECORD_ID) + 10;
+		int columnWidth = myFontMetrics.stringWidth(TableLayoutTableModel.RECORD_ID) + 10;
 		TableColumnModel columns = recordTable.getColumnModel();
 		columns.getColumn(0).setPreferredWidth(columnWidth);
 		for (int i = 1; i < myTableModel.getColumnCount(); ++i) {
