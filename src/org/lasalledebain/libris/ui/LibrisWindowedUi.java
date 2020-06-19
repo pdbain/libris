@@ -37,9 +37,6 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 
 	public abstract void closeWindow(boolean allWindows);
 
-	public void pack() {
-		mainFrame.pack();
-	}
 	@Override
 	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		boolean result = false;

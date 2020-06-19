@@ -40,6 +40,10 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 		layoutUsers = new Vector<String>(1);
 	}
 
+	public Schema getSchema() {
+		return mySchema;
+	}
+
 	public void setId(String id) {
 		this.id = id;
 	}

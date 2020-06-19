@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -11,7 +12,6 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -23,12 +23,9 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisMenu.NewRecordListener;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
+@SuppressWarnings("serial")
 public class RecordDisplayPanel extends JPanel {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private LibrisGui mainGui;
 	private final JPanel buttonBar;
 	ArrayList<DatabaseRecordWindow> openRecords;
@@ -59,19 +56,12 @@ public class RecordDisplayPanel extends JPanel {
 		buttonBar = new JPanel();
 		addButtonBar(theGui);
 		singleRecordView = new JTabbedPane();
-		multipleRecordView = new JPanel();
+		multipleRecordView = new JPanel(new GridLayout());
 		singleRecordView.addChangeListener(new PaneChangeListener());
 		add(singleRecordView);
 		setMinimumSize(new Dimension(200, 50));
 		setPreferredSize(new Dimension(1200, 750));
 		menu = theGui.getMenu();
-		singleRecordMode = false;
-		add(multipleRecordView);
-		mainGui.pack();
-		remove(singleRecordView);
-		add(multipleRecordView);
-		mainGui.pack();
-		remove(singleRecordView);
 	}
 
 	DatabaseRecordWindow addRecord(DatabaseRecord record, boolean editable) throws LibrisException {
@@ -79,27 +69,26 @@ public class RecordDisplayPanel extends JPanel {
 		rw.setModified(false);
 		openRecords.add(rw);
 		String recordTitle = rw.createTitle(getTitleFieldIds());
-		final JScrollPane recordTab = new JScrollPane(rw);
-		singleRecordView.add(recordTitle, recordTab);
+		singleRecordView.add(recordTitle, rw);
 		recordModified();
 		rw.setVisible(true);
-		singleRecordView.setSelectedComponent(recordTab);
+		singleRecordView.setSelectedComponent(rw);
 		menu.recordWindowOpened(editable);
 		return rw;
 	}
 
 	public void displayRecord(int recId) throws LibrisException {
 		if (singleRecordMode) {
-		for (int i= 0; i < openRecords.size(); ++i) {
-			RecordWindow r = openRecords.get(i);
-			final int recordId = r.getRecordId();
-			if (recordId == recId) {
-				singleRecordView.setSelectedIndex(i);
-				return; /* already have the record */
+			for (int i= 0; i < openRecords.size(); ++i) {
+				RecordWindow r = openRecords.get(i);
+				final int recordId = r.getRecordId();
+				if (recordId == recId) {
+					singleRecordView.setSelectedIndex(i);
+					return; /* already have the record */
+				}
 			}
-		}
-		DatabaseRecord rec = myDatabase.getRecord(recId);
-		addRecord(rec, false);
+			DatabaseRecord rec = myDatabase.getRecord(recId);
+			addRecord(rec, false);
 		} else {
 			recLayout.showRecord(recId);
 		}
@@ -150,7 +139,7 @@ public class RecordDisplayPanel extends JPanel {
 				add(multipleRecordView);
 				mainGui.getMenu().enableFieldValueOperations(false);
 			}
-			mainGui.pack();
+			mainGui.mainFrame.pack();
 			mainGui.repaint();
 		}
 	}

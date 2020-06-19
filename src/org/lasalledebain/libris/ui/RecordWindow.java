@@ -2,6 +2,8 @@ package org.lasalledebain.libris.ui;
 
 import java.awt.Point;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 
 import javax.swing.JPanel;
@@ -17,7 +19,7 @@ public class RecordWindow extends JPanel {
 	protected Layout recordLayout;
 	protected String title;
 	protected int recordId;
-	protected JPanel recordPanel;
+	protected final JPanel recordPanel;
 	protected ArrayList<UiField> guiFields = new ArrayList<UiField>();
 	private final Record record;
 	protected ModificationTracker modTracker;
@@ -26,6 +28,8 @@ public class RecordWindow extends JPanel {
 	public RecordWindow(LibrisWindowedUi ui, Layout layout, Record rec, Point position, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
 		this.record = rec;
+		recordPanel = new JPanel();
+		add(recordPanel);
 		recordId = rec.getRecordId();
 		title = layout.getTitle();
 		this.recordLayout = layout;
@@ -38,7 +42,6 @@ public class RecordWindow extends JPanel {
 	}
 
 	protected void layOutWindow(LibrisWindowedUi ui, Layout layout, Record rec) throws LibrisException {
-		recordPanel = new JPanel();
 		layOutFields(layout, rec, recordPanel, modTracker);
 		recordPanel.setVisible(true);
 		ui.fieldSelected(false);

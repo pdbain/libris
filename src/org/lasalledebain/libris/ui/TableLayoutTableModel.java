@@ -1,19 +1,16 @@
 package org.lasalledebain.libris.ui;
+import static java.util.Objects.nonNull;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import javax.swing.table.AbstractTableModel;
 
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.ui.Layout;
-import static java.util.Objects.nonNull;
-
-import java.awt.Graphics;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 @SuppressWarnings("serial")
 public class TableLayoutTableModel<RecordType extends Record> extends AbstractTableModel {

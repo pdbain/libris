@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
+import org.lasalledebain.libris.index.GroupDef;
+import org.lasalledebain.libris.index.GroupDefs;
+import org.lasalledebain.libris.index.GroupMember;
 
 @SuppressWarnings("serial")
 public class ListLayoutTableModel<RecordType extends Record> extends AbstractTableModel {
@@ -18,14 +22,35 @@ public class ListLayoutTableModel<RecordType extends Record> extends AbstractTab
 	private final Layout myLayout;
 	private RecordType myRecord;
 	private final static String[] columnNames = new String[] {"Field", "Main value", "Extra value"};
-	private final ArrayList<FieldValue> values;
 	private final ArrayList<String> titles;
 	private final String[] myFieldIds;
-	public ListLayoutTableModel(RecordType theRecord, Layout theLayout) throws LibrisException {
+	private final ArrayList<String[]> rows;
+	public ListLayoutTableModel(RecordType theRecord, GenericDatabase db, Layout theLayout) throws LibrisException {
 		myRecord = theRecord;
 		myLayout = theLayout;
-		values = new ArrayList<>();
 		titles = new ArrayList<>();
+		rows = new ArrayList<>();
+		Schema mySchema = theLayout.getSchema();
+		int numGroups = mySchema.getNumGroups();
+		if (numGroups > 0) {
+			GroupDefs defs = mySchema.getGroupDefs();
+			int groupNum = 0;
+			for (GroupDef def: defs) {
+				String groupName = def.getFieldTitle();
+				GroupMember gm = theRecord.getMember(groupNum);
+				if (null == gm) {
+					continue;
+				}
+				int[] affiliations = gm.getAffiliations();
+				if (affiliations.length == 0) continue;
+				for (int affiliate: affiliations) {
+					String recordName = db.getRecordName(affiliate);
+					rows.add(new String[] {groupName, recordName, ""});
+					groupName = "";
+				}
+				++groupNum;
+			}
+		}
 		myFieldIds = myLayout.getFieldIds();
 		for (int fieldnum = 0; fieldnum < myFieldIds.length; ++fieldnum) {
 			String id = myFieldIds[fieldnum];
@@ -38,9 +63,7 @@ public class ListLayoutTableModel<RecordType extends Record> extends AbstractTab
 			if (nonNull(f)) {
 				String title = myLayout.getFieldTitle(fieldnum);
 				for (FieldValue v: f.getFieldValues()) {
-					titles.add(title);
-					title = "";
-					values.add(v);
+					rows.add(new String[] {title, v.getValueAsString(), v.getExtraValueAsString()});
 				}
 			}
 		}
@@ -53,7 +76,7 @@ public class ListLayoutTableModel<RecordType extends Record> extends AbstractTab
 
 	@Override
 	public int getRowCount() {
-		return values.size();
+		return rows.size();
 	}
 
 	@Override
@@ -63,18 +86,8 @@ public class ListLayoutTableModel<RecordType extends Record> extends AbstractTab
 
 	@Override
 	public String getValueAt(int rowIndex, int columnIndex) {
-		String result;
-		switch (columnIndex) {
-		case 0: result = titles.get(rowIndex); break;
-		case 1: try {
-			result = values.get(rowIndex).getMainValueAsString();
-		} catch (FieldDataException e) {
-			result = "<unknown>";
-		} break;
-		case 2: result = values.get(rowIndex).getExtraValueAsKey(); break;
-		default: result = "<unknown>";
-		}
-		return result;
+		String[] row = rows.get(rowIndex);
+		return row[columnIndex];
 	}
 
 }

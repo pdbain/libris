@@ -7,6 +7,8 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -140,11 +142,6 @@ public class LibrisGui extends LibrisWindowedUi {
 			contentPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, resultsPanel, displayPanel);
 			contentPane.setOneTouchExpandable(true);
 			Preferences prefs = getLibrisPrefs();
-			int compwidth = prefs.getInt(CONTENT_PANE_WIDTH, 1200);
-			int compheight = prefs.getInt(CONTENT_PANE_HEIGHT, 650);
-			contentPane.setPreferredSize(new Dimension(compwidth, compheight));
-			int divloc = prefs.getInt(CONTENT_PANE_DIVIDER, 285);
-			contentPane.setDividerLocation(divloc);
 
 			mainWindow = contentPane;
 			mainWindow.setOneTouchExpandable(true);

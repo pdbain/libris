@@ -355,50 +355,45 @@ public class RecordEditTests extends TestCase {
 		}
 	}
 	
-	public void testDeleteValue() {
-		try {
-			TestGUI gui = rebuildAndOpenDatabase(getName());
-			BrowserWindow resultsWindow = gui.getResultsWindow();
-			resultsWindow.setSelectedRecordIndex(3);
-			gui.displaySelectedRecord();
-			gui.setRecordWindowEditable(true);
-			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
-			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
-			int originalId = resultsWindow.getSelectedRecordId();
-			Record originalRecord = recWindow.getRecord();
-			info("selected "+originalId);
-			gui.duplicateRecord();
-			gui.enterRecord();
-			gui.setRecordWindowEditable(true);
-			recWindow = dispPanel.getCurrentRecordWindow();
-			Record newRec = recWindow.getRecord();
-			assertEquals("Duplicate record != original record", originalRecord, newRec);
-			UiField authUiField = recWindow.getField(ID_AUTH);
-			MultipleValueUiField pagesUiField = (MultipleValueUiField) recWindow.getField(ID_PAGES);
-			FieldValue pagesValue = pagesUiField.getCtrl(0).getFieldValue();
-			String originalMainValue = pagesValue.getMainValueAsString();
-			String originalExtraValue = pagesValue.getExtraValueAsString();
-			assertNotNull("Could not find "+ID_AUTH, authUiField);
-			Record currentRec = recWindow.getRecord();
-			authUiField.doSelect();
-			pause("Remove field");
-			gui.removeFieldValue();
-			gui.enterRecord();
+	public void testDeleteValue() throws IOException, LibrisException {
+		TestGUI gui = rebuildAndOpenDatabase(getName());
+		BrowserWindow resultsWindow = gui.getResultsWindow();
+		resultsWindow.setSelectedRecordIndex(3);
+		gui.displaySelectedRecord();
+		gui.setRecordWindowEditable(true);
+		RecordDisplayPanel dispPanel = gui.getDisplayPanel();
+		RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
+		int originalId = resultsWindow.getSelectedRecordId();
+		Record originalRecord = recWindow.getRecord();
+		info("selected "+originalId);
+		gui.duplicateRecord();
+		gui.enterRecord();
+		gui.setRecordWindowEditable(true);
+		recWindow = dispPanel.getCurrentRecordWindow();
+		Record newRec = recWindow.getRecord();
+		assertEquals("Duplicate record != original record", originalRecord, newRec);
+		UiField authUiField = recWindow.getField(ID_AUTH);
+		MultipleValueUiField pagesUiField = (MultipleValueUiField) recWindow.getField(ID_PAGES);
+		FieldValue pagesValue = pagesUiField.getCtrl(0).getFieldValue();
+		String originalMainValue = pagesValue.getMainValueAsString();
+		String originalExtraValue = pagesValue.getExtraValueAsString();
+		assertNotNull("Could not find "+ID_AUTH, authUiField);
+		Record currentRec = recWindow.getRecord();
+		authUiField.doSelect();
+		pause("Remove field");
+		gui.removeFieldValue();
+		gui.enterRecord();
 
-			gui.displayRecord(currentRec.getRecordId());
-			pagesValue = pagesUiField.getCtrl(0).getFieldValue();
-			String newMainValue = pagesValue.getMainValueAsString();
-			String newExtraValue = pagesValue.getExtraValueAsString();
-			assertEquals("pages field main values differ", originalMainValue, newMainValue);
-			assertEquals("pages field Extra values differ", originalExtraValue, newExtraValue);
-			String newAuthFieldValues = currentRec.getField(ID_AUTH).getValuesAsString();
-			assertEquals("auth field value deletion failed", "Rec4Fld1Val2", newAuthFieldValues);
-			pause("Close database");
-			assertTrue("Could not close database", gui.quit(true));
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception ");
-		}
+		gui.displayRecord(currentRec.getRecordId());
+		pagesValue = pagesUiField.getCtrl(0).getFieldValue();
+		String newMainValue = pagesValue.getMainValueAsString();
+		String newExtraValue = pagesValue.getExtraValueAsString();
+		assertEquals("pages field main values differ", originalMainValue, newMainValue);
+		assertEquals("pages field Extra values differ", originalExtraValue, newExtraValue);
+		String newAuthFieldValues = currentRec.getField(ID_AUTH).getValuesAsString();
+		assertEquals("auth field value deletion failed", "Rec4Fld1Val2", newAuthFieldValues);
+		pause("Close database");
+		assertTrue("Could not close database", gui.quit(true));
 	}
 
 	public void testAddUnsetEnumValue() {
