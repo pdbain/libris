@@ -21,7 +21,7 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.LibrisException;
 
 @SuppressWarnings("serial")
-public class DatabaseRecordWindow extends RecordWindow {
+public class DatabaseRecordWindow extends RecordWindow<DatabaseRecord> {
 	final DatabaseRecord record;
 	private JButton artifactButton;
 	
@@ -41,12 +41,12 @@ public class DatabaseRecordWindow extends RecordWindow {
 		this(ui, myGuiLayout,  rec,  point, false, modificationListener);
 	}
 	
-	protected void layOutWindow(LibrisWindowedUi ui, Layout layout, Record rec) throws LibrisException {
+	protected void layOutWindow(LibrisWindowedUi ui, Layout<DatabaseRecord> layout, DatabaseRecord rec) throws LibrisException {
 		super.layOutWindow(ui, layout, rec);
 		String recordName = rec.getName();
 		navPanel = new JPanel(new BorderLayout());
 		add(navPanel);
-		navPanel.add(recordPanel, BorderLayout.CENTER);
+		navPanel.add(recordDisplayArea, BorderLayout.CENTER);
 		if (null != recordName) {
 			navPanel.add(new JLabel(recordName, SwingConstants.CENTER), BorderLayout.NORTH);
 		}
@@ -54,7 +54,7 @@ public class DatabaseRecordWindow extends RecordWindow {
 		if (null != artifactInfo) {
 			addArtifactButton(artifactInfo);
 		}
-		recordPanel.setVisible(true);
+		navPanel.setVisible(true);
 		ui.fieldSelected(false);
 		ui.setSelectedField(null);
 	}

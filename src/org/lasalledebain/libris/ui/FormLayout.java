@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.border.TitledBorder;
@@ -26,7 +27,7 @@ import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class FormLayout extends Layout {
+public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 	public FormLayout(Schema schem) throws DatabaseException {
 		super(schem);
 	}
@@ -49,10 +50,10 @@ public class FormLayout extends Layout {
 	}
 
 	@Override
-	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 	throws LibrisException {
 		final boolean modifiable = modTrk.isModifiable();
-		JPanel fieldPanel = null;
+		JComponent fieldPanel = null;
 		ArrayList<UiField> guiFields = new ArrayList<UiField>();
 		int numGroups = mySchema.getNumGroups();
 		if (numGroups > 0) {
@@ -109,7 +110,7 @@ public class FormLayout extends Layout {
 	}
 
 	@Override
-	ArrayList<UiField> layOutFields(RecordList recList, LibrisWindowedUi ui, JPanel recordPanel,
+	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		Record rec = recList.getFirstRecord();
 		return layOutFields(rec, ui, recordPanel, modTrk);

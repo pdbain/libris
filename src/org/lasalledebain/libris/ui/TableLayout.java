@@ -5,7 +5,7 @@ import java.awt.FontMetrics;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
+import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumnModel;
@@ -17,9 +17,9 @@ import org.lasalledebain.libris.SingleRecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class TableLayout extends MultiRecordLayout<Record> {
+public class TableLayout<RecordType extends Record> extends MultiRecordLayout<RecordType> {
 
-	private TableLayoutTableModel<Record> myTableModel;
+	private TableLayoutTableModel<RecordType> myTableModel;
 	private JTable recordTable;
 	private JScrollPane scrollPane;
 
@@ -33,9 +33,9 @@ public class TableLayout extends MultiRecordLayout<Record> {
 	}
 
 	@Override
-	ArrayList<UiField> layOutFields(RecordList recList, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException {
-		myTableModel = new TableLayoutTableModel<Record>(recList, this);
+		myTableModel = new TableLayoutTableModel<RecordType>(recList, this);
 		recordTable = new JTable(myTableModel);
 		FontMetrics myFontMetrics = recordPanel.getFontMetrics(recordTable.getFont());
 		int columnWidth = myFontMetrics.stringWidth(TableLayoutTableModel.RECORD_ID) + 10;
@@ -57,9 +57,9 @@ public class TableLayout extends MultiRecordLayout<Record> {
 	}
 
 	@Override
-	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {		
-		return layOutFields(new SingleRecordList<Record>(rec), ui, recordPanel, modTrk);
+		return layOutFields(new SingleRecordList<RecordType>(rec), ui, recordPanel, modTrk);
 	}
 
 	@Override

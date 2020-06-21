@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -25,7 +26,7 @@ public class ParagraphLayout extends Layout {
 	}
 
 	@Override
-	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {
 		JEditorPane content = new JEditorPane();
 		JScrollPane editorScrollPane = new JScrollPane(content);

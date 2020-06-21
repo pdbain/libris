@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.lasalledebain.libris.Field;
@@ -104,10 +105,10 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 		return bodyFieldList.size();
 	}
 
-	abstract ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
+	abstract ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException;
 
-	ArrayList<UiField> layOutFields(RecordList recList, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {
 		return 	layOutFields(recList.getFirstRecord(), ui,  recordPanel, modTrk);
 	};

@@ -7,6 +7,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -36,7 +37,7 @@ public class ListLayout extends Layout<Record> {
 
 	// TODO show groups
 	@Override
-	ArrayList<UiField> layOutFields(Record theRecord, LibrisWindowedUi ui, JPanel recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(Record theRecord, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws LibrisException {
 		LibrisDatabase db = ui.getDatabase();
 		myTableModel = new ListLayoutTableModel<Record>(theRecord, db, this);

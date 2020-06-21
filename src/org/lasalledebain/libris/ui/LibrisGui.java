@@ -54,7 +54,6 @@ public class LibrisGui extends LibrisWindowedUi {
 	protected BrowserWindow resultsPanel;
 	protected RecordDisplayPanel displayPanel;
 	private JSplitPane contentPane;
-	private JSplitPane mainWindow;
 	private JPanel layoutEditPane;
 	private Clipboard systemClipboard;
 	private Component mainframeContents;
@@ -143,10 +142,9 @@ public class LibrisGui extends LibrisWindowedUi {
 			contentPane.setOneTouchExpandable(true);
 			Preferences prefs = getLibrisPrefs();
 
-			mainWindow = contentPane;
-			mainWindow.setOneTouchExpandable(true);
-			mainFrame.add(mainWindow);
-			mainframeContents = mainWindow;
+			contentPane.setOneTouchExpandable(true);
+			mainFrame.add(contentPane);
+			mainframeContents = contentPane;
 		} else {
 			createDummyWindow();
 		}
@@ -196,7 +194,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	@Override
 	protected void destroyWindow(boolean retain) {
-		if (null != mainWindow) {
+		if (null != contentPane) {
 			if (!isDatabaseReadOnly()) {
 				Preferences prefs = getLibrisPrefs();
 				int temp = contentPane.getWidth();
@@ -211,11 +209,9 @@ public class LibrisGui extends LibrisWindowedUi {
 					LibrisDatabase.log(Level.WARNING, "exception in destroyWindow", e);
 				}
 			}
-			for (Component c : mainWindow.getComponents()) {
-				mainWindow.remove(c);
-			}
+			contentPane.removeAll();
 			if (retain) {
-				mainWindow.setVisible(false);
+				contentPane.setVisible(false);
 				mainFrame.remove(mainframeContents);
 				createDummyWindow();
 				mainFrame.pack();
@@ -318,7 +314,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		if (result) {
 			closeWindow(true);
 		}
-		if (nonNull(mainWindow)) mainWindow.removeAll();
+		if (nonNull(contentPane)) contentPane.removeAll();
 		return result;
 	}
 
@@ -583,7 +579,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		String userDir = System.getProperty("user.dir");
 		String lastArtifactDirectory = librisPrefs.get(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, userDir);
 		JFileChooser chooser = new JFileChooser(lastArtifactDirectory);
-		int option = chooser.showOpenDialog(this.mainframeContents);
+		int option = chooser.showOpenDialog(mainframeContents);
 		if (JFileChooser.APPROVE_OPTION == option) {
 			result = chooser.getSelectedFile();
 			lastArtifactDirectory = result.getParent();
