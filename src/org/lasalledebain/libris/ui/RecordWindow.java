@@ -7,13 +7,14 @@ import java.util.ArrayList;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 
 @SuppressWarnings("serial")
-public abstract class RecordWindow<RecordType extends Record> extends JPanel {
+public abstract class RecordWindow<RecordType extends Record> extends JScrollPane {
 
 	protected LibrisWindowedUi ui;
 	protected Layout<RecordType> recordLayout;
@@ -29,7 +30,6 @@ public abstract class RecordWindow<RecordType extends Record> extends JPanel {
 			ActionListener modificationListener) throws LibrisException {
 		this.record = rec;
 		recordDisplayArea = new JPanel(new GridLayout());
-		add(recordDisplayArea);
 		recordId = rec.getRecordId();
 		title = layout.getTitle();
 		this.recordLayout = layout;

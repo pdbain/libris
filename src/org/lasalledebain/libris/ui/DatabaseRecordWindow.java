@@ -16,7 +16,6 @@ import javax.swing.SwingConstants;
 
 import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseRecord;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.LibrisException;
 
@@ -45,7 +44,7 @@ public class DatabaseRecordWindow extends RecordWindow<DatabaseRecord> {
 		super.layOutWindow(ui, layout, rec);
 		String recordName = rec.getName();
 		navPanel = new JPanel(new BorderLayout());
-		add(navPanel);
+		setViewportView(navPanel);
 		navPanel.add(recordDisplayArea, BorderLayout.CENTER);
 		if (null != recordName) {
 			navPanel.add(new JLabel(recordName, SwingConstants.CENTER), BorderLayout.NORTH);

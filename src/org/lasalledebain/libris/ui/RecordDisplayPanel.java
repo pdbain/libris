@@ -74,6 +74,7 @@ public class RecordDisplayPanel extends JPanel {
 		rw.setVisible(true);
 		singleRecordView.setSelectedComponent(rw);
 		menu.recordWindowOpened(editable);
+		mainGui.mainFrame.repaint();
 		return rw;
 	}
 
