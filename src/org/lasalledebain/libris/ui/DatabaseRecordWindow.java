@@ -54,6 +54,7 @@ public class DatabaseRecordWindow extends RecordWindow<DatabaseRecord> {
 			addArtifactButton(artifactInfo);
 		}
 		navPanel.setVisible(true);
+		// TODO redundant?
 		ui.fieldSelected(false);
 		ui.setSelectedField(null);
 	}

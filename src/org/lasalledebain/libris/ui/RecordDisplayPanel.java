@@ -140,9 +140,9 @@ public class RecordDisplayPanel extends JPanel {
 				add(multipleRecordView);
 				mainGui.getMenu().enableFieldValueOperations(false);
 			}
-			mainGui.mainFrame.pack();
-			mainGui.repaint();
 		}
+		mainGui.mainFrame.pack();
+		mainGui.repaint();
 	}
 
 	private synchronized String[] getTitleFieldIds() throws DatabaseException {

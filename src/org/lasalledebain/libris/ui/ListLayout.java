@@ -1,15 +1,12 @@
 package org.lasalledebain.libris.ui;
 
+import static java.util.Objects.nonNull;
+
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.FontMetrics;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumnModel;
 
@@ -19,7 +16,6 @@ import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-import static java.util.Objects.nonNull;
 
 public class ListLayout extends Layout<Record> {
 
@@ -55,9 +51,7 @@ public class ListLayout extends Layout<Record> {
 		}
 		recordTable.setGridColor(Color.BLACK);
 		recordTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		JScrollPane scrollPane = new JScrollPane(recordTable);
-		recordPanel.add(scrollPane);
-		recordPanel.setVisible(true);
+		recordPanel.add(recordTable);
 		return null;
 	}
 

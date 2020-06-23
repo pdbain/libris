@@ -39,6 +39,8 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		modTracker.setModifiable(editable);
 		layOutWindow(ui, layout, rec);
 		modTracker.setModified(false);
+		recordDisplayArea.setVisible(true);
+		recordDisplayArea.repaint();
 	}
 
 	protected void layOutWindow(LibrisWindowedUi ui, Layout<RecordType> layout, RecordType rec) throws LibrisException {
