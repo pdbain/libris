@@ -123,7 +123,7 @@ public class RecordDisplayPanel extends JPanel {
 		}
 	}
 
-	private synchronized void setRecLayout(Layout<DatabaseRecord> theLayout) throws DatabaseException, LibrisException {
+	void setRecLayout(Layout<DatabaseRecord> theLayout) throws DatabaseException, LibrisException {
 		recLayout = theLayout;
 		boolean oldMode = singleRecordMode;
 		singleRecordMode = theLayout.isSingleRecord();

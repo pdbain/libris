@@ -45,6 +45,7 @@ import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.TestGUI;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementReader;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -81,13 +82,14 @@ public class Utilities extends TestCase {
 	public static final String SCHEMA_WITH_DEFAULTS = "SchemaWithDefaults.xml";
 	public static final String DATABASE_WITH_GROUPS_XML = "DatabaseWithGroups.xml";
 	public static final String DATABASE_WITH_GROUPS_AND_RECORDS_XML = "DatabaseWithGroupsAndRecords.xml";
+	public static final String EXAMPLE_DATABASE1_FILE = "example_database1.libr";
 	public static final String TEST_DATABASE_WITH_REPO = "testDatabaseWithRepo.xml";
 	public static final String TEST_DATABASE_UNORDERED_XML = "testDatabaseUnordered.xml";
 	public static final String EXAMPLE_ARTIFACT_PDF = "example_artifact.pdf";
 	public static final String EXAMPLE_LARGE_PDF = "mesa.pdf";
 	public static final String EXAMPLE_DOCS_ZIP = "example_docs.zip";
 	public static final String EXAMPLE_FILES = "example_pdfs";
-	
+
 	static RecordFactory<DatabaseRecord> makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {
 		Schema s = new MockSchema();
@@ -123,7 +125,7 @@ public class Utilities extends TestCase {
 		}
 		return testDirectory;
 	}
-	
+
 	public static Schema loadSchema(File schemaFile) throws LibrisException  {
 		FileReader rdr;
 		try {
@@ -138,8 +140,8 @@ public class Utilities extends TestCase {
 	}
 
 	public static Layouts loadLayoutsFromXml(Schema schem, File inputFile)
-	throws FileNotFoundException, FactoryConfigurationError,
-	XMLStreamException, LibrisException, DatabaseException {
+			throws FileNotFoundException, FactoryConfigurationError,
+			XMLStreamException, LibrisException, DatabaseException {
 		ElementManager mgr = makeElementManagerFromFile(inputFile, "layouts");
 		Layouts myLayouts = new Layouts(schem);
 		myLayouts.fromXml(mgr);
@@ -147,9 +149,9 @@ public class Utilities extends TestCase {
 	}
 
 	static DatabaseRecord loadRecordFromXml(File schemaFile, File recordFile)
-	throws LibrisException, XMLStreamException,
-	LibrisException, RecordDataException,
-	FactoryConfigurationError, DatabaseException, FileNotFoundException {
+			throws LibrisException, XMLStreamException,
+			LibrisException, RecordDataException,
+			FactoryConfigurationError, DatabaseException, FileNotFoundException {
 		Schema s = Utilities.loadSchema(schemaFile);
 		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		ElementManager mgr = makeElementManagerFromFile(recordFile, "record");
@@ -159,7 +161,7 @@ public class Utilities extends TestCase {
 	}
 
 	static Record loadRecordFromXml(File schemaFile, InputStream xmlStream, File sourceFile) throws 
-		LibrisException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
+	LibrisException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
 		Schema s = Utilities.loadSchema(schemaFile);
 		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		String sourcePath = (null == sourceFile)? null : sourceFile.getPath();
@@ -174,7 +176,7 @@ public class Utilities extends TestCase {
 		FileInputStream xmlInputStream;
 		try {
 			xmlInputStream = new FileInputStream(recordFile);
-		return makeElementManagerFromInputStream(xmlInputStream, recordFile.getPath(), elementNameString);
+			return makeElementManagerFromInputStream(xmlInputStream, recordFile.getPath(), elementNameString);
 		} catch (FileNotFoundException e) {
 			throw new XmlException("error parsing "+elementNameString, e);
 		}
@@ -256,11 +258,11 @@ public class Utilities extends TestCase {
 		copyFile(testDatabaseFile, testDatabaseFileCopy);
 		return testDatabaseFileCopy;
 	}
-	
+
 	public static void deleteTestDatabaseFiles() {
 		deleteTestDatabaseFiles(TEST_DB1_XML_FILE);
 	}
-	
+
 	public static void deleteWorkingDirectory() {
 		File workDir = getTempTestDirectory();
 		deleteRecursively(workDir);
@@ -278,7 +280,7 @@ public class Utilities extends TestCase {
 			auxFiles.delete();
 		}
 	}
-	
+
 	private static File getTempTestDirectory() {
 		File tempTestDirectory = new File(System.getProperty("java.io.tmpdir"), "libristest");
 		return tempTestDirectory;
@@ -297,7 +299,7 @@ public class Utilities extends TestCase {
 		assertTrue("Cannot create temporary test directory " + testDir.getAbsolutePath(), testDir.mkdir());
 		return testDir;
 	}
-	
+
 	@Deprecated
 	public static FileSpaceManager makeFileSpaceManager(String managerName) {
 		File workDir = makeTempTestDirectory();
@@ -366,25 +368,25 @@ public class Utilities extends TestCase {
 		}
 		return b.toString();
 	}
-	
+
 	static String getRecordIdString(Record recData) {
 		return RecordId.toString(recData.getRecordId());
 	}
-	
+
 	public static final Logger testLogger;
 	static {
 		testLogger = Logger.getLogger("org.lasalledebain.test");
 		testLogger.setLevel(Boolean.getBoolean("org.lasalledebain.test.verbose")? Level.ALL: Level.WARNING);
 	}
-	
+
 	public static void trace(String msg) {
 		testLogger.fine(msg);
 	}
-	
+
 	public static void info(String msg) {
 		testLogger.info(msg);
 	}
-	
+
 	public static void warn(String msg) {
 		testLogger.warning(msg);
 	}
@@ -428,7 +430,7 @@ public class Utilities extends TestCase {
 		}
 		return result;
 	}
-	
+
 	public static boolean compareIntLists(String dType, int[] expectedData, int[] actualData) {
 		int sed[] = Arrays.copyOf(expectedData, expectedData.length);
 		int sad[] = Arrays.copyOf(actualData, actualData.length);
@@ -496,6 +498,56 @@ public class Utilities extends TestCase {
 			GenericDatabase<DatabaseRecord> database, FileAccessManager journalFileMr) throws LibrisException {
 		RecordTemplate recFactory = RecordTemplate.templateFactory(database.getSchema(), null);
 		return new LibrisJournalFileManager<DatabaseRecord>(database, journalFileMr, recFactory);
+	}
+
+	public static TestGUI openGuiAndDatabase(String testName, File dbFile) throws DatabaseException {
+		@SuppressWarnings("unused")
+		TestGUI gui = null;
+		try {
+			gui = new TestGUI(dbFile);
+		} catch (LibrisException e) {
+			e.printStackTrace();
+			fail("Error creating GUI: "+e.getMessage());
+		}
+		LibrisDatabase db = gui.openDatabase();
+		gui.setTitle(testName);
+		return gui;
+	}
+
+	public static TestGUI rebuildAndOpenDatabase(String workingName, File theWorkingDirectory,
+			String databaseFileName) throws FileNotFoundException, IOException,
+	DatabaseException {
+		LibrisDatabase db = buildTestDatabase(theWorkingDirectory, databaseFileName);
+		File dbFile = db.getDatabaseFile();
+		assertTrue("Could not close database", db.closeDatabase(false));
+
+		TestGUI gui = openGuiAndDatabase(workingName, dbFile);
+		return gui;
+	}
+
+	public static void pause() {
+		int duration = pauseDuration;
+		pause(duration);
+	}
+
+	public static void pause(int duration) {
+		try {
+			if (duration < 0) {
+				return;
+			} else if (0 == duration) {
+				System.out.println("Paused...");
+				System.in.read();
+			} else {
+				Thread.sleep(duration);
+			}
+		} catch (Exception e) {}
+	}
+
+	public static int pauseDuration = Integer.getInteger("libris.test.pause", -1);
+
+	public static void pause(String msg) {
+		info("Pause: "+msg);
+		pause();
 	}
 
 }

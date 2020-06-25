@@ -6,7 +6,6 @@ import static org.lasalledebain.Utilities.testLogger;
 import static org.lasalledebain.Utilities.info;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -38,8 +37,6 @@ public class RecordEditTests extends TestCase {
 	private static final String ID_HARDCOPY = "ID_hardcopy";
 	PrintStream out = System.out;
 	private File workingDirectory;
-	static int pauseDuration = Integer.getInteger("libris.test.pause", -1);
-	
 	public void testRecordSanity() {
 		try {
 			TestGUI gui = rebuildAndOpenDatabase(getName());
@@ -47,10 +44,10 @@ public class RecordEditTests extends TestCase {
 			resultsWindow.setSelectedRecordIndex(0);
 			int rid = resultsWindow.getSelectedRecordId();
 			gui.displaySelectedRecord();
-			pause("opened record");
+			Utilities.pause("opened record");
 			info("selected "+rid);
 			gui.setRecordWindowEditable(true);
-			pause("re-open record");
+			Utilities.pause("re-open record");
 			gui.displaySelectedRecord();
 			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
 			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
@@ -62,10 +59,10 @@ public class RecordEditTests extends TestCase {
 			String originalMainValue = pagesValue.getMainValueAsString();
 			String originalExtraValue = pagesValue.getExtraValueAsString();
 
-			pause("check pages values");
+			Utilities.pause("check pages values");
 			assertEquals("main value wrong", "1", originalMainValue);
 			assertEquals("Extra value wrong", "2", originalExtraValue);
-			pause("Close database");
+			Utilities.pause("Close database");
 			assertTrue("Could not quit", gui.quit(false));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -151,7 +148,7 @@ public class RecordEditTests extends TestCase {
 			}
 
 			{
-				TestGUI newGui = openGuiAndDatabase(testName, dbFile);
+				TestGUI newGui = Utilities.openGuiAndDatabase(testName, dbFile);
 				LibrisDatabase newDb = newGui.getDatabase();
 				rec = newDb.getRecord(recId);
 				Field fld = rec.getField(ID_PUB);
@@ -170,7 +167,7 @@ public class RecordEditTests extends TestCase {
 	
 	public void testDefaultValue() {
 		try {
-			TestGUI gui = rebuildAndOpenDatabase(getName(), TEST_DB_WITH_DEFAULTS_XML_FILE);
+			TestGUI gui = Utilities.rebuildAndOpenDatabase(getName(), workingDirectory, TEST_DB_WITH_DEFAULTS_XML_FILE);
 			LibrisDatabase db = gui.getDatabase();
 			int pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
 			Record rec = gui.newRecord();
@@ -183,7 +180,7 @@ public class RecordEditTests extends TestCase {
 			assertEquals("wrong default for publisher","IBM", valString);
 			FieldValue fldVal = rec.getFieldValue("ID_hardcopy");
 			assertTrue("ID_hardcopy default wrong", fldVal.isTrue());
-			pause("Close database");
+			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(false));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -197,14 +194,14 @@ public class RecordEditTests extends TestCase {
 			BrowserWindow resultsWindow = gui.getResultsWindow();
 			resultsWindow.setSelectedRecordIndex(3);
 			gui.displaySelectedRecord();
-			pause("opened record");
+			Utilities.pause("opened record");
 			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
 			DatabaseRecordWindow recWindow = dispPanel.getCurrentRecordWindow();
 			String ids[] = {ID_AUTH, ID_HARDCOPY, ID_PAGES, ID_PUB, ID_PAGES};
 			int counts[] = {2, 1, 1, 1, 1};
 			boolean editable = true;
 			for (int j = 0; j < 3; ++j) {
-				pause("test with editable="+editable);
+				Utilities.pause("test with editable="+editable);
 				for (int i = 0; i < ids.length; ++i) {
 					String id = ids[i];
 					UiField pagesUiField = recWindow.getField(id);
@@ -215,7 +212,7 @@ public class RecordEditTests extends TestCase {
 				recWindow.setEditable(editable);
 				editable = !editable;
 			}
-			pause("Close database");
+			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(false));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -231,11 +228,11 @@ public class RecordEditTests extends TestCase {
 			resultsWindow.setSelectedRecordIndex(1);
 			int rid = resultsWindow.getSelectedRecordId();
 			gui.displaySelectedRecord();
-			pause("opened record");
+			Utilities.pause("opened record");
 			info("selected "+rid);
 			assertEquals("Opened wrong record", 2, rid);
 			gui.setRecordWindowEditable(true);
-			pause("check publisher field");
+			Utilities.pause("check publisher field");
 			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
 			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
 			UiField pubUiField = recWindow.getField(ID_PUB);
@@ -247,7 +244,7 @@ public class RecordEditTests extends TestCase {
 			numValues = pubUiField.getNumValues();
 			assertEquals("Wrong number of values for read-only"+ID_PUB, 0, numValues);
 			val = pubUiField.getRecordField().getValuesAsString();
-			pause("Close database");
+			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(false));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -270,22 +267,22 @@ public class RecordEditTests extends TestCase {
 			MultipleValueUiField authUiField = (MultipleValueUiField) recWindow.getField(ID_AUTH);
 			assertNotNull("Could not find "+ID_AUTH, authUiField);
 			authUiField.doSelect();
-			pause();
+			Utilities.pause();
 			int numAuthValues = authUiField.getNumValues();
 			gui.newFieldValue();
 			GuiControl newCtrl = authUiField.getCtrl(numAuthValues);
 			assertNotNull("GUI control for new value is null", newCtrl);
 			newCtrl.setFieldValue("new value");
-			pause();
+			Utilities.pause();
 			MultipleValueUiField pubField = (MultipleValueUiField) recWindow.getField(ID_PUB);
 			assertNotNull("Could not find "+ID_PUB, pubField);
 			GuiControl pubCtrl = pubField.getCtrl(0);
 			String PUB_NEW_VALUE = "PubNewValue";
 			pubCtrl.setFieldValue(PUB_NEW_VALUE);
-			pause();
+			Utilities.pause();
 			Record currentRec = recWindow.getRecord();
 			gui.enterRecord();
-			pause();
+			Utilities.pause();
 			Field testField = currentRec.getField(ID_AUTH);
 			String actualValues = testField.getValuesAsString();
 			String AUTH_NEW_VALUE = "Rec4Fld1Val1, Rec4Fld1Val2, new value";
@@ -294,10 +291,10 @@ public class RecordEditTests extends TestCase {
 			actualValues = testField.getValuesAsString();
 			assertEquals(ID_PUB+" field mismatch", PUB_NEW_VALUE, actualValues);
 			resultsWindow.setSelectedRecordIndex(4);
-			pause();
+			Utilities.pause();
 			rid = resultsWindow.getSelectedRecordId();
 			assertEquals("Wrong record opened", currentRec.getRecordId(), rid);
-			pause("Close database");
+			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(true));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -326,22 +323,22 @@ public class RecordEditTests extends TestCase {
 			GuiControl newControl = pubField.addControl(true);
 			String PUB_NEW_VALUE = "PubNewValue";
 			newControl.setFieldValue(PUB_NEW_VALUE);
-			pause();
+			Utilities.pause();
 			Record currentRec = recWindow.getRecord();
 			gui.enterRecord();
 			db.save();
-			pause();
+			Utilities.pause();
 
 			resultsWindow.setSelectedRecordIndex(lastRecord);
 			resultsWindow.displaySelectedRecord();
 			gui.setRecordWindowEditable(true);
-			pause();
+			Utilities.pause();
 			dispPanel = gui.getDisplayPanel();
 			recWindow = dispPanel.getCurrentRecordWindow();			
-			pause("Close database");
+			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(false));
 
-			TestGUI newGui = openGuiAndDatabase(testName, dbFile);
+			TestGUI newGui = Utilities.openGuiAndDatabase(testName, dbFile);
 			LibrisDatabase newDb = newGui.getDatabase();
 			resultsWindow = newGui.getResultsWindow();
 			lastRecord = resultsWindow.getNumRecords() - 1;
@@ -380,7 +377,7 @@ public class RecordEditTests extends TestCase {
 		assertNotNull("Could not find "+ID_AUTH, authUiField);
 		Record currentRec = recWindow.getRecord();
 		authUiField.doSelect();
-		pause("Remove field");
+		Utilities.pause("Remove field");
 		gui.removeFieldValue();
 		gui.enterRecord();
 
@@ -392,7 +389,7 @@ public class RecordEditTests extends TestCase {
 		assertEquals("pages field Extra values differ", originalExtraValue, newExtraValue);
 		String newAuthFieldValues = currentRec.getField(ID_AUTH).getValuesAsString();
 		assertEquals("auth field value deletion failed", "Rec4Fld1Val2", newAuthFieldValues);
-		pause("Close database");
+		Utilities.pause("Close database");
 		assertTrue("Could not close database", gui.quit(true));
 	}
 
@@ -412,20 +409,20 @@ public class RecordEditTests extends TestCase {
 			assertNotNull("Could not find "+ID_PUB, pubUiField);
 			pubUiField.doSelect();
 			String oldValues = pubUiField.getRecordField().getValuesAsString();
-			pause();
+			Utilities.pause();
 			int numPubValues = pubUiField.getNumValues();
 			GuiControl ctrl = pubUiField.getCtrl(numPubValues - 1);
 			gui.newFieldValue();
 			GuiControl newCtrl = pubUiField.getCtrl(numPubValues);
 			assertNotNull("GUI control for new value is null", newCtrl);
-			pause();
+			Utilities.pause();
 			gui.enterRecord();
-			pause();
+			Utilities.pause();
 			Field testField = currentRec.getField(ID_PUB);
 			String actualValues = testField.getValuesAsString();
 			assertEquals("Empty enum", oldValues, actualValues);
 			assertEquals("Empty enum", numPubValues, testField.getNumberOfValues());
-			pause("Close database");
+			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(true));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -442,10 +439,10 @@ public class RecordEditTests extends TestCase {
 			BrowserWindow resultsWindow = gui.getResultsWindow();
 			resultsWindow.setSelectedRecordIndex(0);
 			gui.displaySelectedRecord();
-			pause();
+			Utilities.pause();
 			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
 			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
-			pause();
+			Utilities.pause();
 			MultipleValueUiField titleField = (MultipleValueUiField) recWindow.getField(ID_TITL);
 			assertNotNull("Could not find "+ID_TITL, titleField);
 			assertEquals("wrong initial number of field values", 1, titleField.getNumValues());
@@ -458,14 +455,14 @@ public class RecordEditTests extends TestCase {
 			assertNotNull("control for new object is null", titleNewValue);
 			String TITLE_NEW_VALUE = "TitleNewValue";
 			titleNewValue.setFieldValue(TITLE_NEW_VALUE);
-			pause();
+			Utilities.pause();
 			Record currentRec = recWindow.getRecord();
 			gui.enterRecord();
-			pause();
+			Utilities.pause();
 			Field testField = currentRec.getField(ID_TITL);
 			String actualValues = testField.getValuesAsString();
 			assertEquals(ID_PUB+" field mismatch", oldFieldValues+", "+TITLE_NEW_VALUE, actualValues);
-			pause("Close database");
+			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(true));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -478,10 +475,10 @@ public class RecordEditTests extends TestCase {
 			BrowserWindow resultsWindow = gui.getResultsWindow();
 			resultsWindow.setSelectedRecordIndex(3);
 			gui.displaySelectedRecord();
-			pause();
+			Utilities.pause();
 			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
 			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
-			pause();
+			Utilities.pause();
 			MultipleValueUiField pubField = (MultipleValueUiField) recWindow.getField(ID_PUB);
 			assertNotNull("Could not find "+ID_PUB, pubField);
 			assertEquals("wrong initial number of field values", pubField.getNumValues(), 1);
@@ -494,14 +491,14 @@ public class RecordEditTests extends TestCase {
 			assertNotNull("control for new object is null", pubCtrl);
 			String PUB_NEW_VALUE = "PubNewValue";
 			pubCtrl.setFieldValue(PUB_NEW_VALUE);
-			pause();
+			Utilities.pause();
 			Record currentRec = recWindow.getRecord();
 			gui.enterRecord();
-			pause();
+			Utilities.pause();
 			Field testField = currentRec.getField(ID_PUB);
 			String actualValues = testField.getValuesAsString();
 			assertEquals(ID_PUB+" field mismatch", oldFieldValues+", "+PUB_NEW_VALUE, actualValues);
-			pause("Close database");
+			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(true));
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -509,59 +506,10 @@ public class RecordEditTests extends TestCase {
 		}
 	}
 
-	private void pause() {
-		int duration = pauseDuration;
-		pause(duration);
-	}
-
-	private void pause(int duration) {
-		try {
-			if (duration < 0) {
-				return;
-			} else if (0 == duration) {
-				System.out.println("Paused...");
-				System.in.read();
-			} else {
-				Thread.sleep(duration);
-			}
-		} catch (Exception e) {}
-	}
-
-	private void pause(String msg) {
-		info("Pause: "+msg);
-		pause();
-	}
-
 	private TestGUI rebuildAndOpenDatabase(String testName) throws IOException,
 			DatabaseException {
 		String databaseFileName = TEST_DB4_XML_FILE;
-		return rebuildAndOpenDatabase(testName, databaseFileName);
-	}
-
-	private TestGUI rebuildAndOpenDatabase(String testName,
-			String databaseFileName) throws FileNotFoundException, IOException,
-			DatabaseException {
-		LibrisDatabase db = Utilities.buildTestDatabase(workingDirectory, databaseFileName);
-		File dbFile = db.getDatabaseFile();
-		assertTrue("Could not close database", db.closeDatabase(false));
-	
-		TestGUI gui = openGuiAndDatabase(testName, dbFile);
-		return gui;
-	}
-
-	private TestGUI openGuiAndDatabase(String testName, File dbFile) throws DatabaseException {
-		@SuppressWarnings("unused")
-		LibrisDatabase db;
-		TestGUI gui = null;
-		try {
-			gui = new TestGUI(dbFile);
-		} catch (LibrisException e) {
-			e.printStackTrace();
-			fail("Error creating GUI: "+e.getMessage());
-		}
-		db = gui.openDatabase();
-		gui.setTitle(testName);
-		return gui;
+		return Utilities.rebuildAndOpenDatabase(testName, workingDirectory, databaseFileName);
 	}
 
 	@Override
