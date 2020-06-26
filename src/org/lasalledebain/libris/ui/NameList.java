@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
@@ -88,7 +89,7 @@ public class NameList extends GuiControl {
 	}
 
 	@Override
-	public Component getGuiComponent() {
+	public JComponent getGuiComponent() {
 		return control;
 	}
 

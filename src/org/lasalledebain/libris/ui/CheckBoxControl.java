@@ -5,6 +5,9 @@ import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldBooleanValue;
@@ -13,7 +16,7 @@ import org.lasalledebain.libris.field.FieldValue;
 public class CheckBoxControl extends GuiControl {
 
 	boolean selected;
-	protected final Checkbox control;
+	protected final JCheckBox control;
 	private String title;
 	private boolean empty;
 
@@ -31,35 +34,35 @@ public class CheckBoxControl extends GuiControl {
 	}
 	@Override
 	public void setFieldValue(String controlValue) {
-		control.setState(Boolean.parseBoolean(controlValue));
+		control.setSelected(Boolean.parseBoolean(controlValue));
 		empty = false;
 	}
 
 	@Override
 	public void setFieldValue(FieldValue value) throws FieldDataException {
-		control.setState(value.isTrue());
+		control.setSelected(value.isTrue());
 		empty = false;
 	}
 
 	@Override
-	public Component getGuiComponent() {
+	public JComponent getGuiComponent() {
 		return control;
 	}
 
 	@Override ()
 	public FieldValue getFieldValue() throws FieldDataException {
-		boolean buttonState = control.getState();
+		boolean buttonState = control.isSelected();
 		return new FieldBooleanValue(buttonState? LibrisConstants.BOOLEAN_TRUE_STRING: LibrisConstants.BOOLEAN_FALSE_STRING);
 	}
 
 	@Override
-	protected Checkbox displayControls() {
-		Checkbox tempControl = new Checkbox(title);
+	protected JCheckBox displayControls() {
+		JCheckBox tempControl = new JCheckBox(title);
 		tempControl.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent arg0) {
 				if (!editable) {
-					control.setState(!control.getState());
+					control.setEnabled(!control.isSelected());
 				} else {
 					setModified(true);
 				}

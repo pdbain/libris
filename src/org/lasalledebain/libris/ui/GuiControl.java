@@ -5,6 +5,7 @@ import java.awt.Frame;
 import java.awt.event.FocusListener;
 import java.util.Arrays;
 
+import javax.swing.JComponent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -89,7 +90,7 @@ public abstract class GuiControl {
 		}
 	}
 	
-	public abstract Component getGuiComponent();
+	public abstract JComponent getGuiComponent();
 	public void setLegalValues(EnumFieldChoices legalValues) {
 		return;
 	}

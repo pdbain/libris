@@ -1,6 +1,9 @@
 package org.lasalledebain.libris.ui;
 
-import java.awt.Component;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -11,7 +14,10 @@ import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.DefaultCaret;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
@@ -56,7 +62,7 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 		JComponent fieldPanel = null;
 		ArrayList<UiField> guiFields = new ArrayList<UiField>();
 		int numGroups = mySchema.getNumGroups();
-		if (numGroups > 0) {
+		if ((numGroups > 0) && rec.hasAffiliations()) {
 			GroupDefs defs = mySchema.getGroupDefs();
 			JPanel groupPanel =  new JPanel(new GridLayout(1, numGroups));
 			fieldPanel = new JPanel();
@@ -67,11 +73,10 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 			for (GroupDef def: defs) {
 				String groupName = def.getFieldTitle();
 				TitledBorder affiliateBorder = BorderFactory.createTitledBorder(UiField.LINE_BORDER, groupName);
-
 				Box groupBox = Box.createHorizontalBox();
 				groupBox.setBorder(affiliateBorder);
 				GuiControl uiField = new NameList(ui, db, rec, def, modifiable);
-				Component comp = uiField.getGuiComponent();
+				JComponent comp = uiField.getGuiComponent();
 				GroupMember gm = rec.getMember(groupNum);
 				if (null == gm) {
 					gm = new GroupMember(defs, def);
@@ -94,14 +99,14 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 		for (FieldPosition fp: getFields()) {
 			int fieldNum = fp.getFieldNum();
 			Field fld = getField(rec, fieldNum);
-			if (null == fld) {
+			if (null == fld  || 1 == fieldNum || 9 == fieldNum) {
 				continue;
 			}
 			c.gridx = fp.getHpos(); c.gridy = fp.getVpos();
 			c.gridwidth = fp.isCarriageReturn()? GridBagConstraints.REMAINDER: fp.getHspan();
 			c.gridheight = fp.getVspan();
 			MultipleValueUiField guiFld = GuiControlFactory.makeMultiControlField(fp, fld, modTrk);
-			Component comp = guiFld.getGuiComponent();
+			JComponent comp = guiFld.getGuiComponent();
 			panelLayout.setConstraints(comp, c);
 			fieldPanel.add(comp);
 			guiFields.add(guiFld);

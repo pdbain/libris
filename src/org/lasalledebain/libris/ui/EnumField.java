@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.lasalledebain.libris.EnumFieldChoices;
@@ -66,7 +67,7 @@ public class EnumField extends GuiControl {
 	}
 
 	@Override
-	public Component getGuiComponent() {
+	public JComponent getGuiComponent() {
 		return control;
 	}
 

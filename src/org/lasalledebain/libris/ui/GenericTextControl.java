@@ -2,6 +2,7 @@ package org.lasalledebain.libris.ui;
 
 import java.awt.Component;
 
+import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -20,6 +21,7 @@ public abstract class GenericTextControl extends GuiControl {
 		if (editable) {
 			addModificationListener();
 		}
+		control.setEnabled(editable);
 	}
 
 	@Override
@@ -53,7 +55,7 @@ public abstract class GenericTextControl extends GuiControl {
 	}
 
 	@Override
-	public Component getGuiComponent() {
+	public JComponent getGuiComponent() {
 		return control;
 	}
 

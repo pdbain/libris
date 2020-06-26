@@ -7,6 +7,7 @@ import java.awt.event.FocusListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
@@ -34,7 +35,7 @@ public abstract class UiField  implements Iterable<FieldValue> {
 		return recordField;
 	}
 
-	public Component getGuiComponent() {
+	public JComponent getGuiComponent() {
 		return controlsContainer;
 	}
 

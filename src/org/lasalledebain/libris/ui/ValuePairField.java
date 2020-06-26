@@ -3,6 +3,7 @@ package org.lasalledebain.libris.ui;
 import java.awt.Component;
 import java.util.Objects;
 
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -33,7 +34,7 @@ public abstract class ValuePairField extends GuiControl {
 	protected abstract JPanel displayControls();
 
 	@Override
-	public Component getGuiComponent() {
+	public JComponent getGuiComponent() {
 		return control;
 	}
 
