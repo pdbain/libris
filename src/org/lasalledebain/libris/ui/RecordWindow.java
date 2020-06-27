@@ -44,6 +44,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 	}
 
 	protected void layOutWindow(LibrisWindowedUi ui, Layout<RecordType> layout, RecordType rec) throws LibrisException {
+		recordDisplayArea.removeAll();
 		layOutFields(layout, rec, recordDisplayArea, modTracker);
 		recordDisplayArea.setVisible(true);
 		ui.fieldSelected(false);
@@ -75,7 +76,6 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 	
 	public void refresh() throws LibrisException {
 		recordDisplayArea.setVisible(false);
-		remove(navPanel);
 		layOutWindow(ui, recordLayout, record);
 	}
 	
