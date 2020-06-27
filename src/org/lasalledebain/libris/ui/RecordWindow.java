@@ -89,7 +89,6 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 	}
 
 	protected void layOutFields(Layout<RecordType> layout, RecordType rec, JComponent recordPanel, ModificationTracker modTrk) throws LibrisException {
-	//	setSize(layout.getWidth(), layout.getHeight());
 		guiFields = layout.layOutFields(rec, ui, recordPanel, modTrk);
 	}
 

@@ -99,7 +99,7 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 		for (FieldPosition fp: getFields()) {
 			int fieldNum = fp.getFieldNum();
 			Field fld = getField(rec, fieldNum);
-			if (null == fld  || 1 == fieldNum || 9 == fieldNum) {
+			if (null == fld) {
 				continue;
 			}
 			c.gridx = fp.getHpos(); c.gridy = fp.getVpos();
