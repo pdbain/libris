@@ -21791,4 +21791,8 @@ genomic interval selection parallel set algorithms search algorithms sweep slici
 			<field id="ID_year" value="2014"/>
 		</record>
 	</records>
+	<artifacts>
+		<records>
+		</records>
+	</artifacts>
 </libris>
