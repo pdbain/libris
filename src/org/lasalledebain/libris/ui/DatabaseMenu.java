@@ -129,10 +129,10 @@ public class DatabaseMenu extends JMenu {
 				closeForkItem.setEnabled(true);
 			} else {
 				createForkItem.setEnabled(true);
-				joinItem.setEnabled(db.isReadOnly());				
+				joinItem.setEnabled(db.isDatabaseReadOnly());				
 			}
 			exportItem.setEnabled(true);
-			importItem.setEnabled(db.isReadOnly());
+			importItem.setEnabled(db.isDatabaseReadOnly());
 		} else {
 			disableMenu();
 		}

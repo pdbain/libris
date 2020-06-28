@@ -314,7 +314,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return getMetadata().getSavedRecords();
 	}
 
-	public boolean isReadOnly() {
+	public boolean isDatabaseReadOnly() {
 		return readOnly;
 	}
 
@@ -328,7 +328,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public boolean isRecordReadOnly(int recordId) {
 		
-		return isReadOnly();
+		return isDatabaseReadOnly();
 	}
 
 	public boolean isModified() {

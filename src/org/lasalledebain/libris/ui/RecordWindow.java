@@ -38,7 +38,6 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		modTracker = new ModificationTracker(ui, modificationListener, this, "This record has been modified. Do you want to enter it?");
 		modTracker.setModifiable(editable);
 		layOutWindow(ui, layout, rec);
-		modTracker.setModified(false);
 		recordDisplayArea.setVisible(true);
 		recordDisplayArea.repaint();
 	}
@@ -59,7 +58,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 	}
 
 	public boolean isEditable() {
-		return modTracker.isModifiable();
+		return modTracker.isModifiable() && recordLayout.isEditable();
 	}
 
 	public boolean setEditable(boolean isEditable) {
@@ -90,6 +89,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 
 	protected void layOutFields(Layout<RecordType> layout, RecordType rec, JComponent recordPanel, ModificationTracker modTrk) throws LibrisException {
 		guiFields = layout.layOutFields(rec, ui, recordPanel, modTrk);
+		modTracker.setModified(false);
 	}
 
 	public String getTitle() {
@@ -115,7 +115,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		}
 	}
 
-	public Record getRecord() {
+	public RecordType getRecord() {
 		return record;
 	}
 

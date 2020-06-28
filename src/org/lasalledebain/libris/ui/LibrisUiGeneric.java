@@ -228,7 +228,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	}
 
 	public boolean isDatabaseReadOnly() {
-		return Objects.nonNull(currentDatabase)? currentDatabase.isReadOnly(): false;
+		return Objects.nonNull(currentDatabase)? currentDatabase.isDatabaseReadOnly(): false;
 	}
 
 	

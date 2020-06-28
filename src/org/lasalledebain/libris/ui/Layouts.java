@@ -7,6 +7,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -19,17 +20,17 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisEmptyAttributes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
-public class Layouts implements XMLElement {
+public class Layouts<RecordType extends Record> implements XMLElement {
 	public static final String DEFAULT_LAYOUT_VALUE = "default";
-	HashMap<String, Layout> layouts;
+	HashMap<String, Layout<RecordType>> layouts;
 	ArrayList<String> layoutIds;
-	HashMap <String,Layout> usage = new HashMap<String, Layout>();
+	HashMap <String,Layout<RecordType>> usage = new HashMap<>();
 	private Schema schem;
 	
 	protected static HashMap<String, Dimension> defaultDimensionStrings = initializeDefaultDimensions();
 	public Layouts(Schema mySchema) {
 		schem = mySchema;
-		layouts = new HashMap<String, Layout>();
+		layouts = new HashMap<>();
 		layoutIds = new ArrayList<String>();
 	}
 
@@ -45,7 +46,7 @@ public class Layouts implements XMLElement {
 		mgr.parseOpenTag();
 		while (mgr.hasNext()) {
 			ElementManager layoutMgr = mgr.nextElement();
-			Layout l = Layout.layoutFactory(schem, layoutMgr);
+			Layout<RecordType> l = Layout.layoutFactory(schem, layoutMgr);
 			String id = l.getId();
 			layouts.put(id, l);
 			layoutIds.add(id);
@@ -90,8 +91,8 @@ public class Layouts implements XMLElement {
 		return typeIds.toArray(new String[typeIds.size()]);
 	}
 	
-	public Layout getLayoutByUsage(String user) throws DatabaseException {
-		Layout l = usage.get(user);
+	public Layout<RecordType> getLayoutByUsage(String user) throws DatabaseException {
+		Layout<RecordType> l = usage.get(user);
 		if (null == l) {
 			throw new DatabaseException("no layout defined for "+user);
 		} else {
@@ -116,7 +117,7 @@ public class Layouts implements XMLElement {
 	@Override
 	public boolean equals(Object comparand) {
 		try {
-			Layouts otherLayouts = (Layouts) comparand;
+			Layouts<RecordType> otherLayouts = (Layouts<RecordType>) comparand;
 			return otherLayouts.layouts.equals(layouts);
 		} catch (ClassCastException e) {
 			final String msg = "type mismatch in Layouts.equals()";

@@ -35,6 +35,7 @@ public class LayoutTests extends TestCase {
 			Utilities.pause();
 			myGui.closeWindow(false);
 		}
+		myGui.quit(true);
 	}
 
 	@Override

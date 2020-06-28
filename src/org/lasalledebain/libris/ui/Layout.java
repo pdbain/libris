@@ -58,6 +58,10 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 		return true;
 	}
 
+	public boolean isEditable() {
+		return false;
+	}
+
 	/**
 	 * @return height in pixels of the window
 	 */

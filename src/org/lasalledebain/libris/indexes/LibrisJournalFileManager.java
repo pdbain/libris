@@ -37,7 +37,7 @@ public class LibrisJournalFileManager<RecordType extends Record> implements Iter
 		databaseProperties = database.getAttributes();
 		journalIndex = new HashMap<Integer, RecordIdAndLength>();
 		try {
-			if (!database.isReadOnly()) {
+			if (!database.isDatabaseReadOnly()) {
 				boolean initializeFile = false;
 				initializeFile = journalFileMr.createIfNonexistent() || (journalFileMr.getLength() == 0);
 				journalFile = journalFileMr.getReadWriteRandomAccessFile();
@@ -73,7 +73,7 @@ public class LibrisJournalFileManager<RecordType extends Record> implements Iter
 	 * @see org.lasalledebain.libris.records.RecordsWriter#put(org.lasalledebain.libris.Record)
 	 */
 	public void put(Record rec) throws LibrisException  {
-		if (database.isReadOnly()) {
+		if (database.isDatabaseReadOnly()) {
 			throw new UserErrorException("database is read only");
 		}
 		int id = rec.getRecordId();

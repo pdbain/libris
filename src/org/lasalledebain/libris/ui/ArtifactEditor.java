@@ -39,7 +39,7 @@ public class ArtifactEditor {
 	 * @param ui
 	 */
 	public ArtifactEditor(ArtifactParameters params, LibrisGui ui) {
-		boolean editable = ui.isEditable();
+		boolean editable = ui.isCurrentRecordWindowEditable();
 		DocumentListener listener = new DocumentListener() {
 			protected void modificationAction() {
 				modified = true;

@@ -289,6 +289,10 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		}
 	}
 
+	public void enableRecordEdit(boolean enabled) {
+		editRecord.setEnabled(enabled);
+	}
+
 	private JMenu createRecordMenu() {
 		/* edit menu */
 		JMenu recMenu = new JMenu("Record");
@@ -549,7 +553,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	class EditRecordListenerImpl implements ActionListener {
 
 		public void actionPerformed(ActionEvent evt) {
-			boolean wasEditable = guiMain.isEditable();
+			boolean wasEditable = guiMain.isCurrentRecordWindowEditable();
 			try {
 				boolean result = guiMain.setRecordWindowEditable(!wasEditable);
 				editRecord.setState(!result);

@@ -1,9 +1,5 @@
 package org.lasalledebain.libris.ui;
 
-import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
-
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -14,10 +10,7 @@ import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
-import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.DefaultCaret;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
@@ -34,6 +27,11 @@ import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
+	@Override
+	public boolean isEditable() {
+		return true;
+	}
+
 	public FormLayout(Schema schem) throws DatabaseException {
 		super(schem);
 	}

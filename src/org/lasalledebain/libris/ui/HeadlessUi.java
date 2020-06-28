@@ -107,8 +107,8 @@ public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
 	}
 
 	@Override
-	public void closeWindow(boolean allWindows) {
-		return;
+	public boolean closeWindow(boolean allWindows) {
+		return true;
 	}
 
 	@Override

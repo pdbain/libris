@@ -103,7 +103,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		if (null == result) return null;
 		menu.setDatabase(currentDatabase);
 		getMainFrame().toFront();
-		boolean readOnly = currentDatabase.isReadOnly();
+		boolean readOnly = currentDatabase.isDatabaseReadOnly();
 		menu.editMenuEnableModify(readOnly);
 		destroyWindow(true);
 		createPanes(false);
@@ -260,7 +260,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		DatabaseRecordWindow rw = null;
 		try {
 			record = currentDatabase.newRecord();
-			record.setEditable(!currentDatabase.isReadOnly());
+			record.setEditable(!currentDatabase.isDatabaseReadOnly());
 		} catch (LibrisException e1) {
 			fatalError(e1);
 		}
@@ -300,9 +300,11 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	public void closeWindow(boolean allWindows) {
+	public boolean closeWindow(boolean allWindows) {
 		if (null != displayPanel) {
-			displayPanel.close(allWindows);
+			return displayPanel.close(allWindows);
+		} else {
+			return true;
 		}
 	}
 
@@ -310,13 +312,13 @@ public class LibrisGui extends LibrisWindowedUi {
 	public boolean closeDatabase(boolean force) throws DatabaseException {
 		boolean result = super.closeDatabase(force);
 		if (result) {
-			closeWindow(true);
+			result &= closeWindow(true);
 		}
-		if (nonNull(contentPane)) contentPane.removeAll();
+		if (result && nonNull(contentPane)) contentPane.removeAll();
 		return result;
 	}
 
-	public boolean isEditable() {
+	public boolean isCurrentRecordWindowEditable() {
 		RecordWindow rw = null;
 		if (null != displayPanel) {
 			rw = displayPanel.getCurrentRecordWindow();
@@ -339,7 +341,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	public boolean setRecordWindowEditable(boolean editable) throws LibrisException {
 		DatabaseRecordWindow rw = getCurrentRecordWindow();
 		if (editable) {
-			if (currentDatabase.isReadOnly() || currentDatabase.isRecordReadOnly(rw.getRecordId()))
+			if (currentDatabase.isDatabaseReadOnly() || currentDatabase.isRecordReadOnly(rw.getRecordId()))
 				return false;
 		}
 		boolean wasEditable = rw.isEditable();
@@ -351,7 +353,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	public boolean isDatabaseReadOnly() {
-		return (null == currentDatabase) || currentDatabase.isReadOnly();
+		return (null == currentDatabase) || currentDatabase.isDatabaseReadOnly();
 	}
 
 	@Override
@@ -482,7 +484,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	public boolean duplicateRecord() {
-		if (currentDatabase.isReadOnly()) {
+		if (currentDatabase.isDatabaseReadOnly()) {
 			return false;
 		}
 		int rid = resultsPanel.getSelectedRecordId();

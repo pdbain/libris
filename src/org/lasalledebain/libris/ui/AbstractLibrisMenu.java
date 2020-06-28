@@ -28,7 +28,7 @@ public abstract class AbstractLibrisMenu {
 	protected abstract JMenu createEditMenu();
 
 	protected boolean isEditable() {
-		return (null != database)  && !database.isReadOnly();
+		return (null != database)  && !database.isDatabaseReadOnly();
 	}
 
 	public void sendChooseDatabase() {

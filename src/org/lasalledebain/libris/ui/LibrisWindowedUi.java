@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.ui;
 
 import static javax.swing.JOptionPane.showMessageDialog;
-import static org.lasalledebain.libris.LibrisDatabase.log;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -35,7 +34,7 @@ public abstract class LibrisWindowedUi extends LibrisUiGeneric {
 	protected boolean databaseSelected = false;
 	protected String title = NO_DATABASE_OPEN;
 
-	public abstract void closeWindow(boolean allWindows);
+	public abstract boolean closeWindow(boolean allWindows);
 
 	@Override
 	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {

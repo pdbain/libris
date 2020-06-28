@@ -81,7 +81,7 @@ public class RecordDisplayPanel extends JPanel {
 	public void displayRecord(int recId) throws LibrisException {
 		if (singleRecordMode) {
 			for (int i= 0; i < openRecords.size(); ++i) {
-				RecordWindow r = openRecords.get(i);
+				RecordWindow<DatabaseRecord> r = openRecords.get(i);
 				final int recordId = r.getRecordId();
 				if (recordId == recId) {
 					singleRecordView.setSelectedIndex(i);
@@ -107,7 +107,7 @@ public class RecordDisplayPanel extends JPanel {
 		prevButton.setEnabled(enable);	
 	}
 
-	public void addLayouts(Layouts layouts) {
+	public void addLayouts(Layouts<DatabaseRecord> layouts) {
 		layoutIds = layouts.getLayoutIds();
 		String lo = "";
 		try {
@@ -124,23 +124,32 @@ public class RecordDisplayPanel extends JPanel {
 	}
 
 	void setRecLayout(Layout<DatabaseRecord> theLayout) throws DatabaseException, LibrisException {
+		if (theLayout == recLayout) {
+			return;
+		}
+		DatabaseRecordWindow currentRecordWindow = mainGui.getCurrentRecordWindow();
+		if (nonNull(currentRecordWindow) && currentRecordWindow.isModified()) {
+			mainGui.alert("Current record has been modified. Enter or close record and try again");
+			return;
+		}
 		recLayout = theLayout;
 		boolean oldMode = singleRecordMode;
 		singleRecordMode = theLayout.isSingleRecord();
+		LibrisMenu theMenu = mainGui.getMenu();
 		if (singleRecordMode != oldMode) {
 			if (singleRecordMode) {
 				remove(multipleRecordView);
 				add(singleRecordView);
-				DatabaseRecordWindow currentRecordWindow = mainGui.getCurrentRecordWindow();
-				mainGui.getMenu().enableFieldValueOperations(nonNull(currentRecordWindow) && currentRecordWindow.isEditable());
+				theMenu.enableFieldValueOperations(nonNull(currentRecordWindow) && currentRecordWindow.isEditable());
 			} else {
 				remove(singleRecordView);
 				multipleRecordView.removeAll();
 				theLayout.layOutFields(mainGui.getResultRecords(), mainGui,multipleRecordView, null);
 				add(multipleRecordView);
-				mainGui.getMenu().enableFieldValueOperations(false);
+				theMenu.enableFieldValueOperations(false);
 			}
 		}
+		theMenu.enableRecordEdit(theLayout.isEditable() && !mainGui.getDatabase().isDatabaseReadOnly());
 		mainGui.mainFrame.pack();
 		mainGui.repaint();
 	}
@@ -205,20 +214,22 @@ public class RecordDisplayPanel extends JPanel {
 	}
 	private class layoutSelectionListener implements ActionListener {
 
+		private int oldLayout = 0;
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			int selectedLayout = layoutSelector.getSelectedIndex();
 			if (selectedLayout >= 0) {
+				RecordWindow<DatabaseRecord> rw = getCurrentRecordWindow();
+				if ((selectedLayout != oldLayout) && nonNull(rw)) {
+rw.checkClose();
+				}
 				try {
-					Layout theLayout = myDatabase.getLayouts().getLayout(layoutIds[selectedLayout]);
+					Layout<DatabaseRecord> theLayout = myDatabase.getLayouts().getLayout(layoutIds[selectedLayout]);
 					setRecLayout(theLayout);
 					boolean singleRecordLayout = theLayout.isSingleRecord();
-					if (singleRecordLayout) {
-						RecordWindow w = getCurrentRecordWindow();
-						if (null != w) {
-							w.setRecordLayout(recLayout);
-						}
+					if (singleRecordLayout && nonNull(rw)) {
+						rw.setRecordLayout(recLayout);
 					}
 				} catch (LibrisException exc) {
 					mainGui.alert("exception "+exc+" "+exc.getMessage());
@@ -286,7 +297,7 @@ public class RecordDisplayPanel extends JPanel {
 
 	private void adjustMenusForWindowClose() {
 		menu.recordWindowClosed();
-		RecordWindow w = getCurrentRecordWindow();
+		RecordWindow<DatabaseRecord> w = getCurrentRecordWindow();
 		if (null != w) {
 			menu.recordWindowOpened(w.isEditable());
 		}
@@ -325,29 +336,52 @@ public class RecordDisplayPanel extends JPanel {
 	}
 
 
-	public void close(boolean allRecords) {
+	public boolean close(boolean allRecords) {
+		boolean canClose = true;
 		if (allRecords) {
-			for (int i = openRecords.size()-1; i >= 0; --i) {
-				removeRecord(i);
+			for (int i = openRecords.size()-1; i >= 0 && canClose; --i) {
+				canClose &= removeRecord(i);
 			}
 		} else {
 			int currentRecordIndex = singleRecordView.getSelectedIndex();
-			removeRecord(currentRecordIndex);
+			canClose &= removeRecord(currentRecordIndex);
 		}
-		adjustMenusForWindowClose();
+		if (canClose) {
+			adjustMenusForWindowClose();
+		}
+		return canClose;
 	}
 
-	private void removeRecord(int index) {
-		if (index < 0) {
-			return;
+	/**
+	 * @param index specifies a record window
+	 * @return true if window is removable
+	 */
+	private boolean removeRecord(int index) {
+		boolean canClose = true;
+		if (index >= 0) {
+			RecordWindow<DatabaseRecord> rw = openRecords.get(index);
+			if (null != rw) {
+				int result = rw.checkClose();
+				switch (result) {
+				case Dialogue.CANCEL_OPTION: canClose = false; break;
+				case Dialogue.YES_OPTION: try {
+						myDatabase.putRecord(rw.getRecord());
+					} catch (LibrisException e) {
+						mainGui.alert("Error saving record", e);
+					}
+				break;
+				case Dialogue.NO_OPTION: break;
+				default: break;
+				}
+				if (canClose) {
+					rw.close();
+				}
+			}
+			if (canClose) {
+				openRecords.remove(index);
+				singleRecordView.remove(index);
+			}
 		}
-		RecordWindow rw = openRecords.get(index);
-		if (null != rw) {
-			rw.checkClose();
-			rw.close();
-		}
-		openRecords.remove(index);
-		singleRecordView.remove(index);
-
+		return canClose;
 	}
 }
