@@ -28,7 +28,7 @@ public class LayoutTests extends TestCase {
 		resultsWindow.setSelectedRecordIndex(3);
 		RecordDisplayPanel dispPanel = myGui.getDisplayPanel();
 		for (String layoutId: new String[] {"LO_shortFormDisplay", "LO_formDisplay",
-				"LO_tableDisplay", "LO_listDisplay", "LO_browserDisplay"}) {
+				"LO_paraDisplay", "LO_tableDisplay", "LO_listDisplay", "LO_browserDisplay"}) {
 			Layout<DatabaseRecord> theLayout = myDb.getLayouts().getLayout(layoutId);
 			dispPanel.setRecLayout(theLayout);
 			myGui.displaySelectedRecord();

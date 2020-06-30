@@ -96,6 +96,23 @@
 				<layoutfield control="textbox" height="1" hspan="1" id="ID_keywords" return="true" title="Keywords" vspan="1" width="25"/>
 				<layoutfield control="textbox" height="1" hspan="1" id="ID_abstract" title="Abstract" vspan="1" width="25"/>
 			</layout>
+
+			<layout height="2000" id="LO_paraDisplay" title="Paragraph layout" type="paragraph" width="3000">
+				<layoutfield control="textfield" hspan="1" id="ID_author" title="Author" vspan="1"/>
+				<layoutfield control="textfield" hspan="1" id="ID_title" return="true" title="Title" vspan="1"/>
+				<layoutfield control="enumfield" hspan="1" id="ID_journal" title="Journal" vspan="1"/>
+				<layoutfield control="enumfield" hspan="1" id="ID_publisher" return="true" title="Publisher" vspan="1"/>
+				<layoutfield control="textbox" height="1" hspan="1" id="ID_volume" title="Volume" vspan="1" width="25"/>
+				<layoutfield control="textbox" height="1" hspan="1" id="ID_issue" return="true" title="Issue" vspan="1" width="25"/>
+				<layoutfield control="textbox" height="1" hspan="1" id="ID_year" title="Year" vspan="1" width="25"/>
+				<layoutfield control="enumfield" hspan="1" id="ID_month" return="true" title="Month" vspan="1"/>
+				<layoutfield control="rangefield" height="1" hspan="1" id="ID_pages" title="Pages" vspan="1" width="3"/>
+				<layoutfield control="enumfield" hspan="1" id="ID_doctype" title="Document type" vspan="1"/>
+				<layoutfield control="checkbox" hspan="1" id="ID_hardcopy" return="true" title="Hardcopy" vspan="1"/>
+				<layoutfield control="textbox" height="1" hspan="1" id="ID_keywords" return="true" title="Keywords" vspan="1" width="25"/>
+				<layoutfield control="textbox" height="1" hspan="1" id="ID_abstract" title="Abstract" vspan="1" width="25"/>
+			</layout>
+
 			<layout height="2000" id="LO_tableDisplay" title="Table layout" type="table" width="3000">
 				<layoutusage usedby="tabledisplay"/>
 				<layoutfield control="textfield" hspan="1" id="ID_author" title="Author" width="150"/>

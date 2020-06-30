@@ -105,6 +105,8 @@ Define the indexes in the database
 	width NMTOKEN #IMPLIED
 	height NMTOKEN #IMPLIED
 	control %controltype; "textbox"
+	prefix  CDATA #IMPLIED
+	suffix  CDATA #IMPLIED
 >
 
 <!ELEMENT layoutusage EMPTY >

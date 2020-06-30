@@ -654,7 +654,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		xmlAttributes = attrs;
 	}
 
-	public Layouts getLayouts() {
+	public Layouts<DatabaseRecord> getLayouts() {
 		return databaseMetadata.getLayouts();
 	}
 	public void viewRecord(int recordId) {
