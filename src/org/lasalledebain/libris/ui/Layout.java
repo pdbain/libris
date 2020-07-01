@@ -6,7 +6,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
@@ -170,6 +169,9 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 			break;
 		case XML_LAYOUT_TYPE_PARAGRAPH:
 			l = new ParagraphLayout(schem);
+			break;
+		case XML_LAYOUT_TYPE_XML:
+			l = new XMLLayout<>(schem);
 			break;
 		default:
 			throw new InputException("layout type "+layoutType+" not supported");

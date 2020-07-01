@@ -21,6 +21,7 @@ public class XmlRecordsWriter<RecordType extends Record> implements RecordsWrite
 	 * @param recWriter
 	 * @throws XmlException 
 	 */
+	@Deprecated
 	public XmlRecordsWriter(GenericDatabase<RecordType> database, OutputStream xmlOutputStream) throws XmlException {
 		this.database = database;
 		this.opStream = xmlOutputStream;

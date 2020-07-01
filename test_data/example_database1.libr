@@ -113,6 +113,9 @@
 				<layoutfield control="textbox" height="1" hspan="1" id="ID_abstract" title="Abstract" vspan="1" width="25"/>
 			</layout>
 
+			<layout height="2000" id="LO_xmlDisplay" title="XML layout" type="xml">
+			</layout>
+
 			<layout height="2000" id="LO_tableDisplay" title="Table layout" type="table" width="3000">
 				<layoutusage usedby="tabledisplay"/>
 				<layoutfield control="textfield" hspan="1" id="ID_author" title="Author" width="150"/>

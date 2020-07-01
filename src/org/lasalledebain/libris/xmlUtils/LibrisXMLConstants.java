@@ -98,6 +98,7 @@ public interface LibrisXMLConstants {
 
 	public static final String XML_LAYOUT_TYPE_ATTR = "type";
 	public static final String XML_LAYOUT_TYPE_TABLE = "table";
+	public static final String XML_LAYOUT_TYPE_XML = "xml";
 	public static final String XML_LAYOUT_TYPE_FORM = "form";
 	public static final String XML_LAYOUT_TYPE_LIST = "list";
 	public static final String XML_LAYOUT_TYPE_PARAGRAPH = "paragraph";
