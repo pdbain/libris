@@ -59,7 +59,7 @@
 				</enumset>
 				<fielddef datatype="enum" enumset="ENUM_doctype" id="ID_doctype" title="Document type"/>
 				<fielddef datatype="string" id="ID_author" title="author"/>
-				<fielddef datatype="string" id="ID_title"/>
+				<fielddef datatype="string" id="ID_title" title="Title"/>
 				<fielddef datatype="enum" enumset="ENUM_journal" id="ID_journal" inherit="GRP_pubinfo" valueseparator=":"/>
 				<fielddef datatype="string" id="ID_volume" inherit="GRP_pubinfo"/>
 				<fielddef datatype="string" id="ID_issue" inherit="GRP_pubinfo"/>

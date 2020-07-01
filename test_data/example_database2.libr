@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libris date="2011-06-03 00:00:00 UTC"
+	schemaname="recipeDatabase1" databasename="recipes" schemaversion="0.0">
+	<metadata>
+		<schema>
+			<groupdefs>
+				<groupdef id="GRP_pubinfo" structure="flat"
+					title="Publication information" />
+			</groupdefs>
+			<fielddefs>
+				<enumset id="ENUM_publication">
+					<enumchoice id="PUB_fc" value="Fine Cooking" />
+					<enumchoice id="PUB_OTHER" value="other" />
+				</enumset>
+				<enumset id="ENUM_month">
+					<enumchoice id="MO_january" value="January" />
+					<enumchoice id="MO_february" value="February" />
+					<enumchoice id="MO_march" value="March" />
+					<enumchoice id="MO_april" value="April" />
+					<enumchoice id="MO_may" value="May" />
+					<enumchoice id="MO_june" value="June" />
+					<enumchoice id="MO_july" value="July" />
+					<enumchoice id="MO_august" value="August" />
+					<enumchoice id="MO_september" value="September" />
+					<enumchoice id="MO_october" value="October" />
+					<enumchoice id="MO_november" value="November" />
+					<enumchoice id="MO_december" value="December" />
+					<enumchoice id="MO_winter" value="Winter" />
+					<enumchoice id="MO_spring" value="Spring" />
+					<enumchoice id="MO_summer" value="Summer" />
+					<enumchoice id="MO_autumn" value="Autumn" />
+					<enumchoice id="MO_none" />
+					<enumchoice id="MO_other" />
+				</enumset>
+				<enumset id="ENUM_dishtype">
+					<enumchoice id="MEAL_breakfast" value="Breakfast" />
+					<enumchoice id="MEAL_appetizer" value="Appetizer" />
+					<enumchoice id="MEAL_main" value="Main dish" />
+					<enumchoice id="MEAL_side" value="Side dish" />
+					<enumchoice id="MEAL_dessert" value="Dessert" />
+					<enumchoice id="MEAL_condiment" value="Condiment" />
+					<enumchoice id="MEAL_bread" value="Bread" />
+					<enumchoice id="MEAL_none" />
+					<enumchoice id="MEAL_other" />
+				</enumset>
+				<enumset id="ENUM_genre">
+					<enumchoice id="GENRE_asian" value="Asian" />
+					<enumchoice id="GENRE_italian" value="Italian" />
+					<enumchoice id="GENRE_latin" value="Latin american" />
+					<enumchoice id="GENRE_french" value="French" />
+					<enumchoice id="GENRE_none" />
+					<enumchoice id="GENRE_other" />
+				</enumset>
+				<fielddef datatype="string" id="ID_title" title="Title" />
+				<fielddef datatype="string" id="ID_ingredients"
+					title="Ingredients" />
+				<fielddef datatype="string" id="ID_instructions"
+					title="Instructions" />
+				<fielddef datatype="enum" enumset="ENUM_publication"
+					id="ID_publication" inherit="GRP_pubinfo" valueseparator=":"
+					title="Publication" />
+				<fielddef datatype="string" id="ID_volume" title="Volume"
+					inherit="GRP_pubinfo" />
+				<fielddef datatype="string" id="ID_issue" title="Issue"
+					inherit="GRP_pubinfo" />
+				<fielddef datatype="string" id="ID_year" title="year"
+					inherit="GRP_pubinfo" />
+				<fielddef datatype="enum" enumset="ENUM_month" title="Month"
+					id="ID_month" inherit="GRP_pubinfo" />
+				<fielddef datatype="valuepair" id="ID_pages" title="Pages"/>
+				<fielddef datatype="enum" enumset="ENUM_dishtype"
+					id="ID_meal" title="Dish type" />
+				<fielddef datatype="enum" enumset="ENUM_genre"
+					id="ID_genre" title="Genre" />
+				<fielddef datatype="boolean" id="ID_vegetarian"
+					title="Vegetarian" />
+				<fielddef datatype="string" id="ID_comments"
+					title="Comments" />
+				<fielddef datatype="string" id="ID_categories" />
+				<fielddef datatype="string" id="ID_keywords" />
+			</fielddefs>
+			<indexdefs>
+			</indexdefs>
+		</schema>
+		<layouts>
+			<layout height="2000" id="LO_formDisplay" title="Form layout"
+				type="form" width="600">
+				<layoutusage usedby="newrecord" />
+				<layoutfield control="textfield" id="ID_title"
+					return="true" />
+				<layoutfield control="enumfield" id="ID_meal" />
+				<layoutfield control="enumfield" id="ID_genre" />
+				<layoutfield control="checkbox" id="ID_vegetarian"
+					return="true" />
+				<layoutfield control="textfield" id="ID_ingredients"
+					return="true" />
+				<layoutfield control="textfield" id="ID_instructions"
+					return="true" />
+				<layoutfield control="textfield" id="ID_comments" />
+				<layoutfield control="enumfield" id="ID_publication" />
+				<layoutfield control="textbox" id="ID_volume" width="25" />
+				<layoutfield control="textbox" id="ID_issue"
+					return="true" width="25" />
+				<layoutfield control="textbox" id="ID_year" width="25" />
+				<layoutfield control="enumfield" id="ID_month"
+					return="true" />
+				<layoutfield control="rangefield" id="ID_pages"
+					width="3" />
+				<layoutfield control="textbox" id="ID_keywords" />
+			</layout>
+			<layout height="1400" id="LO_browserDisplay" title="Summary"
+				type="list" width="700">
+				<layoutusage usedby="summarydisplay" />
+				<layoutfield control="textfield" hspan="1" id="ID_title" />
+			</layout>
+		</layouts>
+	</metadata>
+	<records lastid="0">
+	</records>
+	<artifacts>
+		<records>
+		</records>
+	</artifacts>
+</libris>

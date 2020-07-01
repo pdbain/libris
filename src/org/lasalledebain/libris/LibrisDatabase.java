@@ -192,7 +192,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			librisMgr.closeFile();
 			databaseFileMgr.releaseIpStream(fileIpStream);
 		} catch (XmlException e) {	
-			throw new DatabaseException("Error reading schema", e); //$NON-NLS-1$
+			throw new DatabaseException("Error reading schema: "+e.getLocalizedMessage(), e); //$NON-NLS-1$
 		} catch (IOException e) {	
 			throw new DatabaseException("Error closing schema file", e); //$NON-NLS-1$
 		}
