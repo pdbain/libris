@@ -4,11 +4,12 @@ import java.util.HashMap;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
-public abstract class GuiControlFactory {
+public abstract class GuiControlFactory<RecordType extends Record> {
 	static HashMap<String, ControlConstructor> controls = initializeControlList();
 	public GuiControlFactory() {
 	}
@@ -49,7 +50,7 @@ public abstract class GuiControlFactory {
 		return map;
 	}
 	
-	static MultipleValueUiField makeMultiControlField(FieldPosition fieldPosn, Field recordField, ModificationTracker modTrk) throws DatabaseException {
+	static MultipleValueUiField makeMultiControlField(LayoutField fieldPosn, Field recordField, ModificationTracker modTrk) throws DatabaseException {
 		try {
 			int numValues = recordField.getNumberOfValues();
 			final ControlConstructor ctrlConst = fieldPosn.getControlContructor();
@@ -69,7 +70,7 @@ public abstract class GuiControlFactory {
 		}
 	}
 
-	static GuiControl newControl(FieldPosition fieldPosn,
+	static GuiControl newControl(LayoutField fieldPosn,
 			Field recordField, ModificationTracker modTrk, boolean editable) throws FieldDataException {
 		GuiControl control = fieldPosn.getControlContructor().makeControl(fieldPosn, modTrk, editable);
 		EnumFieldChoices legalValues = recordField.getLegalValues();
@@ -87,14 +88,8 @@ public abstract class GuiControlFactory {
 	
 	public static abstract class ControlConstructor {
 		public abstract GuiControl makeControl(String title, int height, int width, boolean editable);
-		public GuiControl makeControl(FieldInfo fldInfo, ModificationTracker modTrk, boolean editable) {
-			GuiControl ctrl = makeControl(fldInfo.getTitle(), 0, 0, editable);
-			ctrl.setFieldInfo(fldInfo);
-			ctrl.setModificationTracker(modTrk);
-			return ctrl;
-		}
-		
-		public GuiControl makeControl(FieldPosition fieldPosn, ModificationTracker modTrk, boolean editable) {
+
+		public GuiControl makeControl(LayoutField fieldPosn, ModificationTracker modTrk, boolean editable) {
 			GuiControl ctrl = makeControl(fieldPosn.getTitle(), fieldPosn.getHeight(), 
 					fieldPosn.getWidth(), editable);
 			ctrl.setFieldInfo(fieldPosn);

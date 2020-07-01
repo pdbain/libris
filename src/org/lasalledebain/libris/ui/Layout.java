@@ -27,16 +27,16 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 	protected int height;
 	protected int width;
 	Schema mySchema = null;
-	protected ArrayList<FieldPosition> bodyFieldList;
+	protected ArrayList<LayoutField<RecordType>> bodyFieldList;
 	Vector <String> layoutUsers;
-	protected FieldPosition positionList = null;
+	protected LayoutField<RecordType> positionList = null;
 	private String id;
 	private String title = null;
 	final static ArrayList<UiField> emptyUiList = new ArrayList<>();
 
 	public Layout(Schema schem) throws DatabaseException {
 		mySchema = schem;
-		bodyFieldList = new ArrayList<FieldPosition>();
+		bodyFieldList = new ArrayList<LayoutField<RecordType>>();
 		layoutUsers = new Vector<String>(1);
 	}
 
@@ -89,7 +89,7 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 	}
 
 	public void addBodyField(FieldPositionParameter fParams) throws DatabaseException {
-		FieldPosition l = new FieldPosition(this, positionList, fParams);
+		LayoutField<RecordType> l = new LayoutField<>(this, positionList, fParams);
 		positionList = l;
 		bodyFieldList.add(l);
 	}
@@ -126,7 +126,7 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 
 	public String[] getFieldIds() {
 		Vector<String> fieldIds = new Vector<String>();
-		for (FieldPosition p: bodyFieldList) {
+		for (LayoutField<RecordType> p: bodyFieldList) {
 			fieldIds.add(p.getId());
 		}
 		return fieldIds.toArray(new String[fieldIds.size()]);
@@ -136,8 +136,8 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 		return bodyFieldList.get(id).title;
 	}
 
-	FieldPosition[] getFields() {
-		FieldPosition[] positions = new FieldPosition[bodyFieldList.size()];
+	LayoutField<RecordType>[] getFields() {
+		LayoutField<RecordType>[] positions = new LayoutField[bodyFieldList.size()];
 		bodyFieldList.toArray(positions);
 		return positions;
 	}
@@ -222,7 +222,7 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 			output.writeStartElement(XML_LAYOUTUSAGE_TAG, attr, true);
 		}
 
-		for (FieldPosition f: bodyFieldList) {
+		for (LayoutField<RecordType> f: bodyFieldList) {
 			LibrisAttributes attr = f.getAttributes();
 			output.writeStartElement(XML_LAYOUTFIELD_TAG, attr, true);
 		}
@@ -257,7 +257,7 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 	@Override
 	public boolean equals(Object obj) {
 		try {
-			Layout otherLayout = (Layout) obj;
+			Layout<RecordType> otherLayout = (Layout) obj;
 			return otherLayout.getAttributes().equals(getAttributes());
 		} catch (ClassCastException e) {
 			LibrisDatabase.log(Level.WARNING, "Type mismatch in Layout.equals()", e);

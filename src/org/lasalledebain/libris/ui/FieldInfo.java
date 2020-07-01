@@ -3,19 +3,20 @@ import java.util.HashMap;
 
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.XmlException;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 
-public class FieldInfo implements LibrisXMLConstants, GuiConstants{
+public abstract class FieldInfo<RecordType extends Record> implements LibrisXMLConstants, GuiConstants, XMLElement {
 
 	protected final String id;
 	protected final String title;
-	protected final Layout containingLayout;
+	protected final Layout<RecordType> containingLayout;
 	protected final String controlTypeName;
-	public FieldInfo(Layout containingLayout, String ctrlType, String id, String title) throws DatabaseException {
-		super();
+	public FieldInfo(Layout<RecordType> containingLayout, String ctrlType, String id, String title) throws DatabaseException {
 		String controlType = ctrlType;
 		if (controlType.equals(LibrisXMLConstants.DEFAULT_GUI_CONTROL)) {
 			controlTypeName = GUI_TEXTBOX;
@@ -28,19 +29,13 @@ public class FieldInfo implements LibrisXMLConstants, GuiConstants{
 		this.title = title;
 	}
 
-	public String getTitle() {
-		return title;
-	}
+	public abstract String getTitle();
 
-	public String getId() {
-		return id;
-	}
+	public abstract String getId();
 
-	public String getControlTypeName() {
-		return controlTypeName;
-	}
+	public abstract String getControlTypeName();
 
-	protected static HashMap<FieldType, String> defaultControlType = initializeDefaultControlTypes();
+	protected static final HashMap<FieldType, String> defaultControlType = initializeDefaultControlTypes();
 	private static HashMap<FieldType, String> initializeDefaultControlTypes() {
 		HashMap<FieldType, String> temp = new HashMap<FieldType, String>();
 		temp.put(FieldType.T_FIELD_BOOLEAN, GuiConstants.GUI_CHECKBOX);
@@ -54,5 +49,4 @@ public class FieldInfo implements LibrisXMLConstants, GuiConstants{
 		temp.put(FieldType.T_FIELD_AFFILIATES, GuiConstants.GUI_NAMES_BROWSER);
 		return temp;
 	}
-
 }

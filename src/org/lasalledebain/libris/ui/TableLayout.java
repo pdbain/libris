@@ -42,7 +42,7 @@ public class TableLayout<RecordType extends Record> extends MultiRecordLayout<Re
 		TableColumnModel columns = recordTable.getColumnModel();
 		columns.getColumn(0).setPreferredWidth(columnWidth);
 		for (int i = 1; i < myTableModel.getColumnCount(); ++i) {
-			FieldPosition theFieldPosition = bodyFieldList.get(i-1);
+			LayoutField theFieldPosition = bodyFieldList.get(i-1);
 			columnWidth = theFieldPosition.getWidth();
 			columnWidth = Math.max(columnWidth, myFontMetrics.stringWidth(theFieldPosition.title) + 10);
 			columns.getColumn(i).setPreferredWidth(columnWidth);

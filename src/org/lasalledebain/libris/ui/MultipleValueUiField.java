@@ -24,8 +24,8 @@ import org.lasalledebain.libris.field.FieldValueIterator;
  */
 public class MultipleValueUiField extends UiField  implements Iterable<FieldValue> {
 	private ArrayList<GuiControl> controlList;
-	private FieldPosition fldInfo;
-	public MultipleValueUiField(FieldPosition fInfo, boolean labelField, Field fld, int numValues, ModificationTracker modTrk) {
+	private LayoutField fldInfo;
+	public MultipleValueUiField(LayoutField fInfo, boolean labelField, Field fld, int numValues, ModificationTracker modTrk) {
 		super(fld,modTrk);
 		fldInfo = fInfo;
 		controlList = new ArrayList<GuiControl>(numValues);

@@ -58,7 +58,7 @@ public class ParagraphLayout<RecordType extends Record> extends Layout<RecordTyp
 		recordPanel.setLayout(new GridBagLayout());
 		content.setContentType("text/html;");
 		content.setEditable(false);
-		FieldPosition[] fieldInfo = getFields();
+		LayoutField[] fieldInfo = getFields();
 		StringBuffer windowText = new StringBuffer();
 
 		windowText.append("<!DOCTYPE html>\n<html>\n<head>");
@@ -73,7 +73,7 @@ public class ParagraphLayout<RecordType extends Record> extends Layout<RecordTyp
 		windowText.append("</style>\n");
 		windowText.append("</head>\n<body><p>\n");
 		String separator = "";
-		for (FieldPosition fp: fieldInfo) {
+		for (LayoutField fp: fieldInfo) {
 			FieldValue val = rec.getFieldValue(fp.fieldNum);
 			if (!Objects.isNull(val) && !val.isEmpty()) {
 				windowText.append(separator);

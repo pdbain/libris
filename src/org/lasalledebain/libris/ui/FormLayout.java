@@ -38,10 +38,10 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 
 	@Override
 	protected void validate() throws InputException {
-		for (FieldInfo fp: getFields()) {
-			String fid = fp.getId();
+		for (LayoutField<RecordType> lf: getFields()) {
+			String fid = lf.getId();
 			FieldType fType = mySchema.getFieldType(fid);
-			if (fp.getControlTypeName().equals(GuiConstants.GUI_ENUMFIELD)
+			if (lf.getControlTypeName().equals(GuiConstants.GUI_ENUMFIELD)
 					&& !fType.equals(FieldType.T_FIELD_ENUM)) {
 				throw new InputException("Cannot use enumfield layout control for non-enum field "+fid);
 			}
@@ -94,7 +94,7 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		fieldPanel.setLayout(panelLayout);
-		for (FieldPosition fp: getFields()) {
+		for (LayoutField fp: getFields()) {
 			int fieldNum = fp.getFieldNum();
 			Field fld = getField(rec, fieldNum);
 			if (null == fld) {

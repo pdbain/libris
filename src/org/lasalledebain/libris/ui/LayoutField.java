@@ -2,15 +2,19 @@ package org.lasalledebain.libris.ui;
 
 import java.util.Iterator;
 
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.GuiControlFactory.ControlConstructor;
+import org.lasalledebain.libris.xmlUtils.ElementManager;
+import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
-public class FieldPosition extends FieldInfo implements Iterable<FieldPosition> {
+public class LayoutField<RecordType extends Record> extends FieldInfo<RecordType> implements Iterable<LayoutField<RecordType>> {
 	protected final int fieldNum;
 	int height = -1, width = -1, vpos = -1, hpos = -1, hspan = -1, vspan = -1;
-	private FieldPosition prevLink;
-	private Layout containingLayout;
+	private LayoutField<RecordType> prevLink;
+	private Layout<RecordType> containingLayout;
 	protected final ControlConstructor control;
 
 	public boolean isCarriageReturn() {
@@ -18,7 +22,7 @@ public class FieldPosition extends FieldInfo implements Iterable<FieldPosition> 
 	}
 
 	private boolean carriageReturn = false;
-	public FieldPosition(Layout containingLayout, FieldPosition previous, FieldPositionParameter params) throws DatabaseException {
+	public LayoutField(Layout<RecordType> containingLayout, LayoutField<RecordType> previous, FieldPositionParameter params) throws DatabaseException {
 		super(containingLayout, params.getControlType(), params.getId(), params.getTitle());
 		control=GuiControlFactory.getControlConstructor(controlTypeName);
 		if (null == control) {
@@ -47,7 +51,7 @@ public class FieldPosition extends FieldInfo implements Iterable<FieldPosition> 
 
 	private void checkForOverlap() throws DatabaseException {
 		int myRightEdge = hpos+hspan-1;
-		FieldPosition cursor = prevLink;
+		LayoutField cursor = prevLink;
 		while (null != cursor) {
 			int otherBottomEdge = cursor.vpos+cursor.vspan-1;
 			int otherRightEdge = cursor.hpos+cursor.hspan-1;
@@ -109,16 +113,16 @@ public class FieldPosition extends FieldInfo implements Iterable<FieldPosition> 
 	}
 
 	@Override
-	public Iterator<FieldPosition> iterator() {
+	public Iterator<LayoutField<RecordType>> iterator() {
 		return new FieldPositionIterator(this);
 	}
 
-	public class FieldPositionIterator implements Iterator<FieldPosition> {
-		FieldPosition cursor;
+	public class FieldPositionIterator implements Iterator<LayoutField<RecordType>> {
+		LayoutField<RecordType> cursor;
 		/**
 		 * @param cursor
 		 */
-		public FieldPositionIterator(FieldPosition cursor) {
+		public FieldPositionIterator(LayoutField<RecordType> cursor) {
 			this.cursor = cursor;
 		}
 	
@@ -128,8 +132,8 @@ public class FieldPosition extends FieldInfo implements Iterable<FieldPosition> 
 		}
 	
 		@Override
-		public FieldPosition next() {
-			FieldPosition result = cursor;
+		public LayoutField<RecordType> next() {
+			LayoutField<RecordType> result = cursor;
 			if (null != cursor) {
 				cursor = cursor.prevLink;
 			}
@@ -143,7 +147,8 @@ public class FieldPosition extends FieldInfo implements Iterable<FieldPosition> 
 	
 	}
 
-	public LibrisAttributes getAttributes() throws DatabaseException {
+	@Override
+	public LibrisAttributes getAttributes() {
 		LibrisAttributes attrs = new LibrisAttributes();
 		attrs.setAttribute(XML_LAYOUTFIELD_ID_ATTR, id);
 		if (null != title) {
@@ -166,6 +171,39 @@ public class FieldPosition extends FieldInfo implements Iterable<FieldPosition> 
 		}
 		attrs.setAttribute(XML_LAYOUTFIELD_CONTROL_ATTR, controlTypeName);
 		return attrs;
+	}
+
+	@Override
+	public String getElementTag() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void fromXml(ElementManager mgr) throws LibrisException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void toXml(ElementWriter output) throws LibrisException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getTitle() {
+		return title;
+	}
+
+	@Override
+	public String getId() {
+		return id;
+	}
+
+	@Override
+	public String getControlTypeName() {
+		return controlTypeName;
 	}
 
 }
