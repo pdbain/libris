@@ -29,6 +29,7 @@ import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.ui.EnumField;
 import org.lasalledebain.libris.ui.GuiControl;
@@ -213,7 +214,7 @@ public class GuiManualTests extends TestCase {
 		}
 	}
 
-	public void testRecordWindowSanity() {
+	public void testRecordWindowSanity() throws LibrisException {
 		loadSchema();
 		RecordFactory<DatabaseRecord> template = null;
 		try {
@@ -241,7 +242,7 @@ public class GuiManualTests extends TestCase {
 		}
 	}
 
-	public void testMultipleFieldValues() {
+	public void testMultipleFieldValues() throws LibrisException {
 		loadSchema();
 		RecordFactory<DatabaseRecord> template = null;
 		try {
@@ -290,7 +291,7 @@ public class GuiManualTests extends TestCase {
 		}
 	}
 
-	private Layouts loadFromLayout(Record rec) {
+	private Layouts loadFromLayout(Record rec) throws LibrisException {
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, Utilities.LAYOUT_DECLARATIONS_XML_FILE);
 		try {

@@ -124,6 +124,9 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 		return fieldTitleArray;
 	}
 
+	public String getFieldTitle(int fieldNum) {
+		return fieldTitles.get(fieldNum);
+	}
 
 	/**
 	 * @param fieldId string name of the field

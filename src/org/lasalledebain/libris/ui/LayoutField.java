@@ -1,29 +1,49 @@
 package org.lasalledebain.libris.ui;
 
+import java.awt.Dimension;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.XMLElement;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.GuiControlFactory.ControlConstructor;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
+import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class LayoutField<RecordType extends Record> extends FieldInfo<RecordType> implements Iterable<LayoutField<RecordType>> {
-	protected final int fieldNum;
+public class LayoutField<RecordType extends Record> implements XMLElement, Iterable<LayoutField<RecordType>>, LibrisXMLConstants {
+	protected String controlTypeName;
+	protected String id;
+	protected String title;
+	protected int fieldNum;
 	int height = -1, width = -1, vpos = -1, hpos = -1, hspan = -1, vspan = -1;
 	private LayoutField<RecordType> prevLink;
 	private Layout<RecordType> containingLayout;
-	protected final ControlConstructor control;
+	protected ControlConstructor control;
+	private boolean carriageReturn = false;
 
 	public boolean isCarriageReturn() {
 		return carriageReturn;
 	}
 
-	private boolean carriageReturn = false;
+	public LayoutField(Layout<RecordType> containingLayout, LayoutField<RecordType> previous) throws DatabaseException {
+		this.containingLayout = containingLayout;
+		prevLink = previous;
+	}
+	@Deprecated
 	public LayoutField(Layout<RecordType> containingLayout, LayoutField<RecordType> previous, FieldPositionParameter params) throws DatabaseException {
-		super(containingLayout, params.getControlType(), params.getId(), params.getTitle());
+		this(containingLayout, previous);
+		String controlType = params.getControlType();
+		if (controlType.equals(LibrisXMLConstants.DEFAULT_GUI_CONTROL)) {
+			controlTypeName = GuiConstants.GUI_TEXTBOX;
+			controlType = defaultControlType.get(containingLayout.getFieldType(id));
+		} else {
+			controlTypeName = controlType;
+		}
 		control=GuiControlFactory.getControlConstructor(controlTypeName);
 		if (null == control) {
 			throw new DatabaseException("unrecognized control type "+controlTypeName);
@@ -45,13 +65,31 @@ public class LayoutField<RecordType extends Record> extends FieldInfo<RecordType
 		} else {
 			hpos = vpos = 0;
 		}
-		prevLink = previous;
 		checkForOverlap();
+	}
+
+	public void setFieldNum(int fieldNum) {
+		this.fieldNum = fieldNum;
+	}
+
+	protected static final HashMap<FieldType, String> defaultControlType = initializeDefaultControlTypes();
+	private static HashMap<FieldType, String> initializeDefaultControlTypes() {
+		HashMap<FieldType, String> temp = new HashMap<FieldType, String>();
+		temp.put(FieldType.T_FIELD_BOOLEAN, GuiConstants.GUI_CHECKBOX);
+		temp.put(FieldType.T_FIELD_ENUM, GuiConstants.GUI_ENUMFIELD);
+		temp.put(FieldType.T_FIELD_INDEXENTRY, GuiConstants.GUI_TEXTFIELD);
+		temp.put(FieldType.T_FIELD_INTEGER, GuiConstants.GUI_TEXTFIELD);
+		temp.put(FieldType.T_FIELD_PAIR, GuiConstants.GUI_PAIRFIELD);
+		temp.put(FieldType.T_FIELD_STRING, GuiConstants.GUI_TEXTFIELD);
+		temp.put(FieldType.T_FIELD_TEXT, GuiConstants.GUI_TEXTBOX);
+		temp.put(FieldType.T_FIELD_LOCATION, GuiConstants.GUI_LOCATIONFIELD);
+		temp.put(FieldType.T_FIELD_AFFILIATES, GuiConstants.GUI_NAMES_BROWSER);
+		return temp;
 	}
 
 	private void checkForOverlap() throws DatabaseException {
 		int myRightEdge = hpos+hspan-1;
-		LayoutField cursor = prevLink;
+		LayoutField<RecordType> cursor = prevLink;
 		while (null != cursor) {
 			int otherBottomEdge = cursor.vpos+cursor.vspan-1;
 			int otherRightEdge = cursor.hpos+cursor.hspan-1;
@@ -125,12 +163,12 @@ public class LayoutField<RecordType extends Record> extends FieldInfo<RecordType
 		public FieldPositionIterator(LayoutField<RecordType> cursor) {
 			this.cursor = cursor;
 		}
-	
+
 		@Override
 		public boolean hasNext() {
 			return cursor != null;
 		}
-	
+
 		@Override
 		public LayoutField<RecordType> next() {
 			LayoutField<RecordType> result = cursor;
@@ -139,15 +177,14 @@ public class LayoutField<RecordType extends Record> extends FieldInfo<RecordType
 			}
 			return result;
 		}
-	
+
 		@Override
 		public void remove() {
 			return;
 		}
-	
+
 	}
 
-	@Override
 	public LibrisAttributes getAttributes() {
 		LibrisAttributes attrs = new LibrisAttributes();
 		attrs.setAttribute(XML_LAYOUTFIELD_ID_ATTR, id);
@@ -175,33 +212,83 @@ public class LayoutField<RecordType extends Record> extends FieldInfo<RecordType
 
 	@Override
 	public String getElementTag() {
-		// TODO Auto-generated method stub
-		return null;
+		return LibrisXMLConstants.XML_LAYOUTFIELD_TAG;
 	}
 
 	@Override
 	public void fromXml(ElementManager mgr) throws LibrisException {
-		// TODO Auto-generated method stub
-		
+		HashMap<String, String> values = mgr.parseOpenTag();
+
+		id = values.get("id");
+		title = values.get("title");
+
+		String controlType = values.get("control").intern();
+		if (controlType.equals(LibrisXMLConstants.DEFAULT_GUI_CONTROL)) {
+			controlTypeName = GuiConstants.GUI_TEXTBOX;
+			controlType = defaultControlType.get(containingLayout.getFieldType(id));
+		} else {
+			controlTypeName = controlType;
+		}
+		control=GuiControlFactory.getControlConstructor(controlTypeName);
+		if (null == control) {
+			throw new DatabaseException("unrecognized control type "+controlTypeName);
+		}
+
+		Dimension dims = Layouts.getDefaultDimensions(controlType);
+
+		String heightString = values.get("height");
+		if (heightString.isEmpty()) {
+			height = (null == dims)? -1: dims.height;
+		} else {
+			height = Integer.parseInt(heightString);			
+		}
+		String widthString = values.get("width");
+		if (widthString.isEmpty()) {
+			width = (null == dims)? -1: dims.width;
+		} else {
+			width = Integer.parseInt(widthString);			
+		}
+
+		if ((null != dims) && ((height < 1) || (width < 1))) {
+			throw new DatabaseException("field dimensions must be positive");
+		}
+
+		hspan = Integer.parseInt(values.get("hspan"));
+		vspan = Integer.parseInt(values.get("vspan"));
+		if ((hspan < 1) || (vspan < 1)) {
+			throw new DatabaseException("field dimensions, spans, and motions must be positive");
+		}
+
+		carriageReturn = Boolean.parseBoolean(values.get("return"));
+		if (prevLink != null) {
+			if (prevLink.isCarriageReturn()) {
+				vpos = prevLink.getVpos() + 1;
+				hpos = 0;
+			} else {
+				vpos = prevLink.getVpos();
+				hpos = prevLink.getHpos() + prevLink.getHspan();
+			}
+		} else {
+			hpos = vpos = 0;
+		}
+		checkForOverlap();
 	}
 
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
-		// TODO Auto-generated method stub
-		
+		LibrisAttributes attr = getAttributes();
+		output.writeStartElement(XML_LAYOUTFIELD_TAG, attr, true);		
 	}
 
-	@Override
 	public String getTitle() {
-		return title;
+		String result = ((null != title) && !title.isEmpty())? title: containingLayout.getSchema().getFieldTitle(fieldNum);
+		return result;
 	}
 
-	@Override
 	public String getId() {
 		return id;
 	}
 
-	@Override
 	public String getControlTypeName() {
 		return controlTypeName;
 	}

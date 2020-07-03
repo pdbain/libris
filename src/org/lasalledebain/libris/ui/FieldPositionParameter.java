@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
+
+@Deprecated
 public class FieldPositionParameter {
 	public String id;
 	int fieldNum = -1;

@@ -32,7 +32,7 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 		return true;
 	}
 
-	public FormLayout(Schema schem) throws DatabaseException {
+	public FormLayout(Schema schem) {
 		super(schem);
 	}
 
@@ -54,7 +54,7 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 	}
 
 	@Override
-	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 	throws LibrisException {
 		final boolean modifiable = modTrk.isModifiable();
 		JComponent fieldPanel = null;
@@ -73,7 +73,7 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 				TitledBorder affiliateBorder = BorderFactory.createTitledBorder(UiField.LINE_BORDER, groupName);
 				Box groupBox = Box.createHorizontalBox();
 				groupBox.setBorder(affiliateBorder);
-				GuiControl uiField = new NameList(ui, db, rec, def, modifiable);
+				GuiControl<RecordType> uiField = new NameList(ui, db, rec, def, modifiable);
 				JComponent comp = uiField.getGuiComponent();
 				GroupMember gm = rec.getMember(groupNum);
 				if (null == gm) {
@@ -94,7 +94,7 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		fieldPanel.setLayout(panelLayout);
-		for (LayoutField fp: getFields()) {
+		for (LayoutField<RecordType> fp: getFields()) {
 			int fieldNum = fp.getFieldNum();
 			Field fld = getField(rec, fieldNum);
 			if (null == fld) {
@@ -115,7 +115,7 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 	@Override
 	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
-		Record rec = recList.getFirstRecord();
+		RecordType rec = recList.getFirstRecord();
 		return layOutFields(rec, ui, recordPanel, modTrk);
 	}
 

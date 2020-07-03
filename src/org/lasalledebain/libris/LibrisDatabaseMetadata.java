@@ -1,7 +1,6 @@
 package org.lasalledebain.libris;
 
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
@@ -11,7 +10,7 @@ public class LibrisDatabaseMetadata extends LibrisMetadata {
 	public LibrisDatabaseMetadata(LibrisDatabase database) {
 		super(database);
 	}
-	public void fromXml(ElementManager metadataMgr) throws InputException, DatabaseException {
+	public void fromXml(ElementManager metadataMgr) throws LibrisException {
 		ElementManager schemaMgr;
 
 		metadataMgr.parseOpenTag();

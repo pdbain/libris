@@ -16,7 +16,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class XMLLayout<RecordType extends Record> extends Layout<RecordType> {
 
-	public XMLLayout(Schema schem) throws DatabaseException {
+	public XMLLayout(Schema schem) {
 		super(schem);
 	}
 

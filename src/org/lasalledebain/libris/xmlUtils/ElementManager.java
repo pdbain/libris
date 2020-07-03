@@ -130,10 +130,15 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 			return false;
 		}
 		try {
-			return xmlReader.peek().isCharacters();
+			return peek().isCharacters();
 		} catch (XMLStreamException e) {
 			throw new XmlException(this, e);
 		}
+	}
+
+	public XMLEvent peek() throws XMLStreamException {
+		XMLEvent peek = xmlReader.peek();
+		return peek;
 	}
 
 	public String getContent() throws XmlException {

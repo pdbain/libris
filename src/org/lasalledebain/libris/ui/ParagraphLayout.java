@@ -4,8 +4,6 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -22,7 +20,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class ParagraphLayout<RecordType extends Record> extends Layout<RecordType> {
 
-	public ParagraphLayout(Schema schem) throws DatabaseException {
+	public ParagraphLayout(Schema schem){
 		super(schem);
 	}
 

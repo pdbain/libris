@@ -13,7 +13,6 @@ import javax.swing.table.TableColumnModel;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
@@ -22,7 +21,7 @@ public class ListLayout extends Layout<Record> {
 	private JTable recordTable;
 	private ListLayoutTableModel<Record> myTableModel;
 
-	public ListLayout(Schema schem) throws DatabaseException {
+	public ListLayout(Schema schem) {
 		super(schem);
 	}
 

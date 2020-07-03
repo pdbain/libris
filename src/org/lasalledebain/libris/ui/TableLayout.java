@@ -23,7 +23,7 @@ public class TableLayout<RecordType extends Record> extends MultiRecordLayout<Re
 	private JTable recordTable;
 	private JScrollPane scrollPane;
 
-	public TableLayout(Schema schem) throws DatabaseException {
+	public TableLayout(Schema schem) {
 		super(schem);
 	}
 

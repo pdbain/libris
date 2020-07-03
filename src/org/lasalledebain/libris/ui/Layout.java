@@ -33,8 +33,7 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 	private String id;
 	private String title = null;
 	final static ArrayList<UiField> emptyUiList = new ArrayList<>();
-
-	public Layout(Schema schem) throws DatabaseException {
+	public Layout(Schema schem){
 		mySchema = schem;
 		bodyFieldList = new ArrayList<LayoutField<RecordType>>();
 		layoutUsers = new Vector<String>(1);
@@ -77,23 +76,6 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 	}
 
 
-	void readLayoutField(ElementManager fieldMgr, FieldPositionParameter fParams) throws InputException, DatabaseException {
-
-		HashMap<String, String> values = fieldMgr.parseOpenTag();
-		fParams.setParams(values);
-		fParams.setFieldNum(mySchema.getFieldNum(fParams.getId()));
-		addBodyField(fParams);
-		if (fieldMgr.hasNext()) {
-			throw new XmlException(fieldMgr, "layoutfield cannot contain other elements");
-		}	
-	}
-
-	public void addBodyField(FieldPositionParameter fParams) throws DatabaseException {
-		LayoutField<RecordType> l = new LayoutField<>(this, positionList, fParams);
-		positionList = l;
-		bodyFieldList.add(l);
-	}
-
 	void setHeight(String h) {
 		this.height = Integer.parseInt(h);
 	}
@@ -103,7 +85,7 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 	public String getTitle() {
 		return title;
 	}
-	
+
 	public int getNumFields() {
 		return bodyFieldList.size();
 	}
@@ -152,50 +134,23 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 		return layoutUsers;
 	}
 
-	static Layout layoutFactory(Schema schem, ElementManager mgr)
-			throws InputException, DatabaseException {
-		HashMap<String, String> values = mgr.parseOpenTag();
-		String layoutType = values.get(XML_LAYOUT_TYPE_ATTR);
-		Layout l;
-		switch (layoutType) {
-		case XML_LAYOUT_TYPE_TABLE: 
-			l = new TableLayout(schem);
-			break;
-		case LibrisXMLConstants.XML_LAYOUT_TYPE_FORM:
-			l = new FormLayout(schem);
-			break;
-		case XML_LAYOUT_TYPE_LIST:
-			l = new ListLayout(schem);
-			break;
-		case XML_LAYOUT_TYPE_PARAGRAPH:
-			l = new ParagraphLayout(schem);
-			break;
-		case XML_LAYOUT_TYPE_XML:
-			l = new XMLLayout<>(schem);
-			break;
-		default:
-			throw new InputException("layout type "+layoutType+" not supported");
-		}
-		l.initialize(mgr, values);
-		return l;
-	}
-
 	@Override
 	public void fromXml(ElementManager mgr) throws LibrisException {
 		HashMap<String, String> values = mgr.parseOpenTag();
-		initialize(mgr, values);
-	}
-
-	protected void initialize(ElementManager layoutMgr, HashMap<String, String> values)
-			throws DatabaseException, XmlException, InputException {
 		setHeight(values.get("height"));
 		setWidth(values.get("width"));
-		FieldPositionParameter fParams = new FieldPositionParameter();
 		setIdAndTitle(values.get("title"), values.get("id"));
-		while (layoutMgr.hasNext()) {
-			ElementManager subElementMgr = layoutMgr.nextElement();
+		while (mgr.hasNext()) {
+			ElementManager subElementMgr = mgr.nextElement();
 			if (subElementMgr.getElementTag().equals(XML_LAYOUTFIELD_TAG)) {
-				readLayoutField(subElementMgr, fParams);
+				LayoutField<RecordType> l = new LayoutField<>(this, positionList);
+				l.fromXml(subElementMgr);		
+				l.setFieldNum(mySchema.getFieldNum(l.getId()));
+				positionList = l;
+				bodyFieldList.add(l);
+				if (subElementMgr.hasNext()) {
+					throw new XmlException(subElementMgr, "layoutfield cannot contain other elements");
+				}
 			} else {
 				parseUsage(subElementMgr);
 			}
