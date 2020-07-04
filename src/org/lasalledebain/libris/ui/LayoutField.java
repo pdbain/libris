@@ -34,39 +34,6 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 		this.containingLayout = containingLayout;
 		prevLink = previous;
 	}
-	@Deprecated
-	public LayoutField(Layout<RecordType> containingLayout, LayoutField<RecordType> previous, FieldPositionParameter params) throws DatabaseException {
-		this(containingLayout, previous);
-		String controlType = params.getControlType();
-		if (controlType.equals(LibrisXMLConstants.DEFAULT_GUI_CONTROL)) {
-			controlTypeName = GuiConstants.GUI_TEXTBOX;
-			controlType = defaultControlType.get(containingLayout.getFieldType(id));
-		} else {
-			controlTypeName = controlType;
-		}
-		control=GuiControlFactory.getControlConstructor(controlTypeName);
-		if (null == control) {
-			throw new DatabaseException("unrecognized control type "+controlTypeName);
-		}
-		fieldNum = params.getFieldNum();
-		width = params.getWidth();
-		height = params.getHeight();
-		hspan = params.getHspan();
-		vspan = params.getVspan();
-		carriageReturn = params.getReturn();
-		if (previous != null) {
-			if (previous.isCarriageReturn()) {
-				vpos = previous.getVpos() + 1;
-				hpos = 0;
-			} else {
-				vpos = previous.getVpos();
-				hpos = previous.getHpos() + previous.getHspan();
-			}
-		} else {
-			hpos = vpos = 0;
-		}
-		checkForOverlap();
-	}
 
 	public void setFieldNum(int fieldNum) {
 		this.fieldNum = fieldNum;

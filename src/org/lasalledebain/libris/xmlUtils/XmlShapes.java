@@ -113,7 +113,14 @@ public class XmlShapes implements LibrisXMLConstants {
 				new String[][] {{"title", ""}, {"type","table"}, {"height", "300"}, {"width", "400"}});		
 		
 		shapes.put(Layouts.getXmlTag(), Layouts.getShape());
-		shapes.put(XML_LAYOUTUSAGE_TAG, makeLayoutUsageXmlShape());
+		makeShape(shapes, 
+				XML_LAYOUTUSAGE_TAG,
+				emptyList,
+				new String[] {XML_LAYOUT_USEDBY_ATTR},
+				emptyListList);
+		 ElementShape s = new ElementShape(XML_LAYOUTUSAGE_TAG);
+			s.setRequiredAttributeNames(new String[] {XML_LAYOUT_USEDBY_ATTR});
+
 		shapes.put(Record.getXmlTag(), Record.getShape());
 		makeShape(shapes, GroupMember.getMemberTag(),
 				new String [] {GroupMember.XML_AFFILIATION_TAG}, new String [] {GroupMember.XML_MEMBER_GROUP_ATTR},
@@ -212,12 +219,6 @@ public class XmlShapes implements LibrisXMLConstants {
 		return s;
 	}
 
-	@Deprecated
-private static ElementShape makeLayoutUsageXmlShape() {
-		 ElementShape s = new ElementShape(XML_LAYOUTUSAGE_TAG);
-			s.setRequiredAttributeNames(new String[] {XML_LAYOUT_USEDBY_ATTR});
-			return s;
-		}
 	public ElementShape getShape(String elementTag) {
 		return myShapes.get(elementTag);
 	}

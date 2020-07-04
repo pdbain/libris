@@ -165,6 +165,8 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 	public static String getXmlTag() {
 		return XML_LAYOUTS_TAG;
 	}
+	
+	@Deprecated
 	static public ElementShape getShape() {
 		return XmlShapes.makeShape(getTag(), 
 				new String [] {XML_LAYOUT_TAG},

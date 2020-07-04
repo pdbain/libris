@@ -139,32 +139,16 @@ public class TermCountHashBucket extends StringKeyHashBucket<TermCountEntry> {
 	protected int getNumEntriesImpl() {
 		return entries.size();
 	}
-	
+
 	public int getNumEntries() throws IOException {
-	int numEntries;
-	if (dirty) {
-		numEntries = getNumEntriesImpl();
-	} else {
-		backingStore.seek(filePosition);
-		numEntries = backingStore.readShort();
-	}
-	return numEntries;
-}
-	
-	@Deprecated
-	public static class TermCountBucketFactory
-	implements HashBucketFactory<TermCountEntry, TermCountHashBucket, TermCountEntryFactory> {
-		private TermCountEntryFactory entryFactory;
-
-		public TermCountBucketFactory() {
-			entryFactory = new TermCountEntry.TermCountEntryFactory();
+		int numEntries;
+		if (dirty) {
+			numEntries = getNumEntriesImpl();
+		} else {
+			backingStore.seek(filePosition);
+			numEntries = backingStore.readShort();
 		}
-
-		@Override
-		public TermCountHashBucket createBucket(RandomAccessFile backingStore, int bucketNum, TermCountEntryFactory fact) {
-			return new TermCountHashBucket(backingStore, bucketNum, entryFactory);
-		}
-
+		return numEntries;
 	}
 
 	@Override
