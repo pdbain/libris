@@ -13,13 +13,14 @@ import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.ui.LibrisUiGeneric;
 
 public class Libris {
+	enum IfType {UI_HTML, UI_CMDLINE, UI_WEB, UI_GUI} ;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		IfType myUiType = IfType.UI_GUI;
 		boolean readOnly = false;
-		boolean isGui = true;
 		String auxDirpath = null;
 		String databaseFilePath = null;
 
@@ -30,9 +31,12 @@ public class Libris {
 			if (arg.equals("-r")) {
 				readOnly = true;
 			} else if (arg.equals("-g")) {
-				isGui = true;
+				myUiType = IfType.UI_GUI;
 			} else if (arg.equals("-c")) {
-				isGui = false;
+				myUiType = IfType.UI_CMDLINE;
+			} else if (arg.equals("-h")) {
+				printHelpString();
+				System.exit(0);
 			} else if (arg.equals("-x")) {
 				if ((i + 1) < args.length) {
 					auxDirpath = args[i+1];
@@ -47,43 +51,56 @@ public class Libris {
 			++i;
 		}
 
-		if (isGui) {
-			try {
-				File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
-				File auxDir = null;
-				if ((null != dbFile) && (!dbFile.isFile())) {
-					LibrisUiGeneric.cmdlineError(databaseFilePath+" is not a file");
-				} else {
-					if (null != auxDirpath) {
-						auxDir = new File(auxDirpath);
-					}
+		try {
+			File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
+			File auxDir = null;
+			if ((null != dbFile) && (!dbFile.isFile())) {
+				LibrisUiGeneric.cmdlineError(databaseFilePath+" is not a file");
+			} else {
+				if (null != auxDirpath) {
+					auxDir = new File(auxDirpath);
 				}
-				// TODO configurable aux dir
-				LibrisGui ui = new LibrisGui(dbFile, readOnly);				
-				if (null != dbFile) {
-					LibrisDatabase db = ui.openDatabase();
-				} else {
-					ui.sendChooseDatabase();
-				}
-			} catch (LibrisException e) {
-				LibrisUiGeneric.cmdlineError("Cannot open Libris: "+e.getMessage());
-
 			}
+			// TODO configurable aux dir
+			LibrisGui ui = null;
+			if (IfType.UI_GUI == myUiType) {
+				ui = new LibrisGui(dbFile, readOnly);
+			}
+			if (null != dbFile) {
+				LibrisDatabase db = ui.openDatabase();
+			} else {
+				ui.sendChooseDatabase();
+			}
+		} catch (LibrisException e) {
+			LibrisUiGeneric.cmdlineError("Cannot open Libris: "+e.getMessage());
+
 		}
+	}
+
+	private static void printHelpString() {
+		String helpString = "Libris: a record management system.\n"
+				+ "Syntax:]\n"
+				+ "libris -[c|g|w] -x <path> -r <database file>\n"
+				+ "-c: command-line\n"
+				+ "-g: graphical user interface\n"
+				+ "-w: start web server\n"
+				+ "-r: open database read-only"
+				+ "-x: specify auxiliary directory";
+		System.out.println(helpString);
 
 	}
 
 	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
 		HeadlessUi ui = new HeadlessUi(databaseFile, false);
 		buildIndexes(databaseFile, ui);
-		
+
 		LibrisDatabase result = ui.openDatabase();
 		return result;
 	}
 
 	public static LibrisDatabase buildAndOpenDatabase(LibrisIndexConfiguration config) throws LibrisException {
 		buildIndexes(config);
-		
+
 		LibrisDatabase result = config.getDatabaseUi().openDatabase();
 		return result;
 	}
