@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.Objects;
 
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
@@ -21,7 +21,9 @@ public class Libris {
 	public static void main(String[] args) {
 		IfType myUiType = IfType.UI_GUI;
 		boolean readOnly = false;
-		String auxDirpath = null;
+		boolean doRebuild = false;
+		String auxDirPath = null;
+		String artifactDirpath = null;
 		String databaseFilePath = null;
 
 		int i = 0; 
@@ -30,17 +32,24 @@ public class Libris {
 			String arg = args[i];
 			if (arg.equals("-r")) {
 				readOnly = true;
+			} else if (arg.equals("-b")) {
+				doRebuild = true;
+				notImplemented(arg);
 			} else if (arg.equals("-g")) {
 				myUiType = IfType.UI_GUI;
 			} else if (arg.equals("-c")) {
 				myUiType = IfType.UI_CMDLINE;
+				notImplemented(arg);
 			} else if (arg.equals("-h")) {
 				printHelpString();
 				System.exit(0);
+			} else if (arg.equals("-a")) {
+				notImplemented(arg);
 			} else if (arg.equals("-x")) {
 				if ((i + 1) < args.length) {
-					auxDirpath = args[i+1];
+					auxDirPath = args[i+1];
 				}
+				notImplemented(arg);
 			} else if (!arg.startsWith("-")) {
 				if (null == databaseFile) {
 					databaseFilePath = arg;
@@ -57,8 +66,8 @@ public class Libris {
 			if ((null != dbFile) && (!dbFile.isFile())) {
 				LibrisUiGeneric.cmdlineError(databaseFilePath+" is not a file");
 			} else {
-				if (null != auxDirpath) {
-					auxDir = new File(auxDirpath);
+				if (null != auxDirPath) {
+					auxDir = new File(auxDirPath);
 				}
 			}
 			// TODO configurable aux dir
@@ -66,8 +75,9 @@ public class Libris {
 			if (IfType.UI_GUI == myUiType) {
 				ui = new LibrisGui(dbFile, readOnly);
 			}
+			LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
 			if (null != dbFile) {
-				LibrisDatabase db = ui.openDatabase();
+				ui.openDatabase();
 			} else {
 				ui.sendChooseDatabase();
 			}
@@ -77,15 +87,21 @@ public class Libris {
 		}
 	}
 
+	private static void notImplemented(String arg) {
+		System.err.println(arg+" not implemented");
+		System.exit(1);
+	}
+
 	private static void printHelpString() {
 		String helpString = "Libris: a record management system.\n"
 				+ "Syntax:]\n"
-				+ "libris -[c|g|w] -x <path> -r <database file>\n"
+				+ "libris -[c|g|w] [-x <path>] [-r] [-a <path>] <database file>\n"
 				+ "-c: command-line\n"
 				+ "-g: graphical user interface\n"
 				+ "-w: start web server\n"
-				+ "-r: open database read-only"
-				+ "-x: specify auxiliary directory";
+				+ "-r: open database read-only\n"
+				+ "-x: specify auxiliary directory\n"
+				+ "-a: specify arifact repository location";
 		System.out.println(helpString);
 
 	}
@@ -98,10 +114,10 @@ public class Libris {
 		return result;
 	}
 
-	public static LibrisDatabase buildAndOpenDatabase(LibrisIndexConfiguration config) throws LibrisException {
-		buildIndexes(config);
-
-		LibrisDatabase result = config.getDatabaseUi().openDatabase();
+	public static LibrisDatabase buildAndOpenDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
+		HeadlessUi ui = new HeadlessUi();
+		buildIndexes(config, ui);
+		LibrisDatabase result = ui.openDatabase(config);
 		return result;
 	}
 
@@ -114,12 +130,16 @@ public class Libris {
 	}
 
 	public static boolean buildIndexes(File databaseFile, LibrisUi ui) throws LibrisException {
-		LibrisIndexConfiguration config = new LibrisIndexConfiguration(databaseFile, ui);
-		return buildIndexes(config);
+		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(databaseFile);
+		return buildIndexes(config, ui);
 	}
 
-	public static boolean buildIndexes(LibrisIndexConfiguration config) throws LibrisException {
-		LibrisDatabase db = new LibrisDatabase(config.getDatabaseFile(), false, config.getDatabaseUi());
+	public static boolean buildIndexes(LibrisDatabaseConfiguration config, LibrisUi databaseUi) throws LibrisException {
+		if (config.isReadOnly()) {
+			databaseUi.alert("Cannot build indexes if read-only set");
+			return false;
+		}
+		LibrisDatabase db = new LibrisDatabase(config, databaseUi);
 		config.setLoadMetadata(true);
 		if (!db.isDatabaseReserved()) {
 			boolean buildResult = db.buildDatabase(config);
@@ -131,6 +151,7 @@ public class Libris {
 			return false;
 		}
 	}
+
 	static {
 		URL props = PdfRecordImporter.class.getClassLoader().getResource("commons-logging.properties");
 		if (Objects.nonNull(props)) {

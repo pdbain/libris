@@ -41,7 +41,7 @@ import org.lasalledebain.libris.exception.RecordDataException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
-import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -407,12 +407,12 @@ public class Utilities extends TestCase {
 		return db;
 	}
 
-	public static LibrisDatabase buildTestDatabase(LibrisIndexConfiguration config)
+	public static LibrisDatabase buildTestDatabase(LibrisDatabaseConfiguration config)
 			throws FileNotFoundException, IOException {
 		LibrisDatabase db = null;
 		try {
 			db = Libris.buildAndOpenDatabase(config);
-			LibrisUi ui = config.getDatabaseUi();
+			LibrisUi ui = db.getUi();
 			ui.closeDatabase(false);
 			db = ui.openDatabase();
 		} catch (LibrisException e) {
@@ -509,7 +509,7 @@ public class Utilities extends TestCase {
 			e.printStackTrace();
 			fail("Error creating GUI: "+e.getMessage());
 		}
-		LibrisDatabase db = gui.openDatabase();
+		gui.openDatabase();
 		gui.setTitle(testName);
 		return gui;
 	}

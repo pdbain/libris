@@ -18,7 +18,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.AffiliateList;
-import org.lasalledebain.libris.indexes.IndexConfiguration;
+import org.lasalledebain.libris.indexes.DatabaseConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.RecordKeywords;
@@ -92,7 +92,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 		return indexed;
 	}
 
-	public void buildIndexes(IndexConfiguration config, Records<RecordType> recs) throws LibrisException {
+	public void buildIndexes(DatabaseConfiguration config, Records<RecordType> recs) throws LibrisException {
 		int numGroups = database.getSchema().getNumGroups();
 		FileAccessManager childTempFiles[] = new FileAccessManager[numGroups];
 		FileAccessManager affiliateTempFiles[] = new FileAccessManager[numGroups];

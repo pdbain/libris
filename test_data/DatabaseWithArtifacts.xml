@@ -1,4 +1,4 @@
-<libris branch="0" databasename="testDatabase1" date="2011-06-03 00:00:00 UTC" lastchild="0" schemalocation="" schemaname="testDatabase1" schemaversion="testDatabase1">
+<libris branch="0" databasename="DatabaseWithArtifacts" date="2011-06-03 00:00:00 UTC" lastchild="0" schemalocation="" schemaname="testDatabase1" schemaversion="testDatabase1">
 	<metadata>
 		<schema>
 			<groupdefs>

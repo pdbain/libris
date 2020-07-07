@@ -22,14 +22,17 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.GenericDatabase;
+import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.index.IndexField;
-import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
+import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.util.DeterministicFieldGenerator;
 import org.lasalledebain.libris.util.FieldGenerator;
@@ -43,7 +46,6 @@ import junit.framework.TestCase;
 public class TestRecordFilter extends TestCase {
 
 	private LibrisDatabase db;
-	private LibrisUi ui;
 	private LibrisDatabase database;
 	private File workingDirectory;
 	private final static int keywordFieldNums[] = new int[] { 0, 1, 3 };
@@ -122,9 +124,9 @@ public class TestRecordFilter extends TestCase {
 		Random rand = new Random(314159);
 		final int numRecs = 2;
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
-		LibrisIndexConfiguration config = new LibrisIndexConfiguration(testDatabaseFileCopy);
-		LibrisUi ui = config.getDatabaseUi();
+		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
+		LibrisUi ui = database.getUi();
 		int fieldNums[] = new int[] { 0 };
 		RandomFieldGenerator generators[] = new RandomFieldGenerator[fieldNums.length];
 		generators[0] = new RandomFieldGenerator(4, 12, 4, 4, rand, numRecs);
@@ -144,10 +146,10 @@ public class TestRecordFilter extends TestCase {
 		Random rand = new Random(314159);
 		final int numRecs = 100;
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
-		LibrisIndexConfiguration config = new LibrisIndexConfiguration(testDatabaseFileCopy);
+		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setSignatureLevels(2);
-		LibrisUi ui = config.getDatabaseUi();
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
+		LibrisUi ui = database.getUi();
 		RandomFieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
 		final int keywordRatio = 15 * numRecs;
 		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
@@ -168,10 +170,10 @@ public class TestRecordFilter extends TestCase {
 
 	public void testSearchMultipleResults() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
-		LibrisIndexConfiguration config = new LibrisIndexConfiguration(testDatabaseFileCopy);
+		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setSignatureLevels(2);
-		LibrisUi ui = config.getDatabaseUi();
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
+		LibrisUi ui = database.getUi();
 		String singleKeyword = "singleKeyword";
 		String multipleKeyword = "multipleKeyword";
 
@@ -211,7 +213,7 @@ public class TestRecordFilter extends TestCase {
 	 * @throws LibrisException
 	 */
 	public void testSearchCompoundQuery() throws FileNotFoundException, IOException, LibrisException {
-		LibrisIndexConfiguration config = copyAndBuildDatabase();
+		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
 
 		final String[] fieldSource = Lorem.fields;
 		final int numRecs = fieldSource.length / keywordFieldNums.length;
@@ -223,7 +225,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		ui = config.getDatabaseUi();
+		LibrisUi ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -242,7 +244,7 @@ public class TestRecordFilter extends TestCase {
 	 * @throws LibrisException
 	 */
 	public void testSearchSubstring() throws FileNotFoundException, IOException, LibrisException {
-		LibrisIndexConfiguration config = copyAndBuildDatabase();
+		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
 
 		final String[] fieldSource = Lorem.fields;
 		final int numRecs = fieldSource.length / keywordFieldNums.length;
@@ -254,7 +256,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		ui = config.getDatabaseUi();
+		LibrisUi ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -276,7 +278,7 @@ public class TestRecordFilter extends TestCase {
 	 */
 	public void testSearchCaseInsensitive() throws FileNotFoundException, IOException, LibrisException {
 
-		LibrisIndexConfiguration config = copyAndBuildDatabase();
+		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
 
 		final String[] fieldSource = Lorem.fields;
 		final int numRecs = fieldSource.length / keywordFieldNums.length;
@@ -288,7 +290,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		ui = config.getDatabaseUi();
+		LibrisUi ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -314,7 +316,7 @@ public class TestRecordFilter extends TestCase {
 	 * @throws LibrisException
 	 */
 	public void testSearchNewRecords() throws FileNotFoundException, IOException, LibrisException {
-		LibrisIndexConfiguration config = copyAndBuildDatabase();
+		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
 
 		final String[] fieldSource = Lorem.fields;
 		final int numRecs = fieldSource.length / keywordFieldNums.length;
@@ -325,7 +327,7 @@ public class TestRecordFilter extends TestCase {
 		}
 		makeDatabase(database, numRecs, generators, keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		ui = config.getDatabaseUi();
+		LibrisUi ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -345,7 +347,7 @@ public class TestRecordFilter extends TestCase {
 	}
 
 	public void testIndexStress() throws FileNotFoundException, IOException, LibrisException {
-		LibrisIndexConfiguration config = copyAndBuildDatabase();
+		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
 
 		Random rand = new Random(3141592);
 		final int numRecs = 40000; // TODO increase to 10^6
@@ -363,7 +365,7 @@ public class TestRecordFilter extends TestCase {
 			Record r = database.getRecord(i);
 			assertNotNull("Record "+i+" null", r);
 		}
-		ui = config.getDatabaseUi();
+		LibrisUi ui = database.getUi();
 		assertTrue("Database not closed", ui.closeDatabase(false));
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -382,9 +384,9 @@ public class TestRecordFilter extends TestCase {
 
 	}
 
-	private LibrisIndexConfiguration copyAndBuildDatabase() throws FileNotFoundException, IOException {
+	private LibrisDatabaseConfiguration copyAndBuildDatabase() throws FileNotFoundException, IOException, DatabaseException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
-		LibrisIndexConfiguration config = new LibrisIndexConfiguration(testDatabaseFileCopy);
+		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setSignatureLevels(2);
 		database = Utilities.buildTestDatabase(config);
 		return config;

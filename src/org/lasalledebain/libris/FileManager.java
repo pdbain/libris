@@ -169,4 +169,9 @@ public class FileManager {
 		activeManagers.values().forEach(f -> f.close());
 	}
 
+	public static File getDefautlArtifactsDirectory(File databaseFile) throws DatabaseException {
+		File artifactDirectoryFile =LibrisDatabase.getDatabaseAuxDirectory(databaseFile, "artifacts");
+		return artifactDirectoryFile;
+	}
+
 }

@@ -20,7 +20,6 @@ import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;

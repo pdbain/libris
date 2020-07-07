@@ -1,29 +1,30 @@
 package org.lasalledebain.libris.indexes;
 
 import java.util.Optional;
-import java.util.Properties;
 
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.util.Reporter;
 
-public class IndexConfiguration {
+public class DatabaseConfiguration {
 
-	protected final LibrisUi myUi;
 	protected final Reporter indexingReporter;
-	protected final Properties config;
 	private Optional<Integer> signatureLevels;
 	private Optional<Integer> termcountBuckets;
+	private boolean readOnly;
 
-	public IndexConfiguration(LibrisUi theUi) {
-		myUi = theUi;
+	public DatabaseConfiguration() {
 		indexingReporter = new Reporter();
-		config = new Properties();
 		signatureLevels = Optional.empty();
 		termcountBuckets = Optional.empty();
+		readOnly = false;
 	}
 
-	public LibrisUi getDatabaseUi() {
-		return myUi;
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
 	}
 
 	public Reporter getIndexingReporter() {

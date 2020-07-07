@@ -14,7 +14,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.GroupManager;
-import org.lasalledebain.libris.indexes.IndexConfiguration;
+import org.lasalledebain.libris.indexes.DatabaseConfiguration;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
@@ -58,7 +58,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		saveMetadata();
 	}
 
-	public void buildIndexes(IndexConfiguration config)
+	public void buildIndexes(DatabaseConfiguration config)
 			throws LibrisException {
 		 Records<RecordType> myRecs = getDatabaseRecords();
 		indexMgr.buildIndexes(config, myRecs);

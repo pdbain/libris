@@ -11,7 +11,7 @@ import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public interface LibrisUi {
 
@@ -22,7 +22,7 @@ public interface LibrisUi {
 	public boolean quit(boolean force) throws DatabaseException;
 
 	public void rebuildDatabase() throws LibrisException;
-	public void rebuildDatabase(LibrisIndexConfiguration config) throws LibrisException;
+	public void rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException;
 	public boolean isDatabaseSelected();
 	public boolean isDatabaseOpen();
 	public boolean isDatabaseReadOnly();

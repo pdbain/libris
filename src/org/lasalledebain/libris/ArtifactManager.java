@@ -17,7 +17,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
-import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.ui.Dialogue;
 import org.lasalledebain.libris.ui.LibrisUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -196,7 +196,7 @@ public class ArtifactManager {
 		myDb.toXml(outWriter);
 	}
 
-	public void buildIndexes(LibrisIndexConfiguration config) throws LibrisException {
+	public void buildIndexes(LibrisDatabaseConfiguration config) throws LibrisException {
 		myDb.buildIndexes(config);
 	}
 

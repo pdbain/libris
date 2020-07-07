@@ -33,6 +33,7 @@ public class LibrisTestSuite {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.lasalledebain");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(ConfigTest.class);
 		suite.addTestSuite(LayoutTests.class);
 		suite.addTestSuite(ArtifactTest.class);
 		suite.addTestSuite(TestRecordFilter.class);

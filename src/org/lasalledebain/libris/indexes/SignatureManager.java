@@ -60,7 +60,7 @@ public class SignatureManager implements LibrisConstants {
 		}
 	}
 	
-	public void createFiles(IndexConfiguration config) throws FileNotFoundException {
+	public void createFiles(DatabaseConfiguration config) throws FileNotFoundException {
 		Optional<Integer> sigLevelsTemp = config.getSignatureLevels();
 		if (sigLevelsTemp.isPresent()) {
 			sigLevels = sigLevelsTemp.get();

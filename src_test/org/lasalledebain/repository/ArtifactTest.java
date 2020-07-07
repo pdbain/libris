@@ -22,7 +22,7 @@ import org.lasalledebain.libris.ArtifactRecord;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.indexes.IndexConfiguration;
+import org.lasalledebain.libris.indexes.DatabaseConfiguration;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisUi;
@@ -190,7 +190,7 @@ public class ArtifactTest extends TestCase {
 			ElementManager mgr = GenericDatabase.getXmlFactory().makeElementManager(reader, exportFile.getAbsolutePath(),
 					LibrisXMLConstants.XML_ARTIFACTS_TAG, new XmlShapes(XmlShapes.SHAPE_LIST.ARTIFACTS_SHAPES));
 			db.fromXml(mgr);
-			IndexConfiguration config = new IndexConfiguration(myUi);
+			DatabaseConfiguration config = new DatabaseConfiguration();
 			config.setSignatureLevels(2);
 			db.buildIndexes(config);
 			FilteredRecordList<ArtifactRecord> filteredList = db.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, new int[] {ArtifactDatabase.TITLE_FIELD}, TITLE_PREFIX+3);

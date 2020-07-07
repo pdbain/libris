@@ -15,7 +15,7 @@ import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.indexes.LibrisIndexConfiguration;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	
@@ -26,7 +26,9 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	protected String uiTitle;
 	protected LibrisDatabase currentDatabase;
 	private XmlSchema mySchema;
-	File databaseFile;
+	protected File databaseFile;
+	protected File auxiliaryDirectory;
+	protected File artifactDirectory;
 	private boolean readOnly;
 
 	public LibrisUiGeneric(File dbFile, boolean readOnly) {
@@ -76,6 +78,11 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 	}
 
 	public LibrisDatabase openDatabase() throws DatabaseException {
+		return openDatabase(new LibrisDatabaseConfiguration(databaseFile, readOnly, mySchema));
+	}
+	
+	public LibrisDatabase openDatabase(LibrisDatabaseConfiguration config) throws DatabaseException {
+		setDatabaseFile(config.getDatabaseFile());
 		if (!isDatabaseSelected()) {
 			throw new DatabaseException("Database file not set");
 		}
@@ -83,8 +90,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 			alert("Cannot open "+databaseFile.getAbsolutePath()+" because "+currentDatabase.getDatabaseFile().getAbsolutePath()+" is open");
 		}
 		try {
-			// TODO add option to open read-write
-			currentDatabase = new LibrisDatabase(databaseFile,readOnly, this, mySchema);
+			currentDatabase = new LibrisDatabase(config, this);
 			if (!currentDatabase.isIndexed()) {
 				alert("database "+databaseFile.getAbsolutePath()+" is not indexed.  Please re-index.");
 				return null;
@@ -97,6 +103,7 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		}
 		return currentDatabase;
 	}
+	
 	@Override
 	public boolean closeDatabase(boolean force) throws DatabaseException {
 		boolean result = false;
@@ -171,8 +178,8 @@ public abstract class LibrisUiGeneric implements LibrisUi, LibrisConstants {
 		Libris.buildIndexes(databaseFile, new HeadlessUi(databaseFile, false));
 	}
 
-	public void rebuildDatabase(LibrisIndexConfiguration config) throws LibrisException {
-		Libris.buildIndexes(config);
+	public void rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
+		Libris.buildIndexes(config, this);
 	}
 
 	@Override
