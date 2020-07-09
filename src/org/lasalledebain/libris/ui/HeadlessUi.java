@@ -13,7 +13,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 import static org.lasalledebain.libris.LibrisDatabase.log;
 
-public class HeadlessUi extends LibrisWindowedUi implements LibrisUi {
+public class HeadlessUi extends LibrisWindowedUi implements DatabaseUi {
 	private String schemaPath;
 	private int confirmValue;
 	private boolean accessible; 

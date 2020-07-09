@@ -64,7 +64,7 @@ public class DatabaseExporter {
 
 	public DatabaseExporter(LibrisDatabase db) {
 		this.db = db;
-		librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+		librisPrefs = LibrisUi.getLibrisPrefs();
 		exportFrame = new JFrame("Export database");
 		exportFrame.setLayout(new BorderLayout());
 	}
@@ -91,7 +91,7 @@ public class DatabaseExporter {
 
 		exportFile = exportFileChooser.chooseOutputFile(lastExportFileName);
 		if (null != exportFile) {
-			Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+			Preferences librisPrefs = LibrisUi.getLibrisPrefs();
 			fmt = sepPanel.getFormat();
 			librisPrefs.put(DATABASE_EXPORT_FORMAT, fmt.toString());
 			librisPrefs.put(DATABASE_EXPORT_FILE, exportFile.getAbsolutePath());

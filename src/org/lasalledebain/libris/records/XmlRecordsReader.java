@@ -69,7 +69,7 @@ public class XmlRecordsReader<RecordType extends Record> implements Iterable<Rec
 		try {
 			recMgr = recsMgr.nextElement();
 			if (null != recMgr) {
-				inputRecord = database.newRecord();
+				inputRecord = database.newRecordUnchecked();
 				inputRecord.fromXml(recMgr);
 			}
 		} catch (LibrisException e) {

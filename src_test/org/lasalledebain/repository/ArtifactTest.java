@@ -25,7 +25,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.DatabaseConfiguration;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -54,7 +54,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testCreateDatabase() throws LibrisException {
 		final int numArtifacts = 16;
-		LibrisUi myUi = new HeadlessUi(null, false);
+		DatabaseUi myUi = new HeadlessUi(null, false);
 		ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory);
 		db.initialize();
 		db.openDatabase();
@@ -95,7 +95,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testImportExportRecords() throws LibrisException, IOException, XMLStreamException {
 		final int numArtifacts = 16;
-		LibrisUi myUi = new HeadlessUi(null, false);
+		DatabaseUi myUi = new HeadlessUi(null, false);
 		ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory);
 		db.initialize();
 		db.openDatabase();
@@ -137,6 +137,7 @@ public class ArtifactTest extends TestCase {
 			ElementManager mgr = GenericDatabase.getXmlFactory().makeElementManager(reader, exportFile.getAbsolutePath(),
 					LibrisXMLConstants.XML_ARTIFACTS_TAG, new XmlShapes(XmlShapes.SHAPE_LIST.ARTIFACTS_SHAPES));
 			db.fromXml(mgr);
+			db.openDatabase();
 			for (int i = 0; i < numArtifacts; ++i) {
 				final int expectedId = i + 1;
 				ArtifactRecord actual = db.getRecord(expectedId);
@@ -156,7 +157,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testIndex() throws LibrisException, IOException, XMLStreamException {
 		final int numArtifacts = 16;
-		LibrisUi myUi = new HeadlessUi(null, false);
+		DatabaseUi myUi = new HeadlessUi(null, false);
 		ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory);
 		db.initialize();
 		db.openDatabase();
@@ -193,6 +194,7 @@ public class ArtifactTest extends TestCase {
 			DatabaseConfiguration config = new DatabaseConfiguration();
 			config.setSignatureLevels(2);
 			db.buildIndexes(config);
+			db.openDatabase();
 			FilteredRecordList<ArtifactRecord> filteredList = db.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, new int[] {ArtifactDatabase.TITLE_FIELD}, TITLE_PREFIX+3);
 			int recordCount = 0;
 			for (ArtifactRecord rec: filteredList) {
@@ -214,7 +216,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testGroups() throws LibrisException {
 		final int numArtifacts = 16;
-		LibrisUi myUi = new HeadlessUi(null, false);
+		DatabaseUi myUi = new HeadlessUi(null, false);
 		ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory);
 		db.initialize();
 		db.openDatabase();

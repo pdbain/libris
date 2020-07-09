@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.ModifiedRecordList;
@@ -19,7 +20,7 @@ import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 
 import junit.framework.TestCase;
 
@@ -100,7 +101,7 @@ public class RecordListTests extends TestCase {
 		try {
 			testDatabaseFileCopy = getTestDatabase();
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
-			final LibrisUi myUi = testDb.getUi();
+			final DatabaseUi myUi = testDb.getUi();
 			DatabaseRecord rec = testDb.newRecord();
 			rec.addFieldValue(ID_AUTH, "new record");
 			int id = testDb.putRecord(rec);
@@ -127,7 +128,7 @@ public class RecordListTests extends TestCase {
 		try {
 			testDatabaseFileCopy = getTestDatabase();
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
-			final LibrisUi myUi = testDb.getUi();
+			final DatabaseUi myUi = testDb.getUi();
 			DatabaseRecord rec = testDb.newRecord();
 			rec.addFieldValue(ID_AUTH, "new record");
 			testDb.putRecord(rec);
@@ -161,7 +162,7 @@ public class RecordListTests extends TestCase {
 			testDatabaseFileCopy = getTestDatabase();
 			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 			testDb.getUi().quit(true);
-			final LibrisUi myUi = testDb.getUi();
+			final DatabaseUi myUi = testDb.getUi();
 			for (int r=1; r <= expectedIds.length; ++r) {
 				int oldId = r;
 				testDb = myUi.openDatabase();
@@ -226,7 +227,7 @@ public class RecordListTests extends TestCase {
 		}			
 	}
 
-	private void checkRecordOrder(LibrisDatabase db, String[] expectedData)
+	private void checkRecordOrder(GenericDatabase<DatabaseRecord> db, String[] expectedData)
 			throws LibrisException {
 		int expectedId = 1;
 		for (Record r: db.getDatabaseRecords()) {

@@ -19,7 +19,7 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.records.Records;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -50,12 +50,12 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	public static int TITLE_FIELD;
 	public static int ARCHIVEPATH_FIELD;
 	public static int numFields;
-	public ArtifactDatabase(LibrisUi theUi, FileManager theFileManager) throws DatabaseException {
+	public ArtifactDatabase(DatabaseUi theUi, FileManager theFileManager) throws DatabaseException {
 		super(theUi, theFileManager);
 		myMetadata = new DatabaseMetadata();
 	}
 	
-	public ArtifactDatabase(LibrisUi theUi, File workingDirectory) throws DatabaseException {
+	public ArtifactDatabase(DatabaseUi theUi, File workingDirectory) throws DatabaseException {
 		this(theUi, new FileManager(new File(workingDirectory, LibrisConstants.REPOSITORY_AUX_DIRECTORY_NAME)));
 	}
 	@Override
@@ -68,7 +68,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		mgr.parseOpenTag();
 		String nextId = mgr.getNextId();
 		if (LibrisXMLConstants.XML_RECORDS_TAG == nextId) {
-			Records<ArtifactRecord> recs = getDatabaseRecords();
+			Records<ArtifactRecord> recs = getDatabaseRecordsUnchecked();
 			ElementManager recsMgr = mgr.nextElement();
 			recs.fromXml(recsMgr);
 		}
@@ -94,16 +94,27 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	@Override
 	public ArtifactRecord newRecord() {
+		assertDatabaseWritable("new artiact record");
+		return newRecordUnchecked();
+	}
+
+	@Override
+	public ArtifactRecord newRecordUnchecked() {
 		return new ArtifactRecord(getSchema());
 	}
-	
-	public ArtifactRecord newRecord(ArtifactParameters artifactParameters) throws LibrisException {
+
+	public ArtifactRecord newRecordUnchecked(ArtifactParameters artifactParameters) throws LibrisException {
 		ArtifactRecord rec = newRecord();
 		setRecordFields(artifactParameters, rec);
 		return rec;
 	}
 
-	protected void setRecordFields(ArtifactParameters artifactParameters, ArtifactRecord rec)
+	public ArtifactRecord newRecord(ArtifactParameters artifactParameters) throws LibrisException {
+		assertDatabaseWritable("new artiact record");
+		return newRecordUnchecked(artifactParameters);
+	}
+
+		protected void setRecordFields(ArtifactParameters artifactParameters, ArtifactRecord rec)
 			throws InputException, FieldDataException, DatabaseException {
 		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
 		rec.addFieldValue(ID_ARCHIVEPATH, artifactParameters.getArchivePathString());
@@ -238,6 +249,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		theSchema.setIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS, new int[] {TITLE_FIELD, KEYWORDS_FIELD});
 		return theSchema;
 	}
+	// TODO add unchecked version
 	@Override
 	public ArtifactRecord makeRecord(boolean editable) {
 		ArtifactRecord rec = newRecord();
@@ -245,4 +257,10 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		return rec;
 	}
 
+	@Override
+	public ArtifactRecord makeRecordUnchecked(boolean editable) {
+		ArtifactRecord rec = newRecordUnchecked();
+		rec.setEditable(editable);
+		return rec;
+	}
 }

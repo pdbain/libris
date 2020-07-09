@@ -7,6 +7,8 @@ import java.io.IOException;
 import junit.framework.TestCase;
 
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -16,7 +18,7 @@ import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;;
 
 public class ImportTests extends TestCase {
 	private File testDatabaseFileCopy;
-	private LibrisDatabase db;
+	private GenericDatabase<DatabaseRecord> db;
 	private File workingDirectory;
 	
 	public void setUp() {

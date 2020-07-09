@@ -9,8 +9,8 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 class DatabaseRecordList extends RecordList<DatabaseRecord> {
 
-	private LibrisDatabase database;
-	public DatabaseRecordList(LibrisDatabase db) {
+	private GenericDatabase<DatabaseRecord> database;
+	public DatabaseRecordList(GenericDatabase<DatabaseRecord> db) {
 		database = db;
 		
 	}

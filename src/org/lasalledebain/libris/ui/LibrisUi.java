@@ -1,79 +1,287 @@
 package org.lasalledebain.libris.ui;
 
 import java.io.File;
+import java.util.Objects;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
-import org.lasalledebain.libris.DatabaseRecord;
-import org.lasalledebain.libris.GenericDatabase;
+import org.lasalledebain.libris.Libris;
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XmlSchema;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public interface LibrisUi {
-
-	public void setSchema(XmlSchema mySchema);
-	public LibrisDatabase openDatabase() throws DatabaseException;
-	public void saveDatabase();
-	public boolean closeDatabase(boolean force) throws DatabaseException;
-	public boolean quit(boolean force) throws DatabaseException;
-
-	public void rebuildDatabase() throws LibrisException;
-	public void rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException;
-	public boolean isDatabaseSelected();
-	public boolean isDatabaseOpen();
-	public boolean isDatabaseReadOnly();
-	public GenericDatabase<DatabaseRecord> getDatabase();
-	void setDatabaseFile(File dbFile);
-	public abstract String SelectSchemaFile(String schemaName) throws DatabaseException;
-	public void setTitle(String title);
-
-	public abstract void pasteToField();
-
-	void recordsAccessible(boolean accessible);
-
-	Record newRecord();
-	public abstract void displayRecord(int recordId) throws LibrisException;
-	public abstract void put(Record newRecord) throws DatabaseException;
-
-	public void addRecord(Record newRecord) throws DatabaseException;
-
-	/**
-	 * Create a new, empty, value for a field
-	 */
-	public abstract void newFieldValue();
-
-	public abstract void removeFieldValue();
-
-	public abstract void fieldSelected(boolean b);
-
-	UiField getSelectedField();
-
-	void setSelectedField(UiField selectedField);
-
-	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException;
-	public void setRecordArtifact();
+public abstract class LibrisUi implements DatabaseUi, LibrisConstants {
 	
-	public abstract void arrangeValues();
+	private static final String NO_DATABASE_OPENED = "No database opened";
+	protected static Preferences librisPrefs;
+	protected static Object prefsSync = new Object();
+	private UiField selectedField;
+	protected String uiTitle;
+	protected LibrisDatabase currentDatabase;
+	private XmlSchema mySchema;
+	protected File databaseFile;
+	protected File auxiliaryDirectory;
+	protected File artifactDirectory;
+	private boolean readOnly;
 
-	public void repaint();
-	public abstract void alert(String msg, Exception e);
-	public abstract void alert(String msg);
+	public LibrisUi(File dbFile, boolean readOnly) {
+		this();
+		setDatabaseFile(dbFile);
+		this.readOnly = readOnly;
+	}
+	public LibrisUi() {
+		fieldSelected(false);
+		setSelectedField(null);
+	}
+
+	@Override
+	public LibrisDatabase getDatabase() {
+		return currentDatabase;
+	}
 	/**
-	 * Print a message and get a yes/no/cancel response.
-	 * Possible responses are:
-	 * YES_OPTION
-	 * NO_OPTION
-	 * CANCEL_OPTION
-	 * OK_OPTION
-	 * CLOSED_OPTION
-	 * @param msg message to print
-	 * @return user response
+	 * @return the uiTitle
 	 */
-	public abstract int confirm(String msg);
-	public abstract int confirmWithCancel(String msg);
-	public String promptAndReadReply(String prompt) throws DatabaseException;
+	public String getUiTitle() {
+		return uiTitle;
+	}
+	/**
+	 * @param uiTitle the uiTitle to set
+	 */
+	public void setUiTitle(String uiTitle) {
+		this.uiTitle = uiTitle;
+	}
+	/**
+	 * @return the mySchema
+	 */
+	public XmlSchema getSchema() {
+		return mySchema;
+	}
+	/**
+	 * @param mySchema the mySchema to set
+	 */
+	public void setSchema(XmlSchema mySchema) {
+		this.mySchema = mySchema;
+	}
+
+	/**
+	 * @param openReadOnly the openReadOnly to set
+	 */
+	public void setOpenReadOnly(boolean openReadOnly) {
+		readOnly = openReadOnly;
+	}
+
+	public LibrisDatabase openDatabase() throws DatabaseException {
+		return openDatabase(new LibrisDatabaseConfiguration(databaseFile, readOnly, mySchema));
+	}
+	
+	public LibrisDatabase openDatabase(LibrisDatabaseConfiguration config) throws DatabaseException {
+		setDatabaseFile(config.getDatabaseFile());
+		if (!isDatabaseSelected()) {
+			throw new DatabaseException("Database file not set");
+		}
+		if (isDatabaseOpen()) {
+			alert("Cannot open "+databaseFile.getAbsolutePath()+" because "+currentDatabase.getDatabaseFile().getAbsolutePath()+" is open");
+		}
+		try {
+			currentDatabase = new LibrisDatabase(config, this);
+			if (!currentDatabase.isIndexed()) {
+				alert("database "+databaseFile.getAbsolutePath()+" is not indexed.  Please re-index.");
+				return null;
+			}
+			currentDatabase.openDatabase();
+			getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
+		} catch (Exception e) {
+			alert("Error opening database", e);
+			return null;
+		}
+		return currentDatabase;
+	}
+	
+	@Override
+	public boolean closeDatabase(boolean force) throws DatabaseException {
+		boolean result = false;
+		if (Objects.nonNull(currentDatabase) && currentDatabase.isDatabaseOpen()) {
+			result = checkAndCloseDatabase(force);
+		}
+		if (result) {
+			currentDatabase = null;
+			setTitle(NO_DATABASE_OPENED);
+		}
+		return result;
+	}
+	protected abstract boolean checkAndCloseDatabase(boolean force) throws DatabaseException;
+
+	@Override
+	public boolean quit(boolean force) throws DatabaseException {
+		return closeDatabase(force);
+	}
+
+	public boolean isDatabaseSelected() {
+		return (null != databaseFile);
+	}
+	
+	@Override
+	public boolean isDatabaseOpen() {
+		return Objects.nonNull(currentDatabase) && currentDatabase.isDatabaseOpen();
+	}
+	
+	protected boolean isDatabaseModified() {
+		return (null != currentDatabase) && currentDatabase.isModified();
+	}
+	public void setDatabaseFile(File dbFile) {
+		 databaseFile = dbFile;
+	}
+	public UiField getSelectedField() {
+		return selectedField;
+	}
+	@Override
+	public Record newRecord() {
+		return null;
+	}
+	public void setTitle(String title) {
+		uiTitle = title;
+	}
+
+	@Override
+	public void arrangeValues() {
+		throw new DatabaseError("LibrisUiGeneric.arrangeValues unimplemented");
+	}
+
+	@Override
+	public void addRecord(Record newRecord) throws DatabaseException{
+		throw new DatabaseError("LibrisUiGeneric.addRecord unimplemented");
+	}
+
+	@Override
+	public abstract String SelectSchemaFile(String schemaName) throws DatabaseException;
+
+	@Override
+	public abstract void alert(String msg, Exception e);
+
+	@Override
+	public abstract void alert(String msg);
+
+	public void fatalError(Exception e, String msg) {
+		alert(msg+e.getMessage());
+		e.printStackTrace();
+		System.exit(1);
+	}
+
+	public void rebuildDatabase() throws LibrisException {
+		Libris.buildIndexes(databaseFile, new HeadlessUi(databaseFile, false));
+	}
+
+	public void rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
+		Libris.buildIndexes(config, this);
+	}
+
+	@Override
+	public void displayRecord(int recordId) throws LibrisException {
+		// TODO implement or remove displayRecord
+
+	}
+	@Override
+	public void pasteToField() {
+		// TODO implement or remove pasteToField
+
+	}
+
+	@Override
+	public String promptAndReadReply(String prompt) throws DatabaseException {
+		// TODO implement or remove promptAndReadReply
+		return null;
+	}
+
+	 @Override
+	public void recordsAccessible(boolean accessible) {
+	}
+
+	public static Preferences getLibrisPrefs() {
+		synchronized (prefsSync) {
+			if (null == librisPrefs) {
+				librisPrefs = Preferences.userRoot();
+			}
+		}
+		return librisPrefs;
+	}
+
+	@Override
+	public void newFieldValue() {
+		return;
+	}
+
+	@Override
+	public void removeFieldValue() {
+		throw new DatabaseError("removeField not implemented");
+	}
+
+	@Override
+	public void fieldSelected(boolean b) {
+		return;
+	}
+
+	public void setSelectedField(UiField selectedField) {
+		this.selectedField = selectedField;
+	}
+
+	public void repaint() {
+	}
+
+	public boolean isDatabaseReadOnly() {
+		return Objects.nonNull(currentDatabase)? currentDatabase.isDatabaseReadOnly(): false;
+	}
+
+	
+	public static void cmdlineError(String msg) {
+		System.err.println(msg);
+		System.exit(1);
+	}
+	public static String formatConciseStackTrace(Exception e, StringBuilder buff) {
+		String emessage;
+		emessage = e.getMessage();
+		if (null != emessage) {
+			buff.append(": "); buff.append(emessage);
+		} else {
+			buff.append(" at ");
+			String sep = "";
+			for (StackTraceElement t: e.getStackTrace()) {
+				buff.append(sep);
+				String className = t.getClassName();
+				int lastDot = className.lastIndexOf('.');
+				if (lastDot > 0) {
+					buff.append(className.substring(lastDot + 1, className.length()));
+				} else {
+					buff.append(className);
+				}
+				buff.append(".");
+				buff.append(t.getMethodName());
+				buff.append("() line ");
+				buff.append(t.getLineNumber());
+				sep = "\n";
+			}
+		}
+		return emessage;
+	}
+	public static void setLoggingLevel(Logger myLogger) {
+		String logLevelString = System.getProperty(LIBRIS_LOGGING_LEVEL);
+		if (null != logLevelString) {
+			Level logLevel = Level.parse(logLevelString);
+			myLogger.setLevel(logLevel);
+			for (Handler handler : Logger.getLogger("").getHandlers()) {
+				handler.setLevel(logLevel);
+			}
+		}
+	}
+	@Override
+	public void saveDatabase() {
+		currentDatabase.save();
+	}
+
 }

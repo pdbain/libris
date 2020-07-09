@@ -405,7 +405,7 @@ public void removeRecord(int rid) throws DatabaseException {
 	private RecordType readRecord(long recordPosition) throws InputException {
 		try {
 			int recId = recordsFileStore.readInt();
-			RecordType r = myRecordFactory.makeRecord(false);//
+			RecordType r = myRecordFactory.makeRecordUnchecked(false);
 			r.setRecordId(recId);
 
 			byte flags = recordsFileStore.readByte();

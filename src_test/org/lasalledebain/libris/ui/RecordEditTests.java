@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -149,7 +150,7 @@ public class RecordEditTests extends TestCase {
 
 			{
 				TestGUI newGui = Utilities.openGuiAndDatabase(testName, dbFile);
-				LibrisDatabase newDb = newGui.getDatabase();
+				GenericDatabase<DatabaseRecord> newDb = newGui.getDatabase();
 				rec = newDb.getRecord(recId);
 				Field fld = rec.getField(ID_PUB);
 				Iterator<String> expectedValues = Arrays.asList(new String [] {"Enumv2", TEST_PUBLISHER, "foobar"}).iterator();
@@ -168,7 +169,7 @@ public class RecordEditTests extends TestCase {
 	public void testDefaultValue() {
 		try {
 			TestGUI gui = Utilities.rebuildAndOpenDatabase(getName(), workingDirectory, TEST_DB_WITH_DEFAULTS_XML_FILE);
-			LibrisDatabase db = gui.getDatabase();
+			GenericDatabase<DatabaseRecord> db = gui.getDatabase();
 			int pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
 			Record rec = gui.newRecord();
 			rec.setEditable(false);
@@ -339,7 +340,7 @@ public class RecordEditTests extends TestCase {
 			assertTrue("Could not close database", gui.quit(false));
 
 			TestGUI newGui = Utilities.openGuiAndDatabase(testName, dbFile);
-			LibrisDatabase newDb = newGui.getDatabase();
+			GenericDatabase<DatabaseRecord> newDb = newGui.getDatabase();
 			resultsWindow = newGui.getResultsWindow();
 			lastRecord = resultsWindow.getNumRecords() - 1;
 			resultsWindow.setSelectedRecordIndex(lastRecord);

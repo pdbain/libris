@@ -19,7 +19,7 @@ public class ModificationTracker {
 	 * @param parentComponent parent GUI element
 	 * @param dialogueMessage printed if database closed with modified records
 	 */
-	public ModificationTracker(LibrisUi ui, ActionListener modificationListener, 
+	public ModificationTracker(DatabaseUi ui, ActionListener modificationListener, 
 			Component parentComponent, String dialogueMessage) {
 		this.modificationListener = modificationListener;
 		this.dialogueMessage = dialogueMessage;
@@ -42,8 +42,8 @@ public class ModificationTracker {
 
 	private ActionListener modificationListener;
 	String dialogueMessage;
-	private LibrisUi ui;
-	public LibrisUi getUi() {
+	private DatabaseUi ui;
+	public DatabaseUi getUi() {
 		return ui;
 	}
 

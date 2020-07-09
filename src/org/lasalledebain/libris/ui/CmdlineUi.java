@@ -16,7 +16,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class CmdlineUi extends LibrisUiGeneric implements LibrisUi {
+public class CmdlineUi extends LibrisUi implements DatabaseUi {
 
 	BufferedReader cmdlineInput;
 	@Override

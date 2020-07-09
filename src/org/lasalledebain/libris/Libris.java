@@ -9,8 +9,8 @@ import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.LibrisUi;
-import org.lasalledebain.libris.ui.LibrisUiGeneric;
 
 public class Libris {
 	enum IfType {UI_HTML, UI_CMDLINE, UI_WEB, UI_GUI} ;
@@ -54,7 +54,7 @@ public class Libris {
 				if (null == databaseFile) {
 					databaseFilePath = arg;
 				} else {
-					LibrisUiGeneric.cmdlineError("only one database name can be specified");
+					LibrisUi.cmdlineError("only one database name can be specified");
 				}
 			}
 			++i;
@@ -64,7 +64,7 @@ public class Libris {
 			File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
 			File auxDir = null;
 			if ((null != dbFile) && (!dbFile.isFile())) {
-				LibrisUiGeneric.cmdlineError(databaseFilePath+" is not a file");
+				LibrisUi.cmdlineError(databaseFilePath+" is not a file");
 			} else {
 				if (null != auxDirPath) {
 					auxDir = new File(auxDirPath);
@@ -82,7 +82,7 @@ public class Libris {
 				ui.sendChooseDatabase();
 			}
 		} catch (LibrisException e) {
-			LibrisUiGeneric.cmdlineError("Cannot open Libris: "+e.getMessage());
+			LibrisUi.cmdlineError("Cannot open Libris: "+e.getMessage());
 
 		}
 	}
@@ -125,16 +125,16 @@ public class Libris {
 		if (null == ui) {
 			ui = new HeadlessUi(databaseFile, false);
 		}
-		LibrisDatabase db = ui.openDatabase();
+		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(databaseFile));
 		return db;
 	}
 
-	public static boolean buildIndexes(File databaseFile, LibrisUi ui) throws LibrisException {
+	public static boolean buildIndexes(File databaseFile, DatabaseUi ui) throws LibrisException {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(databaseFile);
 		return buildIndexes(config, ui);
 	}
 
-	public static boolean buildIndexes(LibrisDatabaseConfiguration config, LibrisUi databaseUi) throws LibrisException {
+	public static boolean buildIndexes(LibrisDatabaseConfiguration config, DatabaseUi databaseUi) throws LibrisException {
 		if (config.isReadOnly()) {
 			databaseUi.alert("Cannot build indexes if read-only set");
 			return false;

@@ -18,7 +18,7 @@ import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 
 import junit.framework.TestCase;
 
@@ -150,7 +150,7 @@ public class RepositoryTest  extends TestCase {
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
 		File dbFile = Repository.initialize(repoRoot);
 		assertTrue("could not create database", null != dbFile);
-		LibrisUi ui = new HeadlessUi(dbFile, false);
+		DatabaseUi ui = new HeadlessUi(dbFile, false);
 		Repository repo = Repository.open(ui, repoRoot);
 		return repo;
 	}

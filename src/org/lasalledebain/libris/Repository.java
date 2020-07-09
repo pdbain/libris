@@ -21,7 +21,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 
 public class Repository extends Libris {
 	private static final String LEVEL_PREFIX = "_L";
@@ -70,9 +70,9 @@ public class Repository extends Libris {
 		return databaseFile;
 	}
 
-	public static Repository open(LibrisUi parent, File repoRoot) throws FactoryConfigurationError, LibrisException {
+	public static Repository open(DatabaseUi parent, File repoRoot) throws FactoryConfigurationError, LibrisException {
 		HeadlessUi myUi = new HeadlessUi(getDatabaseFileFromRoot(repoRoot), parent.isDatabaseReadOnly());
-		LibrisDatabase db = myUi.openDatabase();
+		GenericDatabase<DatabaseRecord> db = myUi.openDatabase();
 		Repository result = new Repository(db, repoRoot);
 		return result;
 	}
@@ -160,7 +160,8 @@ public class Repository extends Libris {
 	}
 
 	public int putArtifactInfo(ArtifactParameters artifactParameters) throws LibrisException {
-		DatabaseRecord rec = repoDatabase.newRecord();
+		repoDatabase.assertDatabaseWritable("put artifact information");
+		DatabaseRecord rec = repoDatabase.newRecordUnchecked();
 		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.getSourceString());
 		rec.addFieldValue(ArtifactDatabase.ID_DATE, artifactParameters.getDate());
 		rec.addFieldValue(ArtifactDatabase.ID_DOI, artifactParameters.getDoi());

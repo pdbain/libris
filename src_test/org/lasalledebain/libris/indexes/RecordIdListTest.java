@@ -10,12 +10,13 @@ import junit.framework.TestCase;
 
 import org.junit.After;
 import org.lasalledebain.Utilities;
+import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
-import org.lasalledebain.libris.LibrisDatabase;
 
 public class RecordIdListTest extends TestCase {
 	File testDatabaseFileCopy;
-	LibrisDatabase db;
+	GenericDatabase<DatabaseRecord> db;
 	private File workingDirectory;
 
 	public void testNameList() {

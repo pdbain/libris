@@ -33,7 +33,7 @@ import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.util.DeterministicFieldGenerator;
 import org.lasalledebain.libris.util.FieldGenerator;
 import org.lasalledebain.libris.util.Lorem;
@@ -126,7 +126,7 @@ public class TestRecordFilter extends TestCase {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
-		LibrisUi ui = database.getUi();
+		DatabaseUi ui = database.getUi();
 		int fieldNums[] = new int[] { 0 };
 		RandomFieldGenerator generators[] = new RandomFieldGenerator[fieldNums.length];
 		generators[0] = new RandomFieldGenerator(4, 12, 4, 4, rand, numRecs);
@@ -149,7 +149,7 @@ public class TestRecordFilter extends TestCase {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setSignatureLevels(2);
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
-		LibrisUi ui = database.getUi();
+		DatabaseUi ui = database.getUi();
 		RandomFieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
 		final int keywordRatio = 15 * numRecs;
 		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
@@ -173,7 +173,7 @@ public class TestRecordFilter extends TestCase {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setSignatureLevels(2);
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
-		LibrisUi ui = database.getUi();
+		DatabaseUi ui = database.getUi();
 		String singleKeyword = "singleKeyword";
 		String multipleKeyword = "multipleKeyword";
 
@@ -225,7 +225,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		LibrisUi ui = database.getUi();
+		DatabaseUi ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -256,7 +256,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		LibrisUi ui = database.getUi();
+		DatabaseUi ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -290,7 +290,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		LibrisUi ui = database.getUi();
+		DatabaseUi ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -327,7 +327,7 @@ public class TestRecordFilter extends TestCase {
 		}
 		makeDatabase(database, numRecs, generators, keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		LibrisUi ui = database.getUi();
+		DatabaseUi ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -365,7 +365,7 @@ public class TestRecordFilter extends TestCase {
 			Record r = database.getRecord(i);
 			assertNotNull("Record "+i+" null", r);
 		}
-		LibrisUi ui = database.getUi();
+		DatabaseUi ui = database.getUi();
 		assertTrue("Database not closed", ui.closeDatabase(false));
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
@@ -392,7 +392,7 @@ public class TestRecordFilter extends TestCase {
 		return config;
 	}
 
-	private void doCompoundQuery(LibrisDatabase database, int[] fieldNums,
+	private void doCompoundQuery(GenericDatabase<DatabaseRecord> database, int[] fieldNums,
 			HashMap<String, List<Integer>> keyWordsAndRecords, String[] searchTerms)
 			throws UserErrorException, IOException {
 		List<Integer> recordList = keyWordsAndRecords.get(searchTerms[0]);
@@ -406,7 +406,7 @@ public class TestRecordFilter extends TestCase {
 		checkReturnedRecords(filteredList, recordSet);
 	}
 
-	private void doSubstringQuery(LibrisDatabase database, int[] fieldNums,
+	private void doSubstringQuery(GenericDatabase<DatabaseRecord> database, int[] fieldNums,
 			HashMap<String, List<Integer>> keyWordsAndRecords, String[] searchTerms, String key)
 			throws UserErrorException, IOException {
 		List<Integer> recordList = keyWordsAndRecords.get(searchTerms[0]);
@@ -452,7 +452,7 @@ public class TestRecordFilter extends TestCase {
 		return rec;
 	}
 
-	HashMap<String, List<Integer>> makeDatabase(LibrisDatabase database, int numRecs, FieldGenerator[] fieldGenerators,
+	HashMap<String, List<Integer>> makeDatabase(GenericDatabase<DatabaseRecord> database, int numRecs, FieldGenerator[] fieldGenerators,
 			int fieldNums[]) throws LibrisException {
 		HashMap<String, List<Integer>> keyWordsAndRecords = new HashMap<>();
 		HashSet<String> keyWords = new HashSet<>();

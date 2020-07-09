@@ -101,6 +101,13 @@ public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 		return rec;
 	}
 
+	@Override
+	public DatabaseRecord makeRecordUnchecked(boolean editable) {
+		DatabaseRecord rec = makeRecord();
+		rec.setEditable(editable);
+		return rec;
+	}
+
 	public Field newField(int i) throws InputException {
 		Field f = fieldMasters[i].newField();
 		return f;

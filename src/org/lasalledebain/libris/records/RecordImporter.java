@@ -13,4 +13,5 @@ public abstract class RecordImporter<RecordType extends Record> {
 	}
 	
 	public abstract RecordType importRecord(FieldValueStringList[] fields) throws LibrisException;
+	public abstract RecordType importRecordUnchecked(FieldValueStringList[] fields) throws LibrisException;
 }

@@ -19,7 +19,7 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.ui.Dialogue;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
@@ -30,11 +30,11 @@ public class ArtifactManager {
 	static final int FANOUT = 100;
 	private final FileManager myFileMgr;
 	private final File artifactDirectory;
-	private final LibrisUi myUi;
+	private final DatabaseUi myUi;
 	private ArtifactDatabase myDb;
 	private ReservationManager reservationMgr;
 
-	public ArtifactManager(LibrisUi theUi, File artifactDirectory, FileManager theFileMgr) throws DatabaseException {
+	public ArtifactManager(DatabaseUi theUi, File artifactDirectory, FileManager theFileMgr) throws DatabaseException {
 		this.artifactDirectory = artifactDirectory;
 		myFileMgr = theFileMgr;
 		myUi = theUi;

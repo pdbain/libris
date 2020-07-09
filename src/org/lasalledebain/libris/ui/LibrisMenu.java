@@ -437,7 +437,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		JFileChooser chooser;
 		File dbLocation = null;
 		String userDir = System.getProperty("user.dir");
-		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+		Preferences librisPrefs = LibrisUi.getLibrisPrefs();
 		String lastDbFileName = librisPrefs.get(LibrisConstants.DATABASE_FILE, userDir);
 		dbLocation = new File(lastDbFileName);
 		if (!dbLocation.exists()) {
@@ -494,7 +494,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 			return false;
 		}
 		if (null == database) return false;
-		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+		Preferences librisPrefs = LibrisUi.getLibrisPrefs();
 		librisPrefs.put(LibrisConstants.DATABASE_FILE, dbFile.getAbsolutePath());
 		guiMain.getMainFrame().toFront();
 		return true;

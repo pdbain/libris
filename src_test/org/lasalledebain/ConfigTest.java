@@ -14,11 +14,11 @@ import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisUi;
-import org.lasalledebain.libris.ui.LibrisUiGeneric;
 
 import junit.framework.TestCase;
 
@@ -43,15 +43,31 @@ public class ConfigTest extends TestCase {
 	public void testReadOnly() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
-		LibrisUiGeneric ui = new HeadlessUi();
+		LibrisUi ui = new HeadlessUi();
 		ui.rebuildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();
 		assertNotNull("Record not created in read-write mode", rec);
 		currentDb.closeDatabase(true);
-		
+		try {
+			rec = currentDb.getRecord(2);
+			assertNull("Record retrieved from closed database", rec);
+		} catch (DatabaseError e) {/* ignore */}
+
+		try {
+			rec = currentDb.newRecord();
+			assertNull("Record created in closed database", rec);
+		} catch (DatabaseError e) {/* ignore */}
+
 		ui = new HeadlessUi();
-// TODO		Libris.openDatabase(databaseFile, ui)
+		config.setReadOnly(true);
+		ui.openDatabase(config);
+		currentDb = ui.getDatabase();
+		try {
+			rec = currentDb.newRecord();
+			assertNull("Record created in read-only mode", rec);
+		} catch (DatabaseError e) {/* ignore */}
+		currentDb.closeDatabase(true);
 	}
 
 }

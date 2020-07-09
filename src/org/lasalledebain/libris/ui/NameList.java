@@ -13,7 +13,8 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -27,7 +28,7 @@ public class NameList extends GuiControl {
 
 	private final JList<KeyIntegerTuple> control;
 	private final GroupDef grpDef;
-	private final LibrisDatabase dBase;
+	private final GenericDatabase<DatabaseRecord> dBase;
 	Vector <KeyIntegerTuple> affiliateInfo;
 	private final LibrisWindowedUi windowedUi;
 	final Record currentRecord;
@@ -41,7 +42,7 @@ public class NameList extends GuiControl {
 		}
 	}
 
-	public NameList(LibrisWindowedUi ui, LibrisDatabase db, Record rec, GroupDef gd, boolean editable) throws InputException {
+	public NameList(LibrisWindowedUi ui, GenericDatabase<DatabaseRecord> db, Record rec, GroupDef gd, boolean editable) throws InputException {
 		super(0, 0, editable);
 		grpDef = gd;
 		windowedUi = ui;

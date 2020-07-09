@@ -35,8 +35,8 @@ import javax.swing.table.TableModel;
 
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
@@ -52,7 +52,7 @@ public class DelimitedTextImporter {
 	private static final String FIELD_SEPARATOR_TAB = "FIELD_SEPARATOR_TAB";
 	private static final String IMPORT_FILTER_FILE = "CSV_IMPORT_FILTER_FILE";
 	public String[] fieldIds;
-	LibrisDatabase db;
+	GenericDatabase<DatabaseRecord> db;
 	TreeSet<String> availableFieldIds;
 	private char separatorChar;
 	private JFrame importFrame;
@@ -62,7 +62,7 @@ public class DelimitedTextImporter {
 	File dataFile;
 	File importFilterFile = null;
 
-	public static void guiImportFile(LibrisDatabase db) throws DatabaseException {
+	public static void guiImportFile(GenericDatabase<DatabaseRecord> db) throws DatabaseException {
 		DelimitedTextImporter importer = new DelimitedTextImporter(db);
 		if (importer.chooseImportFile()) {
 			importer.doImport();
@@ -106,9 +106,9 @@ public class DelimitedTextImporter {
 		dataFile = dFile;
 	}
 
-	public DelimitedTextImporter(LibrisDatabase db) {
+	public DelimitedTextImporter(GenericDatabase<DatabaseRecord> db) {
 		this.db = db;
-		librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+		librisPrefs = LibrisUi.getLibrisPrefs();
 		importFrame = new JFrame("Import CSV Data");
 		importFrame.setLayout(new BorderLayout());
 	}
@@ -239,7 +239,7 @@ public class DelimitedTextImporter {
 		int response = dataFileChooser.showOpenDialog(sepPanel);
 		dataFile = null;
 		if (JFileChooser.CANCEL_OPTION != response) {
-			Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+			Preferences librisPrefs = LibrisUi.getLibrisPrefs();
 			separatorChar = (tabButton.isSelected()) ? '\t' : ',';				
 			librisPrefs.putBoolean(FIELD_SEPARATOR_TAB, tabButton.isSelected());
 			dataFile = dataFileChooser.getSelectedFile();

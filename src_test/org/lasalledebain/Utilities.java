@@ -44,7 +44,7 @@ import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.ui.Layouts;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.TestGUI;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementReader;
@@ -397,7 +397,7 @@ public class Utilities extends TestCase {
 		LibrisDatabase db = null;
 		try {
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
-			LibrisUi ui = db.getUi();
+			DatabaseUi ui = db.getUi();
 			ui.closeDatabase(false);
 			db = ui.openDatabase();
 		} catch (LibrisException e) {
@@ -412,7 +412,7 @@ public class Utilities extends TestCase {
 		LibrisDatabase db = null;
 		try {
 			db = Libris.buildAndOpenDatabase(config);
-			LibrisUi ui = db.getUi();
+			DatabaseUi ui = db.getUi();
 			ui.closeDatabase(false);
 			db = ui.openDatabase();
 		} catch (LibrisException e) {

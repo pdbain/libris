@@ -27,6 +27,7 @@ import javax.swing.JTextArea;
 import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.NamedRecordList;
@@ -99,7 +100,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	public LibrisDatabase openDatabase() throws DatabaseException {
-		LibrisDatabase result = super.openDatabase();
+		GenericDatabase<DatabaseRecord> result = super.openDatabase();
 		if (null == result) return null;
 		menu.setDatabase(currentDatabase);
 		getMainFrame().toFront();
@@ -575,7 +576,7 @@ public class LibrisGui extends LibrisWindowedUi {
 
 	private File selectArtifactFile() throws BackingStoreException {
 		File result = null;
-		Preferences librisPrefs = LibrisUiGeneric.getLibrisPrefs();
+		Preferences librisPrefs = LibrisUi.getLibrisPrefs();
 		String userDir = System.getProperty("user.dir");
 		String lastArtifactDirectory = librisPrefs.get(LibrisConstants.LAST_ARTIFACT_SOURCE_DIR, userDir);
 		JFileChooser chooser = new JFileChooser(lastArtifactDirectory);

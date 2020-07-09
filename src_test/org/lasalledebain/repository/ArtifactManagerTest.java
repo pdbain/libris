@@ -30,7 +30,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 
 import junit.framework.TestCase;
 
@@ -288,7 +288,7 @@ public class ArtifactManagerTest  extends TestCase {
 
 	private ArtifactManager createManager()
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
-		LibrisUi ui = new HeadlessUi();
+		DatabaseUi ui = new HeadlessUi();
 		ArtifactManager dut = new ArtifactManager(ui, repoRoot, fileMgr);
 		boolean initializeStatus = dut.initialize(false);
 		assertTrue("Could not initialize artifact manager", initializeStatus);

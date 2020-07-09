@@ -10,7 +10,8 @@ import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.TableColumnModel;
 
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -34,7 +35,7 @@ public class ListLayout extends Layout<Record> {
 	@Override
 	ArrayList<UiField> layOutFields(Record theRecord, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws LibrisException {
-		LibrisDatabase db = ui.getDatabase();
+		GenericDatabase<DatabaseRecord> db = ui.getDatabase();
 		myTableModel = new ListLayoutTableModel<Record>(theRecord, db, this);
 		recordTable = new JTable(myTableModel);
 		TableColumnModel columns = recordTable.getColumnModel();

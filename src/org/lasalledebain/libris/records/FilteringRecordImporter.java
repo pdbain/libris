@@ -43,10 +43,11 @@ public class FilteringRecordImporter<RecordType extends Record> extends RecordIm
 			throw new InputException(librisImportFileMgr.getPath(), e);
 		}
 	}
+	// TODO add unchecked version
 	@Override
-	public RecordType importRecord(FieldValueStringList[] fields)
+	public RecordType importRecordUnchecked(FieldValueStringList[] fields)
 	throws LibrisException {
-		RecordType rec = db.newRecord();
+		RecordType rec = db.newRecordUnchecked();
 		for (FilteringFieldImporter fi: fieldImporters) {
 			fi.addFieldValues(rec, fields);
 		}
@@ -59,6 +60,11 @@ public class FilteringRecordImporter<RecordType extends Record> extends RecordIm
 		return null;
 	}
 	public String getTitle() {
+		return null;
+	}
+	@Override
+	public RecordType importRecord(FieldValueStringList[] fields) throws LibrisException {
+		db.assertDatabaseWritable("Import record");
 		return null;
 	}
 }

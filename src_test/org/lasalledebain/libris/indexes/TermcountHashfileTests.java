@@ -24,7 +24,7 @@ import org.lasalledebain.libris.hashfile.TermCountHashFile;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.index.TermCountEntry;
 import org.lasalledebain.libris.records.Records;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.util.ByteArraySlice;
 import org.lasalledebain.libris.util.Lorem;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -155,7 +155,7 @@ public class TermcountHashfileTests extends TestCase {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE4_XML, workingDirectory);
 			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
 			IndexField[] indexFieldList = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
-			final LibrisUi myUi = db.getUi();
+			final DatabaseUi myUi = db.getUi();
 			
 			assertTrue("Could not close database", myUi.closeDatabase(false));
 			db = myUi.openDatabase();

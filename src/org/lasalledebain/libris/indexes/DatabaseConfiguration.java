@@ -2,7 +2,7 @@ package org.lasalledebain.libris.indexes;
 
 import java.util.Optional;
 
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.util.Reporter;
 
 public class DatabaseConfiguration {

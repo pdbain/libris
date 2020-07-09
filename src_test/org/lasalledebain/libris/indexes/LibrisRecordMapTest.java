@@ -8,11 +8,11 @@ import junit.framework.TestCase;
 
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.records.Records;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 
 public class LibrisRecordMapTest extends TestCase {
 	private File workingDirectory;
@@ -21,8 +21,8 @@ public class LibrisRecordMapTest extends TestCase {
 	public void testBuildIndex() {
 		try {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
-			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
-			final LibrisUi myUi = db.getUi();
+			GenericDatabase<DatabaseRecord> db = Libris.buildAndOpenDatabase(testDatabaseFile);
+			final DatabaseUi myUi = db.getUi();
 			
 			assertTrue("Could not close database", myUi.closeDatabase(false));
 			db = myUi.openDatabase();
@@ -42,7 +42,7 @@ public class LibrisRecordMapTest extends TestCase {
 	public void testDatabaseGetNamedRecords() {
 		try {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_XML, workingDirectory);
-			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
+			GenericDatabase<DatabaseRecord> db = Libris.buildAndOpenDatabase(testDatabaseFile);
 			HashSet<String> nameSet = new HashSet<String>(Arrays.asList(recordNames));
 			for (Record r: db.getNamedRecords()) {
 				String recName = r.getName();
@@ -63,7 +63,7 @@ public class LibrisRecordMapTest extends TestCase {
 	public void testDatabaseGetRecordByName() {
 		try {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_XML, workingDirectory);
-			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
+			GenericDatabase<DatabaseRecord> db = Libris.buildAndOpenDatabase(testDatabaseFile);
 			
 			int expectedId = 1;
 			for (String recName: recordNames) {

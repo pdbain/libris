@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.logging.Level;
 
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -23,7 +24,7 @@ import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.search.KeywordFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
@@ -31,7 +32,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected boolean dbOpen;
 	protected GroupManager<RecordType> groupMgr;
 	protected IndexManager<RecordType> indexMgr;
-	protected final LibrisUi ui;
+	protected final DatabaseUi ui;
 	protected ModifiedRecordList<RecordType> modifiedRecords;
 	/**
 	 * XML representation of database records added
@@ -43,13 +44,13 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected final FileManager fileMgr;
 	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 
-	public GenericDatabase(LibrisUi theUi, FileManager theFileManager) throws DatabaseException {
+	public GenericDatabase(DatabaseUi theUi, FileManager theFileManager) throws DatabaseException {
 		ui = theUi;
 		fileMgr = theFileManager;
 		indexMgr = new IndexManager<RecordType>(this, fileMgr);
 		modifiedRecords = readOnly? new EmptyRecordList<>(): new ModifiedRecordList<RecordType>();			
 	}
-	
+
 	public void initialize() throws LibrisException {
 		fileMgr.createAuxFiles(true);		
 		DatabaseMetadata metatada = getMetadata();
@@ -60,11 +61,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public void buildIndexes(DatabaseConfiguration config)
 			throws LibrisException {
-		 Records<RecordType> myRecs = getDatabaseRecords();
+		Records<RecordType> myRecs = getDatabaseRecordsUnchecked();
 		indexMgr.buildIndexes(config, myRecs);
-		save();
+		saveUnchecked();
 	}
-	
+
 	public synchronized void openDatabase() throws LibrisException {
 		if (dbOpen) {
 			throw new DatabaseException("Database already open");
@@ -89,12 +90,12 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		if (!metadata.isMetadataOkay()) {
 			throw new DatabaseException("Error in metadata");
 		}
-		getDatabaseRecords();
+		getDatabaseRecordsUnchecked();
 		dbOpen = true;
 	}
 
 	public boolean closeDatabase(boolean force) throws DatabaseException {
-		
+
 		if (!isOkayToClose(force)) {
 			return false;
 		} else {
@@ -124,11 +125,16 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	}
 
 	public void save()  {
+		assertDatabaseWritable("save database");
+		saveUnchecked();
+	}
+
+	private void saveUnchecked() {
 		try {
 			if (isIndexed()) {
 				saveMetadata();
 			}
-			Records<RecordType> recs = getDatabaseRecords();
+			Records<RecordType> recs = getDatabaseRecordsUnchecked();
 			recs.putRecords(modifiedRecords);
 			try {
 				recs.flush();
@@ -142,7 +148,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		}
 	}
 
-	public void saveMetadata() {
+	void saveMetadata() {
 		FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.PROPERTIES_FILENAME);
 		synchronized (propsMgr) {
 			try {
@@ -162,14 +168,14 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public abstract DatabaseMetadata getMetadata();
 
-	public LibrisUi getUi() {
+	public DatabaseUi getUi() {
 		return ui;
 	}
 
 	public static LibrisXmlFactory getXmlFactory() {
 		return xmlFactory;
 	}
-	
+
 	public abstract RecordFactory<RecordType> getRecordFactory();
 
 	public FileManager getFileMgr() {
@@ -177,13 +183,19 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	}
 
 	public Records<RecordType> getDatabaseRecords() throws LibrisException {
+		assertDatabaseOpen("get records");
+		return getDatabaseRecordsUnchecked();
+	}
+
+	public Records<RecordType> getDatabaseRecordsUnchecked() throws LibrisException {
 		if (null == databaseRecords) {
 			databaseRecords = new Records<RecordType>(this, fileMgr);
 		}
 		return databaseRecords;
 	}
-	
+
 	public NamedRecordList<RecordType> getNamedRecords() {
+		assertDatabaseOpen("get named records");
 		NamedRecordList<RecordType> l = new NamedRecordList<RecordType>(this);
 		return l;
 	}
@@ -195,7 +207,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		FilteredRecordList<RecordType> filteredList = new FilteredRecordList<RecordType>(recList, filter);
 		return filteredList;
 	}
-	
+
 	public FilteredRecordList<RecordType> makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int fieldList[], String searchTerm) throws UserErrorException, IOException {
 		Collection<String> searchTerms = Collections.singleton(searchTerm);
@@ -212,7 +224,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	public RecordPositions getRecordPositions() throws DatabaseException {
 		return indexMgr.getRecordPositions();
 	}
-	
+
 	public LibrisJournalFileManager<RecordType> getJournalFileMgr() throws LibrisException {
 		if (null == journalFileMgr) {
 			FileAccessManager journalFile = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.JOURNAL_FILENAME);
@@ -220,11 +232,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		}
 		return journalFileMgr;
 	}
-	
+
 	public int getLastRecordId() {
 		return getMetadata().lastRecordId;
 	}
-	
+
 	public LibrisRecordsFileManager<RecordType> getRecordsFileMgr() throws LibrisException {
 		return indexMgr.getRecordsFileMgr();
 	}
@@ -232,15 +244,18 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	public Iterable<RecordType> getRecordReader() throws LibrisException {
 		return getRecordsFileMgr();
 	}
-	
+
 	public int newRecordId() {
 		return getMetadata().newRecordId();
 	}
 
-	public abstract  RecordType newRecord() throws InputException;
+	public abstract RecordType newRecord() throws InputException;
+
+	public abstract RecordType newRecordUnchecked();
+
 
 	public abstract int putRecord(RecordType rec) throws LibrisException;
-	
+
 	/**
 	 * Get the record.  If the record has been modified but not written to the database file, use that.
 	 * Otherwise read the record from the file.
@@ -249,6 +264,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	 * @throws InputException  in case of error
 	 */
 	public RecordType getRecord(int recId) throws InputException {
+		assertDatabaseOpen("get record");
+		return getRecordUnchecked(recId);
+	}
+	private RecordType getRecordUnchecked(int recId) throws InputException {
+
 		RecordType rec = modifiedRecords.getRecord(recId);
 		if (null == rec) {
 			try {
@@ -265,6 +285,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	}
 
 	public Record getRecord(String recordName) throws InputException {
+		assertDatabaseOpen("get record");
+		return getRecordUnchecked(recordName);
+	}
+
+	private Record getRecordUnchecked(String recordName) throws InputException {
 		SortedKeyValueFileManager<KeyIntegerTuple> idx = indexMgr.getNamedRecordIndex();
 		Record result = null;
 		KeyIntegerTuple t = idx.getByName(recordName);
@@ -279,36 +304,36 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		Record rec = getRecord(recordNum);
 		return (null == rec) ? null: rec.getName();
 	}
-	
+
 	public SortedKeyValueFileManager<KeyIntegerTuple> getNamedRecordIndex() {
 		return indexMgr.getNamedRecordIndex();
 	}
 
 	protected int genericPutRecord(DatabaseMetadata metaData, RecordType rec)
 			throws DatabaseException, LibrisException, InputException, UserErrorException {
-				int id = rec.getRecordId();
-				if (RecordId.isNull(id)) {
-					id = newRecordId();
-					rec.setRecordId(id);
-					metaData.adjustModifiedRecords(1);
-				} else {
-					if (isRecordReadOnly(id)) {
-						throw new DatabaseException("Record "+id+" is read-only");
-					}
-					metaData.setLastRecordId(id);
-				}
-				getJournalFileMgr().put(rec);
-				String recordName = rec.getName();
-				if (Objects.nonNull(recordName)) {
-					indexMgr.addNamedRecord(id, recordName);
-				}
-				indexMgr.addRecordKeywords(rec);
-				
-				modifiedRecords.addRecord(rec);
-				setModified(true);
-				metaData.adjustSavedRecords(1);
-				return id;
+		int id = rec.getRecordId();
+		if (RecordId.isNull(id)) {
+			id = newRecordId();
+			rec.setRecordId(id);
+			metaData.adjustModifiedRecords(1);
+		} else {
+			if (isRecordReadOnly(id)) {
+				throw new DatabaseException("Record "+id+" is read-only");
 			}
+			metaData.setLastRecordId(id);
+		}
+		getJournalFileMgr().put(rec);
+		String recordName = rec.getName();
+		if (Objects.nonNull(recordName)) {
+			indexMgr.addNamedRecord(id, recordName);
+		}
+		indexMgr.addRecordKeywords(rec);
+
+		modifiedRecords.addRecord(rec);
+		setModified(true);
+		metaData.adjustSavedRecords(1);
+		return id;
+	}
 
 	public int getSavedRecordCount() {
 		return getMetadata().getSavedRecords();
@@ -327,7 +352,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	}
 
 	public boolean isRecordReadOnly(int recordId) {
-		
+
 		return isDatabaseReadOnly();
 	}
 
@@ -352,4 +377,12 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return LibrisAttributes.getLibrisEmptyAttributes();
 	}
 
+	public void assertDatabaseWritable(String message) {
+		Assertion.assertTrueError("Closed database: ", message, isDatabaseOpen());
+		Assertion.assertTrueError("Read-only database: ", message, !isDatabaseReadOnly());
+	}
+
+	public void assertDatabaseOpen(String message) {
+		Assertion.assertTrueError("Closed database: ", message, isDatabaseOpen());
+	}
 }

@@ -10,8 +10,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 
@@ -25,7 +25,7 @@ public class DatabaseStressTests extends TestCase {
 
 	public void testHugeDatabase() {
 		try {
-			LibrisDatabase db = buildTestDatabase();
+			GenericDatabase<DatabaseRecord> db = buildTestDatabase();
 			ArrayList<Record> expectedRecords = new ArrayList<Record>(NUM_RECORDS);
 			expectedRecords.add(null);
 
@@ -64,9 +64,9 @@ public class DatabaseStressTests extends TestCase {
 	protected void tearDown() throws Exception {
 		Utilities.deleteTestDatabaseFiles(EMPTY_DATABASE_FILE);
 	}
-	private LibrisDatabase buildTestDatabase() throws IOException {
+	private GenericDatabase<DatabaseRecord> buildTestDatabase() throws IOException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(EMPTY_DATABASE_FILE, workingDirectory);			
-		LibrisDatabase db = null;
+		GenericDatabase<DatabaseRecord> db = null;
 		try {
 			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
 		} catch (LibrisException e) {

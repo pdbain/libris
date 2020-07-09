@@ -23,7 +23,7 @@ import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.util.ZipUtils;
 
 import junit.framework.TestCase;
@@ -116,7 +116,7 @@ public class TestPDF extends TestCase {
 			db = Utilities.buildTestDatabase(workingDirectory, Utilities.KEYWORD_DATABASE1_XML);
 	        Map<String, String> env = new HashMap<>(); 
 	        env.put("create", "true");
-	        LibrisUi ui = db.getUi();
+	        DatabaseUi ui = db.getUi();
 			int keywordField = db.getSchema().getFieldNum("ID_keywords");
 			int abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);

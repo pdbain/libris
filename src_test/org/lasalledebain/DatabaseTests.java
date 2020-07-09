@@ -20,6 +20,7 @@ import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;
@@ -29,7 +30,7 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 import junit.framework.TestCase;
@@ -67,7 +68,7 @@ public class DatabaseTests extends TestCase {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
 		File myArtifact = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_ARTIFACT_PDF, workingDirectory);
 		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
-		LibrisUi myUi = db.getUi();
+		DatabaseUi myUi = db.getUi();
 		DatabaseRecord rec = db.getRecord(1);
 		rec.setEditable(true);
 		db.addArtifact(rec, myArtifact);
@@ -204,7 +205,7 @@ public class DatabaseTests extends TestCase {
 	public void testOpenAndImmediatelyCloseDatabase() throws IOException, LibrisException {
 		File testDatabaseFileCopy = getTestDatabase();
 		rootDb = buildTestDatabase(testDatabaseFileCopy);
-		LibrisUi testUi = rootDb.getUi();
+		DatabaseUi testUi = rootDb.getUi();
 		testUi.closeDatabase(false);
 		rootDb = testUi.openDatabase();
 		testUi.closeDatabase(false);
@@ -225,7 +226,7 @@ public class DatabaseTests extends TestCase {
 		try {			
 			File testDatabaseFileCopy = getTestDatabase();			
 			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
-			LibrisUi ui = rootDb.getUi();
+			DatabaseUi ui = rootDb.getUi();
 			LibrisMetadata meta = rootDb.getMetadata();
 			int numRecs = meta.getSavedRecords();
 			assertEquals("Wrong number of records initial build", 4, numRecs);
@@ -251,7 +252,7 @@ public class DatabaseTests extends TestCase {
 	public void testEnumOutOfRange() {
 		try {
 			rootDb = buildTestDatabase(getTestDatabase());
-			LibrisUi testUi = rootDb.getUi();
+			DatabaseUi testUi = rootDb.getUi();
 			String expected = null;
 			{
 				DatabaseRecord rec = rootDb.getRecord(1);
@@ -326,7 +327,7 @@ public class DatabaseTests extends TestCase {
 			db.exportDatabaseXml(copyStream, true, true, false);
 			copyStream.close();
 
-			LibrisDatabase dbCopy = Libris.buildAndOpenDatabase(copyDbXml);
+			GenericDatabase<DatabaseRecord> dbCopy = Libris.buildAndOpenDatabase(copyDbXml);
 			assertNotNull("Error rebuilding database copy", dbCopy);
 			assertTrue("database copy does not match original", dbCopy.equals(db));
 			db.closeDatabase(false);

@@ -12,9 +12,10 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.border.TitledBorder;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
@@ -66,7 +67,7 @@ public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
 			fieldPanel = new JPanel();
 			JSplitPane groupsAndFields = new JSplitPane(JSplitPane.VERTICAL_SPLIT, groupPanel, fieldPanel);
 			recordPanel.add(groupsAndFields);
-			LibrisDatabase db = ui.getDatabase();
+			GenericDatabase<DatabaseRecord> db = ui.getDatabase();
 			int groupNum = 0;
 			for (GroupDef def: defs) {
 				String groupName = def.getFieldTitle();

@@ -8,18 +8,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.DatabaseRecord;
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValueStringList;
-import org.lasalledebain.libris.ui.LibrisUiGeneric;
+import org.lasalledebain.libris.ui.LibrisUi;
 
 public class DelimitedTextRecordsReader {
 	/**
 	 * 
 	 */
 	public String[] fieldIds;
-	private LibrisDatabase db;
+	private GenericDatabase<DatabaseRecord> db;
 	private char separatorChar;
 	int unknownFields = 0;
 	boolean fieldIdsInFirstRow;
@@ -30,20 +30,20 @@ public class DelimitedTextRecordsReader {
 		dataFile = dFile;
 	}
 
-	public DelimitedTextRecordsReader(LibrisDatabase db, File dFile, char separatorChar) {
+	public DelimitedTextRecordsReader(GenericDatabase<DatabaseRecord> db, File dFile, char separatorChar) {
 		this.db = db;
 		dataFile = dFile;
 		this.separatorChar = separatorChar;
 	}
 	
-	public DelimitedTextRecordsReader(LibrisDatabase db, char separatorChar) {
+	public DelimitedTextRecordsReader(GenericDatabase<DatabaseRecord> db, char separatorChar) {
 		this.db = db;
-		LibrisUiGeneric.getLibrisPrefs();
+		LibrisUi.getLibrisPrefs();
 		this.fieldIdsInFirstRow = false;
 		this.separatorChar = separatorChar;
 	}
 
-	public DelimitedTextRecordsReader(LibrisDatabase db, Reader source) {
+	public DelimitedTextRecordsReader(GenericDatabase<DatabaseRecord> db, Reader source) {
 		super();
 		this.db = db;
 	}
@@ -64,7 +64,7 @@ public class DelimitedTextRecordsReader {
 		}
 		while (recRdr.hasNext()) {
 			FieldValueStringList[] recFields = recRdr.next();
-			Record rec = db.newRecord();
+			Record rec = db.newRecordUnchecked();
 			for (int i = 0; i < fieldIds.length; ++i) {
 				if ((null == fieldIds[i]) || (fieldIds[i].length() == 0)) {
 					continue;
@@ -81,13 +81,14 @@ public class DelimitedTextRecordsReader {
 	
 
 	public Record[] importRecordsToDatabase(Reader importReader, RecordImporter<DatabaseRecord> recImporter) throws LibrisException  {
+		db.assertDatabaseWritable("import record");
 		Iterator<FieldValueStringList[]> recRdr = (new CsvRecords(importReader, separatorChar)).iterator();
 		ArrayList<Record> newRecords = new ArrayList<Record>();
 		rowCount = 0;
 		while (recRdr.hasNext()) {
 			FieldValueStringList[] recFields = recRdr.next();
 			++rowCount;
-			DatabaseRecord rec = recImporter.importRecord(recFields);
+			DatabaseRecord rec = recImporter.importRecordUnchecked(recFields);
 			db.putRecord(rec);
 			newRecords.add(rec);
 		}

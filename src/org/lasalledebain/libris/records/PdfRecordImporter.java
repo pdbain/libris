@@ -81,8 +81,9 @@ public class PdfRecordImporter {
 			final String documentText = pdfToText(sourceFileUri);
 			recordDatabase.incrementTermCounts(StringUtils.getTerms(documentText, true).map(w -> stem(w)));
 		}
+		recordDatabase.assertDatabaseWritable("import PDF document");
 		for (URI sourceFileUri: sourceFiles) {
-			DatabaseRecord rec = recordDatabase.newRecord();
+			DatabaseRecord rec = recordDatabase.newRecordUnchecked();
 			importDocument(sourceFileUri, documentFrequency, rec);
 			rec.setParent(0, parentId);
 			recordDatabase.putRecord(rec);
