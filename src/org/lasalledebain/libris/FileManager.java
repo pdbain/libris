@@ -4,6 +4,7 @@ import static org.lasalledebain.libris.LibrisConstants.LOCK_FILENAME;
 import static org.lasalledebain.libris.LibrisConstants.POSITION_FILENAME;
 import static org.lasalledebain.libris.LibrisConstants.PROPERTIES_FILENAME;
 import static org.lasalledebain.libris.LibrisConstants.RECORDS_FILENAME;
+import static java.util.Objects.isNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +17,7 @@ import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public class FileManager {
 	/**
@@ -169,8 +171,11 @@ public class FileManager {
 		activeManagers.values().forEach(f -> f.close());
 	}
 
-	public static File getDefautlArtifactsDirectory(File databaseFile) throws DatabaseException {
-		File artifactDirectoryFile =LibrisDatabase.getDatabaseAuxDirectory(databaseFile, "artifacts");
+	public static File getDefautlArtifactsDirectory(LibrisDatabaseConfiguration config) throws DatabaseException {
+		File artifactDirectoryFile = config.getArtifactDirectory();
+		if (isNull(artifactDirectoryFile)) {
+			LibrisDatabase.getDatabaseAuxDirectory(config.getDatabaseFile(), "artifacts");
+		}
 		return artifactDirectoryFile;
 	}
 

@@ -3,6 +3,7 @@ package org.lasalledebain.libris;
 import static org.lasalledebain.libris.exception.Assertion.assertEquals;
 import static org.lasalledebain.libris.exception.Assertion.assertNotNull;
 import static org.lasalledebain.libris.exception.Assertion.assertTrue;
+import static java.util.Objects.isNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -69,14 +70,14 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	private FileAccessManager schemaFileMgr;
 	private final ReservationManager reservationMgr;
 	private final LibrisDatabaseConfiguration myConfiguration;
-	
+
 	public LibrisDatabase(LibrisDatabaseConfiguration config, DatabaseUi theUi) throws LibrisException {
-		super(theUi,new FileManager(getDatabaseAuxDirectory(config.getDatabaseFile(), DATABASE_AUX_DIRECTORY_NAME)));
+		super(theUi,new FileManager(getDatabaseAuxDirectory(config)));
 		myConfiguration = config;
 		myDatabaseFile = config.getDatabaseFile();
 		readOnly = config.isReadOnly();
 		mySchema = config.getDatabaseSchema();
-		
+
 		FileAccessManager lockFileManager = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.LOCK_FILENAME);
 		reservationMgr = new ReservationManager(lockFileManager);
 		databaseMetadata = new LibrisDatabaseMetadata(this);
@@ -138,8 +139,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			}
 			getDatabaseRecordsUnchecked();
 			if (hasDocumentRepository()) {
-				FileManager artifactFileMgr = new FileManager(getDatabaseAuxDirectory(myDatabaseFile, 
-						REPOSITORY_AUX_DIRECTORY_NAME));
+				FileManager artifactFileMgr = new FileManager(getDatabaseArtifactDirectory(myConfiguration));
 				documentRepository = new ArtifactManager(getUi(), databaseMetadata.getRepositoryRoot(), artifactFileMgr);
 			}
 		}
@@ -241,13 +241,13 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return Libris.buildIndexes(databaseFile, ui);
 	}
 
-	boolean buildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
+	boolean buildDatabase() throws LibrisException {
 		boolean result = true;
 		initialize();
 		if (!reserveDatabase()) {
 			result = false;
 		} else {
-			loadDatabaseInfo(config.isLoadMetadata());
+			loadDatabaseInfo(myConfiguration.isLoadMetadata());
 			mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 			final File databaseFile = getDatabaseFile();
 			Records<DatabaseRecord> recs = getDatabaseRecordsUnchecked();
@@ -268,15 +268,15 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				}
 				ElementManager recordsMgr = librisMgr.nextElement();
 				recs.fromXml(recordsMgr);
-				buildIndexes(config);
+				buildIndexes(myConfiguration);
 				nextElement = librisMgr.getNextId();
 				if (XmlRecordsReader.XML_ARTIFACTS_TAG.equals(nextElement)) {
 					ElementManager artifactsMgr = librisMgr.nextElement();
-					File artifactDirectory = config.getArtifactDirectory();
+					File artifactDirectory = myConfiguration.getArtifactDirectory();
 					DatabaseUi databaseUi = new HeadlessUi();
 					initializeDocumentRepository(databaseUi, artifactDirectory);
 					documentRepository.fromXml(artifactsMgr);
-					documentRepository.buildIndexes(config);
+					documentRepository.buildIndexes(myConfiguration);
 				}
 				saveMetadata();
 				librisMgr.closeFile();
@@ -293,8 +293,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	private void initializeDocumentRepository(DatabaseUi databaseUi, File artifactDirectory)
 			throws DatabaseException, LibrisException {
-		FileManager artifactFileMgr = new FileManager(getDatabaseAuxDirectory(myDatabaseFile, 
-				REPOSITORY_AUX_DIRECTORY_NAME));
+		if (isNull(artifactDirectory)) {
+			artifactDirectory = getDatabaseArtifactDirectory(myConfiguration);
+		}
+		FileManager artifactFileMgr = new FileManager(artifactDirectory);
 		documentRepository = new ArtifactManager(databaseUi, artifactDirectory, artifactFileMgr);
 		documentRepository.initialize(true);
 		databaseMetadata.hasDocumentRepository(true);
@@ -308,7 +310,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public String getXmlTag() {
 		return XML_LIBRIS_TAG;
 	}
-	
+
 	@Override
 	public void fromXml(ElementManager librisMgr) throws LibrisException {
 		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
@@ -321,7 +323,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		} catch (ParseException e) {
 			throw new InputException("illegal date format: "+dateString, e);
 		}
-		
+
 		String nextElement = librisMgr.getNextId();
 		DatabaseInstance instanceInfo = null;
 		if (XML_INSTANCE_TAG.equals(nextElement)) {
@@ -375,7 +377,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		if (!isDatabaseOpen()) {
 			throw new UserErrorException("exportDatabaseXml: database not open");
 		}
-	
+
 		try {
 			outWriter = ElementWriter.eventWriterFactory(destination);
 		} catch (XMLStreamException e) {
@@ -389,7 +391,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		if (!isDatabaseOpen()) {
 			throw new UserErrorException("exportDatabaseXml: database not open");
 		}
-	
+
 		try {
 			outWriter = ElementWriter.eventWriterFactory(destination);
 		} catch (XMLStreamException e) {
@@ -540,8 +542,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		InputStreamReader metadataReader = null;
 		ElementManager metadataMgr = null;
 		try {
-			if (null == schemaFileMgr) {
-				if (null == schemaLocation) {
+			if (isNull(schemaFileMgr)) {
+				if (isNull(schemaLocation)) {
 					File schemaFile = new File(schemaName+FILENAME_XML_FILES_SUFFIX);
 					try {
 						if (!setSchemaAccessMgr(fileMgr, schemaFile)) {
@@ -587,13 +589,31 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return myDatabaseFile;
 		}
 	}
-	
+
 
 	public String getDatabaseDirectoryPath() throws DatabaseException {
-		if (null == myDatabaseFile) {
+		if (isNull(myDatabaseFile)) {
 			throw new DatabaseException("Database file not set");
 		}
 		return myDatabaseFile.getParent();
+	}
+
+	public static File getDatabaseAuxDirectory(LibrisDatabaseConfiguration config) throws DatabaseException {
+		File auxDir = config.getAuxiliaryDirectory();
+		if (isNull(auxDir)) {
+			File theDatabaseFile = config.getDatabaseFile();
+			auxDir = getDatabaseAuxDirectory(theDatabaseFile, DATABASE_AUX_DIRECTORY_NAME);
+		}
+		return auxDir;
+	}
+
+	public static File getDatabaseArtifactDirectory(LibrisDatabaseConfiguration config) throws DatabaseException {
+		File auxDir = config.getArtifactDirectory();
+		if (isNull(auxDir)) {
+			File theDatabaseFile = config.getDatabaseFile();
+			auxDir = getDatabaseAuxDirectory(theDatabaseFile, REPOSITORY_AUX_DIRECTORY_NAME);
+		}
+		return auxDir;
 	}
 
 	public static File getDatabaseAuxDirectory(File theDatabaseFile, String auxDirectoryName) throws DatabaseException {
@@ -610,8 +630,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return auxDirectory;
 	}
 
-	// TODO test read-onlyness
-	
 	public LibrisMetadata getMetadata() {
 		return databaseMetadata;
 	}
@@ -635,7 +653,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			throw new DatabaseException("Document repository already set");
 		}
 		if (Objects.isNull(repositoryRoot)) {
-			repositoryRoot = FileManager.getDefautlArtifactsDirectory(myDatabaseFile);
+			repositoryRoot = FileManager.getDefautlArtifactsDirectory(myConfiguration);
 		}
 		initializeDocumentRepository(ui, repositoryRoot);
 		if (isDatabaseOpen()) {
@@ -665,7 +683,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			ui.alert(Messages.getString("LibrisDatabase.error_display_record")+recordId, e); //$NON-NLS-1$
 		}
 	}
-	
+
 	@Override
 	public  DatabaseRecord newRecord() throws InputException {
 		assertDatabaseWritable("create new record");
@@ -741,7 +759,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		rec.setArtifactId(artifactId);
 		return artifactId;
 	}
-	
+
 	@Override
 	public void save() {
 		if (hasDocumentRepository()) {
@@ -791,7 +809,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public boolean isLocked() {
 		return xmlAttributes.isLocked();
 	}
-	
+
 	public boolean isFork() {
 		DatabaseInstance instanceInfo = databaseMetadata.getInstanceInfo();
 		return (null != instanceInfo);
@@ -829,7 +847,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	public static void log(Level severity, String msg, Object param) {
 		librisLogger.log(severity, msg, param);
 	}
-	
+
 	public static void setLogLevel(Level severity) {
 		librisLogger.setLevel(severity);
 	}
@@ -931,20 +949,20 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return null;
 		}
 	}
-	
+
 	public void updateArtifactInfo(int artifactId, ArtifactParameters params) throws LibrisException {
 		if (hasDocumentRepository() && !RecordId.isNull(artifactId)) {
 			documentRepository.updateArtifactInfo(artifactId, params);
 		} else {
 			throw new DatabaseException("No artifact repository or artifact ID invalid");
 		}
-		
+
 	}
 
 	public void incrementTermCount(String term) {
 		indexMgr.incrementTermCount(term);
 	}
-	
+
 	public void incrementTermCounts(final Stream<String> terms) {
 		terms.sorted().distinct()
 		.forEach(term -> indexMgr.incrementTermCount(term));

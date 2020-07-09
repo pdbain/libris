@@ -142,7 +142,7 @@ public class Libris {
 		LibrisDatabase db = new LibrisDatabase(config, databaseUi);
 		config.setLoadMetadata(true);
 		if (!db.isDatabaseReserved()) {
-			boolean buildResult = db.buildDatabase(config);
+			boolean buildResult = db.buildDatabase();
 			if (!buildResult) {
 				return false;
 			}

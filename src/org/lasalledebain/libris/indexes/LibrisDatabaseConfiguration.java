@@ -2,41 +2,41 @@ package org.lasalledebain.libris.indexes;
 
 import java.io.File;
 
-import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 public class LibrisDatabaseConfiguration extends DatabaseConfiguration {
-	private File databaseFile;
+	private File myDatabaseFile;
 	private File artifactDirectory;
 	private File auxiliaryDirectory;
-	boolean loadMetadata;
+	private boolean loadMetadata;
 	Schema databaseSchema;
-
-	public LibrisDatabaseConfiguration(File databaseFile) throws DatabaseException {
-		this();
-		this.databaseFile = databaseFile;
-		File artifactDirectoryFile = FileManager.getDefautlArtifactsDirectory(databaseFile);
-		artifactDirectory = artifactDirectoryFile;
-	}
+	private boolean readOnly;
 
 	private LibrisDatabaseConfiguration() {
 		super();
-		databaseFile = null;
+		readOnly = false;
+		auxiliaryDirectory = null;
+		myDatabaseFile = null;
 		databaseSchema = null;
 		artifactDirectory = null;
 		loadMetadata = true;
 	}
 
+	public LibrisDatabaseConfiguration(File theDatabaseFile) throws DatabaseException {
+		this();
+		myDatabaseFile = theDatabaseFile;
+	}
+
 	public LibrisDatabaseConfiguration(File theDatabaseFile, boolean readOnly, Schema schem) {
-		super();
+		this();
 		setReadOnly(readOnly);
-		databaseFile = theDatabaseFile;
+		myDatabaseFile = theDatabaseFile;
 		databaseSchema = schem;
 	}
 
 	public void setDatabaseFile(File databaseFile) {
-		this.databaseFile = databaseFile;
+		this.myDatabaseFile = databaseFile;
 	}
 
 	public Schema getDatabaseSchema() {
@@ -64,7 +64,7 @@ public class LibrisDatabaseConfiguration extends DatabaseConfiguration {
 	}
 
 	public File getDatabaseFile() {
-		return databaseFile;
+		return myDatabaseFile;
 	}
 
 	public File getArtifactDirectory() {
@@ -73,5 +73,13 @@ public class LibrisDatabaseConfiguration extends DatabaseConfiguration {
 
 	public void setArtifactDirectory(File artifactDirectory) {
 		this.artifactDirectory = artifactDirectory;
+	}
+
+	public boolean isReadOnly() {
+		return readOnly;
+	}
+
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly = readOnly;
 	}
 }

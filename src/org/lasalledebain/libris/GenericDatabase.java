@@ -253,7 +253,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public abstract RecordType newRecordUnchecked();
 
-
+// TODO test if database writable
 	public abstract int putRecord(RecordType rec) throws LibrisException;
 
 	/**
