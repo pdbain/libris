@@ -12,6 +12,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
@@ -30,10 +31,10 @@ import static java.util.Objects.isNull;
 
 public class Layouts<RecordType extends Record> implements XMLElement {
 	public static final String DEFAULT_LAYOUT_VALUE = "default";
-	private final static HashMap<String, Function<Schema, Layout>> layoutGenerators = populateLayoutGenerators();
+	private final static HashMap<String, Function<Schema, LibrisSwingLayout>> layoutGenerators = populateLayoutGenerators();
 
-	private static HashMap<String, Function<Schema, Layout>> populateLayoutGenerators() {
-		HashMap<String, Function<Schema, Layout>> gens = new HashMap<>(5);
+	private static HashMap<String, Function<Schema, LibrisSwingLayout>> populateLayoutGenerators() {
+		HashMap<String, Function<Schema, LibrisSwingLayout>> gens = new HashMap<>(5);
 		gens.put(XML_LAYOUT_TYPE_XML, schem -> new XMLLayout(schem));
 		gens.put(XML_LAYOUT_TYPE_TABLE, schem -> new TableLayout(schem));
 		gens.put(XML_LAYOUT_TYPE_FORM, schem ->  new FormLayout(schem));
@@ -43,9 +44,9 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return gens;
 	}
 
-	HashMap<String, Layout<RecordType>> layouts;
+	HashMap<String, LibrisSwingLayout<RecordType>> layouts;
 	ArrayList<String> layoutIds;
-	HashMap <String,Layout<RecordType>> usage = new HashMap<>();
+	HashMap <String,LibrisSwingLayout<RecordType>> usage = new HashMap<>();
 	private Schema schem;
 
 	protected static HashMap<String, Dimension> defaultDimensionStrings = initializeDefaultDimensions();
@@ -73,11 +74,11 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 					throw new InputException("Element "+nextElement+" missing ID attribute");
 				}
 				String layoutType = layoutTypeAttr.getValue();
-				Function<Schema, Layout> gen = layoutGenerators.get(layoutType);
+				Function<Schema, LibrisSwingLayout> gen = layoutGenerators.get(layoutType);
 				if (isNull(gen)) {
 					throw new InputException("Layout type "+layoutType+" undefined");
 				}
-				Layout<RecordType> theLayout = gen.apply(schem);
+				LibrisSwingLayout<RecordType> theLayout = gen.apply(schem);
 				ElementManager layoutMgr = mgr.nextElement();
 				theLayout.fromXml(layoutMgr);
 				String layoutId = theLayout.getId();
@@ -98,8 +99,8 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		mgr.parseClosingTag();
 	}
 
-	public Layout getLayout(String id) {
-		Layout l = layouts.get(id);
+	public LibrisSwingLayout<RecordType> getLayout(String id) {
+		LibrisSwingLayout<RecordType> l = layouts.get(id);
 		return l;
 	}
 
@@ -127,8 +128,8 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return typeIds.toArray(new String[typeIds.size()]);
 	}
 
-	public Layout<RecordType> getLayoutByUsage(String user) throws DatabaseException {
-		Layout<RecordType> l = usage.get(user);
+	public LibrisSwingLayout<RecordType> getLayoutByUsage(String user) throws DatabaseException {
+		LibrisSwingLayout<RecordType> l = usage.get(user);
 		if (null == l) {
 			throw new DatabaseException("no layout defined for "+user);
 		} else {

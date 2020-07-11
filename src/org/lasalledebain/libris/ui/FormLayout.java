@@ -27,7 +27,7 @@ import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class FormLayout<RecordType extends Record> extends Layout<RecordType> {
+public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 	@Override
 	public boolean isEditable() {
 		return true;

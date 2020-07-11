@@ -17,7 +17,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 public abstract class RecordWindow<RecordType extends Record> extends JScrollPane {
 
 	protected LibrisWindowedUi ui;
-	protected Layout<RecordType> recordLayout;
+	protected LibrisSwingLayout<RecordType> recordLayout;
 	protected String title;
 	protected int recordId;
 	protected final JPanel recordDisplayArea;
@@ -26,7 +26,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 	protected ModificationTracker modTracker;
 	protected JPanel navPanel;
 
-	public RecordWindow(LibrisWindowedUi ui, Layout<RecordType> layout, RecordType rec, Point position, boolean editable, 
+	public RecordWindow(LibrisWindowedUi ui, LibrisSwingLayout<RecordType> layout, RecordType rec, Point position, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
 		this.record = rec;
 		recordDisplayArea = new JPanel(new GridLayout());
@@ -42,7 +42,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		recordDisplayArea.repaint();
 	}
 
-	protected void layOutWindow(LibrisWindowedUi ui, Layout<RecordType> layout, RecordType rec) throws LibrisException {
+	protected void layOutWindow(LibrisWindowedUi ui, LibrisSwingLayout<RecordType> layout, RecordType rec) throws LibrisException {
 		recordDisplayArea.removeAll();
 		layOutFields(layout, rec, recordDisplayArea, modTracker);
 		recordDisplayArea.setVisible(true);
@@ -87,7 +87,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		setVisible(false);
 	}
 
-	protected void layOutFields(Layout<RecordType> layout, RecordType rec, JComponent recordPanel, ModificationTracker modTrk) throws LibrisException {
+	protected void layOutFields(LibrisSwingLayout<RecordType> layout, RecordType rec, JComponent recordPanel, ModificationTracker modTrk) throws LibrisException {
 		guiFields = layout.layOutFields(rec, ui, recordPanel, modTrk);
 		modTracker.setModified(false);
 	}
@@ -104,7 +104,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		return recordId;
 	}
 
-	public void setRecordLayout(Layout<RecordType> layout) throws LibrisException {
+	public void setRecordLayout(LibrisSwingLayout<RecordType> layout) throws LibrisException {
 		if (layout.getId().equals(recordLayout.getId())) {
 			return;
 		}

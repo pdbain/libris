@@ -13,7 +13,6 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -23,17 +22,15 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class Layout<RecordType extends Record> implements XMLElement {
+public abstract class LibrisSwingLayout<RecordType extends Record> extends LibrisLayout {
 	protected int height;
 	protected int width;
 	Schema mySchema = null;
 	protected ArrayList<LayoutField<RecordType>> bodyFieldList;
 	Vector <String> layoutUsers;
 	protected LayoutField<RecordType> positionList = null;
-	private String id;
-	private String title = null;
 	final static ArrayList<UiField> emptyUiList = new ArrayList<>();
-	public Layout(Schema schem){
+	public LibrisSwingLayout(Schema schem){
 		mySchema = schem;
 		bodyFieldList = new ArrayList<LayoutField<RecordType>>();
 		layoutUsers = new Vector<String>(1);
@@ -47,10 +44,6 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 		this.id = id;
 	}
 
-
-	public String getId() {
-		return id;
-	}
 
 	public boolean isSingleRecord() {
 		return true;
@@ -82,10 +75,6 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 	void setWidth(String w) {
 		this.width = Integer.parseInt(w);
 	}
-	public String getTitle() {
-		return title;
-	}
-
 	public int getNumFields() {
 		return bodyFieldList.size();
 	}
@@ -124,8 +113,6 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 		return positions;
 	}
 
-	public abstract String getLayoutType();
-
 	public FieldType getFieldType(String id) {
 		return mySchema.getFieldType(id);
 	}
@@ -157,15 +144,6 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 			subElementMgr.parseClosingTag();
 		}
 		validate();
-	}
-
-	public static String getXmlTag() {
-		return XML_LAYOUT_TAG;
-	}
-
-	@Override
-	public String getElementTag() {
-		return getXmlTag();
 	}
 
 	@Override
@@ -212,7 +190,7 @@ public abstract class Layout<RecordType extends Record> implements XMLElement {
 	@Override
 	public boolean equals(Object obj) {
 		try {
-			Layout<RecordType> otherLayout = (Layout) obj;
+			LibrisLayout otherLayout = (LibrisLayout) obj;
 			return otherLayout.getAttributes().equals(getAttributes());
 		} catch (ClassCastException e) {
 			LibrisDatabase.log(Level.WARNING, "Type mismatch in Layout.equals()", e);

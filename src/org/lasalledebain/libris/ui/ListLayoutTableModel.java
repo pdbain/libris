@@ -19,13 +19,13 @@ import org.lasalledebain.libris.index.GroupMember;
 @SuppressWarnings("serial")
 public class ListLayoutTableModel<RecordType extends Record> extends AbstractTableModel {
 
-	private final Layout myLayout;
+	private final LibrisSwingLayout myLayout;
 	private RecordType myRecord;
 	private final static String[] columnNames = new String[] {"Field", "Main value", "Extra value"};
 	private final ArrayList<String> titles;
 	private final String[] myFieldIds;
 	private final ArrayList<String[]> rows;
-	public ListLayoutTableModel(RecordType theRecord, GenericDatabase db, Layout theLayout) throws LibrisException {
+	public ListLayoutTableModel(RecordType theRecord, GenericDatabase db, LibrisSwingLayout theLayout) throws LibrisException {
 		myRecord = theRecord;
 		myLayout = theLayout;
 		titles = new ArrayList<>();

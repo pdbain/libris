@@ -22,7 +22,7 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 	protected int fieldNum;
 	int height = -1, width = -1, vpos = -1, hpos = -1, hspan = -1, vspan = -1;
 	private LayoutField<RecordType> prevLink;
-	private Layout<RecordType> containingLayout;
+	private LibrisSwingLayout<RecordType> containingLayout;
 	protected ControlConstructor control;
 	private boolean carriageReturn = false;
 
@@ -30,7 +30,7 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 		return carriageReturn;
 	}
 
-	public LayoutField(Layout<RecordType> containingLayout, LayoutField<RecordType> previous) throws DatabaseException {
+	public LayoutField(LibrisSwingLayout<RecordType> containingLayout, LayoutField<RecordType> previous) throws DatabaseException {
 		this.containingLayout = containingLayout;
 		prevLink = previous;
 	}

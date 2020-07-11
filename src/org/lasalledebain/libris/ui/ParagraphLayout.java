@@ -18,7 +18,7 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class ParagraphLayout<RecordType extends Record> extends Layout<RecordType> {
+public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 
 	public ParagraphLayout(Schema schem){
 		super(schem);

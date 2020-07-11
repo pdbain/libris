@@ -34,7 +34,7 @@ import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.ui.EnumField;
 import org.lasalledebain.libris.ui.GuiControl;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.Layout;
+import org.lasalledebain.libris.ui.LibrisSwingLayout;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisWindowedUi;
 import org.lasalledebain.libris.ui.RecordWindow;
@@ -55,7 +55,7 @@ public class GuiManualTests extends TestCase {
 	private static final String LAYOUT1 = "layout1";
 	private static final String LAYOUT1A = "layout1a";
 	private Schema mySchema;
-	private Layout myGuiLayout;
+	private LibrisSwingLayout myGuiLayout;
 	private LibrisWindowedUi myUi;
 
 	public void testWindowSanity() {
@@ -185,7 +185,7 @@ public class GuiManualTests extends TestCase {
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
-				myGuiLayout = (Layout) myLayouts.getLayout(Utilities.LAYOUT2);
+				myGuiLayout = (LibrisSwingLayout) myLayouts.getLayout(Utilities.LAYOUT2);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout2 to FormLayout");
 			}
@@ -222,7 +222,7 @@ public class GuiManualTests extends TestCase {
 			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
-				myGuiLayout = (Layout) myLayouts.getLayout(LAYOUT1);
+				myGuiLayout = (LibrisSwingLayout) myLayouts.getLayout(LAYOUT1);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout1 to FormLayout");
 			}
@@ -250,7 +250,7 @@ public class GuiManualTests extends TestCase {
 			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
-				myGuiLayout = (Layout) myLayouts.getLayout(LAYOUT1);
+				myGuiLayout = (LibrisSwingLayout) myLayouts.getLayout(LAYOUT1);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout1 to FormLayout");
 			}

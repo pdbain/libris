@@ -24,23 +24,23 @@ public class DatabaseRecordWindow extends RecordWindow<DatabaseRecord> {
 	final DatabaseRecord record;
 	private JButton artifactButton;
 	
-	public DatabaseRecordWindow(LibrisWindowedUi ui, Layout<DatabaseRecord> layout, DatabaseRecord rec, boolean editable, 
+	public DatabaseRecordWindow(LibrisWindowedUi ui, LibrisSwingLayout<DatabaseRecord> layout, DatabaseRecord rec, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
 		this(ui, layout, rec, new Point(0, 0), editable, modificationListener);
 	}
 
-	public DatabaseRecordWindow(LibrisWindowedUi ui, Layout<DatabaseRecord> layout, DatabaseRecord rec, Point position, boolean editable, 
+	public DatabaseRecordWindow(LibrisWindowedUi ui, LibrisSwingLayout<DatabaseRecord> layout, DatabaseRecord rec, Point position, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
 		super(ui, layout, rec, position, editable, modificationListener);
 		this.record = rec;
 	}
 
-	public DatabaseRecordWindow(LibrisWindowedUi ui, Layout<DatabaseRecord> myGuiLayout, DatabaseRecord rec, Point point, 
+	public DatabaseRecordWindow(LibrisWindowedUi ui, LibrisSwingLayout<DatabaseRecord> myGuiLayout, DatabaseRecord rec, Point point, 
 			ActionListener modificationListener) throws LibrisException {
 		this(ui, myGuiLayout,  rec,  point, false, modificationListener);
 	}
 	
-	protected void layOutWindow(LibrisWindowedUi ui, Layout<DatabaseRecord> layout, DatabaseRecord rec) throws LibrisException {
+	protected void layOutWindow(LibrisWindowedUi ui, LibrisSwingLayout<DatabaseRecord> layout, DatabaseRecord rec) throws LibrisException {
 		super.layOutWindow(ui, layout, rec);
 		String recordName = rec.getName();
 		navPanel = new JPanel(new BorderLayout());

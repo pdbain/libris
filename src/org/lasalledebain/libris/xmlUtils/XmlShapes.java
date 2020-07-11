@@ -11,7 +11,7 @@ import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexDefs;
 import org.lasalledebain.libris.index.IndexField;
-import org.lasalledebain.libris.ui.Layout;
+import org.lasalledebain.libris.ui.LibrisSwingLayout;
 import org.lasalledebain.libris.ui.Layouts;
 
 
@@ -107,7 +107,7 @@ public class XmlShapes implements LibrisXMLConstants {
 				new String[][] {{XML_INDEXFIELD_STOPLIST_ATTR, "false"}});		
 		
 		makeShape(shapes,
-				Layout.getXmlTag(), 
+				LibrisSwingLayout.getXmlTag(), 
 				new String[] {XML_LAYOUTFIELD_TAG, XML_LAYOUTUSAGE_TAG},
 				new String[] {LibrisXMLConstants.XML_LAYOUT_ID_ATTR},
 				new String[][] {{"title", ""}, {"type","table"}, {"height", "300"}, {"width", "400"}});		

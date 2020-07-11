@@ -223,7 +223,7 @@ public class BrowserWindow extends JPanel {
 		}
 	}
 
-	Layout<DatabaseRecord> myLayout;
+	LibrisSwingLayout<DatabaseRecord> myLayout;
 	private String[] fieldIds;
 
 	MouseListener chooserMouseListener = new MouseAdapter() {
