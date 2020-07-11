@@ -13,6 +13,7 @@ import javax.swing.JEditorPane;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
@@ -56,7 +57,7 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 		recordPanel.setLayout(new GridBagLayout());
 		content.setContentType("text/html;");
 		content.setEditable(false);
-		LayoutField[] fieldInfo = getFields();
+		LayoutField<RecordType>[] fieldInfo = getFields();
 		StringBuffer windowText = new StringBuffer();
 
 		windowText.append("<!DOCTYPE html>\n<html>\n<head>");
@@ -71,7 +72,7 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 		windowText.append("</style>\n");
 		windowText.append("</head>\n<body><p>\n");
 		String separator = "";
-		for (LayoutField fp: fieldInfo) {
+		for (LayoutField<RecordType> fp: fieldInfo) {
 			FieldValue val = rec.getFieldValue(fp.fieldNum);
 			if (!Objects.isNull(val) && !val.isEmpty()) {
 				windowText.append(separator);
@@ -94,6 +95,12 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 	@Override
 	protected void showRecord(int recId) {
 		return;
+	}
+
+	@Override
+	protected void validate() throws InputException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

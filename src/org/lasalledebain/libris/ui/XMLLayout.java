@@ -10,6 +10,7 @@ import javax.xml.stream.XMLStreamException;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -44,6 +45,12 @@ public class XMLLayout<RecordType extends Record> extends LibrisSwingLayout<Reco
 	@Override
 	protected void showRecord(int recId) {
 		return;
+	}
+
+	@Override
+	protected void validate() throws InputException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

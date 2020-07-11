@@ -15,6 +15,7 @@ import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.SingleRecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 public class TableLayout<RecordType extends Record> extends MultiRecordLayout<RecordType> {
@@ -67,6 +68,12 @@ public class TableLayout<RecordType extends Record> extends MultiRecordLayout<Re
 		int row = myTableModel.getRowForRecord(recId);
 		Rectangle cellRect = recordTable.getCellRect(row, 0, true);
 		recordTable.scrollRectToVisible(cellRect);
+	}
+
+	@Override
+	protected void validate() throws InputException {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

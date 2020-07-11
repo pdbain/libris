@@ -161,7 +161,7 @@ public class GuiManualTests extends TestCase {
 			Schema schem = Utilities.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
-			myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
+			myGuiLayout = myLayouts.getSwingLayout(Utilities.LAYOUT2);
 			assertNotNull("could not load "+Utilities.LAYOUT2, myGuiLayout);
 			RecordWindow rWindow = new DatabaseRecordWindow(myUi, myGuiLayout, rec, new Point(100, 200), false, null);
 			rWindow.setVisible(true);
@@ -185,7 +185,7 @@ public class GuiManualTests extends TestCase {
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
-				myGuiLayout = (LibrisSwingLayout) myLayouts.getLayout(Utilities.LAYOUT2);
+				myGuiLayout = (LibrisSwingLayout) myLayouts.getSwingLayout(Utilities.LAYOUT2);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout2 to FormLayout");
 			}
@@ -222,7 +222,7 @@ public class GuiManualTests extends TestCase {
 			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
-				myGuiLayout = (LibrisSwingLayout) myLayouts.getLayout(LAYOUT1);
+				myGuiLayout = (LibrisSwingLayout) myLayouts.getSwingLayout(LAYOUT1);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout1 to FormLayout");
 			}
@@ -250,7 +250,7 @@ public class GuiManualTests extends TestCase {
 			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
-				myGuiLayout = (LibrisSwingLayout) myLayouts.getLayout(LAYOUT1);
+				myGuiLayout = (LibrisSwingLayout) myLayouts.getSwingLayout(LAYOUT1);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout1 to FormLayout");
 			}
@@ -341,7 +341,7 @@ public class GuiManualTests extends TestCase {
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
-				myGuiLayout = myLayouts.getLayout(LAYOUT1A);
+				myGuiLayout = myLayouts.getSwingLayout(LAYOUT1A);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout2 to FormLayout");
 			}

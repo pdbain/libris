@@ -116,7 +116,7 @@ public class RecordDisplayPanel extends JPanel {
 			mainGui.alert("exception "+e+" "+e.getMessage()+" reading layouts");
 		}
 		for (String s: layoutIds) {
-			layoutSelector.addItem(layouts.getLayout(s).getTitle());
+			layoutSelector.addItem(layouts.getSwingLayout(s).getTitle());
 			if (s.equals(lo)) {
 				layoutSelector.setSelectedIndex(layoutSelector.getItemCount()-1);
 			}
@@ -225,7 +225,7 @@ public class RecordDisplayPanel extends JPanel {
 rw.checkClose();
 				}
 				try {
-					LibrisSwingLayout<DatabaseRecord> theLayout = myDatabase.getLayouts().getLayout(layoutIds[selectedLayout]);
+					LibrisSwingLayout<DatabaseRecord> theLayout = myDatabase.getLayouts().getSwingLayout(layoutIds[selectedLayout]);
 					setRecLayout(theLayout);
 					boolean singleRecordLayout = theLayout.isSingleRecord();
 					if (singleRecordLayout && nonNull(rw)) {

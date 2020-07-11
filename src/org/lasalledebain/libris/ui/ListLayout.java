@@ -60,4 +60,10 @@ public class ListLayout extends LibrisSwingLayout<Record> {
 		return;
 	}
 
+	@Override
+	protected void validate() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

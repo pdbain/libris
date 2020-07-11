@@ -74,7 +74,7 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 				TitledBorder affiliateBorder = BorderFactory.createTitledBorder(UiField.LINE_BORDER, groupName);
 				Box groupBox = Box.createHorizontalBox();
 				groupBox.setBorder(affiliateBorder);
-				GuiControl<RecordType> uiField = new NameList(ui, db, rec, def, modifiable);
+				GuiControl<RecordType> uiField = new NameList<RecordType>(ui, db, rec, def, modifiable);
 				JComponent comp = uiField.getGuiComponent();
 				GroupMember gm = rec.getMember(groupNum);
 				if (null == gm) {

@@ -99,9 +99,8 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		mgr.parseClosingTag();
 	}
 
-	public LibrisSwingLayout<RecordType> getLayout(String id) {
-		LibrisSwingLayout<RecordType> l = layouts.get(id);
-		return l;
+	public LibrisSwingLayout<RecordType> getSwingLayout(String id) {
+		return layouts.get(id);
 	}
 
 	public String[]	getLayoutIds() {
@@ -121,7 +120,7 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		String[] ids = getLayoutIds();
 		Vector<String> typeIds = new Vector<String>(ids.length);
 		for (String i: ids) {
-			if (getLayout(i).getLayoutType().equals(layoutType)) {
+			if (getSwingLayout(i).getLayoutType().equals(layoutType)) {
 				typeIds.add(i);
 			}
 		}
@@ -141,7 +140,7 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 	public void toXml(ElementWriter output) throws LibrisException {
 		output.writeStartElement(XML_LAYOUTS_TAG);
 		for (String id: getLayoutIds()) {
-			getLayout(id).toXml(output);
+			getSwingLayout(id).toXml(output);
 		}
 		output.writeEndElement();	
 	}
