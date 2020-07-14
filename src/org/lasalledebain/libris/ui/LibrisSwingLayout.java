@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.ui;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 import javax.swing.JComponent;
 
@@ -13,9 +12,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 public abstract class LibrisSwingLayout<RecordType extends Record> extends LibrisLayout<RecordType> {
 	public LibrisSwingLayout(Schema schem){
-		mySchema = schem;
-		bodyFieldList = new ArrayList<LayoutField<RecordType>>();
-		layoutUsers = new Vector<String>(1);
+		super(schem);
 	}
 
 	abstract ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)

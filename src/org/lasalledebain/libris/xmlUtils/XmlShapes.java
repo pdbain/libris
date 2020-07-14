@@ -13,6 +13,7 @@ import org.lasalledebain.libris.index.IndexDefs;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.ui.LibrisSwingLayout;
 import org.lasalledebain.libris.ui.Layouts;
+import org.lasalledebain.libris.ui.LibrisLayout;
 
 
 public class XmlShapes implements LibrisXMLConstants {
@@ -107,12 +108,14 @@ public class XmlShapes implements LibrisXMLConstants {
 				new String[][] {{XML_INDEXFIELD_STOPLIST_ATTR, "false"}});		
 		
 		makeShape(shapes,
-				LibrisSwingLayout.getXmlTag(), 
+				LibrisLayout.getXmlTag(), 
 				new String[] {XML_LAYOUTFIELD_TAG, XML_LAYOUTUSAGE_TAG},
 				new String[] {LibrisXMLConstants.XML_LAYOUT_ID_ATTR},
 				new String[][] {{"title", ""}, {"type","table"}, {"height", "300"}, {"width", "400"}});		
 		
-		shapes.put(Layouts.getXmlTag(), Layouts.getShape());
+		makeShape(shapes, Layouts.getXmlTag(), new String [] {XML_LAYOUT_TAG},
+				emptyRequiredAttributesList, emptyOptionalAttributesList);
+
 		makeShape(shapes, 
 				XML_LAYOUTUSAGE_TAG,
 				emptyList,

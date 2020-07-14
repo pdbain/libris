@@ -318,7 +318,7 @@ public class GuiManualTests extends TestCase {
 		try {
 			loadSchema();
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(mySchema, inputFile);
-			String ids[] = myLayouts.getLayoutIds();
+			String ids[] = myLayouts.getSwingLayoutIds();
 			System.err.print("Available ids: ");
 			for (String s: ids) {
 				System.err.print(s+" ");

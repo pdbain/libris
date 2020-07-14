@@ -58,6 +58,14 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 		content.setContentType("text/html;");
 		content.setEditable(false);
 		LayoutField<RecordType>[] fieldInfo = getFields();
+		String windowText = createHtmlParagraph(rec, fieldInfo);
+
+		content.setText(windowText);
+		return emptyUiList;
+	}
+
+	public String createHtmlParagraph(RecordType rec, LayoutField<RecordType>[] fieldInfo)
+			throws InputException {
 		StringBuffer windowText = new StringBuffer();
 
 		windowText.append("<!DOCTYPE html>\n<html>\n<head>");
@@ -82,9 +90,7 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 			}
 		}
 		windowText.append("</p></body>\n</html>");
-
-		content.setText(windowText.toString());
-		return emptyUiList;
+		return windowText.toString();
 	}
 
 	@Override

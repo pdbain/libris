@@ -174,12 +174,12 @@ public abstract class LibrisUi implements DatabaseUi, LibrisConstants {
 		System.exit(1);
 	}
 
-	public void rebuildDatabase() throws LibrisException {
-		Libris.buildIndexes(databaseFile, new HeadlessUi(databaseFile, false));
+	public boolean rebuildDatabase() throws LibrisException {
+		return Libris.buildIndexes(databaseFile, new HeadlessUi(databaseFile, false));
 	}
 
-	public void rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
-		Libris.buildIndexes(config, this);
+	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
+		return Libris.buildIndexes(config, this);
 	}
 
 	@Override
@@ -283,5 +283,8 @@ public abstract class LibrisUi implements DatabaseUi, LibrisConstants {
 	public void saveDatabase() {
 		currentDatabase.save();
 	}
+	public void sendChooseDatabase() {
+		alert("No database selected");
+	};
 
 }

@@ -3,14 +3,12 @@ package org.lasalledebain.libris.ui;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
-import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -30,7 +28,13 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 	protected Schema mySchema = null;
 	protected ArrayList<LayoutField<RecordType>> bodyFieldList;
 	protected LayoutField<RecordType> positionList = null;
-	protected Vector <String> layoutUsers;
+	protected ArrayList<String> layoutUsers;
+
+	public LibrisLayout(Schema schem) {
+		mySchema = schem;
+		bodyFieldList = new ArrayList<LayoutField<RecordType>>();
+		layoutUsers = new ArrayList<String>(1);
+	}
 
 	@Override
 	public String getElementTag() {
@@ -70,7 +74,7 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 			attr.setAttribute(XML_LAYOUT_USEDBY_ATTR, user);
 			output.writeStartElement(XML_LAYOUTUSAGE_TAG, attr, true);
 		}
-	
+
 		for (LayoutField<RecordType> f: bodyFieldList) {
 			LibrisAttributes attr = f.getAttributes();
 			output.writeStartElement(XML_LAYOUTFIELD_TAG, attr, true);

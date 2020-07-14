@@ -21,8 +21,8 @@ public interface DatabaseUi {
 	public boolean closeDatabase(boolean force) throws DatabaseException;
 	public boolean quit(boolean force) throws DatabaseException;
 
-	public void rebuildDatabase() throws LibrisException;
-	public void rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException;
+	public boolean rebuildDatabase() throws LibrisException;
+	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException;
 	public boolean isDatabaseSelected();
 	public boolean isDatabaseOpen();
 	public boolean isDatabaseReadOnly();

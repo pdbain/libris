@@ -17,7 +17,7 @@ import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class ListLayout extends LibrisSwingLayout<Record> {
+public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 
 	private JTable recordTable;
 	private ListLayoutTableModel<Record> myTableModel;

@@ -284,14 +284,14 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return rec;
 	}
 
-	public Record getRecord(String recordName) throws InputException {
+	public RecordType getRecord(String recordName) throws InputException {
 		assertDatabaseOpen("get record");
 		return getRecordUnchecked(recordName);
 	}
 
-	private Record getRecordUnchecked(String recordName) throws InputException {
+	private RecordType getRecordUnchecked(String recordName) throws InputException {
 		SortedKeyValueFileManager<KeyIntegerTuple> idx = indexMgr.getNamedRecordIndex();
-		Record result = null;
+		RecordType result = null;
 		KeyIntegerTuple t = idx.getByName(recordName);
 		if (null != t) {
 			int id = t.getValue();

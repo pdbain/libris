@@ -40,6 +40,12 @@ public class Assertion {
 		}
 	}
 
+	public static void assertTrueInputException(String message1, String message2, boolean test) throws InputException {
+		if (!test) {
+			throw new InputException("Error: "+message1+message2);
+		}
+	}
+
 	public static void assertEqualsInputException(String message, Object expected, Object actual) throws InputException {
 		boolean result = actual.equals(expected);
 		if (!result) {
@@ -51,6 +57,13 @@ public class Assertion {
 		boolean result = Objects.nonNull(actual);
 		if (!result) {
 			throw new InputException("Error: "+message+" is null");
+		}
+	}
+
+	public static void assertNotNullInputException(String message1, String message2, Object actual) throws InputException {
+		boolean result = Objects.nonNull(actual);
+		if (!result) {
+			throw new InputException("Error: "+message1+message2+" is null");
 		}
 	}
 

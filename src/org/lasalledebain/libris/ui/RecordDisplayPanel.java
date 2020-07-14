@@ -108,7 +108,7 @@ public class RecordDisplayPanel extends JPanel {
 	}
 
 	public void addLayouts(Layouts<DatabaseRecord> layouts) {
-		layoutIds = layouts.getLayoutIds();
+		layoutIds = layouts.getSwingLayoutIds();
 		String lo = "";
 		try {
 			lo = myDatabase.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_NEWRECORD).getId();
