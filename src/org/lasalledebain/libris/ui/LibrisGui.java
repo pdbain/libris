@@ -3,12 +3,16 @@ package org.lasalledebain.libris.ui;
 import static java.util.Objects.nonNull;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.desktop.QuitEvent;
+import java.awt.desktop.QuitHandler;
+import java.awt.desktop.QuitResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -40,10 +44,6 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-import com.apple.eawt.AppEvent.QuitEvent;
-import com.apple.eawt.QuitHandler;
-import com.apple.eawt.QuitResponse;
-
 public class LibrisGui extends LibrisWindowedUi {
 	private static final String CONTENT_PANE_HEIGHT = "CONTENT_PANE_HEIGHT";
 	private static final String CONTENT_PANE_WIDTH = "CONTENT_PANE_WIDTH";
@@ -67,7 +67,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	// TODO 1 menu option to auto-generate keywords
 	// TODO bulk import artifacts
 	protected void initializeGui() throws DatabaseException {
-		com.apple.eawt.Application.getApplication().setQuitHandler(new QuitHandler() {
+		Desktop.getDesktop().setQuitHandler(new QuitHandler() {
 			@Override
 			public void handleQuitRequestWith(QuitEvent quitEvt, QuitResponse quitResp) {
 				try {
@@ -80,6 +80,7 @@ public class LibrisGui extends LibrisWindowedUi {
 					throw new DatabaseError(e);
 				}
 			}
+
 		});
 		databaseSelected = isDatabaseSelected();
 		systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

@@ -100,7 +100,10 @@ public class Libris {
 			LibrisUi.cmdlineError("Cannot open Libris: "+e.getMessage());
 			status = false;
 		}
-		System.exit(status? 0: 1);
+		
+		if (!status) {
+			System.exit(1);
+		}
 	}
 
 	private static void notImplemented(String arg) {
