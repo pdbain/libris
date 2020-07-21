@@ -13,20 +13,28 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.Assertion;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.util.StringUtils;
+import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import static java.util.Objects.isNull;
+import static org.lasalledebain.libris.exception.Assertion.assertNotNullInputException;
 
 public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 	LibrisUi myUi;
 	private final Layouts<DatabaseRecord> myLayouts;
 	String[] layoutIds;
-	public LibrisServlet(LibrisUi myUi) {
+	private LibrisHtmlLayout<DatabaseRecord> summaryDisplay;
+	public LibrisServlet(LibrisUi myUi) throws DatabaseException, InputException {
 		this.myUi = myUi;
 		database = myUi.getDatabase();
 		myLayouts = database.getLayouts();
 		layoutIds = null;
+		summaryDisplay = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
+		assertNotNullInputException("No layout defined for "+LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY, summaryDisplay);
 	}
 
 	public static final String HTTP_PARAM_RECORD_ID="recId";
@@ -44,22 +52,29 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 		PrintWriter writer = resp.getWriter();
 		try {
 			String recId = req.getParameter(HTTP_PARAM_RECORD_ID);
-			String layoutId = req.getParameter(HTTP_PARAM_LAYOUT_ID);
-			if (isNull(layoutId)) {
-				if (isNull(layoutIds)) layoutIds = myLayouts.getHtmlLayoutIds();
-				if (layoutIds.length == 0) throw new InputException("no HTML layoits defined");
-				layoutId = layoutIds[0];
+			int id;
+			LibrisHtmlLayout<DatabaseRecord> theLayout;
+			if (StringUtils.isStringEmpty(recId)) {
+				id = RecordId.NULL_RECORD_ID;
+				theLayout = summaryDisplay;
+			} else {
+				id = Integer.parseInt(recId);
+				String layoutId = req.getParameter(HTTP_PARAM_LAYOUT_ID);
+				if (isNull(layoutId)) {
+					if (isNull(layoutIds)) layoutIds = myLayouts.getHtmlLayoutIds();
+					if (layoutIds.length == 0) throw new InputException("no HTML layouts defined");
+					layoutId = layoutIds[0];
+				}
+				theLayout = myLayouts.getHtmlLayout(layoutId);
+				Assertion.assertNotNullInputException("Layout not found: ",  layoutId, theLayout);
 			}
-			LibrisHtmlLayout<DatabaseRecord> theLayout = myLayouts.getHtmlLayout(layoutId);
-			Assertion.assertNotNullInputException("Layout not found: ",  layoutId, theLayout);
-			int id = Integer.parseInt(recId);
 			resp.setStatus(HttpStatus.OK_200);
 			DatabaseRecord rec = database.getRecord(id);
 			theLayout.layOutFields(rec, myUi, resp, null);
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());
 			database.log(Level.SEVERE, "Error formatting web page: ", t);
-	        resp.setStatus(HttpStatus.BAD_REQUEST_400);
+			resp.setStatus(HttpStatus.BAD_REQUEST_400);
 		}
 	}
 

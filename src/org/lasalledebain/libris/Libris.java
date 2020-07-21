@@ -86,6 +86,7 @@ public class Libris {
 				break;
 			case UI_WEB:
 				ui = new LibrisHttpServer(LibrisHttpServer.default_port, LibrisHttpServer.DEFAULT_CONTEXT);
+				break;
 			default:
 				LibrisUi.cmdlineError(myUiType.toString()+" not implemented");
 				break;

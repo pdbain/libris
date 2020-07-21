@@ -25,6 +25,7 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.SingleRecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.search.RecordFilter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -39,7 +40,7 @@ public class BrowserWindow extends JPanel {
 	private static final int VISIBLE_LIMIT = 64;
 
 	private LibrisDatabase database;
-	private JList<?> chooser;
+	private JList<RecordInfo<DatabaseRecord>> chooser;
 	private final LibrisGui gui;
 	private JPanel filterView;
 	private JButton moreButton;
@@ -78,7 +79,7 @@ public class BrowserWindow extends JPanel {
 			
 		});
 		add("Filter", filterView);
-		chooser = new JList();
+		chooser = new JList<>();
 		chooser.addMouseListener(chooserMouseListener);
 		chooser.setVisibleRowCount(VISIBLE_LIMIT);
 		scroller = new JScrollPane(chooser);
@@ -113,8 +114,8 @@ public class BrowserWindow extends JPanel {
 	public void initialize(RecordList<DatabaseRecord> records) throws DatabaseException {
 		recordsSource = records;
 		enableNext(false);
-		final Layouts layouts = database.getLayouts();
-		this.myLayout = layouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
+		final Layouts<DatabaseRecord> layouts = database.getLayouts();
+		myLayout = layouts.getSwingLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
 		fieldIds = myLayout.getFieldIds();
 		recordsIterator = recordsSource.iterator();
 		setResultList();

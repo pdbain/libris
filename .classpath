@@ -3,11 +3,22 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="src" path="src_test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="resources/opencsv-2.3.jar"/>
 	<classpathentry kind="lib" path="resources/commons-logging-4.0.6.jar"/>
 	<classpathentry kind="lib" path="resources/fontbox-2.0.16.jar"/>
 	<classpathentry kind="lib" path="resources/pdfbox-app-2.0.16.jar"/>
+	<classpathentry kind="lib" path="resources/javax.servlet-api-3.0.1.jar"/>
+	<classpathentry kind="lib" path="resources/jetty-http-9.2.11.v20150529.jar"/>
+	<classpathentry kind="lib" path="resources/jetty-io-9.2.11.v20150529.jar"/>
+	<classpathentry kind="lib" path="resources/jetty-security-9.2.11.v20150529.jar"/>
+	<classpathentry kind="lib" path="resources/jetty-server-9.2.11.v20150529.jar"/>
+	<classpathentry kind="lib" path="resources/jetty-servlet-9.2.11.v20150529.jar"/>
+	<classpathentry kind="lib" path="resources/jetty-util-9.2.11.v20150529.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -63,7 +63,13 @@ public class Assertion {
 	public static void assertNotNullInputException(String message1, String message2, Object actual) throws InputException {
 		boolean result = Objects.nonNull(actual);
 		if (!result) {
-			throw new InputException("Error: "+message1+message2+" is null");
+			throw new InputException("Error: "+message1+" "+message2+" is null");
+		}
+	}
+
+	public static void assertNotNullDatabaseException(String message1, String message2, Object actual) throws DatabaseException {
+		if (!Objects.nonNull(actual)) {
+			throw new DatabaseException("Error: "+message1+" "+message2+" is null");
 		}
 	}
 
@@ -71,6 +77,13 @@ public class Assertion {
 		boolean result = Objects.nonNull(actual);
 		if (!result) {
 			throw new DatabaseError("Error: "+message+" is null");
+		}
+	}
+
+	public static void assertNotNullError(String message1, String message2, Object actual) throws DatabaseError {
+		boolean result = Objects.nonNull(actual);
+		if (!result) {
+			throw new DatabaseError("Error: "+message1+" "+message2+" is null");
 		}
 	}
 
