@@ -33,8 +33,8 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 		database = myUi.getDatabase();
 		myLayouts = database.getLayouts();
 		layoutIds = null;
-		summaryDisplay = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
-		assertNotNullInputException("No layout defined for "+LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY, summaryDisplay);
+		summaryDisplay = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_HTML_SUMMARYDISPLAY);
+		assertNotNullInputException("No layout defined: "+LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY, summaryDisplay);
 	}
 
 	public static final String HTTP_PARAM_RECORD_ID="recId";
@@ -70,7 +70,8 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 			}
 			resp.setStatus(HttpStatus.OK_200);
 			DatabaseRecord rec = database.getRecord(id);
-			theLayout.layOutFields(rec, myUi, resp, null);
+			LibrisHtmlLayout<DatabaseRecord> summaryLayout = database.getLayouts().getHtmlLayout(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
+			theLayout.layOutPage(database.getRecords(), id, summaryLayout, myUi, resp);
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());
 			database.log(Level.SEVERE, "Error formatting web page: ", t);

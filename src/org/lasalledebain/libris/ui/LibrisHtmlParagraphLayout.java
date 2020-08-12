@@ -1,10 +1,7 @@
 package org.lasalledebain.libris.ui;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.InputException;
 
@@ -29,10 +26,9 @@ public class LibrisHtmlParagraphLayout<RecordType extends Record> extends Libris
 	}
 
 	@Override
-	public void layOutFields(RecordType rec, LibrisUi ui, HttpServletResponse resp, ModificationTracker modTrk) throws InputException, IOException {
+	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
 		LayoutField<RecordType>[] fieldInfo = getFields();
-		String htmlText = myFormatter.createHtmlParagraph(rec, fieldInfo);
-		resp.getWriter().append(htmlText);
+		myFormatter.recordToParagraph(recList.getRecord(recId), fieldInfo, buff);		
 	}
 
 }

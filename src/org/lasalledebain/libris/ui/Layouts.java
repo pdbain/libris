@@ -171,13 +171,13 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 
 	public LibrisSwingLayout<RecordType> getSwingLayoutByUsage(String user) throws DatabaseException {
 		LibrisSwingLayout<RecordType> l = swingLayoutUsage.get(user);
-		assertNotNullDatabaseException("No layout defined for ",  user, l);
+		assertNotNullDatabaseException("No layout defined:",  user, l);
 		return l;
 	}
 
 	public LibrisHtmlLayout<RecordType> getHtmlLayoutByUsage(String user) {
 		LibrisHtmlLayout<RecordType> l = htmlLayoutUsage.get(user);
-		assertNotNullError("No layout defined for ",  user, l);
+		assertNotNullError("No layout defined:",  user, l);
 		return l;
 	}
 

@@ -3,6 +3,7 @@ package org.lasalledebain.libris.ui;
 import javax.servlet.http.HttpServletResponse;
 
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
@@ -26,10 +27,8 @@ public class LibrisHtmlListLayout<RecordType extends Record> extends LibrisHtmlL
 	}
 
 	@Override
-	public void layOutFields(RecordType rec, LibrisUi ui, HttpServletResponse resp,
-			ModificationTracker modTrk) {
-		// TODO Auto-generated method stub
-		throw new DatabaseError("LibrisHtmlListLayout not implemented");
+	protected void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) {
+		throw new DatabaseError("Not implemented");
 	}
 
 }

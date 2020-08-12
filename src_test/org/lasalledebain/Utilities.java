@@ -56,6 +56,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 import junit.framework.TestCase;
 
 public class Utilities extends TestCase {
+	public static final String HTML_TEST_DATABASE = "htmlTestDatabase1.libr";
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
 	public static final String KEYWORD_DATABASE1_XML = "KeywordDatabase1.xml";
 	public static final String KEYWORD_DATABASE0_XML = "KeywordDatabase0.xml";

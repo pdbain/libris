@@ -26,6 +26,10 @@ public class Assertion {
 		return test;
 	}
 
+	public static void assertError(String message) {
+		throw new DatabaseError("Error: "+message);
+	}
+
 	public static boolean assertEquals(DatabaseUi ui, String message, Object expected, Object actual) {
 		boolean result = actual.equals(expected);
 		if (!result) {
@@ -99,6 +103,10 @@ public class Assertion {
 		if (!test) {
 			throw new DatabaseError("Error: "+messagePart1+messagePart2);
 		}
+	}
+
+	public static void assertError(String messagePart1, String messagePart2) {
+		throw new DatabaseError("Error: "+messagePart1+messagePart2);
 	}
 
 }

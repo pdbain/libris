@@ -75,7 +75,7 @@ public class RandomAccessBrowserList<RecordType extends Record> extends RecordLi
 	}
 
 	@Override
-	public Object getElementAt(int index) {
+	public RecordInfo<RecordType> getElementAt(int index) {
 		return recList.get(index);
 	}
 

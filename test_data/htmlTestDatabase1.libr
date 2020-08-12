@@ -57,7 +57,7 @@
 		</layout>
 		<layout id="LO_htmlParagraphDisplay" title="Paragraph layout" type="htmlparagraph" height="400"
 			width="700">
-			<layoutusage usedby="paragraph"/>
+			<layoutusage usedby="htmlparagraph"/>
 			<layoutfield title="Author" id="ID_auth" control="textfield" />
 			<layoutfield title="Title" id="ID_title" control="textfield" return="true"/>
 			<layoutfield title="Pages" id="ID_pages" control="rangefield" return="true"/>
@@ -71,6 +71,12 @@
 			<layoutusage usedby="summarydisplay"/>
 			<layoutfield title="Author" id="ID_auth" control="textfield" />
 			<layoutfield title="Title" id="ID_title" control="textfield" return="true"/>
+		</layout>
+		<layout id="LO_htmlBrowserDisplay" title="Summary" type="htmllist" height="400"
+			width="700">
+			<layoutusage usedby="summaryhtmldisplay"/>
+			<layoutfield title="Author" id="ID_auth" control="textfield" />
+			<layoutfield title="Title" id="ID_title" control="textfield"/>
 		</layout>
 	</layouts>
 	</metadata>

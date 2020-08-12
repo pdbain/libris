@@ -111,6 +111,7 @@ public interface LibrisXMLConstants {
 	public static final String XML_LAYOUT_HEIGHT_ATTR = "height";
 	public static final String XML_LAYOUT_WIDTH_ATTR = "width";
 	public static final String XML_LAYOUT_USER_SUMMARYDISPLAY = "summarydisplay";
+	public static final String XML_LAYOUT_USER_HTML_SUMMARYDISPLAY = "summaryhtmldisplay";
 	public static final String XML_LAYOUT_USER_NEWRECORD = "newrecord";
 	public static final String XML_SCHEMA_VERSION_ATTR = "schemaversion";
 
