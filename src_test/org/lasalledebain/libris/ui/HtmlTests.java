@@ -25,7 +25,7 @@ public class HtmlTests extends TestCase {
 		TestResponse resp = new TestResponse();
 		Layouts<DatabaseRecord> myLayouts = db.getLayouts();
 		LibrisHtmlLayout<DatabaseRecord> myLayout = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_HTML_PARAGRAPH);
-		LibrisHtmlLayout<DatabaseRecord> browserLayout = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_HTML_SUMMARYDISPLAY);
+		LibrisHtmlLayout<DatabaseRecord> browserLayout = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		myLayout.layOutPage(db.getRecords(), 2, browserLayout, db.getUi(), resp);
 		String result = resp.getResponseText();
 		fail("Not yet implemented");

@@ -115,7 +115,7 @@ public class BrowserWindow extends JPanel {
 		recordsSource = records;
 		enableNext(false);
 		final Layouts<DatabaseRecord> layouts = database.getLayouts();
-		myLayout = layouts.getSwingLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
+		myLayout = layouts.getSwingLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		fieldIds = myLayout.getFieldIds();
 		recordsIterator = recordsSource.iterator();
 		setResultList();

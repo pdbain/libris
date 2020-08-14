@@ -112,7 +112,7 @@ public class RecordDisplayPanel extends JPanel {
 		layoutIds = layouts.getSwingLayoutIds();
 		String lo = "";
 		try {
-			lo = myDatabase.getLayouts().getSwingLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_NEWRECORD).getId();
+			lo = myDatabase.getLayouts().getSwingLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_NEWRECORD).getId();
 		} catch (LibrisException e) {
 			mainGui.alert("exception "+e+" "+e.getMessage()+" reading layouts");
 		}
@@ -157,7 +157,7 @@ public class RecordDisplayPanel extends JPanel {
 
 	private synchronized String[] getTitleFieldIds() throws DatabaseException {
 		if (null == titleLayout) {
-			titleLayout = myDatabase.getLayouts().getSwingLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
+			titleLayout = myDatabase.getLayouts().getSwingLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 			titleFieldIds = titleLayout.getFieldIds();
 		}
 		return titleFieldIds;

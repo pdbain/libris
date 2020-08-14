@@ -1,6 +1,8 @@
 package org.lasalledebain.libris.ui;
 
 import static java.util.Objects.isNull;
+import static org.lasalledebain.libris.exception.Assertion.assertNotNullDatabaseException;
+import static org.lasalledebain.libris.exception.Assertion.assertNotNullError;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -25,10 +27,6 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisEmptyAttributes;
-
-import static org.lasalledebain.libris.exception.Assertion.assertNotNullError;
-import static org.lasalledebain.libris.exception.Assertion.assertNotNullInputException;
-import static org.lasalledebain.libris.exception.Assertion.assertNotNullDatabaseException;
 
 public class Layouts<RecordType extends Record> implements XMLElement {
 	enum LAYOUT_MEDIUM {
@@ -195,16 +193,20 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return LibrisEmptyAttributes.getLibrisEmptyAttributes();
 	}
 
-	@Override
-	public boolean equals(Object comparand) {
+	public boolean equals(Layouts<RecordType> comparand) {
 		try {
-			Layouts<RecordType> otherLayouts = (Layouts<RecordType>) comparand;
+			Layouts<RecordType> otherLayouts = comparand;
 			return otherLayouts.swingLayouts.equals(swingLayouts);
 		} catch (ClassCastException e) {
 			final String msg = "type mismatch in Layouts.equals()";
 			LibrisDatabase.log(Level.WARNING, msg, e);
 			return false;
 		}
+	}
+
+	@Override
+	public boolean equals(Object comparand) {
+		return false;
 	}
 
 	public static String getXmlTag() {
