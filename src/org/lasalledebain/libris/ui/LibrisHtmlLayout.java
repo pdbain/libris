@@ -23,9 +23,6 @@ public abstract class LibrisHtmlLayout<RecordType extends Record> extends Libris
 	@Override
 	protected abstract void validate() throws InputException;
 
-	@Override
-	public abstract String getLayoutType();
-
 	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, DatabaseUi ui, HttpServletResponse resp) throws InputException, IOException {
 		StringBuffer buff = new StringBuffer(1000);
 		generateHeaderAndStylesheet(buff);

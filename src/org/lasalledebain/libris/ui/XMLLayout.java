@@ -38,11 +38,6 @@ public class XMLLayout<RecordType extends Record> extends LibrisSwingLayout<Reco
 	}
 
 	@Override
-	public String getLayoutType() {
-		return LibrisXMLConstants.XML_LAYOUT_TYPE_XML;
-	}
-
-	@Override
 	protected void showRecord(int recId) {
 		return;
 	}

@@ -1,26 +1,13 @@
 package org.lasalledebain.libris.records;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.logging.Level;
 
-import javax.xml.stream.FactoryConfigurationError;
-
-import org.lasalledebain.libris.DatabaseInstance;
-import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.DatabaseMetadata;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
-import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.ui.Messages;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants; 

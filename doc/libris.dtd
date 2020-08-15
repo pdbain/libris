@@ -86,6 +86,8 @@ Define the indexes in the database
 	>
 
 <!ELEMENT layouts (layout*) >
+
+<!ELEMENT layout ((layoutusage|layoutfield)*) >
 <!ATTLIST layout
 	id ID #REQUIRED
 	title CDATA #IMPLIED
@@ -94,7 +96,6 @@ Define the indexes in the database
 	height NMTOKEN #IMPLIED
 >
 	
-<!ELEMENT layout ((layoutusage|layoutfield)*) >
 <!ELEMENT layoutfield EMPTY>
 <!ATTLIST layoutfield
 	id IDREF #REQUIRED

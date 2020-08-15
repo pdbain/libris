@@ -25,7 +25,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 	@Override
@@ -47,11 +46,6 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 				throw new InputException("Cannot use enumfield layout control for non-enum field "+fid);
 			}
 		}
-	}
-
-	@Override
-	public String getLayoutType() {
-		return LibrisXMLConstants.XML_LAYOUT_TYPE_FORM;
 	}
 
 	@Override

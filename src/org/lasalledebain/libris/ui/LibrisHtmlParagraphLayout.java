@@ -21,11 +21,6 @@ public class LibrisHtmlParagraphLayout<RecordType extends Record> extends Libris
 	}
 
 	@Override
-	public String getLayoutType() {
-		return XML_LAYOUT_TYPE_HTML_PARAGRAPH;
-	}
-
-	@Override
 	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
 		LayoutField<RecordType>[] fieldInfo = getFields();
 		myFormatter.recordToParagraph(recList.getRecord(recId), fieldInfo, buff);		

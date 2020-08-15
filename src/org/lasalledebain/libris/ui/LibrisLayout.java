@@ -25,6 +25,7 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 	protected String title = null;
 	protected int height;
 	protected int width;
+	protected String layoutType;
 	protected Schema mySchema = null;
 	protected ArrayList<LayoutField<RecordType>> bodyFieldList;
 	protected LayoutField<RecordType> positionList = null;
@@ -47,6 +48,7 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 		setHeight(values.get("height"));
 		setWidth(values.get("width"));
 		setIdAndTitle(values.get("title"), values.get("id"));
+		setType(values.get(XML_LAYOUT_TYPE_ATTR));
 		while (mgr.hasNext()) {
 			ElementManager subElementMgr = mgr.nextElement();
 			if (subElementMgr.getElementTag().equals(XML_LAYOUTFIELD_TAG)) {
@@ -97,7 +99,7 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 		if (null != title) {
 			attrs.setAttribute(LibrisXMLConstants.XML_LAYOUT_TITLE_ATTR, title);
 		}
-		attrs.setAttribute(XML_LAYOUT_TYPE_ATTR, getLayoutType());
+		attrs.setAttribute(XML_LAYOUT_TYPE_ATTR, layoutType);
 		attrs.setAttribute(XML_LAYOUT_HEIGHT_ATTR, Integer.toString(getHeight()));
 		attrs.setAttribute(XML_LAYOUT_WIDTH_ATTR, Integer.toString(getWidth()));
 		return attrs;
@@ -136,8 +138,6 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 	public Schema getSchema() {
 		return mySchema;
 	}
-
-	public abstract String getLayoutType();
 
 	public String getId() {
 		return id;
@@ -218,6 +218,10 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 	@Override
 	public boolean equals(Object obj) {
 		return (obj.getClass() == this.getClass()) && ((LibrisLayout<RecordType>) obj).getAttributes().equals(getAttributes());
+	}
+
+	public void setType(String theType) {
+		this.layoutType = theType;
 	}
 
 

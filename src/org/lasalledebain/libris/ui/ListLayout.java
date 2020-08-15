@@ -26,11 +26,6 @@ public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 		super(schem);
 	}
 
-	@Override
-	public String getLayoutType() {
-		return LibrisXMLConstants.XML_LAYOUT_TYPE_LIST;
-	}
-
 	// TODO show groups
 	@Override
 	ArrayList<UiField> layOutFields(Record theRecord, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)

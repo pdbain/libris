@@ -22,11 +22,6 @@ public class LibrisHtmlListLayout<RecordType extends Record> extends LibrisHtmlL
 	}
 
 	@Override
-	public String getLayoutType() {
-		return XML_LAYOUT_TYPE_HTML_FORM;
-	}
-
-	@Override
 	protected void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) {
 		throw new DatabaseError("Not implemented");
 	}

@@ -99,11 +99,6 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 	}
 
 	@Override
-	public String getLayoutType() {
-		return LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH;
-	}
-
-	@Override
 	protected void showRecord(int recId) {
 		return;
 	}
