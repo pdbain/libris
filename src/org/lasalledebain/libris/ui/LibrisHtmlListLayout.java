@@ -1,7 +1,5 @@
 package org.lasalledebain.libris.ui;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;

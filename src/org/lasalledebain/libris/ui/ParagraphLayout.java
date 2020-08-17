@@ -11,13 +11,13 @@ import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 
@@ -107,6 +107,12 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 	protected void validate() throws InputException {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
+		LayoutField<RecordType>[] fieldInfo = getFields();
+		recordToParagraph(recList.getRecord(recId), fieldInfo, buff);		
 	}
 
 }

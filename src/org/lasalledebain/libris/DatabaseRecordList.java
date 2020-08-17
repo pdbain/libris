@@ -1,7 +1,6 @@
 package org.lasalledebain.libris;
 
 import java.util.Iterator;
-import java.util.Vector;
 
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;

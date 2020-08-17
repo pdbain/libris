@@ -25,7 +25,6 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.SingleRecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.search.RecordFilter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;

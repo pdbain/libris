@@ -13,9 +13,11 @@ import javax.swing.table.TableColumnModel;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.exception.DatabaseError;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 
@@ -59,6 +61,12 @@ public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 	protected void validate() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	protected void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff)
+			throws InputException {
+		throw new DatabaseError("not implemented");
 	}
 
 }

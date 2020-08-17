@@ -3,8 +3,10 @@ package org.lasalledebain.libris.ui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -19,6 +21,7 @@ import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -26,7 +29,7 @@ import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 
-public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
+public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> implements LayoutSwingProcessor<RecordType>, LayoutHtmlProcessor<RecordType> {
 	@Override
 	public boolean isEditable() {
 		return true;
@@ -49,6 +52,7 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 	}
 
 	@Override
+	public
 	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 	throws LibrisException {
 		final boolean modifiable = modTrk.isModifiable();
@@ -108,6 +112,7 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 	}
 
 	@Override
+	public
 	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		RecordType rec = recList.getFirstRecord();
@@ -117,6 +122,21 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 	@Override
 	protected void showRecord(int recId) {
 		return;
+	}
+
+	@Override
+	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout,
+			DatabaseUi ui, HttpServletResponse resp) throws InputException, IOException {
+		throw new DatabaseError("not implemented");
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
+		throw new DatabaseError("not implemented");
+		// TODO Auto-generated method stub
+		
 	}
 
 }

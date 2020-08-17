@@ -8,6 +8,7 @@ import javax.swing.JComponent;
 import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -24,6 +25,12 @@ public class XMLLayout<RecordType extends Record> extends LibrisSwingLayout<Reco
 	@Override
 	ArrayList<UiField>  layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker unused)
 			throws DatabaseException, LibrisException {
+		String xmlText = getXmlText(rec);
+		recordPanel.add(new TextArea(xmlText));
+		return null;
+	}
+
+	protected String getXmlText(Record rec) throws LibrisException, DatabaseException {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		ElementWriter streamWriter;
 		try {
@@ -33,8 +40,7 @@ public class XMLLayout<RecordType extends Record> extends LibrisSwingLayout<Reco
 			throw new DatabaseException(e);
 		}
 		String xmlText = outStream.toString();
-		recordPanel.add(new TextArea(xmlText));
-		return null;
+		return xmlText;
 	}
 
 	@Override
@@ -46,6 +52,18 @@ public class XMLLayout<RecordType extends Record> extends LibrisSwingLayout<Reco
 	protected void validate() throws InputException {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	protected void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff)
+			throws InputException {
+		RecordType rec = recList.getRecord(recId);
+		try {
+			String recText = getXmlText(rec);
+			buff.append(recText);
+		} catch (LibrisException e) {
+			throw new InputException(e);
+		}
 	}
 
 }
