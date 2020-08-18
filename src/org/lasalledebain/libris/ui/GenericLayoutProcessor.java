@@ -24,7 +24,7 @@ public abstract class GenericLayoutProcessor<RecordType extends Record>  impleme
 
 	@Override
 	public
-	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel,
+	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		RecordType rec = recList.getFirstRecord();
 		return layOutFields(rec, ui, recordPanel, modTrk);

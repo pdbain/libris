@@ -30,7 +30,7 @@ public class TableLayout<RecordType extends Record> extends MultiRecordLayout<Re
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
+	public ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException {
 		myTableModel = new TableLayoutTableModel<RecordType>(recList, this);
 		recordTable = new JTable(myTableModel);

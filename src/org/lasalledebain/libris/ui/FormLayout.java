@@ -53,7 +53,7 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 
 	@Override
 	public
-	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
 	throws LibrisException {
 		final boolean modifiable = modTrk.isModifiable();
 		JComponent fieldPanel = null;
@@ -113,7 +113,7 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 
 	@Override
 	public
-	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel,
+	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		RecordType rec = recList.getFirstRecord();
 		return layOutFields(rec, ui, recordPanel, modTrk);
