@@ -62,11 +62,4 @@ public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	protected void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff)
-			throws InputException {
-		throw new DatabaseError("not implemented");
-	}
-
 }

@@ -71,11 +71,4 @@ public class TableLayout<RecordType extends Record> extends MultiRecordLayout<Re
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	protected void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff)
-			throws InputException {
-		throw new DatabaseError("not implemented");
-	}
-
 }

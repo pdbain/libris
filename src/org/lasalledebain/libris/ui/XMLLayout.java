@@ -54,16 +54,4 @@ public class XMLLayout<RecordType extends Record> extends LibrisSwingLayout<Reco
 		
 	}
 
-	@Override
-	protected void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff)
-			throws InputException {
-		RecordType rec = recList.getRecord(recId);
-		try {
-			String recText = getXmlText(rec);
-			buff.append(recText);
-		} catch (LibrisException e) {
-			throw new InputException(e);
-		}
-	}
-
 }

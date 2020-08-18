@@ -108,11 +108,4 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
-		LayoutField<RecordType>[] fieldInfo = getFields();
-		recordToParagraph(recList.getRecord(recId), fieldInfo, buff);		
-	}
-
 }

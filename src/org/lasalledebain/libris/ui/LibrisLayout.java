@@ -22,10 +22,6 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public abstract class LibrisLayout<RecordType extends Record> implements XMLElement {
 
-	private static final String DISPLAY_COLUMN_NAME = ".rightColumn";
-	protected static final String BROWSER_COLUMN_NAME = ".browserColumn";
-	protected static final String BROWSER_ITEM_CLASS = ".browserItem";
-
 	final static ArrayList<UiField> emptyUiList = new ArrayList<>();
 	protected String id;
 	protected String title = null;
@@ -36,11 +32,17 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 	protected ArrayList<LayoutField<RecordType>> bodyFieldList;
 	protected LayoutField<RecordType> positionList = null;
 	protected ArrayList<String> layoutUsers;
+	protected final Layouts<RecordType> myLayouts;
 
-	public LibrisLayout(Schema schem) {
+	public LibrisLayout(Schema schem, Layouts<RecordType> theLayouts) {
 		mySchema = schem;
 		bodyFieldList = new ArrayList<LayoutField<RecordType>>();
 		layoutUsers = new ArrayList<String>(1);
+		myLayouts = theLayouts;
+	}
+
+	public LibrisLayout(Schema schem) {
+		this(schem, null);
 	}
 
 	@Override
@@ -229,63 +231,5 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 	public void setType(String theType) {
 		this.layoutType = theType;
 	}
-
-/* HTML utilities */
-	protected void generateHeaderAndStylesheet(StringBuffer buffer) {
-		buffer.append("<!DOCTYPE html>\n" + 
-				"<html>\n" + 
-				"<head>\n" + 
-				"<title>");
-		buffer.append(getTitle());
-		buffer.append("</title>\n" + 
-				"<style>\n" + 
-				"h1 {color: blue}\n" + 
-				BROWSER_COLUMN_NAME +
-				" {\n" + 
-				"float: left;\n"
-				+ "width:300px;" + 
-				"margin: 10px;\n" + 
-				"border: 1px solid black;\n" + 
-				"}\n" + 
-				DISPLAY_COLUMN_NAME +
-				" {\n" + 
-				"float: left;\n" + 
-				"margin: 10px;\n" + 
-				"border: 1px solid black;\n" + 
-				"}\n" + 
-				BROWSER_ITEM_CLASS +
-				"font-family: Arial, Helvetica, sans-serif;"
-				+ "font-size: 100%;" +
-				"</style>\n" + 
-				"</head>\n"
-				);
-	}
-
-	protected void startBody(StringBuffer buff) {
-		buff.append("<body> <div id=\"mainFrame\">");
-	}
-	protected void endBody(StringBuffer buff) {
-		buff.append("</div> </body>");
-	}
-
-	protected void layoutBrowserPanel(RecordList<RecordType> recList, int start, LibrisLayout<RecordType> browserLayout, StringBuffer buff) {
-		String[] browserFields = browserLayout.getFieldIds();
-		buff.append("<div class="+BROWSER_COLUMN_NAME+">\n"
-				+ "<ul>");
-		Iterator<RecordType> recIter = recList.iterator();
-		int recCount = 0;
-		while (recIter.hasNext() && (recCount < BrowserWindow.LIST_LIMIT)) {
-			RecordType rec = recIter.next();
-			if (rec.getRecordId() < start) {
-				continue;
-			}
-			buff.append("<li>"+rec.generateTitle(browserFields)+"</li>");
-			++recCount;
-		}
-		buff.append("</ul>");
-		buff.append(" </div>");
-	}
-	
-	protected abstract void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException;
 
 }
