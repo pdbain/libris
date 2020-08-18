@@ -28,7 +28,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends GenericLayou
 
 	@Override
 	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout,
-			DatabaseUi ui, HttpServletResponse resp) throws InputException, IOException {
+			DatabaseUi<RecordType> ui, HttpServletResponse resp) throws InputException, IOException {
 		// TODO Auto-generated method stub
 		
 	}

@@ -1,10 +1,9 @@
 package org.lasalledebain.libris.ui;
 
+import java.awt.TextArea;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.swing.JComponent;
 import javax.xml.stream.XMLStreamException;
 
@@ -35,13 +34,6 @@ public class XmlLayoutProcessor<RecordType extends Record> extends GenericLayout
 	}
 
 	@Override
-	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, DatabaseUi ui,
-			HttpServletResponse resp) throws InputException, IOException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
 		RecordType rec = recList.getRecord(recId);
 		try {
@@ -53,9 +45,10 @@ public class XmlLayoutProcessor<RecordType extends Record> extends GenericLayout
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel,
+	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
-		// TODO Auto-generated method stub
+		String xmlText = getXmlText(rec);
+		recordPanel.add(new TextArea(xmlText));
 		return null;
 	}
 

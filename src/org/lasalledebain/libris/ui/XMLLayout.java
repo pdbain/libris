@@ -16,6 +16,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
+@Deprecated
 public class XMLLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 
 	public XMLLayout(Schema schem) {

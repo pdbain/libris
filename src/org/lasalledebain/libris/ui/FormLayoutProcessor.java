@@ -100,7 +100,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends GenericLayou
 	}
 
 	@Override
-	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, DatabaseUi ui,
+	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, DatabaseUi<RecordType> ui,
 			HttpServletResponse resp) throws InputException, IOException {
 		// TODO Auto-generated method stub
 		

@@ -10,7 +10,7 @@ import org.lasalledebain.libris.exception.InputException;
 
 public interface LayoutHtmlProcessor<RecordType extends Record> {
 
-	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, DatabaseUi ui, HttpServletResponse resp) throws InputException, IOException;
+	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, DatabaseUi<RecordType> ui, HttpServletResponse resp) throws InputException, IOException;
 	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException;
 
 }

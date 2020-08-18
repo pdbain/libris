@@ -126,7 +126,7 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 
 	@Override
 	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout,
-			DatabaseUi ui, HttpServletResponse resp) throws InputException, IOException {
+			DatabaseUi<RecordType> ui, HttpServletResponse resp) throws InputException, IOException {
 		throw new DatabaseError("not implemented");
 		// TODO Auto-generated method stub
 		

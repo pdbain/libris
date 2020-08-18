@@ -1,13 +1,16 @@
 package org.lasalledebain.libris.ui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.JComponent;
 
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 public abstract class GenericLayoutProcessor<RecordType extends Record>  implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType> {
@@ -84,6 +87,17 @@ public abstract class GenericLayoutProcessor<RecordType extends Record>  impleme
 		}
 		buff.append("</ul>");
 		buff.append(" </div>");
+	}
+	
+	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, 
+			DatabaseUi<RecordType> ui, HttpServletResponse resp) throws InputException, IOException {
+		StringBuffer buff = new StringBuffer(1000);
+		generateHeaderAndStylesheet(buff);
+		startBody(buff);
+		layoutBrowserPanel(recList, 0, browserLayout, buff);
+		layoutDisplayPanel(recList, recId, buff);
+		endBody(buff);
+		resp.getWriter().append(buff.toString());
 	}
 	
 }
