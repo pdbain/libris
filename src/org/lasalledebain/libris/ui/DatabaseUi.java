@@ -13,7 +13,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public interface DatabaseUi {
+public interface DatabaseUi<RecordType extends Record> {
 
 	public void setSchema(XmlSchema mySchema);
 	public LibrisDatabase openDatabase() throws DatabaseException;
@@ -35,11 +35,11 @@ public interface DatabaseUi {
 
 	void recordsAccessible(boolean accessible);
 
-	Record newRecord();
+	RecordType newRecord();
 	public abstract void displayRecord(int recordId) throws LibrisException;
-	public abstract void put(Record newRecord) throws DatabaseException;
+	public abstract void put(RecordType newRecord) throws DatabaseException;
 
-	public void addRecord(Record newRecord) throws DatabaseException;
+	public void addRecord(RecordType newRecord) throws DatabaseException;
 
 	/**
 	 * Create a new, empty, value for a field
@@ -54,7 +54,7 @@ public interface DatabaseUi {
 
 	void setSelectedField(UiField selectedField);
 
-	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException;
+	public void setRecordName(NamedRecordList<RecordType> namedRecs) throws InputException;
 	public void setRecordArtifact();
 	
 	public abstract void arrangeValues();

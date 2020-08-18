@@ -44,7 +44,7 @@ import com.apple.eawt.AppEvent.QuitEvent;
 import com.apple.eawt.QuitHandler;
 import com.apple.eawt.QuitResponse;
 
-public class LibrisGui extends LibrisWindowedUi {
+public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	private static final String CONTENT_PANE_HEIGHT = "CONTENT_PANE_HEIGHT";
 	private static final String CONTENT_PANE_WIDTH = "CONTENT_PANE_WIDTH";
 	private static final String CONTENT_PANE_DIVIDER = "CONTENT_PANE_DIVIDER_LOCATION";
@@ -274,14 +274,14 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	public void addRecord(Record newRecord) throws DatabaseException {
+	public void addRecord(DatabaseRecord newRecord) throws DatabaseException {
 		if (null != currentDatabase) {
 			resultsPanel.addRecord(newRecord);
 		}
 	}
 
 	@Override
-	public void put(Record newRecord) throws DatabaseException {
+	public void put(DatabaseRecord newRecord) throws DatabaseException {
 		resultsPanel.addRecord(newRecord);
 		updateUITitle();
 	}

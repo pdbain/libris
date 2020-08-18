@@ -17,7 +17,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public abstract class LibrisUi implements DatabaseUi, LibrisConstants {
+public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<RecordType>, LibrisConstants {
 	
 	private static final String NO_DATABASE_OPENED = "No database opened";
 	protected static Preferences librisPrefs;
@@ -142,7 +142,7 @@ public abstract class LibrisUi implements DatabaseUi, LibrisConstants {
 		return selectedField;
 	}
 	@Override
-	public Record newRecord() {
+	public RecordType newRecord() {
 		return null;
 	}
 	public void setTitle(String title) {
@@ -155,7 +155,7 @@ public abstract class LibrisUi implements DatabaseUi, LibrisConstants {
 	}
 
 	@Override
-	public void addRecord(Record newRecord) throws DatabaseException{
+	public void addRecord(RecordType newRecord) throws DatabaseException{
 		throw new DatabaseError("LibrisUiGeneric.addRecord unimplemented");
 	}
 

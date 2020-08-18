@@ -26,7 +26,7 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.index.GroupDef;
 
-public abstract class LibrisWindowedUi extends LibrisUi {	
+public abstract class LibrisWindowedUi<RecordType extends Record> extends LibrisUi<RecordType> {	
 	private static final String NO_DATABASE_OPEN = "no database open";
 	private static final String DATABASE_MODIFIED = " (modified)";
 	protected final JFrame mainFrame;

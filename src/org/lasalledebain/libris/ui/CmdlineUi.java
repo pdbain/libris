@@ -16,7 +16,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class CmdlineUi extends LibrisUi implements DatabaseUi {
+public class CmdlineUi<RecordType extends Record> extends LibrisUi<RecordType> {
 
 	BufferedReader cmdlineInput;
 	@Override
@@ -105,7 +105,7 @@ public class CmdlineUi extends LibrisUi implements DatabaseUi {
 	}
 
 	@Override
-	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException {
+	public void setRecordName(NamedRecordList<RecordType> namedRecs) throws InputException {
 		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
 	}
 
