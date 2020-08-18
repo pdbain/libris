@@ -214,7 +214,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		databaseMetadata.fromXml(metadataMgr);
 	}
 
-	public static boolean newDatabase(File databaseFile, String schemaName, boolean readOnly, DatabaseUi ui, LibrisMetadata metadata) 
+	public static boolean newDatabase(File databaseFile, String schemaName, boolean readOnly, DatabaseUi ui, LibrisMetadata<DatabaseRecord> metadata) 
 			throws XMLStreamException, IOException, LibrisException {
 		if (!databaseFile .createNewFile()) {
 			ui.alert("Database file "+databaseFile.getAbsolutePath()+" already exisits");
@@ -630,7 +630,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return auxDirectory;
 	}
 
-	public LibrisMetadata getMetadata() {
+	public LibrisMetadata<DatabaseRecord> getMetadata() {
 		return databaseMetadata;
 	}
 
@@ -714,7 +714,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 * @throws LibrisException 
 	 */
 	public int putRecord(DatabaseRecord rec) throws LibrisException {
-		LibrisMetadata metaData = getMetadata();
+		LibrisMetadata<DatabaseRecord> metaData = getMetadata();
 		int id = genericPutRecord(metaData, rec);
 		for (int g = 0; g < mySchema.getNumGroups(); ++g) {
 			int[] affiliations = rec.getAffiliates(g);
@@ -777,7 +777,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		Records<DatabaseRecord> recs = getDatabaseRecordsUnchecked();
 		int id = NULL_RECORD_ID;
 		int lastId = 0;
-		LibrisMetadata metadata = getMetadata();
+		LibrisMetadata<DatabaseRecord> metadata = getMetadata();
 		for (Record rec: recList) {
 			id = rec.getRecordId();
 			if (RecordId.isNull(id)) {

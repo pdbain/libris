@@ -9,10 +9,10 @@ import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
-public abstract class LibrisMetadata extends DatabaseMetadata implements XMLElement {
+public abstract class LibrisMetadata<RecordType extends Record> extends DatabaseMetadata implements XMLElement {
 
 	protected LibrisDatabase database;
-	protected Layouts uiLayouts;
+	protected Layouts<RecordType> uiLayouts;
 	private DatabaseInstance instanceInfo;
 
 	private LastFilterSettings lastFiltSettings;
@@ -27,15 +27,15 @@ public abstract class LibrisMetadata extends DatabaseMetadata implements XMLElem
 		this.database = database;
 	}
 
-	public LibrisMetadata(LibrisDatabase database, Layouts myLayouts) {
+	public LibrisMetadata(LibrisDatabase database, Layouts<RecordType> myLayouts) {
 		this();
 		this.database = database;
 		if (Objects.isNull(myLayouts)) {
-			uiLayouts = new Layouts(database.getSchema());
+			uiLayouts = new Layouts<RecordType>(database.getSchema());
 		}
 	}
 
-	public Layouts getLayouts() {
+	public Layouts<RecordType> getLayouts() {
 		return uiLayouts;
 	}
 

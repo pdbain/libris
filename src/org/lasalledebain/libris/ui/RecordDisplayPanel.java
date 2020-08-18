@@ -19,6 +19,7 @@ import javax.swing.event.ChangeListener;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisMenu.NewRecordListener;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -111,8 +112,8 @@ public class RecordDisplayPanel extends JPanel {
 		layoutIds = layouts.getSwingLayoutIds();
 		String lo = "";
 		try {
-			lo = myDatabase.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_NEWRECORD).getId();
-		} catch (DatabaseException e) {
+			lo = myDatabase.getLayouts().getSwingLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_NEWRECORD).getId();
+		} catch (LibrisException e) {
 			mainGui.alert("exception "+e+" "+e.getMessage()+" reading layouts");
 		}
 		for (String s: layoutIds) {
@@ -156,7 +157,7 @@ public class RecordDisplayPanel extends JPanel {
 
 	private synchronized String[] getTitleFieldIds() throws DatabaseException {
 		if (null == titleLayout) {
-			titleLayout = myDatabase.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USER_SUMMARYDISPLAY);
+			titleLayout = myDatabase.getLayouts().getSwingLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 			titleFieldIds = titleLayout.getFieldIds();
 		}
 		return titleFieldIds;

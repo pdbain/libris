@@ -16,12 +16,10 @@ import javax.swing.border.TitledBorder;
 
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -29,34 +27,18 @@ import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 
-public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> implements LayoutSwingProcessor<RecordType>, LayoutHtmlProcessor<RecordType> {
-	@Override
-	public boolean isEditable() {
-		return true;
-	}
+public class FormLayoutProcessor<RecordType extends Record> extends GenericLayoutProcessor<RecordType> {
 
-	public FormLayout(Schema schem) {
-		super(schem);
+	public FormLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+		super(theLayout);
 	}
 
 	@Override
-	protected void validate() throws InputException {
-		for (LayoutField<RecordType> lf: getFields()) {
-			String fid = lf.getId();
-			FieldType fType = mySchema.getFieldType(fid);
-			if (lf.getControlTypeName().equals(GuiConstants.GUI_ENUMFIELD)
-					&& !fType.equals(FieldType.T_FIELD_ENUM)) {
-				throw new InputException("Cannot use enumfield layout control for non-enum field "+fid);
-			}
-		}
-	}
-
-	@Override
-	public
-	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
-	throws LibrisException {
+	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel,
+			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		final boolean modifiable = modTrk.isModifiable();
 		JComponent fieldPanel = null;
+		Schema mySchema = myLayout.getSchema();
 		ArrayList<UiField> guiFields = new ArrayList<UiField>();
 		int numGroups = mySchema.getNumGroups();
 		if ((numGroups > 0) && rec.hasAffiliations()) {
@@ -93,9 +75,9 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		fieldPanel.setLayout(panelLayout);
-		for (LayoutField<RecordType> fp: getFields()) {
+		for (LayoutField<RecordType> fp: myLayout.getFields()) {
 			int fieldNum = fp.getFieldNum();
-			Field fld = getField(rec, fieldNum);
+			Field fld = myLayout.getField(rec, fieldNum);
 			if (null == fld) {
 				continue;
 			}
@@ -112,29 +94,14 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 	}
 
 	@Override
-	public
-	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel,
-			ModificationTracker modTrk) throws DatabaseException, LibrisException {
-		RecordType rec = recList.getFirstRecord();
-		return layOutFields(rec, ui, recordPanel, modTrk);
-	}
-
-	@Override
-	protected void showRecord(int recId) {
-		return;
-	}
-
-	@Override
-	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout,
-			DatabaseUi ui, HttpServletResponse resp) throws InputException, IOException {
-		throw new DatabaseError("not implemented");
+	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
-		throw new DatabaseError("not implemented");
+	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, DatabaseUi ui,
+			HttpServletResponse resp) throws InputException, IOException {
 		// TODO Auto-generated method stub
 		
 	}

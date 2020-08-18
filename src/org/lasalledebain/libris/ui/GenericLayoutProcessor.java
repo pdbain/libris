@@ -1,43 +1,42 @@
 package org.lasalledebain.libris.ui;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.swing.JComponent;
 
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
-import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.LibrisException;
 
-public abstract class LibrisHtmlLayout<RecordType extends Record> extends LibrisLayout<RecordType> {
+public abstract class GenericLayoutProcessor<RecordType extends Record>  implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType> {
 
-	private static final String DISPLAY_COLUMN_NAME = ".rightColumn";
 	protected static final String BROWSER_COLUMN_NAME = ".browserColumn";
 	protected static final String BROWSER_ITEM_CLASS = ".browserItem";
+	private static final String DISPLAY_COLUMN_NAME = ".displayColumn";
 
-	public LibrisHtmlLayout(Schema schem) {
-		super(schem);
+	protected final LibrisLayout<RecordType> myLayout;
+
+	public GenericLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+		myLayout = theLayout;
 	}
 
 	@Override
-	protected abstract void validate() throws InputException;
-
-	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, DatabaseUi ui, HttpServletResponse resp) throws InputException, IOException {
-		StringBuffer buff = new StringBuffer(1000);
-		generateHeaderAndStylesheet(buff);
-		startBody(buff);
-		layoutBrowserPanel(recList, 0, browserLayout, buff);
-		layoutDisplayPanel(recList, recId, buff);
-		endBody(buff);
-		resp.getWriter().append(buff.toString());
+	public
+	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel,
+			ModificationTracker modTrk) throws DatabaseException, LibrisException {
+		RecordType rec = recList.getFirstRecord();
+		return layOutFields(rec, ui, recordPanel, modTrk);
 	}
+
+	/* HTML utilities */
 	protected void generateHeaderAndStylesheet(StringBuffer buffer) {
 		buffer.append("<!DOCTYPE html>\n" + 
 				"<html>\n" + 
 				"<head>\n" + 
 				"<title>");
-		buffer.append(getTitle());
+		buffer.append(myLayout.getTitle());
 		buffer.append("</title>\n" + 
 				"<style>\n" + 
 				"h1 {color: blue}\n" + 
@@ -87,5 +86,4 @@ public abstract class LibrisHtmlLayout<RecordType extends Record> extends Libris
 		buff.append(" </div>");
 	}
 	
-	protected abstract void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException;
 }

@@ -1,6 +1,8 @@
 package org.lasalledebain.libris.ui;
 
 import static java.util.Objects.isNull;
+import static org.lasalledebain.libris.exception.Assertion.assertNotNullDatabaseException;
+import static org.lasalledebain.libris.exception.Assertion.assertNotNullError;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -22,12 +24,9 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
-import org.lasalledebain.libris.xmlUtils.ElementShape;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisEmptyAttributes;
-import org.lasalledebain.libris.xmlUtils.XmlShapes;
-import org.lasalledebain.libris.ui.LibrisHtmlLayout;
 
 public class Layouts<RecordType extends Record> implements XMLElement {
 	enum LAYOUT_MEDIUM {
@@ -66,12 +65,14 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		map.put(XML_LAYOUT_TYPE_PARAGRAPH, LAYOUT_MEDIUM.LM_SWING);
 		map.put(XML_LAYOUT_TYPE_HTML_FORM, LAYOUT_MEDIUM.LM_HTML);
 		map.put(XML_LAYOUT_TYPE_HTML_LIST, LAYOUT_MEDIUM.LM_HTML);
+		map.put(XML_LAYOUT_TYPE_HTML_PARAGRAPH, LAYOUT_MEDIUM.LM_HTML);
 		return map;
 	}
 
 	HashMap<String, LibrisSwingLayout<RecordType>> swingLayouts;
 	ArrayList<String> swingLayoutIds;
-	HashMap <String,LibrisSwingLayout<RecordType>> usage = new HashMap<>();
+	HashMap <String,LibrisSwingLayout<RecordType>> swingLayoutUsage = new HashMap<>();
+	HashMap <String,LibrisHtmlLayout<RecordType>> htmlLayoutUsage = new HashMap<>();
 	private Schema schem;
 
 	HashMap<String, LibrisHtmlLayout<RecordType>> htmlLayouts;
@@ -105,7 +106,7 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 				}
 				String layoutType = layoutTypeAttr.getValue();
 				LAYOUT_MEDIUM medium = mediumMap.get(layoutType);
-				Assertion.assertNotNullInputException("Undefined layout type",  layoutType, medium);
+				Assertion.assertNotNullInputException("Undefined layout type: ",  layoutType, medium);
 				ElementManager layoutMgr = mgr.nextElement();
 				switch (medium) {
 				case LM_SWING: {
@@ -116,11 +117,11 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 					swingLayouts.put(layoutId, theLayout);
 					swingLayoutIds.add(layoutId);
 					for (String u: theLayout.getLayoutUsers()) {
-						Assertion.assertTrueError("duplicate layout user ", u, !usage.containsKey(u)) ;
-						usage.put(u, theLayout);
+						Assertion.assertTrueError("duplicate layout user ", u, !swingLayoutUsage.containsKey(u)) ;
+						swingLayoutUsage.put(u, theLayout);
 					}
-					}
-					break;
+				}
+				break;
 				case LM_HTML:
 				{
 					Function<Schema, LibrisHtmlLayout<RecordType>> gen = htmlLayoutGenerators.get(layoutType);
@@ -128,7 +129,11 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 					theLayout.fromXml(layoutMgr);
 					String layoutId = theLayout.getId();
 					htmlLayouts.put(layoutId, theLayout);
-					swingLayoutIds.add(layoutId);
+					htmlLayoutIds.add(layoutId);
+					for (String u: theLayout.getLayoutUsers()) {
+						Assertion.assertTrueError("duplicate layout user ", u, !htmlLayoutUsage.containsKey(u)) ;
+						htmlLayoutUsage.put(u, theLayout);
+					}
 				}
 				break;
 				default:
@@ -162,13 +167,16 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return dims;
 	}
 
-	public LibrisSwingLayout<RecordType> getLayoutByUsage(String user) throws DatabaseException {
-		LibrisSwingLayout<RecordType> l = usage.get(user);
-		if (null == l) {
-			throw new DatabaseException("no layout defined for "+user);
-		} else {
-			return l;
-		}
+	public LibrisSwingLayout<RecordType> getSwingLayoutByUsage(String user) throws DatabaseException {
+		LibrisSwingLayout<RecordType> l = swingLayoutUsage.get(user);
+		assertNotNullDatabaseException("No layout defined:",  user, l);
+		return l;
+	}
+
+	public LibrisHtmlLayout<RecordType> getHtmlLayoutByUsage(String user) {
+		LibrisHtmlLayout<RecordType> l = htmlLayoutUsage.get(user);
+		assertNotNullError("No layout defined:",  user, l);
+		return l;
 	}
 
 	@Override
@@ -185,16 +193,20 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return LibrisEmptyAttributes.getLibrisEmptyAttributes();
 	}
 
-	@Override
-	public boolean equals(Object comparand) {
+	public boolean equals(Layouts<RecordType> comparand) {
 		try {
-			Layouts<RecordType> otherLayouts = (Layouts<RecordType>) comparand;
+			Layouts<RecordType> otherLayouts = comparand;
 			return otherLayouts.swingLayouts.equals(swingLayouts);
 		} catch (ClassCastException e) {
 			final String msg = "type mismatch in Layouts.equals()";
 			LibrisDatabase.log(Level.WARNING, msg, e);
 			return false;
 		}
+	}
+
+	@Override
+	public boolean equals(Object comparand) {
+		return false;
 	}
 
 	public static String getXmlTag() {

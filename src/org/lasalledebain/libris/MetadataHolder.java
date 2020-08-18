@@ -6,14 +6,14 @@ import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
-public class MetadataHolder extends LibrisMetadata {
+public class MetadataHolder<RecordType extends Record> extends LibrisMetadata<RecordType> {
 	Schema mySchema;
-	Layouts myLayouts;
+	Layouts<RecordType> myLayouts;
 	public MetadataHolder(LibrisDatabase database) {
 		super(database);
 	}
 
-	public MetadataHolder(Schema theSchema, Layouts theLayouts) {
+	public MetadataHolder(Schema theSchema, Layouts<RecordType> theLayouts) {
 		mySchema = theSchema;
 		myLayouts = theLayouts;
 	}

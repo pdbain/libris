@@ -13,9 +13,11 @@ import javax.swing.table.TableColumnModel;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.exception.DatabaseError;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 
@@ -24,11 +26,6 @@ public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 
 	public ListLayout(Schema schem) {
 		super(schem);
-	}
-
-	@Override
-	public String getLayoutType() {
-		return LibrisXMLConstants.XML_LAYOUT_TYPE_LIST;
 	}
 
 	// TODO show groups
@@ -65,5 +62,4 @@ public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 		// TODO Auto-generated method stub
 		
 	}
-
 }

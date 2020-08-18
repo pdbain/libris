@@ -1,15 +1,14 @@
 package org.lasalledebain.libris.ui;
 
-import java.awt.Component;
-
 import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldSingleStringValue;
 import org.lasalledebain.libris.field.FieldValue;
 
-public abstract class GenericTextControl extends GuiControl {
+public abstract class GenericTextControl<RecordType extends Record> extends GuiControl<RecordType> {
 
 	protected String mainValue;
 	protected final JTextComponent control;

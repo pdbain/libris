@@ -4,7 +4,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
-public class LibrisDatabaseMetadata extends LibrisMetadata {
+public class LibrisDatabaseMetadata extends LibrisMetadata<DatabaseRecord> {
 	private boolean hasDocRepo;
 
 	public LibrisDatabaseMetadata(LibrisDatabase database) {
@@ -17,7 +17,7 @@ public class LibrisDatabaseMetadata extends LibrisMetadata {
 		schemaMgr = metadataMgr.nextElement();
 		Schema schem = new XmlSchema(schemaMgr);
 		database.setSchema(schem);
-		uiLayouts = new Layouts(schem);
+		uiLayouts = new Layouts<DatabaseRecord>(schem);
 		ElementManager layoutsMgr = metadataMgr.nextElement();
 		uiLayouts.fromXml(layoutsMgr);
 		metadataMgr.parseClosingTag();

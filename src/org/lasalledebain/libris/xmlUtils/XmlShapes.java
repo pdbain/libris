@@ -11,7 +11,6 @@ import org.lasalledebain.libris.index.GroupMember;
 import org.lasalledebain.libris.index.IndexDef;
 import org.lasalledebain.libris.index.IndexDefs;
 import org.lasalledebain.libris.index.IndexField;
-import org.lasalledebain.libris.ui.LibrisSwingLayout;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.LibrisLayout;
 

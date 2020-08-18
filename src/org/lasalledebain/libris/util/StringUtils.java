@@ -1,6 +1,5 @@
 package org.lasalledebain.libris.util;
 
-import static java.util.Objects.nonNull;
 import static java.util.Objects.isNull;
 import static org.lasalledebain.libris.util.LibrisStemmer.stem;
 

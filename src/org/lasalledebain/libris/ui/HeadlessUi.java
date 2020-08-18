@@ -45,6 +45,7 @@ public class HeadlessUi extends LibrisWindowedUi implements DatabaseUi {
 	@Override
 	public void alert(String msg) {
 		log(Level.WARNING, msg);
+		System.err.println("Alert: "+msg);
 	}
 
 	@Override

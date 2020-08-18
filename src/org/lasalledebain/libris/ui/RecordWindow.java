@@ -32,7 +32,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		recordDisplayArea = new JPanel(new GridLayout());
 		recordId = rec.getRecordId();
 		title = layout.getTitle();
-		this.recordLayout = layout;
+		recordLayout = layout;
 		this.setLocation(position);
 		this.ui = ui;
 		modTracker = new ModificationTracker(ui, modificationListener, this, "This record has been modified. Do you want to enter it?");

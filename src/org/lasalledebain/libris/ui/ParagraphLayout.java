@@ -11,13 +11,13 @@ import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
-import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 
@@ -79,6 +79,13 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 				);
 		windowText.append("</style>\n");
 		windowText.append("</head>\n<body><p>\n");
+		recordToParagraph(rec, fieldInfo, windowText);
+		windowText.append("</p></body>\n</html>");
+		return windowText.toString();
+	}
+
+	public void recordToParagraph(RecordType rec, LayoutField<RecordType>[] fieldInfo, StringBuffer windowText)
+			throws InputException {
 		String separator = "";
 		for (LayoutField<RecordType> fp: fieldInfo) {
 			FieldValue val = rec.getFieldValue(fp.fieldNum);
@@ -89,13 +96,6 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 				separator = ", ";
 			}
 		}
-		windowText.append("</p></body>\n</html>");
-		return windowText.toString();
-	}
-
-	@Override
-	public String getLayoutType() {
-		return LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH;
 	}
 
 	@Override
@@ -108,5 +108,4 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 		// TODO Auto-generated method stub
 		
 	}
-
 }

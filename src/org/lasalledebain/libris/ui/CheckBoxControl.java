@@ -1,7 +1,5 @@
 package org.lasalledebain.libris.ui;
 
-import java.awt.Checkbox;
-import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -9,11 +7,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 
 import org.lasalledebain.libris.LibrisConstants;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldBooleanValue;
 import org.lasalledebain.libris.field.FieldValue;
 
-public class CheckBoxControl extends GuiControl {
+public class CheckBoxControl<RecordType extends Record> extends GuiControl<RecordType> {
 
 	boolean selected;
 	protected final JCheckBox control;

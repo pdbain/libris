@@ -14,6 +14,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.SingleRecordList;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -29,12 +30,7 @@ public class TableLayout<RecordType extends Record> extends MultiRecordLayout<Re
 	}
 
 	@Override
-	public String getLayoutType() {
-		return XML_LAYOUT_TYPE_TABLE;
-	}
-
-	@Override
-	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
+	public ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException {
 		myTableModel = new TableLayoutTableModel<RecordType>(recList, this);
 		recordTable = new JTable(myTableModel);
@@ -75,5 +71,4 @@ public class TableLayout<RecordType extends Record> extends MultiRecordLayout<Re
 		// TODO Auto-generated method stub
 		
 	}
-
 }

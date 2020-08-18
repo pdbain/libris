@@ -86,6 +86,7 @@ public class Libris {
 				break;
 			case UI_WEB:
 				ui = new LibrisHttpServer(LibrisHttpServer.default_port, LibrisHttpServer.DEFAULT_CONTEXT);
+				break;
 			default:
 				LibrisUi.cmdlineError(myUiType.toString()+" not implemented");
 				break;
@@ -100,7 +101,10 @@ public class Libris {
 			LibrisUi.cmdlineError("Cannot open Libris: "+e.getMessage());
 			status = false;
 		}
-		System.exit(status? 0: 1);
+		
+		if (!status) {
+			System.exit(1);
+		}
 	}
 
 	private static void notImplemented(String arg) {

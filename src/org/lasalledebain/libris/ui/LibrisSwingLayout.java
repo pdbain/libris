@@ -23,9 +23,5 @@ public abstract class LibrisSwingLayout<RecordType extends Record> extends Libri
 		return 	layOutFields(recList.getFirstRecord(), ui,  recordPanel, modTrk);
 	};
 
-	public boolean equals(LibrisSwingLayout<RecordType> obj) {
-		return obj.getAttributes().equals(getAttributes());
-	}
-
 	protected abstract void showRecord(int recId);
 }
