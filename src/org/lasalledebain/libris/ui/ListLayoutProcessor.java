@@ -4,10 +4,8 @@ import static java.util.Objects.nonNull;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.table.TableColumnModel;
@@ -24,13 +22,6 @@ public class ListLayoutProcessor<RecordType extends Record> extends GenericLayou
 
 	public ListLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
-	}
-
-	@Override
-	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout,
-			DatabaseUi<RecordType> ui, HttpServletResponse resp) throws InputException, IOException {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

@@ -28,7 +28,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
-
+@Deprecated
 public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> implements LayoutSwingProcessor<RecordType>, LayoutHtmlProcessor<RecordType> {
 	@Override
 	public boolean isEditable() {

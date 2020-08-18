@@ -232,4 +232,8 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 		this.layoutType = theType;
 	}
 
+	ArrayList<LayoutField<RecordType>> getBodyFieldList() {
+		return bodyFieldList;
+	}
+
 }

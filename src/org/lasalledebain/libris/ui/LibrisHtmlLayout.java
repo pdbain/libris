@@ -10,6 +10,7 @@ import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.InputException;
 
+@Deprecated
 public abstract class LibrisHtmlLayout<RecordType extends Record> extends LibrisLayout<RecordType> {
 
 	private static final String DISPLAY_COLUMN_NAME = ".rightColumn";
