@@ -55,6 +55,7 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 	public
 	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
 	throws LibrisException {
+if (true) super.layOutFields( rec,  ui,  recordPanel,  modTrk);
 		final boolean modifiable = modTrk.isModifiable();
 		JComponent fieldPanel = null;
 		ArrayList<UiField> guiFields = new ArrayList<UiField>();

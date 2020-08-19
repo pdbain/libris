@@ -1,5 +1,7 @@
 package org.lasalledebain;
 
+import static org.lasalledebain.Utilities.testLogger;
+
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
@@ -19,8 +21,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.xml.stream.XMLStreamException;
 
-import junit.framework.TestCase;
-
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Record;
@@ -31,18 +31,18 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
+import org.lasalledebain.libris.ui.DatabaseRecordWindow;
 import org.lasalledebain.libris.ui.EnumField;
 import org.lasalledebain.libris.ui.GuiControl;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.LibrisSwingLayout;
 import org.lasalledebain.libris.ui.Layouts;
+import org.lasalledebain.libris.ui.LibrisLayout;
 import org.lasalledebain.libris.ui.LibrisWindowedUi;
 import org.lasalledebain.libris.ui.RecordWindow;
-import org.lasalledebain.libris.ui.DatabaseRecordWindow;
 import org.lasalledebain.libris.ui.TextBox;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
-import static org.lasalledebain.Utilities.testLogger;
+import junit.framework.TestCase;
 public class GuiManualTests extends TestCase {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -55,7 +55,7 @@ public class GuiManualTests extends TestCase {
 	private static final String LAYOUT1 = "layout1";
 	private static final String LAYOUT1A = "layout1a";
 	private Schema mySchema;
-	private LibrisSwingLayout myGuiLayout;
+	private LibrisLayout myGuiLayout;
 	private LibrisWindowedUi myUi;
 
 	public void testWindowSanity() {
@@ -185,7 +185,7 @@ public class GuiManualTests extends TestCase {
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
-				myGuiLayout = (LibrisSwingLayout) myLayouts.getSwingLayout(Utilities.LAYOUT2);
+				myGuiLayout = myLayouts.getSwingLayout(Utilities.LAYOUT2);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout2 to FormLayout");
 			}
@@ -222,7 +222,7 @@ public class GuiManualTests extends TestCase {
 			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
-				myGuiLayout = (LibrisSwingLayout) myLayouts.getSwingLayout(LAYOUT1);
+				myGuiLayout = (LibrisLayout) myLayouts.getSwingLayout(LAYOUT1);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout1 to FormLayout");
 			}
@@ -250,7 +250,7 @@ public class GuiManualTests extends TestCase {
 			DatabaseRecord rec = template.makeRecord(true);
 			Layouts myLayouts = loadFromLayout(rec);
 			try {
-				myGuiLayout = (LibrisSwingLayout) myLayouts.getSwingLayout(LAYOUT1);
+				myGuiLayout = (LibrisLayout) myLayouts.getSwingLayout(LAYOUT1);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout1 to FormLayout");
 			}

@@ -53,7 +53,7 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 		try {
 			String recId = req.getParameter(HTTP_PARAM_RECORD_ID);
 			int id;
-			LibrisHtmlLayout<DatabaseRecord> theLayout;
+			LibrisLayout<DatabaseRecord> theLayout;
 			if (StringUtils.isStringEmpty(recId)) {
 				id = RecordId.NULL_RECORD_ID;
 				theLayout = summaryDisplay;
@@ -70,7 +70,7 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 			}
 			resp.setStatus(HttpStatus.OK_200);
 			DatabaseRecord rec = database.getRecord(id);
-			LibrisHtmlLayout<DatabaseRecord> summaryLayout = database.getLayouts().getHtmlLayout(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
+			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getHtmlLayout(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 			theLayout.layOutPage(database.getRecords(), id, summaryLayout, myUi, resp);
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());

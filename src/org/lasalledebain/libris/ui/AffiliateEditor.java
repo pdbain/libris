@@ -29,7 +29,7 @@ public class AffiliateEditor<RecordType extends Record> {
 	final Vector<KeyIntegerTuple> affInfo;
 	final JList<KeyIntegerTuple> affList;
 	private final GuiControl<RecordType> guiCtrl;
-	public AffiliateEditor(Record currentRecord, final GuiControl<RecordType> ctrl, LibrisWindowedUi ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
+	public AffiliateEditor(Record currentRecord, final GuiControl<RecordType> ctrl, LibrisWindowedUi<RecordType> ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
 			Vector<KeyIntegerTuple> affiliateInfo, JList<KeyIntegerTuple> affiliateList, GroupDef grpDef) {
 		guiCtrl = ctrl;
 		affInfo = affiliateInfo;
@@ -43,7 +43,7 @@ public class AffiliateEditor<RecordType extends Record> {
 		final int selectedAffiliate = affiliateList.getSelectedIndex();
 		KeyIntegerTuple editedValue = null;
 		if (-1 != selectedAffiliate) {
-			editedValue = (KeyIntegerTuple) affiliateList.getSelectedValue();
+			editedValue = affiliateList.getSelectedValue();
 		}
 		final RecordNameChooser recordFilter = new RecordNameChooser(editedValue, namedRecIndex);
 		RecordSelectorByName nameBrowser = new RecordSelectorByName(recordFilter);
@@ -147,7 +147,7 @@ public class AffiliateEditor<RecordType extends Record> {
 		dLog.setVisible(true);
 	}
 
-	public static class RecordSelectorByName extends JComboBox {
+	public static class RecordSelectorByName extends JComboBox<KeyIntegerTuple> {
 		private final RecordNameChooser recordFilter;
 
 		public RecordSelectorByName (RecordNameChooser recFilter) {
@@ -156,7 +156,7 @@ public class AffiliateEditor<RecordType extends Record> {
 			setKeySelectionManager(new KeySelectionManager() {
 
 				@Override
-				public int selectionForKey(char key, ComboBoxModel model) {
+				public int selectionForKey(char key, ComboBoxModel<?> model) {
 					recordFilter.keyTyped(key);
 					return 0;
 				}

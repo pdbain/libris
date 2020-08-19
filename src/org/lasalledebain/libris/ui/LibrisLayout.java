@@ -1,9 +1,11 @@
 package org.lasalledebain.libris.ui;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.swing.JComponent;
 
 import org.lasalledebain.libris.Field;
@@ -154,12 +156,17 @@ default: throw new InputException("invalid layout type: "+theType);
 		return layoutProc.layOutFields(rec, ui, recordPanel, modTrk);
 	}
 
-	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+	public ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {
 		return 	layoutProc.layOutFields(recList, ui, recordPanel, modTrk);
 	};
 	
-	protected Field getField(Record rec, int fieldNum)
+	public void layOutPage(RecordList<RecordType> recList, int recId, 
+			LibrisLayout<RecordType> browserLayout, DatabaseUi<RecordType> ui, HttpServletResponse resp) throws InputException, IOException {
+		layoutProc.layOutPage(recList, recId, browserLayout, ui, resp);
+	}
+
+		protected Field getField(Record rec, int fieldNum)
 			throws LibrisException {
 		Field fld = null;
 		try {

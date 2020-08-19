@@ -5,7 +5,7 @@ import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
-
+@Deprecated
 public class LibrisHtmlListLayout<RecordType extends Record> extends LibrisHtmlLayout<RecordType>{
 
 	public LibrisHtmlListLayout(Schema schem) {

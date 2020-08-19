@@ -5,10 +5,13 @@ import java.awt.event.KeyEvent;
 import javax.swing.DefaultComboBoxModel;
 
 import org.lasalledebain.libris.RecordId;
+import org.lasalledebain.libris.exception.DatabaseError;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 
-class RecordNameChooser extends DefaultComboBoxModel {
+@SuppressWarnings("serial")
+class RecordNameChooser extends DefaultComboBoxModel<KeyIntegerTuple> {
 
 	private final SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
 	private StringBuffer currentPrefix;
@@ -60,7 +63,11 @@ class RecordNameChooser extends DefaultComboBoxModel {
 			}
 		}
 		if (0 == currentSize) {
-			addElement("");
+			try {
+				addElement(new KeyIntegerTuple("", 0));
+			} catch (InputException e) {
+				throw new DatabaseError("Error: ", e);
+			}
 		}
 		fireContentsChanged(this, 0, currentSize-1);
 		return prefix;

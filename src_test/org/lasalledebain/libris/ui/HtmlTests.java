@@ -24,8 +24,8 @@ public class HtmlTests extends TestCase {
 	public void test() throws InputException, IOException {
 		TestResponse resp = new TestResponse();
 		Layouts<DatabaseRecord> myLayouts = db.getLayouts();
-		LibrisHtmlLayout<DatabaseRecord> myLayout = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_HTML_PARAGRAPH);
-		LibrisHtmlLayout<DatabaseRecord> browserLayout = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
+		LibrisLayout<DatabaseRecord> myLayout = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_HTML_PARAGRAPH);
+		LibrisLayout<DatabaseRecord> browserLayout = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		myLayout.layOutPage(db.getRecords(), 2, browserLayout, db.getUi(), resp);
 		String result = resp.getResponseText();
 		fail("Not yet implemented");

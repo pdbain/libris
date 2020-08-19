@@ -145,19 +145,22 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		}
 		mgr.parseClosingTag();
 	}
-
+	@Deprecated
 	public LibrisSwingLayout<RecordType> getSwingLayout(String id) {
 		return swingLayouts.get(id);
 	}
 
+	@Deprecated
 	public String[]	getSwingLayoutIds() {
 		return swingLayoutIds.toArray(new String[swingLayoutIds.size()]);
 	}
 
+	@Deprecated
 	public LibrisHtmlLayout<RecordType> getHtmlLayout(String id) {
 		return htmlLayouts.get(id);
 	}
 
+	@Deprecated
 	public String[]	getHtmlLayoutIds() {
 		return htmlLayoutIds.toArray(new String[htmlLayoutIds.size()]);
 	}
