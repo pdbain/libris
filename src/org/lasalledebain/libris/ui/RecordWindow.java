@@ -104,7 +104,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		return recordId;
 	}
 
-	public void setRecordLayout(LibrisSwingLayout<RecordType> layout) throws LibrisException {
+	public void setRecordLayout(LibrisLayout<RecordType> layout) throws LibrisException {
 		if (layout.getId().equals(recordLayout.getId())) {
 			return;
 		}

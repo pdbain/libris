@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
@@ -21,11 +22,11 @@ public class HtmlTests extends TestCase {
 	private LibrisDatabase db;
 
 	@Test
-	public void test() throws InputException, IOException {
+	public void test() throws InputException, IOException, DatabaseException {
 		TestResponse resp = new TestResponse();
 		Layouts<DatabaseRecord> myLayouts = db.getLayouts();
-		LibrisLayout<DatabaseRecord> myLayout = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_HTML_PARAGRAPH);
-		LibrisLayout<DatabaseRecord> browserLayout = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
+		LibrisLayout<DatabaseRecord> myLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_HTML_PARAGRAPH);
+		LibrisLayout<DatabaseRecord> browserLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		myLayout.layOutPage(db.getRecords(), 2, browserLayout, db.getUi(), resp);
 		String result = resp.getResponseText();
 		fail("Not yet implemented");

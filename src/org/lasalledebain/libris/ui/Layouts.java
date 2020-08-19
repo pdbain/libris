@@ -33,8 +33,6 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		LM_SWING, LM_TEXT, LM_HTML;
 	};
 	public static final String DEFAULT_LAYOUT_VALUE = "default";
-	private final HashMap<String, Function<Schema, LibrisSwingLayout<RecordType>>> swingLayoutGenerators = populateLayoutGenerators();
-	private final HashMap<String, Function<Schema, LibrisHtmlLayout<RecordType>>> htmlLayoutGenerators = populateHtmlLayoutGenerators();
 	private final static HashMap<String, LAYOUT_MEDIUM> mediumMap = populateMediumMap();
 
 	private HashMap<String, Function<Schema, LibrisSwingLayout<RecordType>>> populateLayoutGenerators() {
@@ -69,22 +67,16 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return map;
 	}
 
-	HashMap<String, LibrisSwingLayout<RecordType>> swingLayouts;
-	ArrayList<String> swingLayoutIds;
-	HashMap <String,LibrisSwingLayout<RecordType>> swingLayoutUsage = new HashMap<>();
-	HashMap <String,LibrisHtmlLayout<RecordType>> htmlLayoutUsage = new HashMap<>();
 	private Schema schem;
-
-	HashMap<String, LibrisHtmlLayout<RecordType>> htmlLayouts;
-	ArrayList<String> htmlLayoutIds;
+	HashMap <String,LibrisLayout<RecordType>> layoutUsageMap = new HashMap<>();
+	HashMap<String, LibrisLayout<RecordType>> myLayouts;
+	ArrayList<String> layoutIds;
 
 	protected static HashMap<String, Dimension> defaultDimensionStrings = initializeDefaultDimensions();
 	public Layouts(Schema mySchema) {
 		schem = mySchema;
-		swingLayouts = new HashMap<>();
-		swingLayoutIds = new ArrayList<String>();
-		htmlLayouts = new HashMap<>();
-		htmlLayoutIds = new ArrayList<>();
+		myLayouts = new HashMap<>();
+		layoutIds = new ArrayList<String>();
 	}
 
 	private static HashMap<String, Dimension> initializeDefaultDimensions() {
@@ -108,61 +100,28 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 				LAYOUT_MEDIUM medium = mediumMap.get(layoutType);
 				Assertion.assertNotNullInputException("Undefined layout type: ",  layoutType, medium);
 				ElementManager layoutMgr = mgr.nextElement();
-				switch (medium) {
-				case LM_SWING: {
-					Function<Schema, LibrisSwingLayout<RecordType>> gen = swingLayoutGenerators.get(layoutType);
-					LibrisSwingLayout<RecordType> theLayout = gen.apply(schem);
+				LibrisLayout<RecordType> theLayout = new LibrisLayout<>(schem, this);
 					theLayout.fromXml(layoutMgr);
-					String layoutId = theLayout.getId();
-					swingLayouts.put(layoutId, theLayout);
-					swingLayoutIds.add(layoutId);
-					for (String u: theLayout.getLayoutUsers()) {
-						Assertion.assertTrueError("duplicate layout user ", u, !swingLayoutUsage.containsKey(u)) ;
-						swingLayoutUsage.put(u, theLayout);
-					}
+				String layoutId = theLayout.getId();
+				for (String u: theLayout.getLayoutUsers()) {
+					Assertion.assertTrueError("duplicate layout user ", u, !layoutUsageMap.containsKey(u)) ;
+					layoutUsageMap.put(u, theLayout);
 				}
-				break;
-				case LM_HTML:
-				{
-					Function<Schema, LibrisHtmlLayout<RecordType>> gen = htmlLayoutGenerators.get(layoutType);
-					LibrisHtmlLayout<RecordType> theLayout = gen.apply(schem);
-					theLayout.fromXml(layoutMgr);
-					String layoutId = theLayout.getId();
-					htmlLayouts.put(layoutId, theLayout);
-					htmlLayoutIds.add(layoutId);
-					for (String u: theLayout.getLayoutUsers()) {
-						Assertion.assertTrueError("duplicate layout user ", u, !htmlLayoutUsage.containsKey(u)) ;
-						htmlLayoutUsage.put(u, theLayout);
-					}
-				}
-				break;
-				default:
-					break;
-				}
+				myLayouts.put(layoutId, theLayout);
+				layoutIds.add(layoutId);
 			} catch (XMLStreamException e) {
 				throw new InputException(e);
 			}
 		}
 		mgr.parseClosingTag();
 	}
-	@Deprecated
-	public LibrisSwingLayout<RecordType> getSwingLayout(String id) {
-		return swingLayouts.get(id);
+
+	public LibrisLayout<RecordType> getLayout(String id) {
+		return myLayouts.get(id);
 	}
 
-	@Deprecated
-	public String[]	getSwingLayoutIds() {
-		return swingLayoutIds.toArray(new String[swingLayoutIds.size()]);
-	}
-
-	@Deprecated
-	public LibrisHtmlLayout<RecordType> getHtmlLayout(String id) {
-		return htmlLayouts.get(id);
-	}
-
-	@Deprecated
-	public String[]	getHtmlLayoutIds() {
-		return htmlLayoutIds.toArray(new String[htmlLayoutIds.size()]);
+	public String[]	getLayoutIds() {
+		return layoutIds.toArray(new String[layoutIds.size()]);
 	}
 
 	public static Dimension getDefaultDimensions(String controlType) {
@@ -170,23 +129,18 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return dims;
 	}
 
-	public LibrisSwingLayout<RecordType> getSwingLayoutByUsage(String user) throws DatabaseException {
-		LibrisSwingLayout<RecordType> l = swingLayoutUsage.get(user);
+	public LibrisLayout<RecordType> getLayoutByUsage(String user) throws DatabaseException {
+		LibrisLayout<RecordType> l = layoutUsageMap.get(user);
 		assertNotNullDatabaseException("No layout defined:",  user, l);
 		return l;
 	}
 
-	public LibrisHtmlLayout<RecordType> getHtmlLayoutByUsage(String user) {
-		LibrisHtmlLayout<RecordType> l = htmlLayoutUsage.get(user);
-		assertNotNullError("No layout defined:",  user, l);
-		return l;
-	}
 
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
 		output.writeStartElement(XML_LAYOUTS_TAG);
-		for (String id: getSwingLayoutIds()) {
-			getSwingLayout(id).toXml(output);
+		for (String id: getLayoutIds()) {
+			getLayout(id).toXml(output);
 		}
 		output.writeEndElement();	
 	}
@@ -199,7 +153,7 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 	public boolean equals(Layouts<RecordType> comparand) {
 		try {
 			Layouts<RecordType> otherLayouts = comparand;
-			return otherLayouts.swingLayouts.equals(swingLayouts);
+			return otherLayouts.myLayouts.equals(myLayouts);
 		} catch (ClassCastException e) {
 			final String msg = "type mismatch in Layouts.equals()";
 			LibrisDatabase.log(Level.WARNING, msg, e);

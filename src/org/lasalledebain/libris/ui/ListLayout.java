@@ -5,6 +5,7 @@ import javax.swing.JTable;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 
+@Deprecated
 public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 
 	private JTable recordTable;

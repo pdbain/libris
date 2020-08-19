@@ -21,6 +21,7 @@ import org.lasalledebain.libris.ui.LibrisUi;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings("rawtypes")
 public class ConfigTest extends TestCase {
 
 	private File workingDirectory;

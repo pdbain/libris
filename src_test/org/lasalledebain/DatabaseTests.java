@@ -35,6 +35,7 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings("rawtypes")
 public class DatabaseTests extends TestCase {
 
 	private static final String ID_AUTH = "ID_auth";

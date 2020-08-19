@@ -18,7 +18,7 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-
+@Deprecated
 public class TableLayout<RecordType extends Record> extends MultiRecordLayout<RecordType> {
 
 	private TableLayoutTableModel<RecordType> myTableModel;

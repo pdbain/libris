@@ -33,6 +33,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings("rawtypes")
 public class ArtifactTest extends TestCase {
 
 	private static final String EVEN_KEYWORD = "even";

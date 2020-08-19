@@ -134,7 +134,7 @@ public class FileSpaceManagerTests extends TestCase {
 					h = iter.next();
 				}
 				headerId = h.getInput().readShort();
-				Integer id = new Integer(headerId);
+				Integer id =  Integer.valueOf(headerId);
 				testLogger.log(Level.INFO, "Remove "+headerId);
 				removedEntries.add(id);
 				iter.remove();
@@ -159,7 +159,7 @@ public class FileSpaceManagerTests extends TestCase {
 		Random dataGen = new Random();
 		for (RecordHeader r: mgr) {
 			int id = checkEntry(entrySize, entrySize, dataGen, r);
-			final Integer integerId = new Integer(id);
+			final Integer integerId = id;
 			assertTrue("Missing entry "+id, addedEntries.contains(integerId));
 		}
 	}
@@ -185,7 +185,7 @@ public class FileSpaceManagerTests extends TestCase {
 		Random dataGen = new Random();
 		for (short i = 0; i < numEntries; ++i) {
 			addEntry(entrySize, mgr, dataGen, i);
-			addedEntries.add(new Integer(i));
+			addedEntries.add(Integer.valueOf(i));
 		}
 		return addedEntries;
 	}

@@ -27,13 +27,13 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 	LibrisUi myUi;
 	private final Layouts<DatabaseRecord> myLayouts;
 	String[] layoutIds;
-	private LibrisHtmlLayout<DatabaseRecord> summaryDisplay;
+	private LibrisLayout<DatabaseRecord> summaryDisplay;
 	public LibrisServlet(LibrisUi myUi) throws DatabaseException, InputException {
 		this.myUi = myUi;
 		database = myUi.getDatabase();
 		myLayouts = database.getLayouts();
 		layoutIds = null;
-		summaryDisplay = myLayouts.getHtmlLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
+		summaryDisplay = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		assertNotNullInputException("No layout defined: "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryDisplay);
 	}
 
@@ -61,16 +61,16 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 				id = Integer.parseInt(recId);
 				String layoutId = req.getParameter(HTTP_PARAM_LAYOUT_ID);
 				if (isNull(layoutId)) {
-					if (isNull(layoutIds)) layoutIds = myLayouts.getHtmlLayoutIds();
+					if (isNull(layoutIds)) layoutIds = myLayouts.getLayoutIds();
 					if (layoutIds.length == 0) throw new InputException("no HTML layouts defined");
 					layoutId = layoutIds[0];
 				}
-				theLayout = myLayouts.getHtmlLayout(layoutId);
+				theLayout = myLayouts.getLayout(layoutId);
 				Assertion.assertNotNullInputException("Layout not found: ",  layoutId, theLayout);
 			}
 			resp.setStatus(HttpStatus.OK_200);
 			DatabaseRecord rec = database.getRecord(id);
-			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getHtmlLayout(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
+			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getLayout(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 			theLayout.layOutPage(database.getRecords(), id, summaryLayout, myUi, resp);
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());

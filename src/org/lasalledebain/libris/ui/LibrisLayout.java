@@ -282,5 +282,8 @@ default: throw new InputException("invalid layout type: "+theType);
 	ArrayList<LayoutField<RecordType>> getBodyFieldList() {
 		return bodyFieldList;
 	}
+	protected void showRecord(int recId) {
+		return;
+	}
 
 }
