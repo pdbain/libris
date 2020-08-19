@@ -24,6 +24,7 @@ public class XMLLayout<RecordType extends Record> extends LibrisSwingLayout<Reco
 	}
 
 	@Override
+	public
 	ArrayList<UiField>  layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker unused)
 			throws DatabaseException, LibrisException {
 		String xmlText = getXmlText(rec);

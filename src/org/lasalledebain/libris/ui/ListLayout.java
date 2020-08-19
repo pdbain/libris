@@ -30,6 +30,7 @@ public class ListLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 
 	// TODO show groups
 	@Override
+	public
 	ArrayList<UiField> layOutFields(Record theRecord, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws LibrisException {
 		GenericDatabase<DatabaseRecord> db = ui.getDatabase();

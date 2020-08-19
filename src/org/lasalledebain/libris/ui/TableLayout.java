@@ -54,6 +54,7 @@ public class TableLayout<RecordType extends Record> extends MultiRecordLayout<Re
 	}
 
 	@Override
+	public
 	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {		
 		return layOutFields(new SingleRecordList<RecordType>(rec), ui, recordPanel, modTrk);

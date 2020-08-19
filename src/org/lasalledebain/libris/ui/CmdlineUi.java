@@ -9,7 +9,6 @@ import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
 
-import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;

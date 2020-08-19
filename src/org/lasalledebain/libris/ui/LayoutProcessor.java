@@ -13,7 +13,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public abstract class GenericLayoutProcessor<RecordType extends Record>  implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType> {
+public abstract class LayoutProcessor<RecordType extends Record>  implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType> {
 
 	protected static final String BROWSER_COLUMN_NAME = ".browserColumn";
 	protected static final String BROWSER_ITEM_CLASS = ".browserItem";
@@ -21,10 +21,11 @@ public abstract class GenericLayoutProcessor<RecordType extends Record>  impleme
 
 	protected final LibrisLayout<RecordType> myLayout;
 
-	public GenericLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+	public LayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		myLayout = theLayout;
 	}
 
+	abstract void validate() throws InputException;
 	@Override
 	public
 	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,

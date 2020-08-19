@@ -16,8 +16,8 @@ import org.lasalledebain.libris.exception.LibrisException;
 @SuppressWarnings("serial")
 public abstract class RecordWindow<RecordType extends Record> extends JScrollPane {
 
-	protected LibrisWindowedUi ui;
-	protected LibrisSwingLayout<RecordType> recordLayout;
+	protected LibrisWindowedUi<RecordType> ui;
+	protected LibrisLayout<RecordType> recordLayout;
 	protected String title;
 	protected int recordId;
 	protected final JPanel recordDisplayArea;
@@ -26,7 +26,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 	protected ModificationTracker modTracker;
 	protected JPanel navPanel;
 
-	public RecordWindow(LibrisWindowedUi ui, LibrisSwingLayout<RecordType> layout, RecordType rec, Point position, boolean editable, 
+	public RecordWindow(LibrisWindowedUi<RecordType> ui, LibrisLayout<RecordType> layout, RecordType rec, Point position, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
 		this.record = rec;
 		recordDisplayArea = new JPanel(new GridLayout());
@@ -42,7 +42,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		recordDisplayArea.repaint();
 	}
 
-	protected void layOutWindow(LibrisWindowedUi ui, LibrisSwingLayout<RecordType> layout, RecordType rec) throws LibrisException {
+	protected void layOutWindow(LibrisWindowedUi<RecordType> ui, LibrisLayout<RecordType> layout, RecordType rec) throws LibrisException {
 		recordDisplayArea.removeAll();
 		layOutFields(layout, rec, recordDisplayArea, modTracker);
 		recordDisplayArea.setVisible(true);
@@ -87,7 +87,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		setVisible(false);
 	}
 
-	protected void layOutFields(LibrisSwingLayout<RecordType> layout, RecordType rec, JComponent recordPanel, ModificationTracker modTrk) throws LibrisException {
+	protected void layOutFields(LibrisLayout<RecordType> layout, RecordType rec, JComponent recordPanel, ModificationTracker modTrk) throws LibrisException {
 		guiFields = layout.layOutFields(rec, ui, recordPanel, modTrk);
 		modTracker.setModified(false);
 	}

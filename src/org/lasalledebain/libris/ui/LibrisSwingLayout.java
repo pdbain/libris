@@ -15,7 +15,7 @@ public abstract class LibrisSwingLayout<RecordType extends Record> extends Libri
 		super(schem);
 	}
 
-	abstract ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+	public abstract ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException;
 
 	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)

@@ -16,7 +16,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class TableLayoutProcessor<RecordType extends Record> extends GenericLayoutProcessor<RecordType> {
+public class TableLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
 
 	public TableLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
@@ -58,6 +58,11 @@ public class TableLayoutProcessor<RecordType extends Record> extends GenericLayo
 		recordPanel.add(scrollPane);
 		scrollPane.setVisible(true);
 		return null;
+	}
+	@Override
+	protected void validate() {
+		// TODO Write tablelayout validate
+		
 	}
 
 }

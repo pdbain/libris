@@ -2,8 +2,9 @@ package org.lasalledebain.libris.ui;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Vector;
+
+import javax.swing.JComponent;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
@@ -20,7 +21,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class LibrisLayout<RecordType extends Record> implements XMLElement {
+public class LibrisLayout<RecordType extends Record> implements XMLElement {
 
 	final static ArrayList<UiField> emptyUiList = new ArrayList<>();
 	protected String id;
@@ -33,12 +34,14 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 	protected LayoutField<RecordType> positionList = null;
 	protected ArrayList<String> layoutUsers;
 	protected final Layouts<RecordType> myLayouts;
+	protected LayoutProcessor<RecordType> layoutProc;
 
 	public LibrisLayout(Schema schem, Layouts<RecordType> theLayouts) {
 		mySchema = schem;
 		bodyFieldList = new ArrayList<LayoutField<RecordType>>();
 		layoutUsers = new ArrayList<String>(1);
 		myLayouts = theLayouts;
+		layoutProc = null;
 	}
 
 	public LibrisLayout(Schema schem) {
@@ -56,7 +59,9 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 		setHeight(values.get("height"));
 		setWidth(values.get("width"));
 		setIdAndTitle(values.get("title"), values.get("id"));
-		setType(values.get(XML_LAYOUT_TYPE_ATTR));
+		String theType = values.get(XML_LAYOUT_TYPE_ATTR);
+		setType(theType);
+		layoutProc = getLayoutProcessor(theType);
 		while (mgr.hasNext()) {
 			ElementManager subElementMgr = mgr.nextElement();
 			if (subElementMgr.getElementTag().equals(XML_LAYOUTFIELD_TAG)) {
@@ -73,7 +78,30 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 			}
 			subElementMgr.parseClosingTag();
 		}
-		validate();
+		layoutProc.validate();
+	}
+
+	private LayoutProcessor<RecordType> getLayoutProcessor(String theType) throws InputException {
+		LayoutProcessor<RecordType> result = null;
+		switch (theType) {
+		case XML_LAYOUT_TYPE_XML: 
+			result = new XmlLayoutProcessor<>(this);
+			break;
+		case XML_LAYOUT_TYPE_TABLE: 
+			result = new TableLayoutProcessor<>(this);
+			break;
+		case XML_LAYOUT_TYPE_FORM: 
+			result = new FormLayoutProcessor<>(this);
+			break;
+		case XML_LAYOUT_TYPE_LIST:
+			result = new ListLayoutProcessor<>(this);
+			break;
+		case XML_LAYOUT_TYPE_PARAGRAPH: 
+			result = new ParagraphLayoutProcessor<>(this);
+break;
+default: throw new InputException("invalid layout type: "+theType);
+		}
+		return result;
 	}
 
 	@Override
@@ -98,7 +126,9 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 		layoutUsers.add(usedBy);
 	}
 
-	protected abstract void validate() throws InputException;
+	@Deprecated
+	protected void validate() throws InputException {
+	}
 
 	@Override
 	public LibrisAttributes getAttributes() {
@@ -119,6 +149,16 @@ public abstract class LibrisLayout<RecordType extends Record> implements XMLElem
 		return positions;
 	}
 
+	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+			throws DatabaseException, LibrisException {
+		return layoutProc.layOutFields(rec, ui, recordPanel, modTrk);
+	}
+
+	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+			throws DatabaseException, LibrisException {
+		return 	layoutProc.layOutFields(recList, ui, recordPanel, modTrk);
+	};
+	
 	protected Field getField(Record rec, int fieldNum)
 			throws LibrisException {
 		Field fld = null;

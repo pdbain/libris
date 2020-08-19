@@ -3,10 +3,8 @@ package org.lasalledebain.libris.ui;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
@@ -20,6 +18,7 @@ import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -27,14 +26,14 @@ import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 
-public class FormLayoutProcessor<RecordType extends Record> extends GenericLayoutProcessor<RecordType> {
+public class FormLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
 
 	public FormLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel,
+	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		final boolean modifiable = modTrk.isModifiable();
 		JComponent fieldPanel = null;
@@ -98,4 +97,17 @@ public class FormLayoutProcessor<RecordType extends Record> extends GenericLayou
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
+	protected void validate() throws InputException {
+		Schema mySchema = myLayout.getSchema();
+		for (LayoutField<RecordType> lf: myLayout.getFields()) {
+			String fid = lf.getId();
+			FieldType fType = mySchema.getFieldType(fid);
+			if (lf.getControlTypeName().equals(GuiConstants.GUI_ENUMFIELD)
+					&& !fType.equals(FieldType.T_FIELD_ENUM)) {
+				throw new InputException("Cannot use enumfield layout control for non-enum field "+fid);
+			}
+		}
+	}
+
 }

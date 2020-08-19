@@ -12,23 +12,27 @@ import javax.swing.JEditorPane;
 
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
-import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
-@Deprecated
-public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayout<RecordType> {
 
-	public ParagraphLayout(Schema schem){
-		super(schem);
+public class ParagraphLayoutProcessor <RecordType extends Record> extends LayoutProcessor<RecordType> {
+
+	public ParagraphLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+		super(theLayout);
 	}
 
 	@Override
-	public
-	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker unused)
-			throws DatabaseException, LibrisException {
+	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
+			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		JEditorPane content = new JEditorPane();
 		recordPanel.addComponentListener(new ComponentListener() {
 
@@ -58,11 +62,11 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 		recordPanel.setLayout(new GridBagLayout());
 		content.setContentType("text/html;");
 		content.setEditable(false);
-		LayoutField<RecordType>[] fieldInfo = getFields();
+		LayoutField<RecordType>[] fieldInfo = myLayout.getFields();
 		String windowText = createHtmlParagraph(rec, fieldInfo);
 
 		content.setText(windowText);
-		return emptyUiList;
+		return LibrisLayout.emptyUiList;
 	}
 
 	public String createHtmlParagraph(RecordType rec, LayoutField<RecordType>[] fieldInfo)
@@ -100,13 +104,9 @@ public class ParagraphLayout<RecordType extends Record> extends LibrisSwingLayou
 	}
 
 	@Override
-	protected void showRecord(int recId) {
-		return;
-	}
-
-	@Override
-	protected void validate() throws InputException {
+	void validate() throws InputException {
 		// TODO Auto-generated method stub
 		
 	}
+
 }

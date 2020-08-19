@@ -5,6 +5,7 @@ import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.InputException;
 
+@Deprecated
 public class LibrisHtmlParagraphLayout<RecordType extends Record> extends LibrisHtmlLayout<RecordType> {
 
 	private ParagraphLayout<RecordType> myFormatter;

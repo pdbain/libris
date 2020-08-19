@@ -14,7 +14,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
-public class XmlLayoutProcessor<RecordType extends Record> extends GenericLayoutProcessor<RecordType> {
+public class XmlLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
 
 	public XmlLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
@@ -50,6 +50,12 @@ public class XmlLayoutProcessor<RecordType extends Record> extends GenericLayout
 		String xmlText = getXmlText(rec);
 		recordPanel.add(new TextArea(xmlText));
 		return null;
+	}
+
+	@Override
+	protected void validate() {
+		// TODO Write xmllayout validate
+		
 	}
 
 }
