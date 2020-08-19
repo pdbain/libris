@@ -50,12 +50,12 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	public static int TITLE_FIELD;
 	public static int ARCHIVEPATH_FIELD;
 	public static int numFields;
-	public ArtifactDatabase(DatabaseUi theUi, FileManager theFileManager) throws DatabaseException {
+	public ArtifactDatabase(DatabaseUi<ArtifactRecord> theUi, FileManager theFileManager) throws DatabaseException {
 		super(theUi, theFileManager);
 		myMetadata = new DatabaseMetadata();
 	}
 	
-	public ArtifactDatabase(DatabaseUi theUi, File workingDirectory) throws DatabaseException {
+	public ArtifactDatabase(DatabaseUi<ArtifactRecord> theUi, File workingDirectory) throws DatabaseException {
 		this(theUi, new FileManager(new File(workingDirectory, LibrisConstants.REPOSITORY_AUX_DIRECTORY_NAME)));
 	}
 	@Override

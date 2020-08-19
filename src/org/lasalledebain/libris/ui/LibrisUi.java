@@ -24,6 +24,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	protected static Object prefsSync = new Object();
 	private UiField selectedField;
 	protected String uiTitle;
+	// TODO make this generic
 	protected LibrisDatabase currentDatabase;
 	private XmlSchema mySchema;
 	protected File databaseFile;

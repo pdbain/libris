@@ -53,67 +53,6 @@ public class FormLayout<RecordType extends Record> extends LibrisSwingLayout<Rec
 
 	@Override
 	public
-	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
-	throws LibrisException {
-if (true) super.layOutFields( rec,  ui,  recordPanel,  modTrk);
-		final boolean modifiable = modTrk.isModifiable();
-		JComponent fieldPanel = null;
-		ArrayList<UiField> guiFields = new ArrayList<UiField>();
-		int numGroups = mySchema.getNumGroups();
-		if ((numGroups > 0) && rec.hasAffiliations()) {
-			GroupDefs defs = mySchema.getGroupDefs();
-			JPanel groupPanel =  new JPanel(new GridLayout(1, numGroups));
-			fieldPanel = new JPanel();
-			JSplitPane groupsAndFields = new JSplitPane(JSplitPane.VERTICAL_SPLIT, groupPanel, fieldPanel);
-			recordPanel.add(groupsAndFields);
-			GenericDatabase<DatabaseRecord> db = ui.getDatabase();
-			int groupNum = 0;
-			for (GroupDef def: defs) {
-				String groupName = def.getFieldTitle();
-				TitledBorder affiliateBorder = BorderFactory.createTitledBorder(UiField.LINE_BORDER, groupName);
-				Box groupBox = Box.createHorizontalBox();
-				groupBox.setBorder(affiliateBorder);
-				GuiControl<RecordType> uiField = new NameList<RecordType>(ui, db, rec, def, modifiable);
-				JComponent comp = uiField.getGuiComponent();
-				GroupMember gm = rec.getMember(groupNum);
-				if (null == gm) {
-					gm = new GroupMember(defs, def);
-					rec.setMember(groupNum, gm);
-				}
-				SingleControlUiField guiFld = new SingleControlUiField(gm, modTrk);
-				guiFld.setControl(uiField);
-				groupBox.add(comp);
-				groupPanel.add(groupBox);
-				guiFields.add(guiFld);
-				++groupNum;
-			}
-		} else {
-			fieldPanel = recordPanel;
-		}
-		GridBagLayout panelLayout = new GridBagLayout();
-		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
-		fieldPanel.setLayout(panelLayout);
-		for (LayoutField<RecordType> fp: getFields()) {
-			int fieldNum = fp.getFieldNum();
-			Field fld = getField(rec, fieldNum);
-			if (null == fld) {
-				continue;
-			}
-			c.gridx = fp.getHpos(); c.gridy = fp.getVpos();
-			c.gridwidth = fp.isCarriageReturn()? GridBagConstraints.REMAINDER: fp.getHspan();
-			c.gridheight = fp.getVspan();
-			MultipleValueUiField guiFld = GuiControlFactory.makeMultiControlField(fp, fld, modTrk);
-			JComponent comp = guiFld.getGuiComponent();
-			panelLayout.setConstraints(comp, c);
-			fieldPanel.add(comp);
-			guiFields.add(guiFld);
-		}
-		return guiFields;
-	}
-
-	@Override
-	public
 	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		RecordType rec = recList.getFirstRecord();

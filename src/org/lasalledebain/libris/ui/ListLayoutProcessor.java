@@ -34,7 +34,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 	public ArrayList<UiField> layOutFields(RecordType theRecord, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		GenericDatabase<DatabaseRecord> db = ui.getDatabase();
-		ListLayoutTableModel<RecordType> myTableModel = null; // TODO FIXnew ListLayoutTableModel(theRecord, db, this);
+		ListLayoutTableModel<RecordType> myTableModel = new ListLayoutTableModel(theRecord, db, myLayout);
 		JTable recordTable = new JTable(myTableModel);
 		TableColumnModel columns = recordTable.getColumnModel();
 		FontMetrics myFontMetrics = recordPanel.getFontMetrics(recordTable.getFont());

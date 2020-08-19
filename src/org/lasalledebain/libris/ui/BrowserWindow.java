@@ -134,7 +134,7 @@ public class BrowserWindow extends JPanel {
 	}
 
 	public int getSelectedRecordId() {
-		RecordInfo<DatabaseRecord> chosenRecord = (RecordInfo) chooser.getSelectedValue();
+		RecordInfo<DatabaseRecord> chosenRecord = chooser.getSelectedValue();
 		if (null != chosenRecord) {		
 			return chosenRecord.getRecordId();
 		} else {
@@ -155,14 +155,12 @@ public class BrowserWindow extends JPanel {
 		setFilter(filter);
 		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(src, filter);
 		recordsIterator = filteredList.iterator();
-		setResultList();
-		chooser.setModel(resultRecords);
+		doRefresh();
 	}
 
 	public void doRefresh(Iterable<DatabaseRecord> src) {
 		recordsIterator = src.iterator();
-		setResultList();
-		chooser.setModel(resultRecords);
+		doRefresh();
 	}
 
 	public void setFilter(RecordFilter filter) {

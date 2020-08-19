@@ -11,6 +11,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -21,7 +22,7 @@ public class DatabaseExporter {
 	enum ExportFormat {
 		EXPORT_XML, EXPORT_CSV, EXPORT_TEXT
 	}
-	private static LibrisWindowedUi gui;
+	private static LibrisWindowedUi<DatabaseRecord> gui;
 	LibrisDatabase db;
 	private JFrame exportFrame;
 	private Preferences librisPrefs;
@@ -30,7 +31,7 @@ public class DatabaseExporter {
 	private boolean includeSchema;
 	private boolean includeRecords;
 
-	public static void guiExportFile(LibrisWindowedUi ui, LibrisDatabase db) throws LibrisException  {
+	public static void guiExportFile(LibrisWindowedUi<DatabaseRecord> ui, LibrisDatabase db) throws LibrisException  {
 		gui = ui;
 		DatabaseExporter exporter = new DatabaseExporter(db);
 		if (exporter.chooseExportFile()) {
