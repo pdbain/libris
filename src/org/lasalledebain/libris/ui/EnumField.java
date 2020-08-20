@@ -12,11 +12,12 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.lasalledebain.libris.EnumFieldChoices;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldEnumValue;
 import org.lasalledebain.libris.field.FieldValue;
 
-public class EnumField extends GuiControl {
+public class EnumField<RecordType extends Record> extends GuiControl<RecordType> {
 
 	protected final JPanel control;
 	private EnumFieldChoices legalValues;

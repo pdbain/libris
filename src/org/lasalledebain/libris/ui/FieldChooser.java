@@ -18,18 +18,18 @@ import org.lasalledebain.libris.Schema;
 
 @SuppressWarnings("serial")
 public class FieldChooser extends JPanel {
-	private final JList fieldList;
+	private final JList<FieldInfo> fieldList;
 	private int numSearchFields;
 	boolean includeRecordName;
 	private Vector<FieldInfo> searchFieldList;
 	private boolean multiSelect;
-	public FieldChooser(Schema schem, EnumSet searchFieldTypes, boolean multiSelect, String label) {
+	public FieldChooser(Schema schem, EnumSet<FieldType> searchFieldTypes, boolean multiSelect, String label) {
 		setLayout(new BorderLayout());
 		includeRecordName = false;
 		this.multiSelect = multiSelect;
 		
 		searchFieldList = getSearchFieldList(schem,searchFieldTypes);
-		fieldList = new JList(searchFieldList);
+		fieldList = new JList<FieldInfo>(searchFieldList);
 		numSearchFields = searchFieldList.size();
 		add(new JLabel(label), BorderLayout.NORTH);
 		add(fieldList, BorderLayout.CENTER);

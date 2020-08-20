@@ -1,19 +1,11 @@
 package org.lasalledebain.libris.ui;
 
-import static java.util.Objects.isNull;
 import static org.lasalledebain.libris.exception.Assertion.assertNotNullDatabaseException;
-import static org.lasalledebain.libris.exception.Assertion.assertNotNullError;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.Function;
 import java.util.logging.Level;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.XMLEvent;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -21,7 +13,6 @@ import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -33,39 +24,6 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		LM_SWING, LM_TEXT, LM_HTML;
 	};
 	public static final String DEFAULT_LAYOUT_VALUE = "default";
-	private final static HashMap<String, LAYOUT_MEDIUM> mediumMap = populateMediumMap();
-
-	private HashMap<String, Function<Schema, LibrisSwingLayout<RecordType>>> populateLayoutGenerators() {
-		HashMap<String, Function<Schema, LibrisSwingLayout<RecordType>>> gens = new HashMap<>(5);
-		gens.put(XML_LAYOUT_TYPE_XML, schem -> new XMLLayout<RecordType>(schem));
-		gens.put(XML_LAYOUT_TYPE_TABLE, schem -> new TableLayout<RecordType>(schem));
-		gens.put(XML_LAYOUT_TYPE_FORM, schem ->  new FormLayout<RecordType>(schem));
-		gens.put(XML_LAYOUT_TYPE_LIST, schem ->  new ListLayout<RecordType>(schem));
-		gens.put(XML_LAYOUT_TYPE_PARAGRAPH, schem ->  new ParagraphLayout<RecordType>(schem));
-
-		return gens;
-	}
-
-	private HashMap<String, Function<Schema, LibrisHtmlLayout<RecordType>>> populateHtmlLayoutGenerators() {
-		HashMap<String, Function<Schema, LibrisHtmlLayout<RecordType>>> gens = new HashMap<>(5);
-		gens.put(XML_LAYOUT_TYPE_HTML_FORM, schem -> new LibrisHtmlFormLayout<RecordType>(schem));
-		gens.put(XML_LAYOUT_TYPE_HTML_PARAGRAPH, schem -> new LibrisHtmlParagraphLayout<RecordType>(schem));
-		gens.put(XML_LAYOUT_TYPE_HTML_LIST, schem -> new LibrisHtmlListLayout<RecordType>(schem));
-		return gens;
-	}
-
-	private static HashMap<String, LAYOUT_MEDIUM> populateMediumMap() {
-		HashMap<String, LAYOUT_MEDIUM> map = new HashMap<>(5);
-		map.put(XML_LAYOUT_TYPE_XML, LAYOUT_MEDIUM.LM_SWING);
-		map.put(XML_LAYOUT_TYPE_TABLE, LAYOUT_MEDIUM.LM_SWING);
-		map.put(XML_LAYOUT_TYPE_FORM, LAYOUT_MEDIUM.LM_SWING);
-		map.put(XML_LAYOUT_TYPE_LIST, LAYOUT_MEDIUM.LM_SWING);
-		map.put(XML_LAYOUT_TYPE_PARAGRAPH, LAYOUT_MEDIUM.LM_SWING);
-		map.put(XML_LAYOUT_TYPE_HTML_FORM, LAYOUT_MEDIUM.LM_HTML);
-		map.put(XML_LAYOUT_TYPE_HTML_LIST, LAYOUT_MEDIUM.LM_HTML);
-		map.put(XML_LAYOUT_TYPE_HTML_PARAGRAPH, LAYOUT_MEDIUM.LM_HTML);
-		return map;
-	}
 
 	private Schema schem;
 	HashMap <String,LibrisLayout<RecordType>> layoutUsageMap = new HashMap<>();
@@ -90,28 +48,16 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 	public void fromXml(ElementManager mgr) throws LibrisException {
 		mgr.parseOpenTag();
 		while (mgr.hasNext()) {
-			try {
-				XMLEvent nextElement = mgr.peek();
-				Attribute layoutTypeAttr = nextElement.asStartElement().getAttributeByName(new QName(XML_LAYOUT_TYPE_ATTR));
-				if (isNull(layoutTypeAttr)) {
-					throw new InputException("Element "+nextElement+" missing ID attribute");
-				}
-				String layoutType = layoutTypeAttr.getValue();
-				LAYOUT_MEDIUM medium = mediumMap.get(layoutType);
-				Assertion.assertNotNullInputException("Undefined layout type: ",  layoutType, medium);
-				ElementManager layoutMgr = mgr.nextElement();
-				LibrisLayout<RecordType> theLayout = new LibrisLayout<>(schem, this);
-					theLayout.fromXml(layoutMgr);
-				String layoutId = theLayout.getId();
-				for (String u: theLayout.getLayoutUsers()) {
-					Assertion.assertTrueError("duplicate layout user ", u, !layoutUsageMap.containsKey(u)) ;
-					layoutUsageMap.put(u, theLayout);
-				}
-				myLayouts.put(layoutId, theLayout);
-				layoutIds.add(layoutId);
-			} catch (XMLStreamException e) {
-				throw new InputException(e);
+			ElementManager layoutMgr = mgr.nextElement();
+			LibrisLayout<RecordType> theLayout = new LibrisLayout<>(schem, this);
+				theLayout.fromXml(layoutMgr);
+			String layoutId = theLayout.getId();
+			for (String u: theLayout.getLayoutUsers()) {
+				Assertion.assertTrueError("duplicate layout user ", u, !layoutUsageMap.containsKey(u)) ;
+				layoutUsageMap.put(u, theLayout);
 			}
+			myLayouts.put(layoutId, theLayout);
+			layoutIds.add(layoutId);
 		}
 		mgr.parseClosingTag();
 	}
