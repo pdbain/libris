@@ -64,6 +64,9 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		String theType = values.get(XML_LAYOUT_TYPE_ATTR);
 		setType(theType);
 		layoutProc = getLayoutProcessor(theType);
+		if (null == layoutProc) {
+			throw new InputException("Invalid layout type: "+theType, mgr);
+		}
 		while (mgr.hasNext()) {
 			ElementManager subElementMgr = mgr.nextElement();
 			if (subElementMgr.getElementTag().equals(XML_LAYOUTFIELD_TAG)) {
@@ -83,7 +86,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		layoutProc.validate();
 	}
 
-	private LayoutProcessor<RecordType> getLayoutProcessor(String theType) throws InputException {
+	private LayoutProcessor<RecordType> getLayoutProcessor(String theType) {
 		LayoutProcessor<RecordType> result = null;
 		switch (theType) {
 		case XML_LAYOUT_TYPE_XML: 
@@ -100,8 +103,8 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 			break;
 		case XML_LAYOUT_TYPE_PARAGRAPH: 
 			result = new ParagraphLayoutProcessor<>(this);
-break;
-default: throw new InputException("invalid layout type: "+theType);
+			break;
+		default: result = null;
 		}
 		return result;
 	}

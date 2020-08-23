@@ -18,6 +18,7 @@ import junit.framework.TestCase;
 
 public class HtmlTests extends TestCase {
 
+	private static final String ANYSTRING = "(\\R|.)*";
 	private File workingDirectory;
 	private LibrisDatabase db;
 
@@ -25,11 +26,21 @@ public class HtmlTests extends TestCase {
 	public void test() throws InputException, IOException, DatabaseException {
 		TestResponse resp = new TestResponse();
 		Layouts<DatabaseRecord> myLayouts = db.getLayouts();
-		LibrisLayout<DatabaseRecord> myLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_HTML_PARAGRAPH);
+		LibrisLayout<DatabaseRecord> myLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH);
 		LibrisLayout<DatabaseRecord> browserLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		myLayout.layOutPage(db.getRecords(), 2, browserLayout, db.getUi(), resp);
 		String result = resp.getResponseText();
-		fail("Not yet implemented");
+		if (!result.matches(ANYSTRING+"<head>"
+				+ANYSTRING+"<style>"
+				+ANYSTRING+"</style>"
+				+ANYSTRING+"</head>"
+				+ANYSTRING+"<body>"
+				+ANYSTRING+"A First History of France"
+				+ANYSTRING+"</body>"
+				+ANYSTRING
+				)) {
+			fail("Missing body text in HTML output;");
+		}
 	}
 
 	@Override

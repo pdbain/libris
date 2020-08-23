@@ -103,9 +103,6 @@ public interface LibrisXMLConstants {
 	public static final String XML_LAYOUT_TYPE_FORM = "form";
 	public static final String XML_LAYOUT_TYPE_LIST = "list";
 	public static final String XML_LAYOUT_TYPE_PARAGRAPH = "paragraph";
-	public static final String XML_LAYOUT_TYPE_HTML_FORM = "htmlform";
-	public static final String XML_LAYOUT_TYPE_HTML_LIST = "htmllist";
-	public static final String XML_LAYOUT_TYPE_HTML_PARAGRAPH = "htmlparagraph";
 	
 	public static final String XML_LAYOUT_USEDBY_ATTR = "usedby";
 	public static final String XML_LAYOUT_HEIGHT_ATTR = "height";

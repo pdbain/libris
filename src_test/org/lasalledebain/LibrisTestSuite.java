@@ -16,6 +16,7 @@ import org.lasalledebain.libris.indexes.TestFileRecordMap;
 import org.lasalledebain.libris.indexes.TestKeyIntegerTuple;
 import org.lasalledebain.libris.search.BloomFilterTest;
 import org.lasalledebain.libris.search.TestRecordFilter;
+import org.lasalledebain.libris.ui.HtmlTests;
 import org.lasalledebain.libris.ui.ImportTests;
 import org.lasalledebain.libris.ui.LayoutTests;
 import org.lasalledebain.libris.ui.RecordEditTests;
@@ -33,6 +34,7 @@ public class LibrisTestSuite {
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for org.lasalledebain");
 		//$JUnit-BEGIN$
+		suite.addTestSuite(HtmlTests.class);
 		suite.addTestSuite(ConfigTest.class);
 		suite.addTestSuite(LayoutTests.class);
 		suite.addTestSuite(ArtifactTest.class);

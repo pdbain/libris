@@ -2,6 +2,8 @@ package org.lasalledebain.libris.exception;
 
 import java.io.File;
 
+import org.lasalledebain.libris.xmlUtils.ElementManager;
+
 public class InputException extends LibrisException {
 	/**
 	 * For errors in the schema or user-provided data.
@@ -18,15 +20,20 @@ public class InputException extends LibrisException {
 
 	public InputException(String msg, String sourceFilePath, Exception e) {
 		super(sourceFilePath+": "+msg, e);
-		}
-	
+	}
+
 	public InputException(String msg, Exception e) {
 		super(msg, e);
 	}
 
 	public InputException(String msg) {
 		super(msg);
-}
+	}
+
+	public InputException(String msg, ElementManager mgr) {
+		super(msg+ " " +
+				mgr.getSourceFilePathAndLine());
+	}
 
 	public InputException() {
 		super();

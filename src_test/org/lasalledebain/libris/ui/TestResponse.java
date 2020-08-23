@@ -17,7 +17,6 @@ class TestResponse implements HttpServletResponse {
 	public  TestResponse() {
 		outStream = new ByteArrayOutputStream();
 		myWriter = new PrintWriter(outStream);
-		// TODO Auto-generated constructor stub
 	}
 	@Override
 	public void flushBuffer() throws IOException {
@@ -56,13 +55,13 @@ class TestResponse implements HttpServletResponse {
 	}
 	
 	public String getResponseText() {
+		myWriter.flush();
 		return outStream.toString();
 	}
 
 	@Override
 	public PrintWriter getWriter() throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		return myWriter;
 	}
 
 	@Override

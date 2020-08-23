@@ -50,7 +50,7 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		while (mgr.hasNext()) {
 			ElementManager layoutMgr = mgr.nextElement();
 			LibrisLayout<RecordType> theLayout = new LibrisLayout<>(schem, this);
-				theLayout.fromXml(layoutMgr);
+			theLayout.fromXml(layoutMgr);
 			String layoutId = theLayout.getId();
 			for (String u: theLayout.getLayoutUsers()) {
 				Assertion.assertTrueError("duplicate layout user ", u, !layoutUsageMap.containsKey(u)) ;

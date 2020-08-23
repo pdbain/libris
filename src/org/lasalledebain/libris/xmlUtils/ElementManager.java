@@ -45,6 +45,10 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 		return xmlReader.getSourceFilePath();
 	}
 
+	public String getSourceFilePathAndLine() {
+		return xmlReader.getSourceFilePath()+" line "+Integer.toString(xmlReader.getSourceLine());
+	}
+
 	public String getSourcePath() {
 		String srcFile = getSourceFilePath();
 		if (null == srcFile) {
