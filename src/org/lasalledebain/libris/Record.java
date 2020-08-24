@@ -203,7 +203,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 		int wordLimit = 8;
 		final int MAX_WORD_LENGTH = 8;
 		final char ELLIPSIS_CHAR = '\u2026';
-		final String ELLIPSIS_STRING = "\u2026";
+		final String ELLIPSIS_STRING = "...";
 		String idString = (NULL_RECORD_ID == id)? "<unknown>": RecordId.toString(id);
 		buff.append(idString);
 		buff.append("]: ");
@@ -235,7 +235,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 				for (int i = 0; i < wordsPerField; ++i) {
 					String titleWord = fieldWords[i];
 					if (lastEllipsis = (titleWord.length() > MAX_WORD_LENGTH)) {
-						titleWord = titleWord.substring(0, MAX_WORD_LENGTH - 1)+ELLIPSIS_CHAR;
+						titleWord = titleWord.substring(0, MAX_WORD_LENGTH - 1)+ELLIPSIS_STRING;
 					}
 					fieldBuff.add(titleWord);
 				}

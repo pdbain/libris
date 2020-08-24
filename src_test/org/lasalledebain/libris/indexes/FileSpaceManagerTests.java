@@ -57,7 +57,7 @@ public class FileSpaceManagerTests extends TestCase {
 					sizeGen.setSeed(id + salt);
 					entrySize = sizeGen.nextInt(1000)+MINIMUM_DATA_SIZE;
 					addEntry(entrySize, mgr, dataGen, id);
-					addedEntries.add(new Integer(id));
+					addedEntries.add( Integer.valueOf(id));
 				}
 
 				testLogger.log(Level.INFO, getName()+": round "+round+" file size = "+mgr.getFileSize());
@@ -67,7 +67,7 @@ public class FileSpaceManagerTests extends TestCase {
 					sizeGen.setSeed(id + salt);
 					entrySize = sizeGen.nextInt(1000) + MINIMUM_DATA_SIZE;
 					checkEntry(r.dataSize, entrySize, dataGen, r);
-					final Integer integerId = new Integer(id);
+					final Integer integerId =  Integer.valueOf(id);
 					boolean wasPresent = addedEntries.remove(integerId);
 					assertTrue("unexpected id "+id, wasPresent);
 				}

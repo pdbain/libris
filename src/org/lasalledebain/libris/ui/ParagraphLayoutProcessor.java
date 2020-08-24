@@ -26,8 +26,15 @@ public class ParagraphLayoutProcessor <RecordType extends Record> extends Layout
 
 	@Override
 	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
-		// TODO Auto-generated method stub
-		
+		LayoutField<RecordType>[] fieldInfo = myLayout.getFields();
+		RecordType rec = recList.getRecord(recId);
+		StringBuffer windowText = new StringBuffer();
+		if (null == rec) {
+			windowText.append("Record "+recId+" not found");
+		} else {
+			recordToParagraph(rec, fieldInfo, windowText);
+		}
+		buff.append(windowText);
 	}
 
 	@Override
@@ -106,7 +113,7 @@ public class ParagraphLayoutProcessor <RecordType extends Record> extends Layout
 	@Override
 	void validate() throws InputException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

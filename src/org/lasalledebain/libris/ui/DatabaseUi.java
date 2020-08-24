@@ -53,6 +53,7 @@ public interface DatabaseUi<RecordType extends Record> {
 	UiField getSelectedField();
 
 	void setSelectedField(UiField selectedField);
+	public abstract String getUiTitle();
 
 	public void setRecordName(NamedRecordList<RecordType> namedRecs) throws InputException;
 	public void setRecordArtifact();

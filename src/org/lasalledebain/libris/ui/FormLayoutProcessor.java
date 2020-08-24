@@ -94,8 +94,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 
 	@Override
 	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
-		// TODO Auto-generated method stub
-		
+		buff.append("<p>Record "+recId+" not found</p>");
 	}
 	@Override
 	protected void validate() throws InputException {

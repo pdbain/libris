@@ -52,6 +52,7 @@ public class ArtifactTest extends TestCase {
 		Utilities.deleteRecursively(workingDirectory);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreateDatabase() throws LibrisException {
 		final int numArtifacts = 16;

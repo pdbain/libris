@@ -12,6 +12,7 @@ import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import junit.framework.TestCase;
@@ -23,7 +24,7 @@ public class HtmlTests extends TestCase {
 	private LibrisDatabase db;
 
 	@Test
-	public void test() throws InputException, IOException, DatabaseException {
+	public void testBasicLayout() throws InputException, IOException, DatabaseException {
 		TestResponse resp = new TestResponse();
 		Layouts<DatabaseRecord> myLayouts = db.getLayouts();
 		LibrisLayout<DatabaseRecord> myLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH);
@@ -39,10 +40,19 @@ public class HtmlTests extends TestCase {
 				+ANYSTRING+"</body>"
 				+ANYSTRING
 				)) {
-			fail("Missing body text in HTML output;");
+			fail("Missing body text in HTML output:\n"+result);
 		}
 	}
 
+	@Test
+	public void testHtmlServer() throws DatabaseException {
+		LibrisHttpServer<DatabaseRecord> ui = new LibrisHttpServer<DatabaseRecord>(LibrisHttpServer.default_port, LibrisHttpServer.DEFAULT_CONTEXT);
+		File dbFile = db.getDatabaseFile();
+		assertTrue("Cannot close database", db.closeDatabase(false));
+		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
+		ui.openDatabase(config);
+
+	}
 	@Override
 	protected void setUp() throws Exception {
 		testLogger.log(Level.INFO, "Starting "+getName());

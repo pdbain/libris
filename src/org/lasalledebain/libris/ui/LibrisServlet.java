@@ -21,6 +21,7 @@ import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import static java.util.Objects.isNull;
+import static org.junit.Assert.assertNotNull;
 import static org.lasalledebain.libris.exception.Assertion.assertNotNullInputException;
 
 public class LibrisServlet<RecordType extends Record> extends HttpServlet {
@@ -62,7 +63,6 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 				String layoutId = req.getParameter(HTTP_PARAM_LAYOUT_ID);
 				if (isNull(layoutId)) {
 					if (isNull(layoutIds)) layoutIds = myLayouts.getLayoutIds();
-					if (layoutIds.length == 0) throw new InputException("no HTML layouts defined");
 					layoutId = layoutIds[0];
 				}
 				theLayout = myLayouts.getLayout(layoutId);
@@ -70,7 +70,9 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 			}
 			resp.setStatus(HttpStatus.OK_200);
 			DatabaseRecord rec = database.getRecord(id);
-			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getLayout(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
+			// TODO handle unknown record IDs
+			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
+			assertNotNull("No layout found for "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryLayout);
 			theLayout.layOutPage(database.getRecords(), id, summaryLayout, myUi, resp);
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());

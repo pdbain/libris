@@ -28,7 +28,7 @@ public class FieldValueArranger extends JDialog {
     private JButton deleteButton;
     private JButton cancelButton;
     private JButton okayButton;
-	private JList valueList;
+	private JList<String> valueList;
 	private FieldValue valueArray[];
 	private int numValues;
 	int selectedValue;
@@ -53,7 +53,7 @@ public class FieldValueArranger extends JDialog {
 		}
 		valueBuff.toArray(valueArray);
 		JPanel panel = new JPanel(new GridBagLayout());
-		valueList = new JList();
+		valueList = new JList<String>();
 		setList();
 		valueList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		panel.add(new JScrollPane(valueList));

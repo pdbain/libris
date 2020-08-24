@@ -116,10 +116,6 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return XML_LAYOUTS_TAG;
 	}
 
-	private static String getTag() {
-		return getXmlTag();
-	}
-
 	public int getFieldNum() {
 		return 0;
 	}

@@ -75,7 +75,7 @@ public class Libris {
 				}
 			}
 			// TODO configurable aux dir & artifact dir
-			LibrisUi ui = null;
+			LibrisUi<DatabaseRecord> ui = null;
 			if (doRebuild) {
 				Assertion.assertNotNullError("Database file not set", databaseFile);
 				ui = new HeadlessUi(databaseFile, false);
