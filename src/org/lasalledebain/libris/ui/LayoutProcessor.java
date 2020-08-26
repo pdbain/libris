@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.JComponent;
 
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
@@ -18,23 +17,23 @@ import org.lasalledebain.libris.exception.LibrisException;
 public abstract class LayoutProcessor<RecordType extends Record>
 implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, LibrisHTMLConstants {
 
+	private static final String HTML_BACKGROUND_COLOUR = "LightCyan";
 	private static final String RECORD_BROWSER = "recordBrowser";
 	private static final String ONCHANGE_THIS_FORM_SUBMIT = "\" onchange=\"this.form.submit()\"";
 	private static final String BACKGROUND_COLOR_WHITE = "background-color: white;\n";
 	private static final String GREY_BORDER = "border: 1px solid LightGrey;\n";
 	private static final String CORNER_RADIUS = "5px;";
 	private static final String MAIN_FRAME = "mainFrame";
-	private static final String NAVIGATION_PANEL_CLASS = "navigationPanel";
 	private static final String CONTENT_PANEL_NAME = "contentPanel";
-	protected static final String BROWSER_COLUMN_NAME = "browserColumn";
+	protected static final String BROWSER_COLUMN_NAME = "browserPanel";
 	protected static final String BROWSER_ITEM_CLASS = "browserItem";
-	private static final String DISPLAY_COLUMN_CLASS = "displayColumn";
+	private static final String DISPLAY_COLUMN_CLASS = "displayPanel";
 
 	private static final String BROWSER_PANEL_STYLE = 
 			'.'+BROWSER_COLUMN_NAME +
-			" {\n" + 
-			"float: left;\n" +
-			"width:300px;\n" + 
+			" {\n"
+			+ "display: inline;"
+			+ "float: left;\n" +
 			"margin: 10px;\n" + 
 			GREY_BORDER + 
 			"border-radius: " + CORNER_RADIUS
@@ -42,13 +41,25 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			+ BACKGROUND_COLOR_WHITE
 			+ "}\n";
 
+	private static final String DISPLAY_PANEL_STYLE = '.'+DISPLAY_COLUMN_CLASS +
+			" {\n" + 
+			"float: left;\n"
+			+ "display: inline;"
+			+ "margin: 10px;\n"
+			+ "width: 600px;"
+			+ GREY_BORDER + 
+			"border-radius: " + CORNER_RADIUS
+			+ "\n" +
+			BACKGROUND_COLOR_WHITE +
+			"}\n";
 	private static final String CONTENT_PANEL_STYLE = 
 			'.'+CONTENT_PANEL_NAME + " {\n"
-					+ "clear: left;\n"
-					+ "}\n";
+			+ "float: left;\n"
+			+ "}\n";
 
-	private static final String MASTER_STYLE = "html {background-color: #B0FFF4;"
-			+ "font-family: Arial, Helvetica, sans-serif;\n"
+	private static final String MASTER_STYLE = "html {background-color: "
+			+ HTML_BACKGROUND_COLOUR + ";"
+			+ " font-family: Arial, Helvetica, sans-serif;\n"
 			+ "}\n";
 
 	private static final String STYLE_STRING = MASTER_STYLE
@@ -59,20 +70,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			"}\n"
 			+ CONTENT_PANEL_STYLE
 			+ BROWSER_PANEL_STYLE+
-			'.'+NAVIGATION_PANEL_CLASS +
-			" {\n" 
-			+ "margin: 10px;\n" + 
-			"}\n" + 
-			'.'+DISPLAY_COLUMN_CLASS +
-			" {\n" + 
-			"float: left;\n" + 
-			"margin: 10px;\n" + 
-			GREY_BORDER + 
-			"border-radius: " + CORNER_RADIUS
-			+ "\n" +
-			BACKGROUND_COLOR_WHITE +
-			"}\n" + 
-			'.'+BROWSER_ITEM_CLASS +
+			DISPLAY_PANEL_STYLE+'.'+BROWSER_ITEM_CLASS +
 			" {\n" + 
 			"font-size: 100%;\n" +
 			"}\n" + 
@@ -117,7 +115,11 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		String[] browserFields = browserLayout.getFieldIds();
 		startDiv(buff, BROWSER_COLUMN_NAME);
 		buff.append("<form action=\".\" method=\"get\">");
+		startDiv(buff, null);
+		startDiv(buff, null);
+		endDiv(buff);
 		addLayoutSelector(buff);
+		startDiv(buff, null);
 		Iterator<RecordType> recIter = recList.iterator();
 		int recCount = 0;
 		int firstRecord = 0;
@@ -147,9 +149,11 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			++recCount;
 		}
 		buff.append("</select>\n");
-addNextLastButtons(currentRecord, buff, firstRecord, lastRecord);	
+		endDiv(buff);
+		endDiv(buff);
+		addNextLastButtons(currentRecord, buff, firstRecord, lastRecord);	
 
-buff.append("</form>\n");
+		buff.append("</form>\n");
 		endDiv(buff);
 	}
 
@@ -162,7 +166,7 @@ buff.append("</form>\n");
 				+ "'\""
 				+ (currentRecord > firstRecord? "": " disabled")
 				+ ">Previous</button>");	
-		
+
 		buff.append("<button onclick=\"document.getElementById('"
 				+ RECORD_BROWSER
 				+ "').value='"
