@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JComponent;
@@ -196,6 +197,11 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 	public Schema getSchema() {
 		return mySchema;
 	}
+	
+	Stream <LibrisLayout<RecordType>> getLayouts() {
+		return myLayouts.getLayouts();
+	}
+
 
 	public String getId() {
 		return id;

@@ -5,7 +5,9 @@ import static org.lasalledebain.libris.exception.Assertion.assertNotNullDatabase
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -27,13 +29,13 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 
 	private Schema schem;
 	HashMap <String,LibrisLayout<RecordType>> layoutUsageMap = new HashMap<>();
-	HashMap<String, LibrisLayout<RecordType>> myLayouts;
+	LinkedHashMap<String, LibrisLayout<RecordType>> myLayouts;
 	ArrayList<String> layoutIds;
 
 	protected static HashMap<String, Dimension> defaultDimensionStrings = initializeDefaultDimensions();
 	public Layouts(Schema mySchema) {
 		schem = mySchema;
-		myLayouts = new HashMap<>();
+		myLayouts = new LinkedHashMap<>();
 		layoutIds = new ArrayList<String>();
 	}
 
@@ -70,6 +72,10 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return layoutIds.toArray(new String[layoutIds.size()]);
 	}
 
+	Stream <LibrisLayout<RecordType>> getLayouts() {
+		return myLayouts.values().stream();
+		
+	}
 	public static Dimension getDefaultDimensions(String controlType) {
 		Dimension dims = defaultDimensionStrings.get(controlType);
 		return dims;

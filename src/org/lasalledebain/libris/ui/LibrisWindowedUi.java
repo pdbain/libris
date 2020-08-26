@@ -129,8 +129,8 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 	public abstract Record newChildRecord(Record currentRecord, int groupNum);
 	public abstract Dimension getDisplayPanelSize();
 	
-	public void setTitle(String title) {
-		super.setTitle(title);
+	public void setUiTitle(String title) {
+		super.setUiTitle(title);
 		if (isDatabaseModified()) {
 			mainFrame.setTitle(title+DATABASE_MODIFIED);
 		} else {
@@ -166,7 +166,7 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 				databaseName = databaseAttributes.getDatabaseName();
 			}
 		}
-		setTitle(databaseName);
+		setUiTitle(databaseName);
 	}
 
 	class WindowCloseListener extends WindowAdapter {

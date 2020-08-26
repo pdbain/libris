@@ -21,10 +21,9 @@ import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import static java.util.Objects.isNull;
-import static org.junit.Assert.assertNotNull;
 import static org.lasalledebain.libris.exception.Assertion.assertNotNullInputException;
 
-public class LibrisServlet<RecordType extends Record> extends HttpServlet {
+public class LibrisServlet<RecordType extends Record> extends HttpServlet implements LibrisHTMLConstants{
 	LibrisUi myUi;
 	private final Layouts<DatabaseRecord> myLayouts;
 	String[] layoutIds;
@@ -38,8 +37,6 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 		assertNotNullInputException("No layout defined: "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryDisplay);
 	}
 
-	public static final String HTTP_PARAM_RECORD_ID="recId";
-	public static final String HTTP_PARAM_LAYOUT_ID="layout";
 	/**
 	 * 
 	 */
@@ -57,22 +54,22 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet {
 			LibrisLayout<DatabaseRecord> theLayout;
 			if (StringUtils.isStringEmpty(recId)) {
 				id = RecordId.NULL_RECORD_ID;
-				theLayout = summaryDisplay;
 			} else {
 				id = Integer.parseInt(recId);
-				String layoutId = req.getParameter(HTTP_PARAM_LAYOUT_ID);
-				if (isNull(layoutId)) {
-					if (isNull(layoutIds)) layoutIds = myLayouts.getLayoutIds();
-					layoutId = layoutIds[0];
-				}
-				theLayout = myLayouts.getLayout(layoutId);
-				Assertion.assertNotNullInputException("Layout not found: ",  layoutId, theLayout);
 			}
+			theLayout = summaryDisplay;
+			String layoutId = req.getParameter(HTTP_PARAM_LAYOUT_ID);
+			if (isNull(layoutId)) {
+				if (isNull(layoutIds)) layoutIds = myLayouts.getLayoutIds();
+				layoutId = layoutIds[0];
+			}
+			theLayout = myLayouts.getLayout(layoutId);
+			Assertion.assertNotNullInputException("Layout not found: ",  layoutId, theLayout);
 			resp.setStatus(HttpStatus.OK_200);
 			DatabaseRecord rec = database.getRecord(id);
 			// TODO handle unknown record IDs
 			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
-			assertNotNull("No layout found for "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryLayout);
+			Assertion.assertNotNull(myUi, "No layout found for "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryLayout);
 			theLayout.layOutPage(database.getRecords(), id, summaryLayout, myUi, resp);
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());

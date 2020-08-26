@@ -29,7 +29,7 @@ public interface DatabaseUi<RecordType extends Record> {
 	public GenericDatabase<DatabaseRecord> getDatabase();
 	void setDatabaseFile(File dbFile);
 	public abstract String SelectSchemaFile(String schemaName) throws DatabaseException;
-	public void setTitle(String title);
+	public void setUiTitle(String title);
 
 	public abstract void pasteToField();
 

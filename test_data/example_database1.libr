@@ -97,7 +97,7 @@
 				<layoutfield control="textbox" height="1" hspan="1" id="ID_abstract" title="Abstract" vspan="1" width="25"/>
 			</layout>
 
-			<layout height="2000" id="LO_paraDisplay" title="Paragraph layout" type="paragraph" width="3000">
+			<layout height="2000" id="LO_paragraphDisplay" title="Paragraph layout" type="paragraph" width="3000">
 				<layoutfield control="textfield" hspan="1" id="ID_author" title="Author" vspan="1"/>
 				<layoutfield control="textfield" hspan="1" id="ID_title" return="true" title="Title" vspan="1"/>
 				<layoutfield control="enumfield" hspan="1" id="ID_journal" title="Journal" vspan="1"/>

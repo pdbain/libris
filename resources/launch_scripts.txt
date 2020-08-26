@@ -1,0 +1,2 @@
+java -cp $BIN_DIR:$RESOURCES/javax.servlet-api-3.0.1.jar:$RESOURCES/jetty-http-9.2.11.v20150529.jar:$RESOURCES/jetty-io-9.2.11.v20150529.jar:$RESOURCES/jetty-security-9.2.11.v20150529.jar:$RESOURCES/jetty-server-9.2.11.v20150529.jar:$RESOURCES/jetty-servlet-9.2.11.v20150529.jar:$RESOURCES/jetty-util-9.2.11.v20150529.jar \
+org.lasalledebain.libris.Libris -w $TEST_DATABASE 

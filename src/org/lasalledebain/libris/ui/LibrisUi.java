@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import org.lasalledebain.libris.DatabaseAttributes;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -97,6 +98,8 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 				return null;
 			}
 			currentDatabase.openDatabase();
+			DatabaseAttributes databaseAttributes = currentDatabase.getDatabaseAttributes();
+			setUiTitle(databaseAttributes.getDatabaseName());
 			getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
 		} catch (Exception e) {
 			alert("Error opening database", e);
@@ -113,7 +116,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 		}
 		if (result) {
 			currentDatabase = null;
-			setTitle(NO_DATABASE_OPENED);
+			setUiTitle(NO_DATABASE_OPENED);
 		}
 		return result;
 	}
@@ -145,9 +148,6 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	@Override
 	public RecordType newRecord() {
 		return null;
-	}
-	public void setTitle(String title) {
-		uiTitle = title;
 	}
 
 	@Override

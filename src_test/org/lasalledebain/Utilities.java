@@ -511,7 +511,7 @@ public class Utilities extends TestCase {
 			fail("Error creating GUI: "+e.getMessage());
 		}
 		gui.openDatabase();
-		gui.setTitle(testName);
+		gui.setUiTitle(testName);
 		return gui;
 	}
 
