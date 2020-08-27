@@ -58,7 +58,8 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	private Component mainframeContents;
 
 	public LibrisGui(File databaseFile, boolean readOnly) throws LibrisException {
-		super(databaseFile, readOnly);
+		super(readOnly);
+		setDatabaseFile(databaseFile);
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
 		System.setProperty("apple.eawt.quitStrategy system property", "CLOSE_ALL_WINDOWS");
 		initializeGui();

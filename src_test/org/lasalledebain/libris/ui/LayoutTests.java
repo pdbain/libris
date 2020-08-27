@@ -28,8 +28,9 @@ public class LayoutTests extends TestCase {
 		resultsWindow.setSelectedRecordIndex(3);
 		RecordDisplayPanel dispPanel = myGui.getDisplayPanel();
 		for (String layoutId: new String[] {"LO_shortFormDisplay", "LO_formDisplay",
-				"LO_paraDisplay", "LO_tableDisplay", "LO_listDisplay", "LO_browserDisplay"}) {
+				"LO_paragraphDisplay", "LO_tableDisplay", "LO_listDisplay", "LO_browserDisplay"}) {
 			LibrisLayout<DatabaseRecord> theLayout = myDb.getLayouts().getLayout(layoutId);
+			assertNotNull("Layout "+layoutId+" not found", theLayout);
 			dispPanel.setRecLayout(theLayout);
 			myGui.displaySelectedRecord();
 			Utilities.pause();

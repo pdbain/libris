@@ -13,17 +13,22 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 import static org.lasalledebain.libris.LibrisDatabase.log;
 
-public class HeadlessUi extends LibrisWindowedUi implements DatabaseUi {
+public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<RecordType> implements DatabaseUi<RecordType> {
 	private String schemaPath;
 	private int confirmValue;
 	private boolean accessible; 
 
-	public HeadlessUi(File databaseFile, boolean readOnly) {
-		super(databaseFile, readOnly);
+	public HeadlessUi(boolean readOnly) {
+		super(readOnly);
+	}
+
+	public HeadlessUi(File theDatabaseFile, boolean readOnly) {
+		super(false);
+		setDatabaseFile(theDatabaseFile);
 	}
 
 	public HeadlessUi() {
-		super(null, false);
+		this(false);
 	}
 
 	// TODO write headless UI

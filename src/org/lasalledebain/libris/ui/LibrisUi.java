@@ -33,9 +33,8 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	protected File artifactDirectory;
 	private boolean readOnly;
 
-	public LibrisUi(File dbFile, boolean readOnly) {
+	public LibrisUi(boolean readOnly) {
 		this();
-		setDatabaseFile(dbFile);
 		this.readOnly = readOnly;
 	}
 	public LibrisUi() {
@@ -176,7 +175,9 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	}
 
 	public boolean rebuildDatabase() throws LibrisException {
-		return Libris.buildIndexes(databaseFile, new HeadlessUi(databaseFile, false));
+		HeadlessUi childUi = new HeadlessUi(false);
+		childUi.setDatabaseFile(databaseFile);
+		return Libris.buildIndexes(databaseFile, childUi);
 	}
 
 	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
@@ -286,6 +287,14 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	}
 	public void sendChooseDatabase() {
 		alert("No database selected");
+	}
+	@Override
+	public boolean start() {
+		return true;
+	}
+	@Override
+	public boolean stop() {
+		return true;
 	};
 
 }

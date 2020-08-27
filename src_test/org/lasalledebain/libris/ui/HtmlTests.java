@@ -4,8 +4,14 @@ import static org.lasalledebain.Utilities.testLogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.util.logging.Level;
 
+import org.eclipse.jetty.server.Server;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
@@ -31,6 +37,10 @@ public class HtmlTests extends TestCase {
 		LibrisLayout<DatabaseRecord> browserLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		myLayout.layOutPage(db.getRecords(), 2, browserLayout, db.getUi(), resp);
 		String result = resp.getResponseText();
+		checkResult(result);
+	}
+
+	private void checkResult(String result) {
 		if (!result.matches(ANYSTRING+"<head>"
 				+ANYSTRING+"<style>"
 				+ANYSTRING+"</style>"
@@ -45,13 +55,24 @@ public class HtmlTests extends TestCase {
 	}
 
 	@Test
-	public void testHtmlServer() throws DatabaseException {
+	public void testHtmlServer() throws Exception {
 		LibrisHttpServer<DatabaseRecord> ui = new LibrisHttpServer<DatabaseRecord>(LibrisHttpServer.default_port, LibrisHttpServer.DEFAULT_CONTEXT);
 		File dbFile = db.getDatabaseFile();
 		assertTrue("Cannot close database", db.closeDatabase(false));
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
 		ui.openDatabase(config);
-
+		StringBuffer response = new StringBuffer();
+		ui.startServer();
+		HttpClient client = HttpClient.newHttpClient();
+		HttpRequest request = HttpRequest.newBuilder()
+		      .uri(URI.create("http://localhost:8080/libris/?layout=LO_paragraphDisplay&recId=2"))
+		      .build();
+		client.sendAsync(request, BodyHandlers.ofString())
+	      .thenApply(HttpResponse::body)
+	      .thenAccept(s->response.append(s))
+	      .join();
+		ui.stop();
+		checkResult(response.toString());
 	}
 	@Override
 	protected void setUp() throws Exception {

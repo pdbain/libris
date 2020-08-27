@@ -11,6 +11,7 @@ import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
 import org.lasalledebain.libris.ui.LibrisHttpServer;
+import org.lasalledebain.libris.ui.ConsoleUi;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.LibrisUi;
 
@@ -64,6 +65,7 @@ public class Libris {
 			++i;
 		}
 
+		LibrisUi<DatabaseRecord> ui = null;
 		try {
 			File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
 			File auxDir = null;
@@ -75,17 +77,18 @@ public class Libris {
 				}
 			}
 			// TODO configurable aux dir & artifact dir
-			LibrisUi<DatabaseRecord> ui = null;
 			if (doRebuild) {
 				Assertion.assertNotNullError("Database file not set", databaseFile);
-				ui = new HeadlessUi(databaseFile, false);
+				ui = new HeadlessUi<DatabaseRecord>(false);
+				ui.setDatabaseFile(databaseFile);
 				status = ui.rebuildDatabase();
 			} else switch (myUiType) {
 			case UI_GUI:
 				ui = new LibrisGui(dbFile, readOnly);
 				break;
 			case UI_WEB:
-				ui = new LibrisHttpServer(LibrisHttpServer.default_port, LibrisHttpServer.DEFAULT_CONTEXT);
+				LibrisHttpServer<DatabaseRecord> htmlUi = new LibrisHttpServer<DatabaseRecord>(LibrisHttpServer.default_port, LibrisHttpServer.DEFAULT_CONTEXT);
+				ui = htmlUi;
 				break;
 			default:
 				LibrisUi.cmdlineError(myUiType.toString()+" not implemented");
@@ -94,6 +97,7 @@ public class Libris {
 			LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
 			if (null != dbFile) {
 				ui.openDatabase(config);
+				ui.start();
 			} else {
 				ui.sendChooseDatabase();
 			}
@@ -101,9 +105,14 @@ public class Libris {
 			LibrisUi.cmdlineError("Cannot open Libris: "+e.getMessage());
 			status = false;
 		}
-		
+
 		if (!status) {
 			System.exit(1);
+		} else {
+			if (IfType.UI_CMDLINE != myUiType) {
+				ConsoleUi<DatabaseRecord> console = new ConsoleUi<DatabaseRecord>(ui);
+				console.start();
+			}
 		}
 	}
 
@@ -143,7 +152,7 @@ public class Libris {
 
 	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi ui) throws LibrisException {
 		if (null == ui) {
-			ui = new HeadlessUi(databaseFile, false);
+			ui = new HeadlessUi(false);
 		}
 		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(databaseFile));
 		return db;

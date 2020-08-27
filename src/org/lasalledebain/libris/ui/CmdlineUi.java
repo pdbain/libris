@@ -5,6 +5,7 @@ import static org.lasalledebain.libris.LibrisDatabase.log;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
@@ -14,10 +15,17 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import static java.util.Objects.isNull;
 
 public class CmdlineUi<RecordType extends Record> extends LibrisUi<RecordType> {
 
-	BufferedReader cmdlineInput;
+	protected final BufferedReader cmdlineInput;
+	
+	public CmdlineUi(boolean readOnly) {
+		super(readOnly);
+		cmdlineInput = new BufferedReader(new InputStreamReader(System.in));
+	}
+
 	@Override
 	public void displayRecord(int recordId) throws LibrisException {
 		alert("displayRecord not implemented");
@@ -97,6 +105,38 @@ public class CmdlineUi<RecordType extends Record> extends LibrisUi<RecordType> {
 		throw new InternalError(getClass().getName()+".put() not implemented");	
 	}
 
+	protected void repl() {
+		boolean doQuit = false;
+		do {
+			String prompt = getUiTitle();
+			if (isNull(prompt)) {
+				prompt = "";
+			}
+			prompt += ": ";
+			try {
+				String command = promptAndReadReply(prompt);
+				doQuit = processCommand(command);
+			} catch (DatabaseException e) {
+				alert("Error: ", e);
+			}
+		} while (!doQuit);
+		stop();
+		
+	}
+	private boolean processCommand(String command) throws DatabaseException {
+		String[] parts = command.split("\\s+");
+		if (parts.length == 0) return false;
+		switch (parts[0]) {
+		case "quit": {
+			boolean force = (parts.length > 1) && parts[1].equals("-f");
+			if (quit(force)) return true;
+		}
+			break;
+			default: alert("command "+command+" not recognized");
+		}
+		return false;
+	}
+
 	public void repaint() {
 	}
 
@@ -135,6 +175,26 @@ public class CmdlineUi<RecordType extends Record> extends LibrisUi<RecordType> {
 
 	public File getDatabaseFile() {
 		return null;
+	}
+
+	@Override
+	public boolean start() {
+		Thread consoleThread = new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				repl();
+				
+			}
+		});
+		consoleThread.start();
+		return true;
+	}
+
+	@Override
+	public boolean stop() {
+		// TODO Auto-generated method stub
+		return super.stop();
 	}
 
 }

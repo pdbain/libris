@@ -77,4 +77,7 @@ public interface DatabaseUi<RecordType extends Record> {
 	public abstract int confirm(String msg);
 	public abstract int confirmWithCancel(String msg);
 	public String promptAndReadReply(String prompt) throws DatabaseException;
+	
+	public boolean start();
+	public boolean stop();
 }

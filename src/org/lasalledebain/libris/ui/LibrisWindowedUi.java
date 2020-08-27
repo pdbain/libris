@@ -101,8 +101,8 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 		parentPanel.add(controlPanel);
 	}
 
-	public LibrisWindowedUi(File databaseFile, boolean readOnly) {
-		super(databaseFile, readOnly);
+	public LibrisWindowedUi(boolean readOnly) {
+		super(readOnly);
 		mainFrame = new JFrame();
 	}
 

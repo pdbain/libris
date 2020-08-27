@@ -8,7 +8,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public class LibrisHttpServer<RecordType extends Record> extends HeadlessUi {
+public class LibrisHttpServer<RecordType extends Record> extends HeadlessUi<RecordType> {
 
 	public LibrisHttpServer(int thePort, String theContext) {
 		portNumber = thePort;
@@ -18,24 +18,42 @@ public class LibrisHttpServer<RecordType extends Record> extends HeadlessUi {
 	private String context;
 	public static final int default_port = 8080;
 	public static final String DEFAULT_CONTEXT="/libris";
-	public void startServer() {
-		Server theServer = new Server(portNumber);
+	private Server theServer;
+	public boolean startServer() {
+		theServer = new Server(portNumber);
 		ServletContextHandler handler = new ServletContextHandler(theServer, context);
 		try {
 			LibrisServlet<RecordType> theServlet = new LibrisServlet<RecordType>(this);
 			ServletHolder theHolder = new ServletHolder(theServlet);
 			handler.addServlet(theHolder, "/");
 			theServer.start();
-			theServer.join();
 		} catch (Exception e) {
-			alert("Error launching server: ", e);
+			alert("Failed to launch server: ", e);
+			return false;
 		}
+		return true;
 	}
 
 	@Override
 	public LibrisDatabase openDatabase(LibrisDatabaseConfiguration config) throws DatabaseException {
 		super.openDatabase(config);
-		startServer();
 		return currentDatabase;
+	}
+
+	@Override
+	public boolean start() {
+		return startServer();
+	}
+
+	@Override
+	public boolean stop() {
+		try {
+			theServer.stop();
+			theServer.join();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }

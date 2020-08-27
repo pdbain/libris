@@ -111,7 +111,7 @@ public class CsvImportTest extends TestCase {
 		workingDirectory = Utilities.makeTempTestDirectory();
 		final File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 		testDatabase = new DiagnosticDatabase(testDatabaseFile);
-		HeadlessUi ui = new HeadlessUi(testDatabaseFile, false);
+		HeadlessUi ui = new HeadlessUi(false);
 		Libris.buildIndexes(testDatabaseFile, ui);
 		testDatabase.openDatabase();
 		valueTranslations = new HashMap<String, String>();
