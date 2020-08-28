@@ -171,10 +171,10 @@ public class BrowserWindow extends JPanel {
 		return filter;
 	}
 
-	public void addRecord(Record rec) throws DatabaseException {
+	public void addRecord(DatabaseRecord rec) throws DatabaseException {
 		removeRecord(rec);
 		if (null == resultRecords) {
-			initialize(new SingleRecordList(rec));
+			initialize(new SingleRecordList<DatabaseRecord>(rec));
 		} else {
 			int index =  resultRecords.add(rec);
 			chooser.ensureIndexIsVisible(index);
@@ -192,7 +192,7 @@ public class BrowserWindow extends JPanel {
 		RandomAccessBrowserList<DatabaseRecord> list = new RandomAccessBrowserList<>(fieldIds);
 		int recordCount = 0;
 		while (recordsIterator.hasNext() && (LIST_LIMIT > recordCount)) {
-			Record r = recordsIterator.next();
+			DatabaseRecord r = recordsIterator.next();
 			list.add(r);
 			++recordCount;
 			if (recordCount > LIST_LIMIT) {

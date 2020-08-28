@@ -30,7 +30,7 @@ public class ArtifactManager {
 	static final int FANOUT = 100;
 	private final FileManager myFileMgr;
 	private final File artifactDirectory;
-	private final DatabaseUi myUi;
+	private final DatabaseUi<DatabaseRecord> myUi;
 	private ArtifactDatabase myDb;
 	private ReservationManager reservationMgr;
 

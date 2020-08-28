@@ -8,13 +8,13 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
-
+// TODO make this a singleton
 public abstract class GuiControlFactory<RecordType extends Record> {
 	static HashMap<String, ControlConstructor> controls = initializeControlList();
 	public GuiControlFactory() {
 	}
 	
-	synchronized static HashMap<String, ControlConstructor> initializeControlList() {
+	 static HashMap<String, ControlConstructor> initializeControlList() {
 		HashMap<String, ControlConstructor> map = new HashMap<String, ControlConstructor>(12);
 
 		try {

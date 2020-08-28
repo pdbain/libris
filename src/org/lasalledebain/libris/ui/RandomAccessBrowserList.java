@@ -16,7 +16,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.InputException;
 
-public class RandomAccessBrowserList<RecordType extends Record> extends RecordList<RecordType> implements ListModel {
+public class RandomAccessBrowserList<RecordType extends Record> extends RecordList<RecordType> implements ListModel<RecordInfo<RecordType>> {
 
 	HashSet<ListDataListener> listeners;
 	ArrayList<RecordInfo<RecordType>> recList;
@@ -31,11 +31,11 @@ public class RandomAccessBrowserList<RecordType extends Record> extends RecordLi
 		rowMap = new HashMap<Integer, RecordInfo<RecordType>>(BrowserWindow.LIST_LIMIT);
 		startIndex = endIndex = 0;
 	}
-	public int add(Record rec) {
+	public int add(RecordType rec) {
 		int posn = 0;
 		final Integer recId = rec.getRecordId();
 		if (!rowMap.containsKey(recId)) {
-			RecordInfo row = new RecordInfo(rec, fieldIds);
+			RecordInfo<RecordType> row = new RecordInfo<RecordType>(rec, fieldIds);
 			if (recList.size() == BrowserWindow.LIST_LIMIT) {
 				recList.remove(0);
 			}
@@ -54,7 +54,7 @@ public class RandomAccessBrowserList<RecordType extends Record> extends RecordLi
 		int posn = 0;
 		final int recId = rec.getRecordId();
 		if (rowMap.containsKey(recId)) {
-			RecordInfo victim = rowMap.remove(recId);
+			RecordInfo<RecordType> victim = rowMap.remove(recId);
 			int victimPos = recList.indexOf(victim);
 			recList.remove(victimPos);
 			posn = recList.size() - 1;
