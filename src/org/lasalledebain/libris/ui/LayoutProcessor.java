@@ -8,6 +8,7 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JComponent;
 
+import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -19,10 +20,11 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 
 	private static final String HTML_BACKGROUND_COLOUR = "LightCyan";
 	private static final String RECORD_BROWSER = "recordBrowser";
-	private static final String ONCHANGE_THIS_FORM_SUBMIT = "\" onchange=\"this.form.submit()\"";
-	private static final String BACKGROUND_COLOR_WHITE = "background-color: white;\n";
-	private static final String GREY_BORDER = "border: 1px solid LightGrey;\n";
-	private static final String CORNER_RADIUS = "5px;";
+	protected static final String ONCHANGE_THIS_FORM_SUBMIT = "\" onchange=\"this.form.submit()\"";
+	protected static final String BACKGROUND_COLOR_LIGHTCYAN = "background-color: " + HTML_BACKGROUND_COLOUR + ";\n";
+	protected static final String BACKGROUND_COLOR_WHITE = "background-color: white;\n";
+	protected static final String GREY_BORDER = "border: 1px solid LightGrey;\n";
+	protected static final String CORNER_RADIUS = "5px;";
 	private static final String MAIN_FRAME = "mainFrame";
 	private static final String CONTENT_PANEL_NAME = "contentPanel";
 	protected static final String BROWSER_COLUMN_NAME = "browserPanel";
@@ -62,7 +64,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			+ " font-family: Arial, Helvetica, sans-serif;\n"
 			+ "}\n";
 
-	private static final String STYLE_STRING = MASTER_STYLE
+	private static final String GENERIC_STYLE = MASTER_STYLE
 			+ "\n" +
 			"h1 {color: blue}\n" + 
 			'#'+MAIN_FRAME +
@@ -70,13 +72,18 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			"}\n"
 			+ CONTENT_PANEL_STYLE
 			+ BROWSER_PANEL_STYLE+
-			DISPLAY_PANEL_STYLE+'.'+BROWSER_ITEM_CLASS +
-			" {\n" + 
+			DISPLAY_PANEL_STYLE
+			+'.'+BROWSER_ITEM_CLASS
+			+ " {\n" + 
 			"font-size: 100%;\n" +
-			"}\n" + 
-			"</style>\n";
+			"}\n";
 
+	protected String getStyleString() { 
+			return GENERIC_STYLE;
+	}
+	
 	protected final LibrisLayout<RecordType> myLayout;
+	protected DatabaseUi<RecordType> myUi;
 
 	public LayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		myLayout = theLayout;
@@ -99,8 +106,9 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				"<title>");
 		buffer.append(ui.getUiTitle());
 		buffer.append("</title>\n" + 
-				"<style>\n" + 
-				STYLE_STRING
+				"<style>\n"
+				+ getStyleString()
+				+ "</style>\n"
 				+ "</head>\n"
 				);
 	}
@@ -114,12 +122,11 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	protected void layoutBrowserPanel(RecordList<RecordType> recList, int start, int currentRecord, LibrisLayout<RecordType> browserLayout, StringBuffer buff) {
 		String[] browserFields = browserLayout.getFieldIds();
 		startDiv(buff, BROWSER_COLUMN_NAME);
-		buff.append("<form action=\".\" method=\"get\">");
-		startDiv(buff, null);
-		startDiv(buff, null);
+		startDiv(buff);
+		startDiv(buff);
 		endDiv(buff);
 		addLayoutSelector(buff);
-		startDiv(buff, null);
+		startDiv(buff);
 		Iterator<RecordType> recIter = recList.iterator();
 		int recCount = 0;
 		int firstRecord = 0;
@@ -153,12 +160,11 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		endDiv(buff);
 		addNextLastButtons(currentRecord, buff, firstRecord, lastRecord);	
 
-		buff.append("</form>\n");
 		endDiv(buff);
 	}
 
 	private void addNextLastButtons(int currentRecord, StringBuffer buff, int firstRecord, int lastRecord) {
-		startDiv(buff, null);
+		startDiv(buff);
 		buff.append("<button onclick=\"document.getElementById('"
 				+ RECORD_BROWSER
 				+ "').value='"
@@ -190,20 +196,38 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		buff.append("</select>");
 	}
 
-	private StringBuffer startDiv(StringBuffer buff, String className) {
-		if (null == className) {
-			className="none";
+	protected void startDiv(StringBuffer buff, String className) {
+		buff.append("<div class="+className+">\n");
+	}
+
+	protected void startDiv(StringBuffer buff) {
+			buff.append("<div>\n");
+	}
+	
+	protected void startDiv(StringBuffer buff, String[] classes) {
+		if (0 == classes.length) {
+			buff.append("<div>\n");
+		} else {
+			String sep = "";
+			buff.append("<div class=\"");
+			for (String c: classes) {
+				buff.append(sep);
+				buff.append(c);
+				sep = " ";
+			}
+			buff.append("\">");
 		}
-		return buff.append("<div class="+className+">\n");
 	}
 
 	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, 
 			DatabaseUi<RecordType> ui, HttpServletResponse resp) throws InputException, IOException {
+		myUi = ui;
 		StringBuffer buff = new StringBuffer(1000);
 		generateHeaderAndStylesheet(ui, buff);
 		startBody(buff);
 		{
-			startContentPanel(buff);
+			startDiv(buff, CONTENT_PANEL_NAME);
+			buff.append("<form action=\".\" method=\"get\">");
 			{
 				layoutBrowserPanel(recList, 0, recId, browserLayout, buff);
 				startDiv(buff, DISPLAY_COLUMN_CLASS);
@@ -212,7 +236,8 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				}
 				endDiv(buff);
 			}
-			endContentPanel(buff);
+			buff.append("</form>\n");
+			endDiv(buff);
 		}
 		endBody(buff);
 		PrintWriter myWriter = resp.getWriter();
@@ -220,15 +245,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		myWriter.append(htmlString);
 	}
 
-	private void startContentPanel(StringBuffer buff) {
-		buff.append("<div class="+CONTENT_PANEL_NAME+">\n");
-	}
-
-	private void endContentPanel(StringBuffer buff) {
-		endDiv(buff);
-	}
-
-	private final void endDiv(StringBuffer buff) {
+	protected final void endDiv(StringBuffer buff) {
 		buff.append("</div>\n");
 	}
 
@@ -237,4 +254,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		buff.append("</body>\n");
 	}
 
+	protected void makeHtmlControl(LayoutField<RecordType> fieldPosn, Field recordField) {
+		
+	}
 }

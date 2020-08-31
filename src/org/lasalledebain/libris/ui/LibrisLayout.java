@@ -38,6 +38,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 	protected ArrayList<String> layoutUsers;
 	protected final Layouts<RecordType> myLayouts;
 	protected LayoutProcessor<RecordType> layoutProc;
+	private int tableRightEdge;
 
 	public LibrisLayout(Schema schem, Layouts<RecordType> theLayouts) {
 		mySchema = schem;
@@ -64,15 +65,12 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		setIdAndTitle(values.get("title"), values.get("id"));
 		String theType = values.get(XML_LAYOUT_TYPE_ATTR);
 		setType(theType);
-		layoutProc = getLayoutProcessor(theType);
-		if (null == layoutProc) {
-			throw new InputException("Invalid layout type: "+theType, mgr);
-		}
 		while (mgr.hasNext()) {
 			ElementManager subElementMgr = mgr.nextElement();
 			if (subElementMgr.getElementTag().equals(XML_LAYOUTFIELD_TAG)) {
 				LayoutField<RecordType> l = new LayoutField<>(this, positionList);
-				l.fromXml(subElementMgr);		
+				l.fromXml(subElementMgr);
+				tableRightEdge = Math.max(l.getRightEdge(), tableRightEdge);
 				l.setFieldNum(mySchema.getFieldNum(l.getId()));
 				positionList = l;
 				bodyFieldList.add(l);
@@ -83,6 +81,10 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 				parseUsage(subElementMgr);
 			}
 			subElementMgr.parseClosingTag();
+		}
+		layoutProc = getLayoutProcessor(theType);
+		if (null == layoutProc) {
+			throw new InputException("Invalid layout type: "+theType, mgr);
 		}
 		layoutProc.validate();
 	}
@@ -293,6 +295,10 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 	}
 	protected void showRecord(int recId) {
 		return;
+	}
+
+	int getTableRightEdge() {
+		return tableRightEdge;
 	}
 
 }

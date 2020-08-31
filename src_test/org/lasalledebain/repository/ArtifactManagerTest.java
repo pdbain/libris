@@ -286,6 +286,7 @@ public class ArtifactManagerTest  extends TestCase {
 		return expectedParentId;
 	}
 
+	@SuppressWarnings("rawtypes")
 	private ArtifactManager createManager()
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
 		DatabaseUi ui = new HeadlessUi();

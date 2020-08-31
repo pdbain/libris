@@ -27,6 +27,7 @@ public class LibrisHttpServer<RecordType extends Record> extends HeadlessUi<Reco
 			ServletHolder theHolder = new ServletHolder(theServlet);
 			handler.addServlet(theHolder, "/");
 			theServer.start();
+			message("Starting server context="+context+" port="+portNumber);
 		} catch (Exception e) {
 			alert("Failed to launch server: ", e);
 			return false;
@@ -47,6 +48,7 @@ public class LibrisHttpServer<RecordType extends Record> extends HeadlessUi<Reco
 
 	@Override
 	public boolean stop() {
+		message("Stopping server");
 		try {
 			theServer.stop();
 			theServer.join();

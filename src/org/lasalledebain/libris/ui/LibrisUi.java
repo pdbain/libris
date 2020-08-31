@@ -185,10 +185,8 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	}
 
 	@Override
-	public void displayRecord(int recordId) throws LibrisException {
-		// TODO implement or remove displayRecord
-
-	}
+	public abstract void displayRecord(int recordId) throws LibrisException;
+	
 	@Override
 	public void pasteToField() {
 		// TODO implement or remove pasteToField

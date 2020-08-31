@@ -25,6 +25,7 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 	private LibrisLayout<RecordType> containingLayout;
 	protected ControlConstructor control;
 	private boolean carriageReturn = false;
+	private int myRightEdge;
 
 	public boolean isCarriageReturn() {
 		return carriageReturn;
@@ -54,7 +55,7 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 		return temp;
 	}
 
-	private void checkForOverlap() throws DatabaseException {
+	private int checkForOverlap() throws DatabaseException {
 		int myRightEdge = hpos+hspan-1;
 		LayoutField<RecordType> cursor = prevLink;
 		while (null != cursor) {
@@ -67,6 +68,7 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 			}
 			cursor = cursor.prevLink;
 		}
+		return myRightEdge;
 	}
 
 	public ControlConstructor getControlContructor() {
@@ -238,9 +240,12 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 		} else {
 			hpos = vpos = 0;
 		}
-		checkForOverlap();
+		myRightEdge = checkForOverlap();
 	}
 
+	public int getRightEdge() {
+		return myRightEdge;
+	}
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
 		LibrisAttributes attr = getAttributes();

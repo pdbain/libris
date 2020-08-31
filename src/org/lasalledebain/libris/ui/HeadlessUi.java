@@ -53,6 +53,11 @@ public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<Reco
 		System.err.println("Alert: "+msg);
 	}
 
+	public void message(String msg) {
+		log(Level.INFO, msg);
+		System.out.println(msg);
+	}
+
 	@Override
 	public int confirm(String msg) {
 		return confirmValue;
