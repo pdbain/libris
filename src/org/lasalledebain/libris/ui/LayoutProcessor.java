@@ -20,6 +20,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 
 	private static final String HTML_BACKGROUND_COLOUR = "LightCyan";
 	private static final String RECORD_BROWSER = "recordBrowser";
+	private static final String RECORD_SELECT_CLASS = "recordSelect";
 	protected static final String ONCHANGE_THIS_FORM_SUBMIT = "\" onchange=\"this.form.submit()\"";
 	protected static final String BACKGROUND_COLOR_LIGHTCYAN = "background-color: " + HTML_BACKGROUND_COLOUR + ";\n";
 	protected static final String BACKGROUND_COLOR_WHITE = "background-color: white;\n";
@@ -27,28 +28,32 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	protected static final String CORNER_RADIUS = "5px;";
 	private static final String MAIN_FRAME = "mainFrame";
 	private static final String CONTENT_PANEL_NAME = "contentPanel";
-	protected static final String BROWSER_COLUMN_NAME = "browserPanel";
+	protected static final String BROWSER_PANEL_CLASS = "browserPanel";
 	protected static final String BROWSER_ITEM_CLASS = "browserItem";
-	private static final String DISPLAY_COLUMN_CLASS = "displayPanel";
+	private static final String DISPLAY_PANEL_CLASS = "displayPanel";
 
 	private static final String BROWSER_PANEL_STYLE = 
-			'.'+BROWSER_COLUMN_NAME +
+			'.'+BROWSER_PANEL_CLASS +
 			" {\n"
+			+ "width: 25%;"
 			+ "display: inline;"
 			+ "float: left;\n" +
 			"margin: 10px;\n" + 
 			GREY_BORDER + 
 			"border-radius: " + CORNER_RADIUS
 			+ "\n"
-			+ BACKGROUND_COLOR_WHITE
+			+ "}\n"
+			+ '.'+RECORD_SELECT_CLASS +
+			" {\n"
+			+ "width: 95%;"
 			+ "}\n";
 
-	private static final String DISPLAY_PANEL_STYLE = '.'+DISPLAY_COLUMN_CLASS +
+	private static final String DISPLAY_PANEL_STYLE = '.'+DISPLAY_PANEL_CLASS +
 			" {\n" + 
 			"float: left;\n"
 			+ "display: inline;"
 			+ "margin: 10px;\n"
-			+ "width: 600px;"
+			+ "width: 70%;"
 			+ GREY_BORDER + 
 			"border-radius: " + CORNER_RADIUS
 			+ "\n" +
@@ -121,7 +126,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	}
 	protected void layoutBrowserPanel(RecordList<RecordType> recList, int start, int currentRecord, LibrisLayout<RecordType> browserLayout, StringBuffer buff) {
 		String[] browserFields = browserLayout.getFieldIds();
-		startDiv(buff, BROWSER_COLUMN_NAME);
+		startDiv(buff, BROWSER_PANEL_CLASS);
 		startDiv(buff);
 		startDiv(buff);
 		endDiv(buff);
@@ -133,8 +138,10 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		int lastRecord = 0;
 		buff.append("<select id="
 				+ RECORD_BROWSER
-				+ " name="
+				+ " "
+				+ "name="
 				+ HTTP_PARAM_RECORD_ID
+				+ " class="+RECORD_SELECT_CLASS
 				+ " size=\"20\""
 				+ ONCHANGE_THIS_FORM_SUBMIT
 				+ ">\n");
@@ -230,7 +237,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			buff.append("<form action=\".\" method=\"get\">");
 			{
 				layoutBrowserPanel(recList, 0, recId, browserLayout, buff);
-				startDiv(buff, DISPLAY_COLUMN_CLASS);
+				startDiv(buff, DISPLAY_PANEL_CLASS);
 				{
 					layoutDisplayPanel(recList, recId, buff);
 				}

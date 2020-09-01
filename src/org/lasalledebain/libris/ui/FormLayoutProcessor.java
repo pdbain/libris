@@ -37,7 +37,9 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 			FIELDS_PANEL_CLASS = "fieldsPanel",
 			MULTICONTROL_CELL_CLASS = "multiControlCell",
 			FIELD_TITLE_CLASS="fieldTitle",
-			FIELD_TEXT_CLASS="fieldText";
+			FIELD_TEXT_CLASS="fieldText",
+			FIELD_TEXT_MULTILINE_CLASS="fieldTextMultiLine",
+			RECORT_TITLE_CLASS="recordTitle";
 	private final String myStyleString;
 	public FormLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
@@ -47,17 +49,29 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 	private String makeStyleString() {
 		StringBuffer buff = new StringBuffer(super.getStyleString());
 		buff.append(
-				"."+ FORM_FIELD_GRID_CLASS + " {\n" + 
+				"."+ RECORT_TITLE_CLASS + " {\n"
+						+ "vertical-align: top;"
+						+ "display:block;\n"
+						+ "text-align: center;"
+						+ "font-size: 120%;\n"
+						+ "font-weight: bold;\n"
+						+ "}\n"
+						+ "."+ FORM_FIELD_GRID_CLASS + " {\n" + 
 						"  display: grid;\n" + 
 						"}\n"
-						+ "."+ FIELD_TITLE_CLASS + " {\n" + 
-						"float:left;\n" + 
-						"font-size: 100%;\n"
+						+ "."+ FIELD_TITLE_CLASS + " {\n"
+						+ "vertical-align: top;"
+						+ "float:left;\n" 
+						+ "display:inline;\n"
+						+ "font-size: 100%;\n"
 						+ "padding-right: 15px;\n"
 						+ "font-weight: bold;\n"
 						+ "}\n"
 						+ "."+ FIELD_TEXT_CLASS + " {\n"
 						+ "display:inline;\n"
+						+ "}\n"
+						+ "."+ FIELD_TEXT_MULTILINE_CLASS + " {\n"
+						+ "display:inline-block;\n"
 						+ "}\n"
 						+ "."+ MULTICONTROL_CELL_CLASS + " {\n"
 						+ GREY_BORDER
@@ -148,6 +162,16 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 			return;
 		}
 		startDiv(buff, RECORD_PANEL_CLASS); {
+			startDiv(buff, RECORT_TITLE_CLASS); {
+				String recName = rec.getName();
+				buff.append("Record ");
+				buff.append(recId);
+				if (null != recName) {
+					buff.append(" ");
+					buff.append(recName);
+				}
+
+			} endDiv(buff);
 			Schema mySchema = myLayout.getSchema();
 			int numGroups = mySchema.getNumGroups();
 			if ((numGroups > 0) && rec.hasAffiliations()) {
@@ -178,14 +202,13 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 						continue;
 					}
 					startDiv(buff, new String[] {MULTICONTROL_CELL_CLASS, RECORD_FIELD_CLASS+fieldNum}); {
-						int numValues = fld.getNumberOfValues();
 						startDiv(buff, FIELD_TITLE_CLASS);
 						buff.append(fp.getTitle());
 						endDiv(buff);
 						buff.append("<!--"
 								+fp.getId()
 								+ "-->\n");
-						startDiv(buff, FIELD_TEXT_CLASS);
+						startDiv(buff, (fld.getNumberOfValues() > 1? FIELD_TEXT_MULTILINE_CLASS: FIELD_TEXT_CLASS));
 						String separator = "";
 						for (FieldValue fv: fld.getFieldValues()) {
 							buff.append(separator);
@@ -214,7 +237,6 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 
 	@Override
 	protected String getStyleString() {
-		return makeStyleString(); // TODO DEBUG
-		// TODO real code return myStyleString;
+		return myStyleString;
 	}
 }
