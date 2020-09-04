@@ -11,7 +11,6 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.logging.Level;
 
-import org.eclipse.jetty.server.Server;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
@@ -25,7 +24,6 @@ import junit.framework.TestCase;
 
 public class HtmlTests extends TestCase {
 
-	private static final String ANYSTRING = "(\\R|.)*";
 	private File workingDirectory;
 	private LibrisDatabase db;
 
@@ -35,22 +33,21 @@ public class HtmlTests extends TestCase {
 		Layouts<DatabaseRecord> myLayouts = db.getLayouts();
 		LibrisLayout<DatabaseRecord> myLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH);
 		LibrisLayout<DatabaseRecord> browserLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
-		myLayout.layOutPage(db.getRecords(), 2, browserLayout, db.getUi(), resp);
+		myLayout.layOutPage(db.getRecords(), new HttpParameters(2, 0, resp), browserLayout, db.getUi());
 		String result = resp.getResponseText();
 		checkResult(result);
 	}
 
 	private void checkResult(String result) {
-		if (!result.matches(ANYSTRING+"<head>"
-				+ANYSTRING+"<style>"
-				+ANYSTRING+"</style>"
-				+ANYSTRING+"</head>"
-				+ANYSTRING+"<body>"
-				+ANYSTRING+"A First History of France"
-				+ANYSTRING+"</body>"
-				+ANYSTRING
-				)) {
-			fail("Missing body text in HTML output:\n"+result);
+		String expectedWords[] = {"<head>", "<style>", "</style>", "</head>", "<body>", "A First History of France", "</body>"};
+		int pos = 0;
+		for (String expWord: expectedWords) {
+			pos = result.indexOf(expWord, pos);
+			if (pos < 0) {
+				fail("Missing body text \""
+						+expWord
+						+ "\" in HTML output:\n"+result);
+			}
 		}
 	}
 
@@ -65,12 +62,12 @@ public class HtmlTests extends TestCase {
 		ui.startServer();
 		HttpClient client = HttpClient.newHttpClient();
 		HttpRequest request = HttpRequest.newBuilder()
-		      .uri(URI.create("http://localhost:8080/libris/?layout=LO_paragraphDisplay&recId=2"))
-		      .build();
+				.uri(URI.create("http://localhost:8080/libris/?layout=LO_paragraphDisplay&recId=2"))
+				.build();
 		client.sendAsync(request, BodyHandlers.ofString())
-	      .thenApply(HttpResponse::body)
-	      .thenAccept(s->response.append(s))
-	      .join();
+		.thenApply(HttpResponse::body)
+		.thenAccept(s->response.append(s))
+		.join();
 		ui.stop();
 		checkResult(response.toString());
 	}

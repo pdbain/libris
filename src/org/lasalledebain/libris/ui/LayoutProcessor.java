@@ -1,23 +1,25 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.libris.ui.BrowserWindow.LIST_LIMIT;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.swing.JComponent;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-
 public abstract class LayoutProcessor<RecordType extends Record>
 implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, LibrisHTMLConstants {
 
+	protected static final String BROWSER_STARTING_RECORD_CONTROL = "browserStartingRecordControl";
 	private static final String HTML_BACKGROUND_COLOUR = "LightCyan";
 	private static final String RECORD_BROWSER = "recordBrowser";
 	private static final String RECORD_SELECT_CLASS = "recordSelect";
@@ -30,7 +32,9 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	private static final String CONTENT_PANEL_NAME = "contentPanel";
 	protected static final String BROWSER_PANEL_CLASS = "browserPanel";
 	protected static final String BROWSER_ITEM_CLASS = "browserItem";
-	private static final String DISPLAY_PANEL_CLASS = "displayPanel";
+	protected static final String DISPLAY_PANEL_CLASS = "displayPanel,\n",
+			RECORT_TITLE_CLASS="recordTitle",
+			NAVIGATION_BUTTONS_CLASS="navigationButtons";
 
 	private static final String BROWSER_PANEL_STYLE = 
 			'.'+BROWSER_PANEL_CLASS +
@@ -61,13 +65,27 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			"}\n";
 	private static final String CONTENT_PANEL_STYLE = 
 			'.'+CONTENT_PANEL_NAME + " {\n"
-			+ "float: left;\n"
-			+ "}\n";
+					+ "float: left;\n"
+					+ "}\n";
+
+	private static final String  NAVIGATION_BUTTONS_STYLE =
+			'.'+NAVIGATION_BUTTONS_CLASS + " {\n"
+					+ " font-family: \"Apple Symbols\", \"Arial Unicode MS\", Symbola, \"Everson Mono\";\n"
+					+ "}\n";
 
 	private static final String MASTER_STYLE = "html {background-color: "
 			+ HTML_BACKGROUND_COLOUR + ";"
 			+ " font-family: Arial, Helvetica, sans-serif;\n"
 			+ "}\n";
+
+	protected static final String RECORT_TITLE_STYLE =
+			"."+ RECORT_TITLE_CLASS + " {\n"
+					+ "vertical-align: top;"
+					+ "display:block;\n"
+					+ "text-align: center;"
+					+ "font-size: 120%;\n"
+					+ "font-weight: bold;\n"
+					+ "}\n";
 
 	private static final String GENERIC_STYLE = MASTER_STYLE
 			+ "\n" +
@@ -76,6 +94,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			" {\n"+
 			"}\n"
 			+ CONTENT_PANEL_STYLE
+			+ NAVIGATION_BUTTONS_STYLE
 			+ BROWSER_PANEL_STYLE+
 			DISPLAY_PANEL_STYLE
 			+'.'+BROWSER_ITEM_CLASS
@@ -84,9 +103,9 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			"}\n";
 
 	protected String getStyleString() { 
-			return GENERIC_STYLE;
+		return GENERIC_STYLE;
 	}
-	
+
 	protected final LibrisLayout<RecordType> myLayout;
 	protected DatabaseUi<RecordType> myUi;
 
@@ -106,7 +125,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	/* HTML utilities */
 	protected void generateHeaderAndStylesheet(DatabaseUi<RecordType> ui, StringBuffer buffer) {
 		buffer.append("<!DOCTYPE html>\n" + 
-				"<html>\n" + 
+				"<meta charset=utf-8>\n" + 
 				"<head>\n" + 
 				"<title>");
 		buffer.append(ui.getUiTitle());
@@ -124,7 +143,21 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				+ MAIN_FRAME
 				+ ">\n");
 	}
-	protected void layoutBrowserPanel(RecordList<RecordType> recList, int start, int currentRecord, LibrisLayout<RecordType> browserLayout, StringBuffer buff) {
+
+	void layoutRecordTitle(StringBuffer buff, RecordType rec) {
+		startDiv(buff, RECORT_TITLE_CLASS); {
+			String recName = rec.getName();
+			buff.append("Record ");
+			buff.append(rec.getRecordId());
+			if (null != recName) {
+				buff.append(" ");
+				buff.append(recName);
+			}
+
+		} endDiv(buff);
+	}
+
+	protected int layoutBrowserPanel(RecordList<RecordType> recList, int start, int currentRecord, LibrisLayout<RecordType> browserLayout, StringBuffer buff) {
 		String[] browserFields = browserLayout.getFieldIds();
 		startDiv(buff, BROWSER_PANEL_CLASS);
 		startDiv(buff);
@@ -145,7 +178,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				+ " size=\"20\""
 				+ ONCHANGE_THIS_FORM_SUBMIT
 				+ ">\n");
-		while (recIter.hasNext() && (recCount < BrowserWindow.LIST_LIMIT)) {
+		while (recIter.hasNext() && (recCount < LIST_LIMIT)) {
 			RecordType rec = recIter.next();
 			int recordId = rec.getRecordId();
 			if (recordId < start) {
@@ -165,20 +198,30 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		buff.append("</select>\n");
 		endDiv(buff);
 		endDiv(buff);
-		addNextLastButtons(currentRecord, buff, firstRecord, lastRecord);	
+		currentRecord = Math.max(Math.min(currentRecord, lastRecord), firstRecord);
+		addNextLastButtons(currentRecord, buff, start, firstRecord, lastRecord);	
 
 		endDiv(buff);
+		return currentRecord;
 	}
 
-	private void addNextLastButtons(int currentRecord, StringBuffer buff, int firstRecord, int lastRecord) {
+	private void addNextLastButtons(int currentRecord, StringBuffer buff, int startRecord, int firstRecord, int lastRecord) {
 		startDiv(buff);
+		buff.append("<button onclick=\"document.getElementById('"
+				+ BROWSER_STARTING_RECORD_CONTROL
+				+ "').value='"
+				+ (Math.max(RecordId.NULL_RECORD_ID, startRecord-LIST_LIMIT))
+				+ "'\""
+				+ ((startRecord > RecordId.NULL_RECORD_ID)? "": " disabled")
+				+ ">&#x23EE</button>\n");	
+
 		buff.append("<button onclick=\"document.getElementById('"
 				+ RECORD_BROWSER
 				+ "').value='"
 				+ (currentRecord-1)
 				+ "'\""
 				+ (currentRecord > firstRecord? "": " disabled")
-				+ ">Previous</button>");	
+				+ ">&#x23EA;</button>\n");	
 
 		buff.append("<button onclick=\"document.getElementById('"
 				+ RECORD_BROWSER
@@ -186,7 +229,25 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				+ (currentRecord+1)
 				+ "'\""
 				+ (currentRecord < lastRecord? "": " disabled")
-				+ ">Next</button>");
+				+ ">&#x23E9;</button>\n");
+		buff.append("<button onclick=\"document.getElementById('"
+				+ BROWSER_STARTING_RECORD_CONTROL
+				+ "').value='"
+				+ (startRecord+LIST_LIMIT)
+				+ "'\""
+				+ (lastRecord >= (startRecord + LIST_LIMIT - 1)? "": " disabled")
+				+ ">&#x23ED;</button>\n");
+		buff.append("<input type=\"hidden\" "
+				+ ONCHANGE_THIS_FORM_SUBMIT
+				+ " id=\""
+				+ BROWSER_STARTING_RECORD_CONTROL
+				+ "\" name=\""
+				+ LibrisHTMLConstants.HTTP_BROWSER_STARTING_RECORD
+				+ "\""
+				+ "\" value=\""
+				+ startRecord
+				+ "\""
+				+ ">\n");
 		endDiv(buff);
 	}
 
@@ -208,9 +269,9 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	}
 
 	protected void startDiv(StringBuffer buff) {
-			buff.append("<div>\n");
+		buff.append("<div>\n");
 	}
-	
+
 	protected void startDiv(StringBuffer buff, String[] classes) {
 		if (0 == classes.length) {
 			buff.append("<div>\n");
@@ -226,32 +287,6 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		}
 	}
 
-	public void layOutPage(RecordList<RecordType> recList, int recId, LibrisLayout<RecordType> browserLayout, 
-			DatabaseUi<RecordType> ui, HttpServletResponse resp) throws InputException, IOException {
-		myUi = ui;
-		StringBuffer buff = new StringBuffer(1000);
-		generateHeaderAndStylesheet(ui, buff);
-		startBody(buff);
-		{
-			startDiv(buff, CONTENT_PANEL_NAME);
-			buff.append("<form action=\".\" method=\"get\">");
-			{
-				layoutBrowserPanel(recList, 0, recId, browserLayout, buff);
-				startDiv(buff, DISPLAY_PANEL_CLASS);
-				{
-					layoutDisplayPanel(recList, recId, buff);
-				}
-				endDiv(buff);
-			}
-			buff.append("</form>\n");
-			endDiv(buff);
-		}
-		endBody(buff);
-		PrintWriter myWriter = resp.getWriter();
-		String htmlString = buff.toString();
-		myWriter.append(htmlString);
-	}
-
 	protected final void endDiv(StringBuffer buff) {
 		buff.append("</div>\n");
 	}
@@ -262,6 +297,33 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	}
 
 	protected void makeHtmlControl(LayoutField<RecordType> fieldPosn, Field recordField) {
+
+	}
+
+	public void layOutPage(RecordList<RecordType> recList, HttpParameters params,
+			LibrisLayout<RecordType> browserLayout, DatabaseUi<RecordType> ui) throws InputException, IOException {
+		myUi = ui;
+		StringBuffer buff = new StringBuffer(1000);
+		generateHeaderAndStylesheet(ui, buff);
+		startBody(buff);
+		{
+			startDiv(buff, CONTENT_PANEL_NAME);
+			buff.append("<form action=\".\" method=\"get\">");
+			{
+				int displayableRecId = layoutBrowserPanel(recList, params.browserFirstId, params.recId, browserLayout, buff);
+				startDiv(buff, DISPLAY_PANEL_CLASS);
+				{
+					layoutDisplayPanel(recList, displayableRecId, buff);
+				}
+				endDiv(buff);
+			}
+			buff.append("</form>\n");
+			endDiv(buff);
+		}
+		endBody(buff);
+		PrintWriter myWriter = params.resp.getWriter();
+		String htmlString = buff.toString();
+		myWriter.append(htmlString);
 		
 	}
 }

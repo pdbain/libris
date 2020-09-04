@@ -49,13 +49,21 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 
 		PrintWriter writer = resp.getWriter();
 		try {
-			String recId = req.getParameter(HTTP_PARAM_RECORD_ID);
-			int id;
+			int recId;
 			LibrisLayout<DatabaseRecord> theLayout;
-			if (StringUtils.isStringEmpty(recId)) {
-				id = RecordId.NULL_RECORD_ID;
-			} else {
-				id = Integer.parseInt(recId);
+			{
+				String recIdString = req.getParameter(HTTP_PARAM_RECORD_ID);
+				if (StringUtils.isStringEmpty(recIdString)) {
+					recId = RecordId.NULL_RECORD_ID;
+				} else {
+					recId = Integer.parseInt(recIdString);
+				}
+			}
+
+			int startId;
+			{
+				String startIdString = req.getParameter(HTTP_BROWSER_STARTING_RECORD);
+				startId = (StringUtils.isStringEmpty(startIdString)) ? RecordId.NULL_RECORD_ID:  Integer.parseInt(startIdString);
 			}
 			theLayout = summaryDisplay;
 			String layoutId = req.getParameter(HTTP_PARAM_LAYOUT_ID);
@@ -66,11 +74,11 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 			theLayout = myLayouts.getLayout(layoutId);
 			Assertion.assertNotNullInputException("Layout not found: ",  layoutId, theLayout);
 			resp.setStatus(HttpStatus.OK_200);
-			DatabaseRecord rec = database.getRecord(id);
+			DatabaseRecord rec = database.getRecord(recId);
 			// TODO handle unknown record IDs
 			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 			Assertion.assertNotNull(myUi, "No layout found for "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryLayout);
-			theLayout.layOutPage(database.getRecords(), id, summaryLayout, myUi, resp);
+			theLayout.layOutPage(database.getRecords(), new HttpParameters(recId, startId, resp), summaryLayout, myUi);
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());
 			database.log(Level.SEVERE, "Error formatting web page: ", t);

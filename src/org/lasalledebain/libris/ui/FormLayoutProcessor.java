@@ -38,8 +38,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 			MULTICONTROL_CELL_CLASS = "multiControlCell",
 			FIELD_TITLE_CLASS="fieldTitle",
 			FIELD_TEXT_CLASS="fieldText",
-			FIELD_TEXT_MULTILINE_CLASS="fieldTextMultiLine",
-			RECORT_TITLE_CLASS="recordTitle";
+			FIELD_TEXT_MULTILINE_CLASS="fieldTextMultiLine";
 	private final String myStyleString;
 	public FormLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
@@ -49,14 +48,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 	private String makeStyleString() {
 		StringBuffer buff = new StringBuffer(super.getStyleString());
 		buff.append(
-				"."+ RECORT_TITLE_CLASS + " {\n"
-						+ "vertical-align: top;"
-						+ "display:block;\n"
-						+ "text-align: center;"
-						+ "font-size: 120%;\n"
-						+ "font-weight: bold;\n"
-						+ "}\n"
-						+ "."+ FORM_FIELD_GRID_CLASS + " {\n" + 
+				"."+ FORM_FIELD_GRID_CLASS + " {\n" + 
 						"  display: grid;\n" + 
 						"}\n"
 						+ "."+ FIELD_TITLE_CLASS + " {\n"
@@ -161,17 +153,8 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 			buff.append("<p>Record "+recId+" not found</p>");
 			return;
 		}
+		layoutRecordTitle(buff, rec);
 		startDiv(buff, RECORD_PANEL_CLASS); {
-			startDiv(buff, RECORT_TITLE_CLASS); {
-				String recName = rec.getName();
-				buff.append("Record ");
-				buff.append(recId);
-				if (null != recName) {
-					buff.append(" ");
-					buff.append(recName);
-				}
-
-			} endDiv(buff);
 			Schema mySchema = myLayout.getSchema();
 			int numGroups = mySchema.getNumGroups();
 			if ((numGroups > 0) && rec.hasAffiliations()) {
@@ -237,6 +220,6 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 
 	@Override
 	protected String getStyleString() {
-		return myStyleString;
+		return makeStyleString(); // TODO DEBUG myStyleString;
 	}
 }

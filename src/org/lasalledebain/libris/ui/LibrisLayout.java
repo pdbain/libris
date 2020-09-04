@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.stream.Stream;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.swing.JComponent;
 
 import org.lasalledebain.libris.Field;
@@ -167,9 +166,9 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		return 	layoutProc.layOutFields(recList, ui, recordPanel, modTrk);
 	};
 	
-	public void layOutPage(RecordList<RecordType> recList, int recId, 
-			LibrisLayout<RecordType> browserLayout, DatabaseUi<RecordType> ui, HttpServletResponse resp) throws InputException, IOException {
-		layoutProc.layOutPage(recList, recId, browserLayout, ui, resp);
+	public void layOutPage(RecordList<RecordType> recList, HttpParameters parameterObject, 
+			LibrisLayout<RecordType> browserLayout, DatabaseUi<RecordType> ui) throws InputException, IOException {
+		layoutProc.layOutPage(recList, parameterObject, browserLayout, ui);
 	}
 
 		protected Field getField(Record rec, int fieldNum)
