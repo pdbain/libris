@@ -19,27 +19,21 @@ import org.lasalledebain.libris.exception.LibrisException;
 public abstract class LayoutProcessor<RecordType extends Record>
 implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, LibrisHTMLConstants {
 
-	protected static final String BROWSER_STARTING_RECORD_CONTROL = "browserStartingRecordControl";
-	private static final String HTML_BACKGROUND_COLOUR = "LightCyan";
-	private static final String RECORD_BROWSER = "recordBrowser";
-	private static final String RECORD_SELECT_CLASS = "recordSelect";
-	protected static final String ONCHANGE_THIS_FORM_SUBMIT = "\" onchange=\"this.form.submit()\"";
-	protected static final String BACKGROUND_COLOR_LIGHTCYAN = "background-color: " + HTML_BACKGROUND_COLOUR + ";\n";
-	protected static final String BACKGROUND_COLOR_WHITE = "background-color: white;\n";
-	protected static final String GREY_BORDER = "border: 1px solid LightGrey;\n";
-	protected static final String CORNER_RADIUS = "5px;";
-	private static final String MAIN_FRAME = "mainFrame";
-	private static final String CONTENT_PANEL_NAME = "contentPanel";
-	protected static final String BROWSER_PANEL_CLASS = "browserPanel";
-	protected static final String BROWSER_ITEM_CLASS = "browserItem";
-	protected static final String DISPLAY_PANEL_CLASS = "displayPanel,\n",
-			RECORT_TITLE_CLASS="recordTitle",
-			NAVIGATION_BUTTONS_CLASS="navigationButtons";
+	private static final String RECORD_SELECT_STYLE = '.'+RECORD_SELECT_CLASS +
+			" {\n"
+			+ "width: 95%;"
+			+ "}\n";
+
+	private static final String LAYOUT_SELECT_STYLE = '.'+LAYOUT_SELECT_CLASS +
+			" {\n"
+			+ "width: 95%;"
+			+ "}\n";
 
 	private static final String BROWSER_PANEL_STYLE = 
 			'.'+BROWSER_PANEL_CLASS +
 			" {\n"
 			+ "width: 25%;"
+			+ "min-width: 200px;"
 			+ "display: inline;"
 			+ "float: left;\n" +
 			"margin: 10px;\n" + 
@@ -47,10 +41,8 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			"border-radius: " + CORNER_RADIUS
 			+ "\n"
 			+ "}\n"
-			+ '.'+RECORD_SELECT_CLASS +
-			" {\n"
-			+ "width: 95%;"
-			+ "}\n";
+			+ RECORD_SELECT_STYLE
+			+ LAYOUT_SELECT_STYLE;
 
 	private static final String DISPLAY_PANEL_STYLE = '.'+DISPLAY_PANEL_CLASS +
 			" {\n" + 
@@ -64,8 +56,9 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			BACKGROUND_COLOR_WHITE +
 			"}\n";
 	private static final String CONTENT_PANEL_STYLE = 
-			'.'+CONTENT_PANEL_NAME + " {\n"
+			'.'+CONTENT_PANEL_CLASS + " {\n"
 					+ "float: left;\n"
+					+ "width: 80%;\n"
 					+ "}\n";
 
 	private static final String  NAVIGATION_BUTTONS_STYLE =
@@ -101,6 +94,20 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			+ " {\n" + 
 			"font-size: 100%;\n" +
 			"}\n";
+	protected static final String FIELD_TITLE_STYLE = "."+FIELD_TITLE_CLASS + " {\n"
+			+ "vertical-align: top;"
+			+ "float:left;\n" 
+			+ "display:inline;\n"
+			+ "font-size: 100%;\n"
+			+ "padding-right: 15px;\n"
+			+ "font-weight: bold;\n"
+			+ "}\n";
+	protected static final String FIELDS_PANEL_STYLE = "."+ FIELDS_PANEL_CLASS + " {\n" + 
+			BACKGROUND_COLOR_WHITE
+			+"}\n";
+	protected static final String FIELD_TEXT_STYLE = "."+ FIELD_TEXT_CLASS + " {\n"
+			+ "font-weight:normal\n"
+			+ "}\n";
 
 	protected String getStyleString() { 
 		return GENERIC_STYLE;
@@ -170,7 +177,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		int firstRecord = 0;
 		int lastRecord = 0;
 		buff.append("<select id="
-				+ RECORD_BROWSER
+				+ RECORD_BROWSER_ID
 				+ " "
 				+ "name="
 				+ HTTP_PARAM_RECORD_ID
@@ -216,7 +223,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				+ ">&#x23EE</button>\n");	
 
 		buff.append("<button onclick=\"document.getElementById('"
-				+ RECORD_BROWSER
+				+ RECORD_BROWSER_ID
 				+ "').value='"
 				+ (currentRecord-1)
 				+ "'\""
@@ -224,7 +231,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				+ ">&#x23EA;</button>\n");	
 
 		buff.append("<button onclick=\"document.getElementById('"
-				+ RECORD_BROWSER
+				+ RECORD_BROWSER_ID
 				+ "').value='"
 				+ (currentRecord+1)
 				+ "'\""
@@ -255,6 +262,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		buff.append("<select name=\""
 				+ HTTP_PARAM_LAYOUT_ID
 				+ ONCHANGE_THIS_FORM_SUBMIT
+				+ " class="+LAYOUT_SELECT_CLASS
 				+ ">");
 		{
 			myLayout.getLayouts().forEach(l -> buff.append("<option value=\""+l.id+"\" "
@@ -307,7 +315,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		generateHeaderAndStylesheet(ui, buff);
 		startBody(buff);
 		{
-			startDiv(buff, CONTENT_PANEL_NAME);
+			startDiv(buff, CONTENT_PANEL_CLASS);
 			buff.append("<form action=\".\" method=\"get\">");
 			{
 				int displayableRecId = layoutBrowserPanel(recList, params.browserFirstId, params.recId, browserLayout, buff);
@@ -324,6 +332,14 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		PrintWriter myWriter = params.resp.getWriter();
 		String htmlString = buff.toString();
 		myWriter.append(htmlString);
-		
+
+	}
+
+	protected RecordType getRecordOrErrorMessage(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
+		RecordType rec = recList.getRecord(recId);
+		if (null == rec) {
+			buff.append("<p>Record "+recId+" not found</p>");
+		}
+		return rec;
 	}
 }

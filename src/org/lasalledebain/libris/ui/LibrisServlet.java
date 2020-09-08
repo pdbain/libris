@@ -47,7 +47,6 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 	@Override
 	protected synchronized void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		System.err.println(Thread.currentThread().getId()+ " start doGet");		// TODO DEBUG
 		PrintWriter writer = resp.getWriter();
 		try {
 			int recId;
@@ -80,7 +79,6 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 			Assertion.assertNotNull(myUi, "No layout found for "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryLayout);
 			theLayout.layOutPage(database.getRecords(), new HttpParameters(recId, startId, resp), summaryLayout, myUi);
-			System.err.println(Thread.currentThread().getId()+ " end doGet");		// TODO DEBUG
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());
 			database.log(Level.SEVERE, "Error formatting web page: ", t);

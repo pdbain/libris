@@ -55,6 +55,14 @@
 			<layoutfield title="Keywords" id="ID_keywords" control="textbox" return="true" />
 			<layoutfield title="Abstract" id="ID_abstract" control="textbox" return="true" />
 		</layout>
+			<layout height="2000" id="LO_tableDisplay" title="Table layout" type="table" width="3000">
+				<layoutusage usedby="tabledisplay"/>
+				<layoutfield control="textfield" hspan="1" id="ID_auth" title="Author" width="150"/>
+				<layoutfield control="textfield" hspan="1" id="ID_title" return="true" title="Title" width="200"/>
+				<layoutfield control="enumfield" hspan="1" id="ID_publisher" return="true" title="Publisher" width="50"/>
+			<layoutfield title="Keywords" id="ID_keywords" control="textbox" return="true" />
+			<layoutfield title="Abstract" id="ID_abstract" control="textbox" return="true" />
+			</layout>
 		<layout id="LO_browserDisplay" title="Summary" type="list" height="400"
 			width="700">
 			<layoutusage usedby="summarydisplay"/>

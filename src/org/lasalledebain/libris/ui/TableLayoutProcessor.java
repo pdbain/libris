@@ -9,24 +9,77 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableColumnModel;
 
+import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.SingleRecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.field.FieldValue;
 
 public class TableLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
+	private final String myStyleString;
+	private static final String RECORD_TABLE_LAYOUT_CLASS = "recordPanel";
 
 	public TableLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
-	}
-	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
-		// TODO Auto-generated method stub
-		
+		myStyleString = makeStyleString();
 	}
 
+	private String makeStyleString() {
+		StringBuffer buff = new StringBuffer(super.getStyleString());
+		buff.append(
+				"."+ RECORD_TABLE_LAYOUT_CLASS + " {\n"
+//		+ "min-width: 400px;\n"
+					+	"}\n"
+						+ FIELDS_PANEL_STYLE
+						+ FIELD_TITLE_STYLE
+						+ FIELD_TEXT_STYLE
+				);
+		return buff.toString();
+	}
+
+	@Override
+	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
+		RecordType rec = getRecordOrErrorMessage(recList, recId, buff);
+		if (null == rec) return;
+		layoutRecordTitle(buff, rec);
+		buff.append("<table class = "
+				+ RECORD_TABLE_LAYOUT_CLASS
+				+ ">\n"); {
+					for (LayoutField<RecordType> fp: myLayout.getFields()) {
+						int fieldNum = fp.fieldNum;
+						Field fld = rec.getField(fieldNum);
+						if (null == fld) {
+							continue;
+						}
+						buff.append("<tr "
+								+ "class=\""+FIELDS_PANEL_CLASS+"\""
+								+ ">\n"); {
+							buff.append("<td "
+									+ "class=\""+FIELD_TITLE_CLASS+"\""
+									+ "> "
+									+ fp.getTitle()
+									+ "</td>\n");
+							String separator = "";
+							buff.append("<td class=\""+FIELD_TEXT_CLASS+"\""
+									+ ">\n");
+							for (FieldValue fv: fld.getFieldValues()) {
+								buff.append(separator);
+								buff.append(fv.getValueAsString());
+								separator = "<br/>\n";
+							}
+							buff.append("</td\n>");
+						} buff.append("</tr>\n");
+					}
+				} buff.append("</table>\n");
+	}
+
+	@Override
+	protected String getStyleString() {
+		return super.getStyleString() + myStyleString;
+	}
 	@Override
 	public
 	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
@@ -43,7 +96,7 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 		int columnWidth = myFontMetrics.stringWidth(TableLayoutTableModel.RECORD_ID) + 10;
 		TableColumnModel columns = recordTable.getColumnModel();
 		columns.getColumn(0).setPreferredWidth(columnWidth);
-		 ArrayList<LayoutField<RecordType>> bodyFieldList = myLayout.getBodyFieldList();
+		ArrayList<LayoutField<RecordType>> bodyFieldList = myLayout.getBodyFieldList();
 
 		for (int i = 1; i < myTableModel.getColumnCount(); ++i) {
 			LayoutField<RecordType> theFieldPosition = bodyFieldList.get(i-1);
@@ -62,7 +115,7 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 	@Override
 	protected void validate() {
 		// TODO Write tablelayout validate
-		
+
 	}
 
 }

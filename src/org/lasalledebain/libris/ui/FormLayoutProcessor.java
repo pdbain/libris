@@ -34,10 +34,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 	private static final String RECORD_FIELD_CLASS = "recordField";
 	private static final String RECORD_PANEL_CLASS = "recordPanel",
 			GROUP_PANEL_CLASS = "groupPanel",
-			FIELDS_PANEL_CLASS = "fieldsPanel",
 			MULTICONTROL_CELL_CLASS = "multiControlCell",
-			FIELD_TITLE_CLASS="fieldTitle",
-			FIELD_TEXT_CLASS="fieldText",
 			FIELD_TEXT_MULTILINE_CLASS="fieldTextMultiLine";
 	private final String myStyleString;
 	public FormLayoutProcessor(LibrisLayout<RecordType> theLayout) {
@@ -51,14 +48,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 				"."+ FORM_FIELD_GRID_CLASS + " {\n" + 
 						"  display: grid;\n" + 
 						"}\n"
-						+ "."+ FIELD_TITLE_CLASS + " {\n"
-						+ "vertical-align: top;"
-						+ "float:left;\n" 
-						+ "display:inline;\n"
-						+ "font-size: 100%;\n"
-						+ "padding-right: 15px;\n"
-						+ "font-weight: bold;\n"
-						+ "}\n"
+						+ FIELD_TITLE_STYLE 
 						+ "."+ FIELD_TEXT_CLASS + " {\n"
 						+ "display:inline;\n"
 						+ "}\n"
@@ -69,9 +59,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 						+ GREY_BORDER
 						+ "border-collapse: collapse;\n"
 						+ "}\n"
-						+ "."+ FIELDS_PANEL_CLASS + " {\n" + 
-						BACKGROUND_COLOR_WHITE
-						+"}\n"
+						+ FIELDS_PANEL_STYLE
 				);
 		for (LayoutField<RecordType> fp: myLayout.getFields()) {
 			buff.append("."
@@ -148,11 +136,8 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 
 	@Override
 	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
-		RecordType rec = recList.getRecord(recId);
-		if (null == rec) {
-			buff.append("<p>Record "+recId+" not found</p>");
-			return;
-		}
+		RecordType rec = getRecordOrErrorMessage(recList, recId, buff);
+		if (null == rec) return;
 		layoutRecordTitle(buff, rec);
 		startDiv(buff, RECORD_PANEL_CLASS); {
 			Schema mySchema = myLayout.getSchema();
@@ -205,6 +190,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 			} endDiv(buff);
 		} endDiv(buff);
 	}
+
 	@Override
 	protected void validate() throws InputException {
 		Schema mySchema = myLayout.getSchema();
@@ -220,6 +206,6 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 
 	@Override
 	protected String getStyleString() {
-		return makeStyleString(); // TODO DEBUG myStyleString;
+		return myStyleString;
 	}
 }

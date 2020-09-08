@@ -22,10 +22,15 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import junit.framework.TestCase;
 
-public class HtmlTests extends TestCase {
+public class HtmlTests extends TestCase implements LibrisHTMLConstants {
 
 	private File workingDirectory;
 	private LibrisDatabase db;
+	private static final String expectedBasicWords[] = {"<head>", "<style>", "</style>", "</head>", "<body>", "A First History of France", "</body>"};
+	private static final String expectedFormWords[] = {"<head>", "<style>", "</style>", "</head>", "<body>", "<div>", 
+			FIELD_TITLE_CLASS, "Title", FIELD_TEXT_CLASS, "Rec4Fld2Val1", "</body>"};
+	private static final String expectedTableWords[] = {"<body>", "<div>", 
+			FIELD_TITLE_CLASS, "Keywords", FIELD_TEXT_CLASS, "Ulysses", "</body>"};
 
 	@Test
 	public void testBasicLayout() throws InputException, IOException, DatabaseException {
@@ -35,11 +40,10 @@ public class HtmlTests extends TestCase {
 		LibrisLayout<DatabaseRecord> browserLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		myLayout.layOutPage(db.getRecords(), new HttpParameters(2, 0, resp), browserLayout, db.getUi());
 		String result = resp.getResponseText();
-		checkResult(result);
+		checkExpectedStrings(result, expectedBasicWords);
 	}
 
-	private void checkResult(String result) {
-		String expectedWords[] = {"<head>", "<style>", "</style>", "</head>", "<body>", "A First History of France", "</body>"};
+	protected void checkExpectedStrings(String result, String[] expectedWords) {
 		int pos = 0;
 		for (String expWord: expectedWords) {
 			pos = result.indexOf(expWord, pos);
@@ -58,18 +62,30 @@ public class HtmlTests extends TestCase {
 		assertTrue("Cannot close database", db.closeDatabase(false));
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
 		ui.openDatabase(config);
-		StringBuffer response = new StringBuffer();
 		ui.startServer();
 		HttpClient client = HttpClient.newHttpClient();
+		String responseString = sendHttpRequest(client, "?layout=LO_paragraphDisplay&recId=3");
+		checkExpectedStrings(responseString, expectedBasicWords);
+		responseString = sendHttpRequest(client, "?layout=LO_formDisplay&recId=4");
+		checkExpectedStrings(responseString, expectedFormWords);
+		responseString = sendHttpRequest(client, "?layout=LO_tableDisplay&recId=2");
+		checkExpectedStrings(responseString, expectedTableWords);
+		ui.stop();
+	}
+
+	protected String sendHttpRequest(HttpClient client, String urlParams) {
+		StringBuffer response = new StringBuffer();
+		String serverAddress = "http://localhost:8080/libris/";
 		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create("http://localhost:8080/libris/?layout=LO_paragraphDisplay&recId=2"))
+				.uri(URI.create(serverAddress
+						+ urlParams))
 				.build();
 		client.sendAsync(request, BodyHandlers.ofString())
 		.thenApply(HttpResponse::body)
 		.thenAccept(s->response.append(s))
 		.join();
-		ui.stop();
-		checkResult(response.toString());
+		String responseString = response.toString();
+		return responseString;
 	}
 	@Override
 	protected void setUp() throws Exception {

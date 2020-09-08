@@ -88,8 +88,8 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		layoutProc.validate();
 	}
 
-	private LayoutProcessor<RecordType> getLayoutProcessor(String theType) {
-		LayoutProcessor<RecordType> result = null;
+	private LayoutProcessor getLayoutProcessor(String theType) {
+		LayoutProcessor result = null;
 		switch (theType) {
 		case XML_LAYOUT_TYPE_XML: 
 			result = new XmlLayoutProcessor<>(this);
