@@ -20,7 +20,7 @@ import org.lasalledebain.libris.field.FieldValue;
 
 public class TableLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
 	private final String myStyleString;
-	private static final String RECORD_TABLE_LAYOUT_CLASS = "recordPanel";
+	private static final String RECORD_TABLE_LAYOUT_CLASS = "recordTable";
 
 	public TableLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
@@ -31,7 +31,6 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 		StringBuffer buff = new StringBuffer(super.getStyleString());
 		buff.append(
 				"."+ RECORD_TABLE_LAYOUT_CLASS + " {\n"
-//		+ "min-width: 400px;\n"
 					+	"}\n"
 						+ FIELDS_PANEL_STYLE
 						+ FIELD_TITLE_STYLE

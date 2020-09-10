@@ -22,13 +22,11 @@ public class ListLayoutTableModel<RecordType extends Record> extends AbstractTab
 	private final LibrisLayout<RecordType> myLayout;
 	private RecordType myRecord;
 	private final static String[] columnNames = new String[] {"Field", "Main value", "Extra value"};
-	private final ArrayList<String> titles;
 	private final String[] myFieldIds;
 	private final ArrayList<String[]> rows;
 	public ListLayoutTableModel(RecordType theRecord, GenericDatabase<RecordType> db, LibrisLayout<RecordType> theLayout) throws LibrisException {
 		myRecord = theRecord;
 		myLayout = theLayout;
-		titles = new ArrayList<>();
 		rows = new ArrayList<>();
 		Schema mySchema = theLayout.getSchema();
 		int numGroups = mySchema.getNumGroups();

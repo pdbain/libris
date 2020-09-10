@@ -20,7 +20,7 @@ public interface LibrisHTMLConstants {
 	String CONTENT_PANEL_CLASS = "contentPanel";
 	String BROWSER_PANEL_CLASS = "browserPanel";
 	String BROWSER_ITEM_CLASS = "browserItem";
-	String DISPLAY_PANEL_CLASS = "displayPanel,\n";
+	String DISPLAY_PANEL_CLASS = "displayPanel";
 	String RECORT_TITLE_CLASS = "recordTitle";
 	String FIELD_TITLE_CLASS = "fieldTitle";
 	String NAVIGATION_BUTTONS_CLASS = "navigationButtons";

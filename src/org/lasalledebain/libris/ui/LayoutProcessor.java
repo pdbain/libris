@@ -9,7 +9,6 @@ import java.util.Iterator;
 
 import javax.swing.JComponent;
 
-import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
@@ -302,10 +301,6 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	protected void endBody(StringBuffer buff) {
 		endDiv(buff);
 		buff.append("</body>\n");
-	}
-
-	protected void makeHtmlControl(LayoutField<RecordType> fieldPosn, Field recordField) {
-
 	}
 
 	public void layOutPage(RecordList<RecordType> recList, HttpParameters params,
