@@ -28,9 +28,9 @@ public class HtmlTests extends TestCase implements LibrisHTMLConstants {
 	private LibrisDatabase db;
 	private static final String expectedBasicWords[] = {"<head>", "<style>", "</style>", "</head>", "<body>", "A First History of France", "</body>"};
 	private static final String expectedFormWords[] = {"<head>", "<style>", "</style>", "</head>", "<body>", "<div>", 
-			FIELD_TITLE_CLASS, "Title", FIELD_TEXT_CLASS, "Rec4Fld2Val1", "</body>"};
+			FIELD_TITLE_TEXT_CLASS, "Title", FIELD_TEXT_CLASS, "Rec4Fld2Val1", "</body>"};
 	private static final String expectedTableWords[] = {"<body>", "<div>", 
-			FIELD_TITLE_CLASS, "Keywords", FIELD_TEXT_CLASS, "Ulysses", "</body>"};
+			FIELD_TITLE_TEXT_CLASS, "Keywords", FIELD_TEXT_CLASS, "Ulysses", "</body>"};
 
 	@Test
 	public void testBasicLayout() throws InputException, IOException, DatabaseException {

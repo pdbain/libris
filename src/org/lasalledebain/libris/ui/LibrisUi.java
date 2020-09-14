@@ -102,7 +102,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 			getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
 		} catch (Exception e) {
 			alert("Error opening database", e);
-			return null;
+			throw new DatabaseException(e);
 		}
 		return currentDatabase;
 	}

@@ -126,7 +126,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		if (parentId != RecordId.NULL_RECORD_ID) {
 			Record parent = getRecord(parentId);
 			if (Objects.isNull(parent)) {
-				throw new InputException("Cannot locate record " + parentId);
+				throw new InputException("Cannot locate parent record " + parentId);
 			}
 			rec.setParent(0, parent.getRecordId());
 		} else {
@@ -134,7 +134,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 			if (!recordParentName.isEmpty()) {
 				Record parent = getRecord(recordParentName);
 				if (Objects.isNull(parent)) {
-					throw new InputException("Cannot locate record " + recordParentName);
+					throw new InputException("Cannot locate parent record " + recordParentName);
 				}
 				rec.setParent(0, parent.getRecordId());
 			}

@@ -48,7 +48,8 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 				"."+ FORM_FIELD_GRID_CLASS + " {\n" + 
 						"  display: grid;\n" + 
 						"}\n"
-						+ FIELD_TITLE_STYLE 
+						+ FIELD_TITLE_TEXT_STYLE 
+						+ FIELD_TITLE_BLOCK_STYLE
 						+ "."+ FIELD_TEXT_CLASS + " {\n"
 						+ "display:inline;\n"
 						+ "}\n"
@@ -135,7 +136,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
+	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
 		RecordType rec = getRecordOrErrorMessage(recList, recId, buff);
 		if (null == rec) return;
 		layoutRecordTitle(buff, rec);
@@ -170,7 +171,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 						continue;
 					}
 					startDiv(buff, new String[] {MULTICONTROL_CELL_CLASS, RECORD_FIELD_CLASS+fieldNum}); {
-						startDiv(buff, FIELD_TITLE_CLASS);
+						startDiv(buff, FIELD_TITLE_TEXT_CLASS);
 						buff.append(fp.getTitle());
 						endDiv(buff);
 						buff.append("<!--"

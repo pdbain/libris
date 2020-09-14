@@ -20,7 +20,18 @@ import org.lasalledebain.libris.field.FieldValue;
 
 public class TableLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
 	private final String myStyleString;
-	private static final String RECORD_TABLE_LAYOUT_CLASS = "recordTable";
+	private static final String RECORD_TABLE_LAYOUT_CLASS = "recordTable",
+			RECORD_FIELD_CELL_CLASS = "recordFieldCell";
+	private static final String RECORD_TABLE_LAYOUT_STYLE = "."+ RECORD_TABLE_LAYOUT_CLASS + " {\n"
+			+"border: 2px solid " + BORDER_COLOUR + ";\n"
+			+ "border-collapse: collapse;\n"
+			+ "vertical-align: top;\n"
+		+	"}\n";
+	private static final String RECORD_FIELD_CELL_STYLE = "."+ RECORD_FIELD_CELL_CLASS + " {\n"
+			+"border: 2px solid " + BORDER_COLOUR + ";\n"
+			+ "border-collapse: collapse;\n"
+			+ "vertical-align: top;\n"
+		+	"}\n";
 
 	public TableLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
@@ -30,17 +41,17 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 	private String makeStyleString() {
 		StringBuffer buff = new StringBuffer(super.getStyleString());
 		buff.append(
-				"."+ RECORD_TABLE_LAYOUT_CLASS + " {\n"
-					+	"}\n"
+				RECORD_TABLE_LAYOUT_STYLE
 						+ FIELDS_PANEL_STYLE
-						+ FIELD_TITLE_STYLE
+						+ FIELD_TITLE_TEXT_STYLE
 						+ FIELD_TEXT_STYLE
+						+ RECORD_FIELD_CELL_STYLE
 				);
 		return buff.toString();
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
+	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
 		RecordType rec = getRecordOrErrorMessage(recList, recId, buff);
 		if (null == rec) return;
 		layoutRecordTitle(buff, rec);
@@ -57,12 +68,12 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 								+ "class=\""+FIELDS_PANEL_CLASS+"\""
 								+ ">\n"); {
 							buff.append("<td "
-									+ "class=\""+FIELD_TITLE_CLASS+"\""
+									+ "class=\""+FIELD_TITLE_TEXT_CLASS+' '+RECORD_FIELD_CELL_CLASS+"\""
 									+ "> "
 									+ fp.getTitle()
 									+ "</td>\n");
 							String separator = "";
-							buff.append("<td class=\""+FIELD_TEXT_CLASS+"\""
+							buff.append("<td class=\""+FIELD_TEXT_CLASS+' '+RECORD_FIELD_CELL_CLASS+"\""
 									+ ">\n");
 							for (FieldValue fv: fld.getFieldValues()) {
 								buff.append(separator);
@@ -77,7 +88,7 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 
 	@Override
 	protected String getStyleString() {
-		return super.getStyleString() + myStyleString;
+		return super.getStyleString() + makeStyleString();
 	}
 	@Override
 	public

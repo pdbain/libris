@@ -74,8 +74,6 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 			theLayout = myLayouts.getLayout(layoutId);
 			Assertion.assertNotNullInputException("Layout not found: ",  layoutId, theLayout);
 			resp.setStatus(HttpStatus.OK_200);
-			DatabaseRecord rec = database.getRecord(recId);
-			// TODO handle unknown record IDs
 			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 			Assertion.assertNotNull(myUi, "No layout found for "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryLayout);
 			theLayout.layOutPage(database.getRecords(), new HttpParameters(recId, startId, resp), summaryLayout, myUi);

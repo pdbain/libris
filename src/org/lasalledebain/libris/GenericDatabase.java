@@ -279,7 +279,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 			}
 		} 
 		if (null == rec) {
-			ui.alert("Cannot locate record "+recId); //$NON-NLS-1$
+			ui.alert("Cannot locate database record "+recId); //$NON-NLS-1$
 		}
 		return rec;
 	}

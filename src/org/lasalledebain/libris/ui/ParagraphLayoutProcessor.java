@@ -25,7 +25,7 @@ public class ParagraphLayoutProcessor <RecordType extends Record> extends Layout
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
+	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
 		LayoutField<RecordType>[] fieldInfo = myLayout.getFields();
 		RecordType rec = recList.getRecord(recId);
 		StringBuffer windowText = new StringBuffer();

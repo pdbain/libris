@@ -34,7 +34,7 @@ public class XmlLayoutProcessor<RecordType extends Record> extends LayoutProcess
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
+	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
 		RecordType rec = recList.getRecord(recId);
 		try {
 			String recText = getXmlText(rec);

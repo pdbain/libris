@@ -18,17 +18,20 @@ import org.lasalledebain.libris.exception.LibrisException;
 public abstract class LayoutProcessor<RecordType extends Record>
 implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, LibrisHTMLConstants {
 
-	private static final String RECORD_SELECT_STYLE = '.'+RECORD_SELECT_CLASS +
+	private final String DATABASE_TITLE_CLASS = "databaseTitle";
+	private final String DATABASE_TITLE_STYLE = '.'+DATABASE_TITLE_CLASS
+			+ " {\n"
+			+ "text-align: center;\n"
+			+ "font-weight: bold;\n"
+			+ "  font-size: 150%;\n" 
+			+ "}\n";
+	
+	private final String RECORD_SELECT_STYLE = '.'+RECORD_SELECT_CLASS +
 			" {\n"
-			+ "width: 95%;"
+			+ "width: 95%;\n"
 			+ "}\n";
 
-	private static final String LAYOUT_SELECT_STYLE = '.'+LAYOUT_SELECT_CLASS +
-			" {\n"
-			+ "width: 95%;"
-			+ "}\n";
-
-	private static final String BROWSER_PANEL_STYLE = 
+	private final String BROWSER_PANEL_STYLE = 
 			'.'+BROWSER_PANEL_CLASS +
 			" {\n"
 			+ "width: 25%;"
@@ -40,10 +43,9 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			"border-radius: " + CORNER_RADIUS
 			+ "\n"
 			+ "}\n"
-			+ RECORD_SELECT_STYLE
-			+ LAYOUT_SELECT_STYLE;
+			+ RECORD_SELECT_STYLE;
 
-	private static final String DISPLAY_PANEL_STYLE = '.'+DISPLAY_PANEL_CLASS +
+	private final String DISPLAY_PANEL_STYLE = '.'+DISPLAY_PANEL_CLASS +
 			" {\n" + 
 			"float: left;\n"
 			+ "display: inline;"
@@ -54,23 +56,17 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			+ "\n" +
 			BACKGROUND_COLOR_WHITE +
 			"}\n";
-	private static final String CONTENT_PANEL_STYLE = 
-			'.'+CONTENT_PANEL_CLASS + " {\n"
-					+ "float: left;\n"
-					+ "width: 80%;\n"
-					+ "}\n";
-
-	private static final String  NAVIGATION_BUTTONS_STYLE =
+	private final String  NAVIGATION_BUTTONS_STYLE =
 			'.'+NAVIGATION_BUTTONS_CLASS + " {\n"
 					+ " font-family: \"Apple Symbols\", \"Arial Unicode MS\", Symbola, \"Everson Mono\";\n"
 					+ "}\n";
 
-	private static final String MASTER_STYLE = "html {background-color: "
+	private final String MASTER_STYLE = "html {background-color: "
 			+ HTML_BACKGROUND_COLOUR + ";"
 			+ " font-family: Arial, Helvetica, sans-serif;\n"
 			+ "}\n";
 
-	protected static final String RECORT_TITLE_STYLE =
+	protected final String RECORT_TITLE_STYLE =
 			"."+ RECORT_TITLE_CLASS + " {\n"
 					+ "vertical-align: top;"
 					+ "display:block;\n"
@@ -79,37 +75,40 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 					+ "font-weight: bold;\n"
 					+ "}\n";
 
-	private static final String GENERIC_STYLE = MASTER_STYLE
+	private final String GENERIC_STYLE = MASTER_STYLE
 			+ "\n" +
 			"h1 {color: blue}\n" + 
 			'#'+MAIN_FRAME +
 			" {\n"+
 			"}\n"
-			+ CONTENT_PANEL_STYLE
-			+ NAVIGATION_BUTTONS_STYLE
+			+ NAVIGATION_BUTTONS_STYLE+ "\n"
 			+ BROWSER_PANEL_STYLE+
 			DISPLAY_PANEL_STYLE
 			+'.'+BROWSER_ITEM_CLASS
 			+ " {\n" + 
 			"font-size: 100%;\n" +
 			"}\n";
-	protected static final String FIELD_TITLE_STYLE = "."+FIELD_TITLE_CLASS + " {\n"
+	protected final String FIELD_TITLE_TEXT_STYLE = "."+FIELD_TITLE_TEXT_CLASS + " {\n"
+			+ "font-size: 100%;\n"
+			+ "font-weight: bold;\n"
+			+ "}\n";
+	protected final String FIELD_TITLE_BLOCK_STYLE = "."+FIELD_TITLE_BLOCK_CLASS + " {\n"
 			+ "vertical-align: top;"
 			+ "float:left;\n" 
 			+ "display:inline;\n"
-			+ "font-size: 100%;\n"
 			+ "padding-right: 15px;\n"
-			+ "font-weight: bold;\n"
 			+ "}\n";
-	protected static final String FIELDS_PANEL_STYLE = "."+ FIELDS_PANEL_CLASS + " {\n" + 
+	protected final String FIELDS_PANEL_STYLE = "."+ FIELDS_PANEL_CLASS + " {\n" + 
 			BACKGROUND_COLOR_WHITE
 			+"}\n";
-	protected static final String FIELD_TEXT_STYLE = "."+ FIELD_TEXT_CLASS + " {\n"
+	protected  final String FIELD_TEXT_STYLE = "."+ FIELD_TEXT_CLASS + " {\n"
 			+ "font-weight:normal\n"
 			+ "}\n";
 
 	protected String getStyleString() { 
-		return GENERIC_STYLE;
+		return GENERIC_STYLE+ "\n"
+			+ DATABASE_TITLE_STYLE+ "\n"
+				+ getLayoutSelectStyle();
 	}
 
 	protected final LibrisLayout<RecordType> myLayout;
@@ -138,6 +137,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		buffer.append("</title>\n" + 
 				"<style>\n"
 				+ getStyleString()
+				+ getContentPanelStyle()
 				+ "</style>\n"
 				+ "</head>\n"
 				);
@@ -153,7 +153,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	void layoutRecordTitle(StringBuffer buff, RecordType rec) {
 		startDiv(buff, RECORT_TITLE_CLASS); {
 			String recName = rec.getName();
-			buff.append("Record ");
+			buff.append("<b>Record:</b> ");
 			buff.append(rec.getRecordId());
 			if (null != recName) {
 				buff.append(" ");
@@ -211,7 +211,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		return currentRecord;
 	}
 
-	private void addNextLastButtons(int currentRecord, StringBuffer buff, int startRecord, int firstRecord, int lastRecord) {
+	protected void addNextLastButtons(int currentRecord, StringBuffer buff, int startRecord, int firstRecord, int lastRecord) {
 		startDiv(buff);
 		buff.append("<button onclick=\"document.getElementById('"
 				+ BROWSER_STARTING_RECORD_CONTROL
@@ -257,7 +257,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		endDiv(buff);
 	}
 
-	private void addLayoutSelector(StringBuffer buff) {
+	protected void addLayoutSelector(StringBuffer buff) {
 		buff.append("<select name=\""
 				+ HTTP_PARAM_LAYOUT_ID
 				+ ONCHANGE_THIS_FORM_SUBMIT
@@ -310,13 +310,16 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		generateHeaderAndStylesheet(ui, buff);
 		startBody(buff);
 		{
+			startDiv(buff, DATABASE_TITLE_CLASS); {
+			buff.append(myUi.getUiTitle());
+			} endDiv(buff);
 			startDiv(buff, CONTENT_PANEL_CLASS);
 			buff.append("<form action=\".\" method=\"get\">");
 			{
 				int displayableRecId = layoutBrowserPanel(recList, params.browserFirstId, params.recId, browserLayout, buff);
 				startDiv(buff, DISPLAY_PANEL_CLASS);
 				{
-					layoutDisplayPanel(recList, displayableRecId, buff);
+					layoutDisplayPanel(recList, params, displayableRecId, buff);
 				}
 				endDiv(buff);
 			}
@@ -336,5 +339,19 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 			buff.append("<p>Record "+recId+" not found</p>");
 		}
 		return rec;
+	}
+
+	public String getLayoutSelectStyle() {
+		return '.'+LAYOUT_SELECT_CLASS +
+				" {\n"
+				+ "width: 95%;"
+				+ "}\n";
+	}
+
+	public String getContentPanelStyle() {
+		return '.'+CONTENT_PANEL_CLASS + " {\n"
+				+ "float: left;\n"
+				+ "width: 80%;\n"
+				+ "}\n";
 	}
 }
