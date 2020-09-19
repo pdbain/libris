@@ -26,12 +26,27 @@ public class HtmlTests extends TestCase implements LibrisHTMLConstants {
 
 	private File workingDirectory;
 	private LibrisDatabase db;
-	private static final String expectedBasicWords[] = {"<head>", "<style>", "</style>", "</head>", "<body>", "A First History of France", "</body>"};
+	static final String expectedBasicWords[] = {"<head>", "<style>", "</style>", "</head>", "<body>", "A First History of France", "</body>"};
 	private static final String expectedFormWords[] = {"<head>", "<style>", "</style>", "</head>", "<body>", "<div>", 
 			FIELD_TITLE_TEXT_CLASS, "Title", FIELD_TEXT_CLASS, "Rec4Fld2Val1", "</body>"};
 	private static final String expectedTableWords[] = {"<body>", "<div>", 
 			FIELD_TITLE_TEXT_CLASS, "Keywords", FIELD_TEXT_CLASS, "Ulysses", "</body>"};
-
+	private static final String expectedXmlWords[] = {"<record id=\"2\">",
+			"<field id=\"ID_auth\" value=\"Rec2Fld1Val1\"/>",
+			"<field id=\"ID_title\" value=\"testMissingField\"/>",
+			"<field id=\"ID_pages\" value=\"365\"/>",
+			"<field id=\"ID_keywords\" value=\"Ulysses Odysseus Trojan war\"/>", 
+			"<field id=\"ID_location\" value=\"https://httpbin.org/html\"/>", 
+			"<field id=\"ID_hardcopy\" value=\"true\"/>", 
+			"</record>", 
+			""};
+	private static final String expectedListWords[] = {
+			"1", "Rec1Fld1Val1", "Rec1Fld2Val1", "1-2", "Enumv1", "true", "k1 k2 k3", "2", "Rec2Fld1Val1",
+			"testMissingField", "365", "true", "Ulysses", "Odysseus", "Trojan", "war", "3", "Rec3Fld1Val1",
+			"A First History of France", "301", "other", "true", "Ulysses", "Odysseus", "Trojan", "war", "4",
+			"Rec4Fld1Val1, Rec4Fld1Val2", "Rec4Fld2Val1", "Rec4Fld3Val1.1-Rec4Fld3Val1.2", "NS_e6", "true",
+			"k13 k14 k15"
+			};
 	@Test
 	public void testBasicLayout() throws InputException, IOException, DatabaseException {
 		TestResponse resp = new TestResponse();
@@ -43,7 +58,7 @@ public class HtmlTests extends TestCase implements LibrisHTMLConstants {
 		checkExpectedStrings(result, expectedBasicWords);
 	}
 
-	protected void checkExpectedStrings(String result, String[] expectedWords) {
+	protected static void checkExpectedStrings(String result, String[] expectedWords) {
 		int pos = 0;
 		for (String expWord: expectedWords) {
 			pos = result.indexOf(expWord, pos);
@@ -70,12 +85,23 @@ public class HtmlTests extends TestCase implements LibrisHTMLConstants {
 		checkExpectedStrings(responseString, expectedFormWords);
 		responseString = sendHttpRequest(client, "?layout=LO_tableDisplay&recId=2");
 		checkExpectedStrings(responseString, expectedTableWords);
+		responseString = sendHttpRequest(client, "?layout=LO_xmlDisplay&recId=2");
+		checkExpectedStrings(responseString, expectedXmlWords);
+		responseString = sendHttpRequest(client, "?layout=LO_listDisplay&recId=3");
+		checkExpectedStrings(responseString, expectedListWords);
 		ui.stop();
 	}
 
-	protected String sendHttpRequest(HttpClient client, String urlParams) {
+	public static String sendHttpRequest(HttpClient client, String urlParams) {
+		String port = "8080";
+		return sendHttpRequest(client, port, urlParams);
+	}
+
+	static String sendHttpRequest(HttpClient client, String port, String urlParams) {
 		StringBuffer response = new StringBuffer();
-		String serverAddress = "http://localhost:8080/libris/";
+		String serverAddress = "http://localhost:"
+				+ port
+				+ "/libris/";
 		HttpRequest request = HttpRequest.newBuilder()
 				.uri(URI.create(serverAddress
 						+ urlParams))

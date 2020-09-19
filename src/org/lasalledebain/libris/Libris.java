@@ -14,25 +14,38 @@ import org.lasalledebain.libris.ui.LibrisHttpServer;
 import org.lasalledebain.libris.ui.ConsoleUi;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.LibrisUi;
+import static org.lasalledebain.libris.ui.LibrisUi.cmdlineError;
 
 public class Libris {
+	public static final String OPTION_WEB = "-w";
+	public static final String OPTION_PORT = "-p";
+
 	enum IfType {UI_HTML, UI_CMDLINE, UI_WEB, UI_GUI} ;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		LibrisUi<DatabaseRecord> result = mainImpl(args);
+
+		if (null == result) {
+			System.exit(1);
+		} 
+	}
+
+	protected static LibrisUi<DatabaseRecord> mainImpl(String[] args) {
 		IfType myUiType = IfType.UI_GUI;
 		boolean readOnly = false;
 		boolean doRebuild = false;
 		String auxDirPath = null;
 		String artifactDirpath = null;
 		String databaseFilePath = null;
+		int webPort = LibrisHttpServer.default_port;
 		boolean status = true; /* success */
 
 		int i = 0; 
 		File databaseFile = null;
-		while (i < args.length) {
+		while (status && (i < args.length)) {
 			String arg = args[i];
 			if (arg.equals("-r")) {
 				readOnly = true;
@@ -42,9 +55,22 @@ public class Libris {
 				myUiType = IfType.UI_GUI;
 			} else if (arg.equals("-c")) {
 				myUiType = IfType.UI_CMDLINE;
-			} else if (arg.equals("-w")) {
+			} else if (arg.equals(OPTION_WEB)) {
 				myUiType = IfType.UI_WEB;
 				// TODO add port and context for web
+			} else if (arg.equals(OPTION_PORT)) {
+				if ((i + 1) < args.length) {
+					++i;
+					try {
+						webPort = Integer.parseInt(args[i]);
+					} catch (NumberFormatException e) {
+						cmdlineError("Invalid argument for "+OPTION_PORT+": "+args[i]);
+						status = false;
+					}
+				} else {
+					cmdlineError("Missing argument for "+OPTION_PORT);
+					status = false;
+				}
 			} else if (arg.equals("-h")) {
 				printHelpString();
 				System.exit(0);
@@ -55,11 +81,13 @@ public class Libris {
 					auxDirPath = args[i+1];
 				}
 				notImplemented(arg);
+				status = false;
 			} else if (!arg.startsWith("-")) {
 				if (null == databaseFile) {
 					databaseFilePath = arg;
 				} else {
-					LibrisUi.cmdlineError("only one database name can be specified");
+					cmdlineError("only one database name can be specified");
+					status = false;
 				}
 			}
 			++i;
@@ -70,7 +98,8 @@ public class Libris {
 			File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
 			File auxDir = null;
 			if ((null != dbFile) && (!dbFile.isFile())) {
-				LibrisUi.cmdlineError(databaseFilePath+" is not a file");
+				cmdlineError(databaseFilePath+" is not a file");
+				status = false;
 			} else {
 				if (null != auxDirPath) {
 					auxDir = new File(auxDirPath);
@@ -87,7 +116,8 @@ public class Libris {
 				ui = new LibrisGui(dbFile, readOnly);
 				break;
 			case UI_WEB:
-				LibrisHttpServer<DatabaseRecord> htmlUi = new LibrisHttpServer<DatabaseRecord>(LibrisHttpServer.default_port, LibrisHttpServer.DEFAULT_CONTEXT);
+				LibrisHttpServer<DatabaseRecord> htmlUi = 
+				new LibrisHttpServer<DatabaseRecord>(webPort, LibrisHttpServer.DEFAULT_CONTEXT);
 				ui = htmlUi;
 				break;
 			default:
@@ -106,14 +136,17 @@ public class Libris {
 			status = false;
 		}
 
-		if (!status) {
-			System.exit(1);
-		} else {
+		LibrisUi<DatabaseRecord> result = null;
+		if (status) {
 			if (IfType.UI_CMDLINE != myUiType) {
 				ConsoleUi<DatabaseRecord> console = new ConsoleUi<DatabaseRecord>(ui);
 				console.start();
+				result = console;
+			} else {
+				result = ui;
 			}
 		}
+		return result;
 	}
 
 	private static void notImplemented(String arg) {
@@ -124,12 +157,16 @@ public class Libris {
 	private static void printHelpString() {
 		String helpString = "Libris: a record management system.\n"
 				+ "Syntax:]\n"
-				+ "libris -[c|g|w] [-x <path>] [-r] [-a <path>] <database file>\n"
-				+ "-c: command-line\n"
-				+ "-g: graphical user interface\n"
-				+ "-w: start web server\n"
-				+ "-r: open database read-only\n"
+				+ "libris -[c|g|w] [-p <port>] [-x <path>] [-r] [-a <path>] <database file>\n"
+				+ "-c"
+				+ ": command-line\n"
+				+ "-g"
+				+ ": graphical user interface\n"
+				+ OPTION_WEB
+				+ ": start web server\n"
+				+ OPTION_PORT+ ": specify port (web server only)"
 				+ "-x: specify auxiliary directory\n"
+				+ "-r: open database read-only\n"
 				+ "-a: specify arifact repository location";
 		System.out.println(helpString);
 

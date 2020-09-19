@@ -55,6 +55,15 @@
 			<layoutfield title="Keywords" id="ID_keywords" control="textbox" return="true" />
 			<layoutfield title="Abstract" id="ID_abstract" control="textbox" return="true" />
 		</layout>
+			<layout height="2000" id="LO_listDisplay" title="List layout" type="list" width="3000">
+			<layoutfield title="Author" id="ID_auth" control="textfield" />
+			<layoutfield title="Title" id="ID_title" control="textfield" return="true"/>
+			<layoutfield title="Pages" id="ID_pages" control="rangefield" return="true"/>
+			<layoutfield title="Publisher" id="ID_publisher" control="enumfield" />
+			<layoutfield title="Hardcopy" id="ID_hardcopy" control="checkbox" />
+			<layoutfield title="Keywords" id="ID_keywords" control="textbox" return="true" />
+			<layoutfield title="Abstract" id="ID_abstract" control="textbox" return="true" />
+			</layout>
 			<layout height="2000" id="LO_tableDisplay" title="Table layout" type="table" width="3000">
 				<layoutusage usedby="tabledisplay"/>
 				<layoutfield control="textfield" hspan="1" id="ID_auth" title="Author" width="150"/>
@@ -69,6 +78,8 @@
 			<layoutfield title="Author" id="ID_auth" control="textfield" />
 			<layoutfield title="Title" id="ID_title" control="textfield" return="true"/>
 		</layout>
+			<layout height="2000" id="LO_xmlDisplay" title="XML layout" type="xml">
+			</layout>
 	</layouts>
 	</metadata>
 	<records lastid="4">
