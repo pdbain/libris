@@ -11,16 +11,21 @@ import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
 import org.lasalledebain.libris.ui.LibrisHttpServer;
+import org.lasalledebain.libris.ui.CmdlineUi;
 import org.lasalledebain.libris.ui.ConsoleUi;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.LibrisUi;
 import static org.lasalledebain.libris.ui.LibrisUi.cmdlineError;
 
 public class Libris {
+	public static final String OPTION_REBUILD = "-b";
+	public static final String OPTION_CMDLINE = "-c";
 	public static final String OPTION_WEB = "-w";
 	public static final String OPTION_PORT = "-p";
 
-	enum IfType {UI_HTML, UI_CMDLINE, UI_WEB, UI_GUI} ;
+	enum IfType {
+		UI_HTML, UI_CMDLINE, UI_WEB, UI_GUI
+	};
 
 	/**
 	 * @param args
@@ -30,7 +35,7 @@ public class Libris {
 
 		if (null == result) {
 			System.exit(1);
-		} 
+		}
 	}
 
 	protected static LibrisUi<DatabaseRecord> mainImpl(String[] args) {
@@ -43,17 +48,16 @@ public class Libris {
 		int webPort = LibrisHttpServer.default_port;
 		boolean status = true; /* success */
 
-		int i = 0; 
-		File databaseFile = null;
+		int i = 0;
 		while (status && (i < args.length)) {
 			String arg = args[i];
 			if (arg.equals("-r")) {
 				readOnly = true;
-			} else if (arg.equals("-b")) {
+			} else if (arg.equals(OPTION_REBUILD)) {
 				doRebuild = true;
 			} else if (arg.equals("-g")) {
 				myUiType = IfType.UI_GUI;
-			} else if (arg.equals("-c")) {
+			} else if (arg.equals(OPTION_CMDLINE)) {
 				myUiType = IfType.UI_CMDLINE;
 			} else if (arg.equals(OPTION_WEB)) {
 				myUiType = IfType.UI_WEB;
@@ -64,11 +68,11 @@ public class Libris {
 					try {
 						webPort = Integer.parseInt(args[i]);
 					} catch (NumberFormatException e) {
-						cmdlineError("Invalid argument for "+OPTION_PORT+": "+args[i]);
+						cmdlineError("Invalid argument for " + OPTION_PORT + ": " + args[i]);
 						status = false;
 					}
 				} else {
-					cmdlineError("Missing argument for "+OPTION_PORT);
+					cmdlineError("Missing argument for " + OPTION_PORT);
 					status = false;
 				}
 			} else if (arg.equals("-h")) {
@@ -78,12 +82,12 @@ public class Libris {
 				notImplemented(arg);
 			} else if (arg.equals("-x")) {
 				if ((i + 1) < args.length) {
-					auxDirPath = args[i+1];
+					auxDirPath = args[i + 1];
 				}
 				notImplemented(arg);
 				status = false;
 			} else if (!arg.startsWith("-")) {
-				if (null == databaseFile) {
+				if (null == databaseFilePath) {
 					databaseFilePath = arg;
 				} else {
 					cmdlineError("only one database name can be specified");
@@ -98,7 +102,7 @@ public class Libris {
 			File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
 			File auxDir = null;
 			if ((null != dbFile) && (!dbFile.isFile())) {
-				cmdlineError(databaseFilePath+" is not a file");
+				cmdlineError(databaseFilePath + " is not a file");
 				status = false;
 			} else {
 				if (null != auxDirPath) {
@@ -107,32 +111,37 @@ public class Libris {
 			}
 			// TODO configurable aux dir & artifact dir
 			if (doRebuild) {
-				Assertion.assertNotNullError("Database file not set", databaseFile);
+				Assertion.assertNotNullError("Database file not set", dbFile);
 				ui = new HeadlessUi<DatabaseRecord>(false);
-				ui.setDatabaseFile(databaseFile);
+				ui.setDatabaseFile(dbFile);
 				status = ui.rebuildDatabase();
-			} else switch (myUiType) {
-			case UI_GUI:
-				ui = new LibrisGui(dbFile, readOnly);
-				break;
-			case UI_WEB:
-				LibrisHttpServer<DatabaseRecord> htmlUi = 
-				new LibrisHttpServer<DatabaseRecord>(webPort, LibrisHttpServer.DEFAULT_CONTEXT);
-				ui = htmlUi;
-				break;
-			default:
-				LibrisUi.cmdlineError(myUiType.toString()+" not implemented");
-				break;
-			}
-			LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
-			if (null != dbFile) {
-				ui.openDatabase(config);
-				ui.start();
 			} else {
-				ui.sendChooseDatabase();
+				switch (myUiType) {
+				case UI_GUI:
+					ui = new LibrisGui(dbFile, readOnly);
+					break;
+				case UI_WEB:
+					LibrisHttpServer<DatabaseRecord> htmlUi = new LibrisHttpServer<DatabaseRecord>(webPort,
+							LibrisHttpServer.DEFAULT_CONTEXT);
+					ui = htmlUi;
+					break;
+				case UI_CMDLINE:
+					ui = new CmdlineUi<>(false);
+					break;
+				default:
+					LibrisUi.cmdlineError(myUiType.toString() + " not implemented");
+					break;
+				}
+				LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
+				if (null != dbFile) {
+					ui.openDatabase(config);
+					ui.start();
+				} else {
+					ui.sendChooseDatabase();
+				}
 			}
 		} catch (LibrisException e) {
-			LibrisUi.cmdlineError("Cannot open Libris: "+e.getMessage());
+			LibrisUi.cmdlineError("Cannot open Libris: " + e.getMessage());
 			status = false;
 		}
 
@@ -150,23 +159,16 @@ public class Libris {
 	}
 
 	private static void notImplemented(String arg) {
-		System.err.println(arg+" not implemented");
+		System.err.println(arg + " not implemented");
 		System.exit(1);
 	}
 
 	private static void printHelpString() {
-		String helpString = "Libris: a record management system.\n"
-				+ "Syntax:]\n"
-				+ "libris -[c|g|w] [-p <port>] [-x <path>] [-r] [-a <path>] <database file>\n"
-				+ "-c"
-				+ ": command-line\n"
-				+ "-g"
-				+ ": graphical user interface\n"
-				+ OPTION_WEB
-				+ ": start web server\n"
-				+ OPTION_PORT+ ": specify port (web server only)"
-				+ "-x: specify auxiliary directory\n"
-				+ "-r: open database read-only\n"
+		String helpString = "Libris: a record management system.\n" + "Syntax:]\n" + OPTION_REBUILD
+				+ ": rebuild database\n" + "libris -[c|g|w] [-p <port>] [-x <path>] [-r] [-a <path>] <database file>\n"
+				+ OPTION_CMDLINE + ": command-line\n" + "-g" + ": graphical user interface\n" + OPTION_WEB
+				+ ": start web server\n" + OPTION_PORT + ": specify port (web server only)"
+				+ "-x: specify auxiliary directory\n" + "-r: open database read-only\n"
 				+ "-a: specify arifact repository location";
 		System.out.println(helpString);
 
@@ -200,7 +202,8 @@ public class Libris {
 		return buildIndexes(config, ui);
 	}
 
-	public static boolean buildIndexes(LibrisDatabaseConfiguration config, DatabaseUi databaseUi) throws LibrisException {
+	public static boolean buildIndexes(LibrisDatabaseConfiguration config, DatabaseUi databaseUi)
+			throws LibrisException {
 		if (config.isReadOnly()) {
 			databaseUi.alert("Cannot build indexes if read-only set");
 			return false;

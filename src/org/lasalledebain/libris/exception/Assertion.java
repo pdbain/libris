@@ -83,6 +83,13 @@ public class Assertion {
 			throw new DatabaseError("Error: "+message+" is null");
 		}
 	}
+	
+	public static void assertNullError(String message, Object actual) throws InputException {
+		boolean result = Objects.isNull(actual);
+		if (!result) {
+			throw new DatabaseError("Error: "+message+" is not null");
+		}
+	}
 
 	public static void assertNotNullError(String message1, String message2, Object actual) throws DatabaseError {
 		boolean result = Objects.nonNull(actual);

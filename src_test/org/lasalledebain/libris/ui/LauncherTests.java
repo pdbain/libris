@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import org.junit.Test;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -64,6 +65,23 @@ public class LauncherTests extends TestCase {
 		ui.stop();
 	}
 
+	@Test
+	public void testRebuild() throws Exception {
+		tearDown();
+		setUp();
+		Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_DATABASE1_FILE, workingDirectory);
+		String directoryFilePath = (new File(workingDirectory, Utilities.EXAMPLE_DATABASE1_FILE)).getAbsolutePath();
+		LibrisUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_REBUILD, directoryFilePath});
+		assertNotNull("Failed to open database UI", ui);
+		ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_CMDLINE, directoryFilePath});
+		LibrisDatabase db = ui.getDatabase();
+		DatabaseRecord rec = db.getRecord(200);
+		assertNotNull("Failed to get record", rec);
+		Field fld = rec.getField(3);
+		assertNotNull("Missing record field", fld);
+		String value = fld.getValuesAsString();
+		assertEquals("Wrong field value", "Amoeba: A Distributed Operating System for the 1990s", value);
+	}
 	@Override
 	protected void setUp() throws Exception {
 		testLogger.log(Level.INFO, "Starting "+getName());

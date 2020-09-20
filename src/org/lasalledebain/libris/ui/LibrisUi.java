@@ -175,9 +175,8 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	}
 
 	public boolean rebuildDatabase() throws LibrisException {
-		HeadlessUi childUi = new HeadlessUi(false);
-		childUi.setDatabaseFile(databaseFile);
-		return Libris.buildIndexes(databaseFile, childUi);
+		setDatabaseFile(databaseFile);
+		return Libris.buildIndexes(databaseFile, this);
 	}
 
 	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
