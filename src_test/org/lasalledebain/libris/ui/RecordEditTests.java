@@ -24,7 +24,7 @@ import org.lasalledebain.libris.field.FieldValue;
 
 import junit.framework.TestCase;
 
-
+@SuppressWarnings("rawtypes")
 public class RecordEditTests extends TestCase {
 
 	private static final String TEST_PUBLISHER = "test_publisher";

@@ -22,7 +22,6 @@ import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -32,7 +31,6 @@ import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
-import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.util.DeterministicFieldGenerator;
 import org.lasalledebain.libris.util.FieldGenerator;
@@ -43,6 +41,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
+@SuppressWarnings("rawtypes")
 public class TestRecordFilter extends TestCase {
 
 	private LibrisDatabase db;

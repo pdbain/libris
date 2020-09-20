@@ -43,6 +43,7 @@ import org.lasalledebain.libris.ui.TextBox;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 import junit.framework.TestCase;
+@SuppressWarnings("rawtypes")
 public class GuiManualTests extends TestCase {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
