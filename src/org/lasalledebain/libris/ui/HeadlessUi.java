@@ -108,7 +108,7 @@ public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<Reco
 	}
 
 	@Override
-	public void setRecordName(NamedRecordList namedRecs) throws InputException {
+	public void setRecordName(NamedRecordList<RecordType> namedRecs) throws InputException {
 		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
 	}
 

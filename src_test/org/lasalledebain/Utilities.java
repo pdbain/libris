@@ -54,6 +54,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
 import junit.framework.TestCase;
+@SuppressWarnings("rawtypes")
 
 public class Utilities extends TestCase {
 	public static final String HTML_TEST_DATABASE = "htmlTestDatabase1.libr";

@@ -191,18 +191,18 @@ public class Libris {
 
 	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi<DatabaseRecord> ui) throws LibrisException {
 		if (null == ui) {
-			ui = new HeadlessUi(false);
+			ui = new HeadlessUi<DatabaseRecord>(false);
 		}
 		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(databaseFile));
 		return db;
 	}
 
-	public static boolean buildIndexes(File databaseFile, DatabaseUi ui) throws LibrisException {
+	public static boolean buildIndexes(File databaseFile, DatabaseUi<?> ui) throws LibrisException {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(databaseFile);
 		return buildIndexes(config, ui);
 	}
 
-	public static boolean buildIndexes(LibrisDatabaseConfiguration config, DatabaseUi databaseUi)
+	public static boolean buildIndexes(LibrisDatabaseConfiguration config, DatabaseUi<?> databaseUi)
 			throws LibrisException {
 		if (config.isReadOnly()) {
 			databaseUi.alert("Cannot build indexes if read-only set");

@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+@SuppressWarnings("rawtypes")
 public class MockFixedSizeEntryFactory  {
 
 	byte testData = 42;

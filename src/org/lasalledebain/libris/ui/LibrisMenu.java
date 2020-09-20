@@ -423,12 +423,12 @@ public class LibrisMenu extends AbstractLibrisMenu {
 
 	private KeyStroke getAcceleratorKeystroke(char key) {
 		return KeyStroke.getKeyStroke(key, 
-				java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask(), false);
+				java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx(), false);
 	}
 
 	private KeyStroke getAcceleratorKeystroke(char key, int modifier) {
 		return KeyStroke.getKeyStroke(key, 
-				java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | modifier, false);
+				java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | modifier, false);
 	}
 
 	@Override

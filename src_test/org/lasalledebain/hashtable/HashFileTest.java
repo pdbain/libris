@@ -2,7 +2,7 @@ package org.lasalledebain.hashtable;
 
 import static org.lasalledebain.Utilities.checkForDuplicates;
 import static org.lasalledebain.Utilities.compareIntLists;
-import static org.lasalledebain.Utilities.trace; 
+import static org.lasalledebain.Utilities.trace;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,11 +12,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.logging.Level;
 
 import org.junit.Test;
 import org.lasalledebain.Utilities;
-import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.AffiliateHashFile;
 import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
@@ -31,6 +29,7 @@ import org.lasalledebain.libris.indexes.MockVariableSizeEntryNumericKeyHashFile;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+@SuppressWarnings("rawtypes")
 
 public class HashFileTest extends TestCase {
 
