@@ -132,7 +132,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators, fieldNums);
 		database.exportDatabaseXml(new FileOutputStream(testDatabaseFileCopy), true, true, true);
 		ui.closeDatabase(false);
-		ui.rebuildDatabase();
+		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
 		for (String term : keyWordsAndRecords.keySet()) {
 			FilteredRecordList<DatabaseRecord> filteredList = database

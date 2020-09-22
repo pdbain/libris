@@ -56,7 +56,7 @@ public class LauncherTests extends TestCase {
 		String directoryFilePath = db.getDatabaseFile().getAbsolutePath();
 		assertTrue("Could not close database", db.closeDatabase(false));
 		final String port = "8123";
-		LibrisUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_WEB, Libris.OPTION_PORT,
+		LibrisUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_WEBUI, Libris.OPTION_PORT,
 				port, directoryFilePath});
 		assertNotNull("Failed to open database UI", ui);
 		HttpClient client = HttpClient.newHttpClient();
@@ -73,7 +73,7 @@ public class LauncherTests extends TestCase {
 		String directoryFilePath = (new File(workingDirectory, Utilities.EXAMPLE_DATABASE1_FILE)).getAbsolutePath();
 		LibrisUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_REBUILD, directoryFilePath});
 		assertNotNull("Failed to open database UI", ui);
-		ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_CMDLINE, directoryFilePath});
+		ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_CMDLINEUI, directoryFilePath});
 		LibrisDatabase db = ui.getDatabase();
 		DatabaseRecord rec = db.getRecord(200);
 		assertNotNull("Failed to get record", rec);

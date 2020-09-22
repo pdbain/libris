@@ -18,9 +18,12 @@ import org.lasalledebain.libris.ui.LibrisUi;
 import static org.lasalledebain.libris.ui.LibrisUi.cmdlineError;
 
 public class Libris {
+	private static final String OPTION_AUXDIR = "-x";
+	public static final String OPTION_GUI = "-g";
+	public static final String OPTION_ARCHIVEDIR = "-a";
 	public static final String OPTION_REBUILD = "-b";
-	public static final String OPTION_CMDLINE = "-c";
-	public static final String OPTION_WEB = "-w";
+	public static final String OPTION_CMDLINEUI = "-c";
+	public static final String OPTION_WEBUI = "-w";
 	public static final String OPTION_PORT = "-p";
 
 	enum IfType {
@@ -55,11 +58,11 @@ public class Libris {
 				readOnly = true;
 			} else if (arg.equals(OPTION_REBUILD)) {
 				doRebuild = true;
-			} else if (arg.equals("-g")) {
+			} else if (arg.equals(OPTION_GUI)) {
 				myUiType = IfType.UI_GUI;
-			} else if (arg.equals(OPTION_CMDLINE)) {
+			} else if (arg.equals(OPTION_CMDLINEUI)) {
 				myUiType = IfType.UI_CMDLINE;
-			} else if (arg.equals(OPTION_WEB)) {
+			} else if (arg.equals(OPTION_WEBUI)) {
 				myUiType = IfType.UI_WEB;
 				// TODO add port and context for web
 			} else if (arg.equals(OPTION_PORT)) {
@@ -78,13 +81,15 @@ public class Libris {
 			} else if (arg.equals("-h")) {
 				printHelpString();
 				System.exit(0);
-			} else if (arg.equals("-a")) {
+			} else if (arg.equals(OPTION_ARCHIVEDIR)) {
 				notImplemented(arg);
-			} else if (arg.equals("-x")) {
-				if ((i + 1) < args.length) {
+			} else if (arg.equals(OPTION_AUXDIR)) {
+				++i;
+				if (i < args.length) {
 					auxDirPath = args[i + 1];
+				} else {
+					cmdlineError("Missing argument for " + OPTION_AUXDIR);
 				}
-				notImplemented(arg);
 				status = false;
 			} else if (!arg.startsWith("-")) {
 				if (null == databaseFilePath) {
@@ -100,44 +105,49 @@ public class Libris {
 		LibrisUi<DatabaseRecord> ui = null;
 		try {
 			File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
+			LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
 			File auxDir = null;
 			if ((null != dbFile) && (!dbFile.isFile())) {
 				cmdlineError(databaseFilePath + " is not a file");
 				status = false;
-			} else {
+			}
 				if (null != auxDirPath) {
 					auxDir = new File(auxDirPath);
+					if (!auxDir.exists()) {
+						cmdlineError("Auxiliariy directory "+auxDirPath+" does not exist");
+						status = false;
+					}
+					config.setAuxiliaryDirectory(auxDir);
 				}
-			}
 			// TODO configurable aux dir & artifact dir
-			if (doRebuild) {
-				Assertion.assertNotNullError("Database file not set", dbFile);
-				ui = new HeadlessUi<DatabaseRecord>(false);
-				ui.setDatabaseFile(dbFile);
-				status = ui.rebuildDatabase();
-			} else {
-				switch (myUiType) {
-				case UI_GUI:
-					ui = new LibrisGui(dbFile, readOnly);
-					break;
-				case UI_WEB:
-					LibrisHttpServer<DatabaseRecord> htmlUi = new LibrisHttpServer<DatabaseRecord>(webPort,
-							LibrisHttpServer.DEFAULT_CONTEXT);
-					ui = htmlUi;
-					break;
-				case UI_CMDLINE:
-					ui = new CmdlineUi<>(false);
-					break;
-				default:
-					LibrisUi.cmdlineError(myUiType.toString() + " not implemented");
-					break;
-				}
-				LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
-				if (null != dbFile) {
-					ui.openDatabase(config);
-					ui.start();
+			if (status) {
+				if (doRebuild) {
+					Assertion.assertNotNullError("Database file not set", dbFile);
+					ui = new HeadlessUi<DatabaseRecord>(false);
+					status = ui.rebuildDatabase(config);
 				} else {
-					ui.sendChooseDatabase();
+					switch (myUiType) {
+					case UI_GUI:
+						ui = new LibrisGui(dbFile, readOnly);
+						break;
+					case UI_WEB:
+						LibrisHttpServer<DatabaseRecord> htmlUi = new LibrisHttpServer<DatabaseRecord>(webPort,
+								LibrisHttpServer.DEFAULT_CONTEXT);
+						ui = htmlUi;
+						break;
+					case UI_CMDLINE:
+						ui = new CmdlineUi<>(false);
+						break;
+					default:
+						LibrisUi.cmdlineError(myUiType.toString() + " not implemented");
+						break;
+					}
+					if (null != dbFile) {
+						ui.openDatabase(config);
+						ui.start();
+					} else {
+						ui.sendChooseDatabase();
+					}
 				}
 			}
 		} catch (LibrisException e) {
@@ -164,12 +174,16 @@ public class Libris {
 	}
 
 	private static void printHelpString() {
-		String helpString = "Libris: a record management system.\n" + "Syntax:]\n" + OPTION_REBUILD
+		String helpString = "Libris: a record management system.\n" + "Syntax:]\n" 
+				+ OPTION_REBUILD
 				+ ": rebuild database\n" + "libris -[c|g|w] [-p <port>] [-x <path>] [-r] [-a <path>] <database file>\n"
-				+ OPTION_CMDLINE + ": command-line\n" + "-g" + ": graphical user interface\n" + OPTION_WEB
-				+ ": start web server\n" + OPTION_PORT + ": specify port (web server only)"
-				+ "-x: specify auxiliary directory\n" + "-r: open database read-only\n"
-				+ "-a: specify arifact repository location";
+				+ OPTION_CMDLINEUI + ": command-line\n" 
+				+ OPTION_GUI + ": graphical user interface\n" 
+				+ OPTION_WEBUI + ": start web server\n"
+				+ OPTION_PORT + ": specify port (web server only)"
+				+ OPTION_AUXDIR + ": specify auxiliary directory\n" 
+				+ "-r: open database read-only\n"
+				+ OPTION_ARCHIVEDIR + ": specify arifact repository location";
 		System.out.println(helpString);
 
 	}

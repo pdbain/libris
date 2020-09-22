@@ -166,11 +166,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 	}
 
 	@Override
-	public boolean rebuildDatabase() throws LibrisException {
-		return nonNull(parentUi)? parentUi.rebuildDatabase(): true;	
-	}
-
-	@Override
 	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
 		alert("Operation not available");
 		return false;
