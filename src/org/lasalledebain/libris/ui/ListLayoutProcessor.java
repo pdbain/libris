@@ -52,19 +52,6 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 		super(theLayout);
 	}
 
-	private String makeStyleString() {
-		StringBuffer buff = new StringBuffer(super.getStyleString());
-		buff.append(FIELDS_PANEL_STYLE
-				+ FIELD_TITLE_TEXT_STYLE
-				+ FIELD_TEXT_STYLE
-				+ RECORD_ID_STYLE
-				+ RECORD_LIST_CELL_STYLE
-				+ RECORD_LIST_TABLE_STYLE
-				+ NAVIGATION_PANEL_STYLE
-				);
-		return buff.toString();
-	}
-
 	@Override
 	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
 		buff.append("<table class = \""
@@ -166,7 +153,16 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 
 	@Override
 	protected String getStyleString() {
-		return super.getStyleString() + makeStyleString();
+		StringBuffer buff = new StringBuffer(super.getStyleString());
+		buff.append(FIELDS_PANEL_STYLE
+				+ FIELD_TITLE_TEXT_STYLE
+				+ FIELD_TEXT_STYLE
+				+ RECORD_ID_STYLE
+				+ RECORD_LIST_CELL_STYLE
+				+ RECORD_LIST_TABLE_STYLE
+				+ NAVIGATION_PANEL_STYLE
+				);
+		return buff.toString();
 	}
 
 	@Override
