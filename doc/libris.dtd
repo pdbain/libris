@@ -8,7 +8,7 @@
 <!ENTITY % databaseAttributes	"
 	schemaname NMTOKEN #REQUIRED
 	schemaversion NMTOKEN #REQUIRED
-	schemalocation NMTOKEN #IMPLIED
+	metadatalocation NMTOKEN #IMPLIED
 	databasename NMTOKEN #IMPLIED
 	date CDATA #IMPLIED
 	repositorylocation NMTOKEN #IMPLIED

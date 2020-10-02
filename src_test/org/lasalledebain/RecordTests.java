@@ -16,6 +16,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.ExactKeywordList;
@@ -145,7 +146,7 @@ public class RecordTests extends TestCase {
 			FieldType[] expectedFieldTypes = {FieldType.T_FIELD_AFFILIATES, FieldType.T_FIELD_AFFILIATES, FieldType.T_FIELD_STRING,
 					FieldType.T_FIELD_BOOLEAN, FieldType.T_FIELD_BOOLEAN, FieldType.T_FIELD_STRING, 
 					FieldType.T_FIELD_PAIR, FieldType.T_FIELD_PAIR, FieldType.T_FIELD_PAIR, FieldType.T_FIELD_INTEGER};
-			Schema schem = Utilities.loadSchema(schemaFile);
+			Schema schem = XmlSchema.loadSchema(schemaFile);
 			Record rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			String[] fids = schem.getFieldIds();
 			StringBuilder sb  = new StringBuilder();
@@ -267,7 +268,7 @@ public class RecordTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
 			Record rec = Utilities.loadRecordFromXml(schemaFile, record2File);
-			Schema s = Utilities.loadSchema(schemaFile);
+			Schema s = XmlSchema.loadSchema(schemaFile);
 			String[] schemaFields = s.getFieldIds();
 			String[] recordFields = rec.getFieldIds();
 			int sfi = 0;
@@ -288,7 +289,7 @@ public class RecordTests extends TestCase {
 		File testDir = Utilities.getTestDataDirectory();
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
-			Schema schem = Utilities.loadSchema(schemaFile);
+			Schema schem = XmlSchema.loadSchema(schemaFile);
 			String groupIds[] = {"group1", "group2"};
 			Iterator<String> actualIds = schem.getGroupIds().iterator();
 			

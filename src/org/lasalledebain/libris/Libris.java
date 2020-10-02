@@ -1,21 +1,23 @@
 package org.lasalledebain.libris;
 
+import static org.lasalledebain.libris.ui.LibrisUi.cmdlineError;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Objects;
+import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.records.PdfRecordImporter;
-import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.LibrisGui;
-import org.lasalledebain.libris.ui.LibrisHttpServer;
 import org.lasalledebain.libris.ui.CmdlineUi;
 import org.lasalledebain.libris.ui.ConsoleUi;
 import org.lasalledebain.libris.ui.DatabaseUi;
+import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.ui.LibrisGui;
+import org.lasalledebain.libris.ui.LibrisHttpServer;
 import org.lasalledebain.libris.ui.LibrisUi;
-import static org.lasalledebain.libris.ui.LibrisUi.cmdlineError;
 
 public class Libris {
 	private static final String OPTION_AUXDIR = "-x";
@@ -49,6 +51,7 @@ public class Libris {
 		String artifactDirpath = null;
 		String databaseFilePath = null;
 		int webPort = LibrisHttpServer.default_port;
+		boolean batch = false;
 		boolean status = true; /* success */
 
 		int i = 0;
@@ -58,6 +61,7 @@ public class Libris {
 				readOnly = true;
 			} else if (arg.equals(OPTION_REBUILD)) {
 				doRebuild = true;
+				batch = true;
 			} else if (arg.equals(OPTION_GUI)) {
 				myUiType = IfType.UI_GUI;
 			} else if (arg.equals(OPTION_CMDLINEUI)) {
@@ -111,14 +115,14 @@ public class Libris {
 				cmdlineError(databaseFilePath + " is not a file");
 				status = false;
 			}
-				if (null != auxDirPath) {
-					auxDir = new File(auxDirPath);
-					if (!auxDir.exists()) {
-						cmdlineError("Auxiliariy directory "+auxDirPath+" does not exist");
-						status = false;
-					}
-					config.setAuxiliaryDirectory(auxDir);
+			if (null != auxDirPath) {
+				auxDir = new File(auxDirPath);
+				if (!auxDir.exists()) {
+					cmdlineError("Auxiliary directory "+auxDirPath+" does not exist");
+					status = false;
 				}
+				config.setAuxiliaryDirectory(auxDir);
+			}
 			// TODO configurable aux dir & artifact dir
 			if (status) {
 				if (doRebuild) {
@@ -151,12 +155,13 @@ public class Libris {
 				}
 			}
 		} catch (LibrisException e) {
+			LibrisDatabase.log(Level.SEVERE, "Error opening database", e);
 			LibrisUi.cmdlineError("Cannot open Libris: " + e.getMessage());
 			status = false;
 		}
 
 		LibrisUi<DatabaseRecord> result = null;
-		if (status) {
+		if (status && !batch) {
 			if (IfType.UI_CMDLINE != myUiType) {
 				ConsoleUi<DatabaseRecord> console = new ConsoleUi<DatabaseRecord>(ui);
 				console.start();
@@ -164,6 +169,8 @@ public class Libris {
 			} else {
 				result = ui;
 			}
+		} else {
+			result = ui;
 		}
 		return result;
 	}
@@ -223,7 +230,6 @@ public class Libris {
 			return false;
 		}
 		LibrisDatabase db = new LibrisDatabase(config, databaseUi);
-		config.setLoadMetadata(true);
 		if (!db.isDatabaseReserved()) {
 			boolean buildResult = db.buildDatabase();
 			if (!buildResult) {

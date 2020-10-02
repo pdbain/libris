@@ -18,6 +18,7 @@ import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
@@ -41,7 +42,7 @@ public class GroupDefsTests extends TestCase {
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, Utilities.SCHEMA_WITH_GROUP_DEFS_XML);
 		try {
-			Schema schema = Utilities.loadSchema(inputFile);
+			Schema schema = XmlSchema.loadSchema(inputFile);
 			checkGroups(schema);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -54,7 +55,7 @@ public class GroupDefsTests extends TestCase {
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, Utilities.SCHEMA_WITH_GROUP_DEFS_XML);
 		try {
-			Schema schema = Utilities.loadSchema(inputFile);
+			Schema schema = XmlSchema.loadSchema(inputFile);
 			File workdir = Utilities.makeTempTestDirectory();
 			File exportedXml = new File (workdir, "schema_copy.xml");
 			exportedXml.deleteOnExit();
@@ -63,7 +64,7 @@ public class GroupDefsTests extends TestCase {
 			schema.toXml(outWriter);
 			outWriter.flush();
 			copyStream.close();
-			schema = Utilities.loadSchema(exportedXml);
+			schema = XmlSchema.loadSchema(exportedXml);
 			checkGroups(schema);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -76,7 +77,7 @@ public class GroupDefsTests extends TestCase {
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, Utilities.SCHEMA_WITH_GROUP_DEFS_XML);
 		try {
-			Schema schema = Utilities.loadSchema(inputFile);
+			Schema schema = XmlSchema.loadSchema(inputFile);
 			for (String gid: schema.getGroupIds()) {
 				GroupDef g = schema.getGroupDef(gid);
 				assertEquals(gid, g.getFieldId());

@@ -13,6 +13,7 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -40,7 +41,7 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 		workDir = Utilities.makeTempTestDirectory();
 		testDatabase = new DiagnosticDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workDir));
 		File schemaFile = new File(Utilities.getTestDataDirectory(), Utilities.TEST_SCHEMA2_XML_FILE);
-		Schema schem = Utilities.loadSchema(schemaFile);
+		Schema schem = XmlSchema.loadSchema(schemaFile);
 		testDatabase.setSchema(schem);
 
 		journalFile = new File(workDir, "JournalTest"+'.'+FILENAME_JOURNAL_SUFFIX);

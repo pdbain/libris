@@ -92,11 +92,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 	}
 
 	@Override
-	public void setSchema(XmlSchema mySchema) {
-		alert("Operation not available");
-	}
-
-	@Override
 	public void setOpenReadOnly(boolean openReadOnly) {
 		if (nonNull(parentUi)) {
 			parentUi.setOpenReadOnly(openReadOnly);	

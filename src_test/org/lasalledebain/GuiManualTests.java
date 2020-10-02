@@ -27,6 +27,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -159,7 +160,7 @@ public class GuiManualTests extends TestCase {
 		File recordFile = new File(testDir, Utilities.TEST_RECORD2_XML_FILE);
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
-			Schema schem = Utilities.loadSchema(schemaFile);
+			Schema schem = XmlSchema.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
@@ -182,7 +183,7 @@ public class GuiManualTests extends TestCase {
 		File recordFile = new File(testDir, Utilities.TEST_RECORD2_XML_FILE);
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
-			Schema schem = Utilities.loadSchema(schemaFile);
+			Schema schem = XmlSchema.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
@@ -338,7 +339,7 @@ public class GuiManualTests extends TestCase {
 		File recordFile = new File(testDir, Utilities.TEST_RECORD1_XML_FILE);
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA_XML_FILE);
 		try {
-			Schema schem = Utilities.loadSchema(schemaFile);
+			Schema schem = XmlSchema.loadSchema(schemaFile);
 			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
@@ -371,7 +372,7 @@ public class GuiManualTests extends TestCase {
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, "schema.xml");
 		try {
-			mySchema = Utilities.loadSchema(inputFile);
+			mySchema = XmlSchema.loadSchema(inputFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();

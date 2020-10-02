@@ -14,7 +14,7 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 public class DiagnosticDatabase extends LibrisDatabase {
 
 	public DiagnosticDatabase(File databaseFile) throws LibrisException, DatabaseException {
-		super(new LibrisDatabaseConfiguration(databaseFile, false, null), new HeadlessUi(databaseFile, false));
+		super(new LibrisDatabaseConfiguration(databaseFile, false), new HeadlessUi(databaseFile, false));
 		getFileMgr().createAuxFiles(true);
 		HashMap<String, String> attrs = new HashMap<String, String>();
 		attrs.put(XML_DATABASE_NAME_ATTR, "unknown");

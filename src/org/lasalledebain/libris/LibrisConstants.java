@@ -46,7 +46,7 @@ public interface LibrisConstants {
 	String DATABASE_FILE = "DATABASE_FILE";
 	String LAST_ARTIFACT_SOURCE_DIR = "ARTIFACT_DIR";
 	String REPO_DB = "repo_db";
-	public static final String SCHEMA_NAME = "SCHEMA";
+	public static final String METADATA_NAME = "METADATA";
 	public static final String DATABASE_AUX_DIRECTORY_NAME = ".libris_db_files";
 	public static final String REPOSITORY_AUX_DIRECTORY_NAME = ".libris_repo_files";
 	public static final String POSITION_FILENAME = "positions";

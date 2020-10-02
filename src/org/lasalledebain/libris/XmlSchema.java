@@ -1,5 +1,8 @@
 package org.lasalledebain.libris;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.HashMap;
 
 import javax.xml.namespace.QName;
@@ -15,6 +18,7 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementReader;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
+import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
@@ -92,6 +96,18 @@ public class XmlSchema extends Schema {
 			}
 		}
 		fieldDefsManager.parseClosingTag();
+	}
+	public static Schema loadSchema(File schemaFile) throws LibrisException  {
+		FileReader rdr;
+		try {
+			rdr = new FileReader(schemaFile);
+			LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
+			ElementReader xmlReader = xmlFactory.makeReader(rdr, schemaFile.getPath());
+			Schema s = new XmlSchema(xmlReader);
+			return s;
+		} catch (FileNotFoundException e) {
+			throw new InputException("Cannot open "+schemaFile.getPath(), e);
+		}
 	}
 
 }

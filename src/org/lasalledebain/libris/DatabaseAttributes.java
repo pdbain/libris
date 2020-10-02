@@ -13,7 +13,7 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	private final String databaseName;
 	private boolean locked;
 	private final String schemaName;
-	private final String schemaLocation;
+	private final String metadataLocation;
 
 	@Override
 	public void setAttribute(String key, String value) {
@@ -24,7 +24,7 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 		super(attrs);
 		String schemaversion = attrs.get(XML_SCHEMA_VERSION_ATTR);
 		schemaName = attrs.get(XML_DATABASE_SCHEMA_NAME_ATTR);
-		schemaLocation = attrs.get(XML_DATABASE_SCHEMA_LOCATION_ATTR);
+		metadataLocation = attrs.get(XML_DATABASE_METADATA_LOCATION_ATTR);
 		databaseName = attrs.get(XML_DATABASE_NAME_ATTR);
 		if ( schemaversion.isEmpty() || schemaName.isEmpty()) {
 			throw new DatabaseException("Missing required attributes in the "+XML_LIBRIS_TAG+" element");
@@ -64,10 +64,10 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	}
 
 	/**
-	 * @return the schemaLocation
+	 * @return the metadataLocation
 	 */
-	public String getSchemaLocation() {
-		return schemaLocation;
+	public String getMetadataLocation() {
+		return metadataLocation;
 	}
 
 }

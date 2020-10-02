@@ -176,6 +176,10 @@ public class FileAccessManager {
 		return (null != opStream) || (null != raRwFile);
 	}
 	
+	public synchronized boolean filesOpen() {
+		return (readOnlyFilesOpen() || readWriteFilesOpen());
+	}
+	
 	public long getLength() {
 		return myFile.length();
 	}

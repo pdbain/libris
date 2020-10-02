@@ -15,7 +15,6 @@ import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public interface DatabaseUi<RecordType extends Record> {
 
-	public void setSchema(XmlSchema mySchema);
 	public LibrisDatabase openDatabase() throws DatabaseException;
 	public void saveDatabase();
 	public boolean closeDatabase(boolean force) throws DatabaseException;

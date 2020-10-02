@@ -15,6 +15,7 @@ import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.XmlSchema;
 
 public class SchemaTests extends TestCase{
 
@@ -44,7 +45,7 @@ public class SchemaTests extends TestCase{
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, "schema.xml");
 		try {
-			Utilities.loadSchema(inputFile);
+			XmlSchema.loadSchema(inputFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Unexpected exception "+e);
@@ -55,7 +56,7 @@ public class SchemaTests extends TestCase{
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, Utilities.TEST_SCHEMA_ENUMDEFS_XML_FILE);
 		try {
-			Schema s = Utilities.loadSchema(inputFile);
+			Schema s = XmlSchema.loadSchema(inputFile);
 			RecordTemplate.templateFactory(s);
 			EnumFieldChoices efc = s.getEnumSet(ENUM_NUMBER_STRINGS);
 			assertNotNull(ENUM_NUMBER_STRINGS+" not found in schema", efc);
@@ -76,7 +77,7 @@ public class SchemaTests extends TestCase{
 		File inputFile = new File(testDir, "badSchema.xml");
 		boolean exceptionThrown = false;
 		try {
-			Schema s = Utilities.loadSchema(inputFile);
+			Schema s = XmlSchema.loadSchema(inputFile);
 			RecordFactory rt = RecordTemplate.templateFactory(s);
 		} catch (Exception e) {
 			assertTrue(e.getMessage().contains("line 4 element \"fielddef\" : fielddef missing attribute: id"));

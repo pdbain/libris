@@ -9,6 +9,7 @@ import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.util.DiagnosticDatabase;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -32,7 +33,7 @@ public class NativeFileTest extends TestCase implements LibrisConstants, LibrisX
 		workingDirectory = Utilities.makeTempTestDirectory();
 		testDatabase = new DiagnosticDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory));
 		File schemaFile = new File(Utilities.getTestDataDirectory(), Utilities.TEST_SCHEMA2_XML_FILE);
-		Schema schem = Utilities.loadSchema(schemaFile);
+		Schema schem = XmlSchema.loadSchema(schemaFile);
 		testDatabase.setSchema(schem);
 
 		nativeRecordsFile = new File(workingDirectory, "NativeFileTest"+'.'+FILENAME_NATIVE_RECORDS_SUFFIX);

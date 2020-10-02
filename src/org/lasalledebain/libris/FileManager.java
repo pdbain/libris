@@ -55,6 +55,12 @@ public class FileManager {
 		return mgr;
 	}
 
+	public FileAccessManager makeAuxiliaryFileAccessManager(String name, File auxFile) {
+		FileAccessManager mgr = new FileAccessManager(auxFile);
+		activeManagers.put(name, mgr);
+		return mgr;
+	}
+
 	public FileAccessManager makeExpendableAccessManager(String fileName) {
 		FileAccessManager mgr = new FileAccessManager(auxDirectory, fileName);
 		activeManagers.put(fileName, mgr);

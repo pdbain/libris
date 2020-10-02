@@ -1,7 +1,13 @@
 package org.lasalledebain.libris.xmlUtils;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -10,6 +16,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -355,5 +362,30 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 
 	public ElementManager nextElement() throws XmlException {
 		return nextElement(null);
+	}
+	public static ElementManager makeElementManager(String filePath,
+			String initialElementName) throws InputException {
+		FileInputStream fileStream;
+		try {
+			fileStream = new FileInputStream(filePath);
+			return makeElementManager(fileStream, filePath, initialElementName);
+		} catch (FileNotFoundException e) {
+			throw new InputException(filePath, e);
+		}
+	}
+
+	public static ElementManager makeElementManager(FileInputStream fileStream, String filePath,
+			String initialElementName) throws InputException {
+		try {
+			InputStreamReader xmlFileReader = new InputStreamReader(fileStream);
+			fileStream.getChannel().position(0);
+			Reader rdr = xmlFileReader;
+			ElementManager mgr = LibrisDatabase.makeElementManager(rdr, initialElementName, filePath);
+			return mgr;
+		} catch (IOException e) {
+			String msg = "error opening "+filePath; //$NON-NLS-1$
+			LibrisDatabase.librisLogger.log(Level.SEVERE, msg, e); //$NON-NLS-1$
+			throw new InputException("error opening "+msg, e); //$NON-NLS-1$
+		}
 	}
 }

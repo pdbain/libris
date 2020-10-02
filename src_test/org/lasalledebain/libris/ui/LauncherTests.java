@@ -4,8 +4,11 @@ import static org.lasalledebain.Utilities.testLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.http.HttpClient;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.logging.Level;
 
 import org.junit.Test;
@@ -69,19 +72,30 @@ public class LauncherTests extends TestCase {
 	public void testRebuild() throws Exception {
 		tearDown();
 		setUp();
-		Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_DATABASE1_FILE, workingDirectory);
-		String directoryFilePath = (new File(workingDirectory, Utilities.EXAMPLE_DATABASE1_FILE)).getAbsolutePath();
+		Utilities.copyTestDatabaseFile(Utilities.TEST_DB4_NOMETADATA_FILE, workingDirectory);
+		Utilities.copyTestDatabaseFile(Utilities.TEST_DB4_METADATAONLY_FILE, workingDirectory);
+		String directoryFilePath = (new File(workingDirectory, Utilities.TEST_DB4_NOMETADATA_FILE)).getAbsolutePath();
 		LibrisUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_REBUILD, directoryFilePath});
 		assertNotNull("Failed to open database UI", ui);
 		ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_CMDLINEUI, directoryFilePath});
 		LibrisDatabase db = ui.getDatabase();
-		DatabaseRecord rec = db.getRecord(200);
+		String databaseCopy = (new File(workingDirectory, "databaseCopy.libr")).getAbsolutePath();
+		db.exportDatabaseXml(new FileOutputStream(databaseCopy));
+		String databaseCopyContent = Files.readString(Path.of(databaseCopy));
+		assertFalse("Database copy contains metadata", databaseCopyContent.contains("<schema>") || databaseCopyContent.contains("<metadata>"));
+		DatabaseRecord rec = db.getRecord(2);
 		assertNotNull("Failed to get record", rec);
-		Field fld = rec.getField(3);
+		Field fld = rec.getField(5);
 		assertNotNull("Missing record field", fld);
 		String value = fld.getValuesAsString();
-		assertEquals("Wrong field value", "Amoeba: A Distributed Operating System for the 1990s", value);
+		assertEquals("Wrong field value", "Ulysses Odysseus Trojan war", value);
 	}
+	
+	@Test
+	public void testSeparateSchema() throws Exception {
+		
+	}
+	
 	@Override
 	protected void setUp() throws Exception {
 		testLogger.log(Level.INFO, "Starting "+getName());

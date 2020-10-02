@@ -10,7 +10,6 @@ public class LibrisDatabaseConfiguration extends DatabaseConfiguration {
 	private File artifactDirectory;
 	private File auxiliaryDirectory;
 	private boolean loadMetadata;
-	Schema databaseSchema;
 	private boolean readOnly;
 
 	private LibrisDatabaseConfiguration() {
@@ -18,7 +17,6 @@ public class LibrisDatabaseConfiguration extends DatabaseConfiguration {
 		readOnly = false;
 		auxiliaryDirectory = null;
 		myDatabaseFile = null;
-		databaseSchema = null;
 		artifactDirectory = null;
 		loadMetadata = true;
 	}
@@ -28,23 +26,14 @@ public class LibrisDatabaseConfiguration extends DatabaseConfiguration {
 		myDatabaseFile = theDatabaseFile;
 	}
 
-	public LibrisDatabaseConfiguration(File theDatabaseFile, boolean readOnly, Schema schem) {
+	public LibrisDatabaseConfiguration(File theDatabaseFile, boolean readOnly) {
 		this();
 		setReadOnly(readOnly);
 		myDatabaseFile = theDatabaseFile;
-		databaseSchema = schem;
 	}
 
 	public void setDatabaseFile(File databaseFile) {
 		this.myDatabaseFile = databaseFile;
-	}
-
-	public Schema getDatabaseSchema() {
-		return databaseSchema;
-	}
-
-	public void setDatabaseSchema(Schema databaseSchema) {
-		this.databaseSchema = databaseSchema;
 	}
 
 	public void setAuxiliaryDirectory(File auxiliaryDirectory) {

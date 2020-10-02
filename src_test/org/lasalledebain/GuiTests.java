@@ -69,10 +69,7 @@ public class GuiTests extends TestCase {
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, "schema.xml");
 		try {
-			InputStreamReader xmlInput = new InputStreamReader(new FileInputStream(inputFile));
-			LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
-			ElementReader xmlReader = xmlFactory.makeReader(xmlInput, inputFile.getPath());
-			mySchema = new XmlSchema(xmlReader);
+			mySchema = XmlSchema.loadSchema(inputFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("unexpected exception: "+e);

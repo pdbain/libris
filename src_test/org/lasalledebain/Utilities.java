@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,7 +46,6 @@ import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.TestGUI;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
-import org.lasalledebain.libris.xmlUtils.ElementReader;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
@@ -77,6 +75,8 @@ public class Utilities extends TestCase {
 	public static final String TEST_DB1_XML_FILE = "testDatabase1.xml";
 	public final static String TEST_DB1_IMPORT_FILE ="csv_import.xml";
 	public static final String TEST_DB4_XML_FILE = "testDatabase4.xml";
+	public static final String TEST_DB4_NOMETADATA_FILE = "testDatabase4_nometadata.libr";
+	public static final String TEST_DB4_METADATAONLY_FILE = "testDatabase4_metadataonly.libr";
 	public static final String TEST_DB_WITH_DEFAULTS_XML_FILE = "databaseWithDefaults.xml";
 	public static final String TEST_DB_WITH_GROUPS_XML_FILE = "databaseWithGroups.xml";
 	public static final String EMPTY_DATABASE_FILE = "emptyDatabase1.xml";
@@ -128,19 +128,6 @@ public class Utilities extends TestCase {
 		return testDirectory;
 	}
 
-	public static Schema loadSchema(File schemaFile) throws LibrisException  {
-		FileReader rdr;
-		try {
-			rdr = new FileReader(schemaFile);
-			LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
-			ElementReader xmlReader = xmlFactory.makeReader(rdr, schemaFile.getPath());
-			Schema s = new XmlSchema(xmlReader);
-			return s;
-		} catch (FileNotFoundException e) {
-			throw new InputException("Cannot open "+schemaFile.getPath(), e);
-		}
-	}
-
 	public static Layouts loadLayoutsFromXml(Schema schem, File inputFile)
 			throws FileNotFoundException, FactoryConfigurationError,
 			XMLStreamException, LibrisException, DatabaseException {
@@ -154,7 +141,7 @@ public class Utilities extends TestCase {
 			throws LibrisException, XMLStreamException,
 			LibrisException, RecordDataException,
 			FactoryConfigurationError, DatabaseException, FileNotFoundException {
-		Schema s = Utilities.loadSchema(schemaFile);
+		Schema s = XmlSchema.loadSchema(schemaFile);
 		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		ElementManager mgr = makeElementManagerFromFile(recordFile, "record");
 		DatabaseRecord rec = rt.makeRecord(true);
@@ -164,7 +151,7 @@ public class Utilities extends TestCase {
 
 	static Record loadRecordFromXml(File schemaFile, InputStream xmlStream, File sourceFile) throws 
 	LibrisException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
-		Schema s = Utilities.loadSchema(schemaFile);
+		Schema s = XmlSchema.loadSchema(schemaFile);
 		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
 		String sourcePath = (null == sourceFile)? null : sourceFile.getPath();
 		ElementManager mgr = makeElementManagerFromInputStream(xmlStream, sourcePath, LibrisXMLConstants.XML_RECORD_TAG);

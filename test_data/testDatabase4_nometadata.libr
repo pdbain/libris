@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libris date="2011-06-03 00:00:00 UTC" schemaname="testDatabase1" databasename="testDatabase1" metadatalocation="testDatabase4_metadataonly.libr" schemaversion="0.0">
+	<records lastid="4">
+			<record id="1">
+			<field id="ID_auth" value="Rec1Fld1Val1" />
+			<field id="ID_title" value="Rec1Fld2Val1" />
+			<field id="ID_pages" value="1" extravalue="2"/>
+			<field id="ID_publisher" value="NS_e1" />
+			<field id="ID_keywords" value="k1 k2 k3" />
+			<field id="ID_hardcopy" value="true" />
+			<field id="ID_location" value="https://httpbin.org/html" extravalue="Random text"/>
+		</record>
+		<record id="2">
+			<field id="ID_auth" value="Rec2Fld1Val1" />
+			<field id="ID_title" value="testMissingField" />
+			<field id="ID_pages" value="365" />
+			<field id="ID_keywords" value="Ulysses Odysseus Trojan war" />
+			<field id="ID_hardcopy" value="true" />
+			<field id="ID_location" value="https://httpbin.org/html"/>
+		</record>
+		<record id="3">
+			<field id="ID_auth" value="Rec3Fld1Val1" />
+			<field id="ID_title" value="A First History of France" />
+			<field id="ID_pages" value="301" />
+			<field id="ID_publisher" value="" extravalue="other" />
+			<field id="ID_keywords" value="Ulysses Odysseus Trojan war" />
+			<field id="ID_hardcopy" value="true" />
+		</record>
+		<record id="4">
+			<field id="ID_auth" value="Rec4Fld1Val1" />
+			<field id="ID_auth" value="Rec4Fld1Val2" />
+			<field id="ID_title" value="Rec4Fld2Val1" />
+			<field id="ID_pages" value="Rec4Fld3Val1.1" extravalue="Rec4Fld3Val1.2" />
+			<field id="ID_publisher" value="" extravalue="NS_e6" />
+			<field id="ID_keywords" value="k13 k14 k15" />
+			<field id="ID_hardcopy" value="true" />
+		</record>
+	</records>
+</libris>

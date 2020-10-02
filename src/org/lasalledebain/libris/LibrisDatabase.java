@@ -1,9 +1,10 @@
 package org.lasalledebain.libris;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.lasalledebain.libris.exception.Assertion.assertEquals;
 import static org.lasalledebain.libris.exception.Assertion.assertNotNull;
 import static org.lasalledebain.libris.exception.Assertion.assertTrue;
-import static java.util.Objects.isNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,8 +14,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,10 +42,11 @@ import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.records.XmlRecordsReader;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
-import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.Messages;
+import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -64,10 +64,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	protected ArtifactManager documentRepository;
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisDatabaseMetadata databaseMetadata;
-	private static final Logger librisLogger = setupLogger();
+	public static final Logger librisLogger = setupLogger();
 	protected DatabaseAttributes xmlAttributes;
 	private FileAccessManager databaseFileMgr;
-	private FileAccessManager schemaFileMgr;
+	private FileAccessManager metadataFileMgr;
 	private final ReservationManager reservationMgr;
 	private final LibrisDatabaseConfiguration myConfiguration;
 
@@ -76,7 +76,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		myConfiguration = config;
 		myDatabaseFile = config.getDatabaseFile();
 		readOnly = config.isReadOnly();
-		mySchema = config.getDatabaseSchema();
+		mySchema = null;
 
 		FileAccessManager lockFileManager = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.LOCK_FILENAME);
 		reservationMgr = new ReservationManager(lockFileManager);
@@ -206,12 +206,31 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		if (XML_METADATA_TAG.equals(nextElementId)) {
 			metadataMgr = librisMgr.nextElement();
 		} else {
-			final String schemaLocation = xmlAttributes.getSchemaLocation();
-			final String schemaName = xmlAttributes.getSchemaName();
-			metadataMgr = makeMetadataMgr(schemaName, schemaLocation);
+			final String metadataLocation = xmlAttributes.getMetadataLocation();
+			File metadataFile = new File(metadataLocation);
+			if (!metadataFile.isAbsolute()) {
+				metadataFile = new File(getDatabaseDirectoryPath(), metadataLocation);
+			}
+			InputStreamReader metadataReader = null;
+			try {
+				if (nonNull(metadataFileMgr) && metadataFileMgr.filesOpen()) {
+					throw new DatabaseException("schema file already set");
+				}
+				if (!metadataFile.exists() || (metadataFile.length() == 0)) {
+					throw new InputException("metadata file "+metadataFile.getAbsolutePath()+" not found or is empty");
+				}
+				metadataFileMgr = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.METADATA_NAME, metadataFile);
+				metadataReader = new InputStreamReader(metadataFileMgr.getIpStream());
+				metadataMgr = makeElementManager(metadataReader, XML_METADATA_TAG, metadataFileMgr.getPath());
+			} catch (FileNotFoundException | DatabaseException e) {
+				throw new InputException(LibrisConstants.COULD_NOT_OPEN_SCHEMA_FILE+metadataFile.getAbsolutePath(), e);
+			}
 		}
 		Assertion.assertNotNullInputException("could not open schema file", metadataMgr);
 		databaseMetadata.fromXml(metadataMgr);
+		if (nonNull(metadataFileMgr)) {
+			metadataFileMgr.close();
+		}
 	}
 
 	public static boolean newDatabase(File databaseFile, String schemaName, boolean readOnly, DatabaseUi ui, LibrisMetadata<DatabaseRecord> metadata) 
@@ -341,7 +360,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	@Override
 	public void toXml(ElementWriter outWriter) throws LibrisException {
-		toXml(outWriter, true, databaseRecords, false);
+		String metadataLocation = xmlAttributes.getMetadataLocation();
+		boolean includeMetadata = StringUtils.isStringEmpty(metadataLocation);		
+		toXml(outWriter, includeMetadata, databaseRecords, false);
 	}
 
 	private void toXml(ElementWriter outWriter, boolean includeMetadata,
@@ -509,22 +530,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 */
 	public static ElementManager makeLibrisElementManager(FileInputStream fileStream, String filePath) throws InputException {
 		String initialElementName = LibrisXMLConstants.XML_LIBRIS_TAG;
-		return makeDatabaseElementManager(fileStream, filePath, initialElementName);
-	}
-
-	public static ElementManager makeDatabaseElementManager(FileInputStream fileStream, String filePath,
-			String initialElementName) throws InputException {
-		try {
-			InputStreamReader xmlFileReader = new InputStreamReader(fileStream);
-			fileStream.getChannel().position(0);
-			Reader rdr = xmlFileReader;
-			ElementManager mgr = makeElementManager(rdr, initialElementName, filePath);
-			return mgr;
-		} catch (IOException e) {
-			String msg = "error opening "+filePath; //$NON-NLS-1$
-			librisLogger.log(Level.SEVERE, msg, e); //$NON-NLS-1$
-			throw new InputException("error opening "+msg, e); //$NON-NLS-1$
-		}
+		return ElementManager.makeElementManager(fileStream, filePath, initialElementName);
 	}
 
 	public static ElementManager makeElementManager(Reader reader, String initialElementName, String filePath) throws
@@ -538,58 +544,12 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return makeLibrisElementManager(elementSource, source.getPath());
 	}
 
-	protected ElementManager makeMetadataMgr(String schemaName, String schemaLocation) throws InputException {
-		InputStreamReader metadataReader = null;
-		ElementManager metadataMgr = null;
-		try {
-			if (isNull(schemaFileMgr)) {
-				if (isNull(schemaLocation)) {
-					File schemaFile = new File(schemaName+FILENAME_XML_FILES_SUFFIX);
-					try {
-						if (!setSchemaAccessMgr(fileMgr, schemaFile)) {
-							schemaFile = new File(getUi().SelectSchemaFile(schemaName));
-						}
-						setSchemaAccessMgr(fileMgr, schemaFile);
-					} catch (DatabaseException e) {
-						throw new InputException(LibrisConstants.COULD_NOT_OPEN_SCHEMA_FILE+schemaFile.getPath(), e);
-					}
-				} else {
-					URL metadataUrl = new URL(schemaLocation);
-					if (metadataUrl.getProtocol().equalsIgnoreCase("file")) { //$NON-NLS-1$
-						String metaPath = metadataUrl.getPath();
-						File schemaFile = new File(metaPath);
-						if (!schemaFile.isAbsolute()) {
-							schemaFile = new File(getDatabaseDirectoryPath(), metaPath);
-						}
-						setSchemaAccessMgr(fileMgr, schemaFile);
-					}
-				}
-			}
-			metadataReader = new InputStreamReader(schemaFileMgr.getIpStream());
-			ElementManager librisMgr = makeElementManager(metadataReader, XML_LIBRIS_TAG, schemaFileMgr.getPath());
-			librisMgr.parseOpenTag();
-			metadataMgr = librisMgr.nextElement();
-			return metadataMgr;
-		} catch (FileNotFoundException | DatabaseException | MalformedURLException e) {
-			throw new InputException(LibrisConstants.COULD_NOT_OPEN_SCHEMA_FILE+schemaLocation, e);
-		}
-	}
-
-	public synchronized boolean setSchemaAccessMgr(FileManager fileMgr, File schemaFile) throws DatabaseException {
-		if (null != schemaFileMgr) {
-			throw new DatabaseException("schema file already set");
-		}
-		schemaFileMgr = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.SCHEMA_NAME);
-		return schemaFile.exists() && (schemaFile.length() > 0);
-	}
-
 	public  File getDatabaseFile() {
 		synchronized (fileMgr) {
 			fileMgr.checkLock();
 			return myDatabaseFile;
 		}
 	}
-
 
 	public String getDatabaseDirectoryPath() throws DatabaseException {
 		if (isNull(myDatabaseFile)) {

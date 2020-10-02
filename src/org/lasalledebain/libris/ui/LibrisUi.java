@@ -64,12 +64,6 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	public XmlSchema getSchema() {
 		return mySchema;
 	}
-	/**
-	 * @param mySchema the mySchema to set
-	 */
-	public void setSchema(XmlSchema mySchema) {
-		this.mySchema = mySchema;
-	}
 
 	/**
 	 * @param openReadOnly the openReadOnly to set
@@ -79,7 +73,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	}
 
 	public LibrisDatabase openDatabase() throws DatabaseException {
-		return openDatabase(new LibrisDatabaseConfiguration(databaseFile, readOnly, mySchema));
+		return openDatabase(new LibrisDatabaseConfiguration(databaseFile, readOnly));
 	}
 	
 	public LibrisDatabase openDatabase(LibrisDatabaseConfiguration config) throws DatabaseException {
@@ -240,7 +234,6 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	
 	public static void cmdlineError(String msg) {
 		System.err.println(msg);
-		System.exit(1);
 	}
 	public static String formatConciseStackTrace(Exception e, StringBuilder buff) {
 		String emessage;
