@@ -72,6 +72,9 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 		readOnly = openReadOnly;
 	}
 
+	/**
+	 * Convenience method for {@link #openDatabase(LibrisDatabaseConfiguration) with current database}
+	 */
 	public LibrisDatabase openDatabase() throws DatabaseException {
 		return openDatabase(new LibrisDatabaseConfiguration(databaseFile, readOnly));
 	}

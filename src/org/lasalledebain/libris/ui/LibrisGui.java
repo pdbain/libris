@@ -43,6 +43,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	private static final String CONTENT_PANE_HEIGHT = "CONTENT_PANE_HEIGHT";
@@ -101,8 +102,8 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 		return getMenu().openDatabaseDialogue();
 	}
 
-	public LibrisDatabase openDatabase() throws DatabaseException {
-		GenericDatabase<DatabaseRecord> result = super.openDatabase();
+	public LibrisDatabase openDatabase(LibrisDatabaseConfiguration config) throws DatabaseException {
+		GenericDatabase<DatabaseRecord> result = super.openDatabase(config);
 		if (null == result) return null;
 		menu.setDatabase(currentDatabase);
 		getMainFrame().toFront();
