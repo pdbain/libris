@@ -83,7 +83,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 		Schema mySchema = myLayout.getSchema();
 		ArrayList<UiField> guiFields = new ArrayList<UiField>();
 		int numGroups = mySchema.getNumGroups();
-		if ((numGroups > 0) && rec.hasAffiliations()) {
+		if ((numGroups > 0) && (rec.hasAffiliations() || modifiable)) {
 			GroupDefs defs = mySchema.getGroupDefs();
 			JPanel groupPanel =  new JPanel(new GridLayout(1, numGroups));
 			fieldPanel = new JPanel();
