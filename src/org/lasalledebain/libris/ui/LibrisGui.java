@@ -27,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.ProgressMonitor;
 
 import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.DatabaseRecord;
@@ -57,7 +58,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	private JPanel layoutEditPane;
 	private Clipboard systemClipboard;
 	private Component mainframeContents;
-
+	ProgressMonitor progMon;
 	public LibrisGui(File databaseFile, boolean readOnly) throws LibrisException {
 		super(readOnly);
 		setDatabaseFile(databaseFile);
@@ -417,10 +418,20 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	}
 
 	public void exportData(LibrisDatabase db) throws LibrisException {
-		try {
-			DatabaseExporter.guiExportFile(this, db);
-		} catch (InputException e) {
-			db.alert("Error exporting database", e);
+		DatabaseExporter exporter = new DatabaseExporter(db);
+		if (exporter.chooseExportFile(this)) {
+			LibrisUiWorker theWorker = new LibrisUiWorker(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						exporter.doExport();
+					} catch (LibrisException e) {
+						db.alert("Error exporting database", e);
+					}
+				}
+			});
+			runProgressMonitoredTask(theWorker, "Exporting database...");
 		}
 	}
 

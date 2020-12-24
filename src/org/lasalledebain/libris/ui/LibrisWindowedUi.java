@@ -1,13 +1,16 @@
 package org.lasalledebain.libris.ui;
 
+import static java.util.Objects.nonNull;
 import static javax.swing.JOptionPane.showMessageDialog;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -18,12 +21,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.ProgressMonitor;
 
 import org.lasalledebain.libris.DatabaseAttributes;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.index.GroupDef;
 
 public abstract class LibrisWindowedUi<RecordType extends Record> extends LibrisUi<RecordType> {	
@@ -33,6 +39,7 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 	private GroupDef selectedGroupDef;
 	protected boolean databaseSelected = false;
 	protected String title = NO_DATABASE_OPEN;
+	protected LibrisUiWorker progressWorker;
 
 	public abstract boolean closeWindow(boolean allWindows);
 
@@ -181,5 +188,33 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 			}
 		}
 	}
-}
 
+
+	@Override
+	public void setCurrentProgress(int currentProgress) {
+		if (nonNull(progressWorker)) {
+			progressWorker.setWorkerProgress(currentProgress);
+		}
+	}
+
+	protected void runProgressMonitoredTask(LibrisUiWorker theWorker, String message) {
+		progressWorker = theWorker;
+		ProgressMonitor progMon = new ProgressMonitor(this.mainFrame, message, null, 0, 100);
+		progressWorker.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if ("progress" == evt.getPropertyName() ) {
+					int progress = (Integer) evt.getNewValue();
+					progMon.setProgress(progress);
+					if (progMon.isCanceled() || progressWorker.isDone()) {
+						Toolkit.getDefaultToolkit().beep();
+						progressWorker = null;
+					}
+				}
+	
+			}
+		});
+		progressWorker.execute();
+	}
+	
+}

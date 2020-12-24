@@ -378,12 +378,19 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		if (includeMetadata) {
 			databaseMetadata.toXml(outWriter, includeInstanceInfo);
 		}
+		final int lastRecordId = getLastRecordId();
 		if (null != recordSource) {
+			final int PROGRESS_INCREMENT = 64;
 			LibrisAttributes recordsAttrs = new LibrisAttributes();
 			outWriter.writeStartElement(XML_RECORDS_TAG, recordsAttrs, false);
 			for (Record r: recordSource) {
 				r.toXml(outWriter);
+				int id = r.getRecordId();
+				if ((id % PROGRESS_INCREMENT) == 0) {
+					ui.setCurrentProgress(100 * id/lastRecordId);
+				}
 			}
+			ui.setCurrentProgress(100);
 			outWriter.writeEndElement(); /* records */
 		}
 		if (hasDocumentRepository()) {

@@ -288,6 +288,5 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	@Override
 	public boolean stop() {
 		return true;
-	};
-
+	}
 }

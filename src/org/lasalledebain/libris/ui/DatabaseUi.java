@@ -79,4 +79,8 @@ public interface DatabaseUi<RecordType extends Record> {
 	
 	public boolean start();
 	public boolean stop();
+	
+	public default void setCurrentProgress(int currentProgress) {
+		return;
+	}
 }
