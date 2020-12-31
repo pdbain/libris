@@ -43,8 +43,7 @@ public class DatabaseInstance extends LibrisElement {
 	
 	@Override
 	public void fromXml(ElementManager mgr) throws InputException {
-		mgr.parseOpenTag();
-		LibrisAttributes attrs = mgr.getElementAttributes();
+		LibrisAttributes attrs = mgr.parseOpenTagNew();
 		forkDate = LibrisAttributes.parseDate(attrs.get(XML_INSTANCE_FORKDATE_ATTR));
 		joinDate = LibrisAttributes.parseDate(attrs.get(XML_INSTANCE_JOINDATE_ATTR));
 		recordIdBase = attrs.getInt(XML_INSTANCE_BASERECID_ATTR, LibrisConstants.NULL_RECORD_ID);

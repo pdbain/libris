@@ -71,15 +71,14 @@ public class FieldTemplate implements XMLElement {
 	}
 	
 	public void fromXml(ElementManager fieldDefManager) throws InputException {
-			HashMap<String, String> attributes = fieldDefManager.parseOpenTag();
-			fieldAttributes = fieldDefManager.getElementAttributes();
+			fieldAttributes = fieldDefManager.parseOpenTagNew();
 	
-			String id = attributes.get(XML_FIELDDEF_ID_ATTR);
+			String id = fieldAttributes.get(XML_FIELDDEF_ID_ATTR);
 	
-			String title = attributes.get(XML_FIELDDEF_TITLE_ATTR);
-			valueSeparator = attributes.get(XML_VALUESEPARATOR_ATTR);
-			valueSeparator = attributes.get(XML_VALUESEPARATOR_ATTR);
-			String groupName = attributes.get(XML_FIELDDEF_INHERIT_ATTR);
+			String title = fieldAttributes.get(XML_FIELDDEF_TITLE_ATTR);
+			valueSeparator = fieldAttributes.get(XML_VALUESEPARATOR_ATTR);
+			valueSeparator = fieldAttributes.get(XML_VALUESEPARATOR_ATTR);
+			String groupName = fieldAttributes.get(XML_FIELDDEF_INHERIT_ATTR);
 			inheritanceGroup = LibrisConstants.NULL_GROUP;
 			if (null != groupName) {
 				GroupDef grp = schem.getGroupDef(groupName);
@@ -88,7 +87,7 @@ public class FieldTemplate implements XMLElement {
 				}
 			}
 	
-			typeName = attributes.get(LibrisXMLConstants.XML_FIELDDEF_TYPE_TAG);
+			typeName = fieldAttributes.get(LibrisXMLConstants.XML_FIELDDEF_TYPE_TAG);
 			FieldType ft = GenericField.getFieldType(typeName);
 			if (null == ft) {
 				throw new XmlException(fieldDefManager, typeName+" is not a recognized field type");
@@ -97,19 +96,19 @@ public class FieldTemplate implements XMLElement {
 			initialize(id, title, ft);
 			if (ft.equals(FieldType.T_FIELD_ENUM)) {
 				String tempEnum;
-				EnumFieldChoices c = schem.getEnumSet(tempEnum = attributes.get(LibrisXMLConstants.XML_FIELDDEF_ENUMSET_TAG));
+				EnumFieldChoices c = schem.getEnumSet(tempEnum = fieldAttributes.get(LibrisXMLConstants.XML_FIELDDEF_ENUMSET_TAG));
 				if (null == c) {
 					throw new XmlException(fieldDefManager, tempEnum+" is not a recognized enumset");
 				}
 				this.legalValues = c;
 			}
 	
-			String tempDefault = attributes.get(LibrisXMLConstants.XML_FIELDDEF_DEFAULT_VALUE_ATTR);
+			String tempDefault = fieldAttributes.get(LibrisXMLConstants.XML_FIELDDEF_DEFAULT_VALUE_ATTR);
 			if (!tempDefault.isEmpty()) {
 				this.defaultData = tempDefault;
 			}
-			restricted = Boolean.parseBoolean(attributes.get(LibrisXMLConstants.XML_FIELDDEF_RESTRICTED_ATTR));
-			singleValue = Boolean.parseBoolean(attributes.get(LibrisXMLConstants.XML_FIELDDEF_SINGLEVALUE_ATTR));
+			restricted = Boolean.parseBoolean(fieldAttributes.get(LibrisXMLConstants.XML_FIELDDEF_RESTRICTED_ATTR));
+			singleValue = Boolean.parseBoolean(fieldAttributes.get(LibrisXMLConstants.XML_FIELDDEF_SINGLEVALUE_ATTR));
 	}
 
 	@Override

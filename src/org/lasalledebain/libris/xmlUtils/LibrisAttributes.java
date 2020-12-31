@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -20,11 +21,13 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 
 public class LibrisAttributes implements Iterable<String[]> {
-	private TreeMap<String, String> attributeList;
+	private final TreeMap<String, String> attributeList;
+	private final HashSet<String> defaultValues;
 	private LibrisAttributes next;
 	protected DateFormat timeInstance;
 
 	public LibrisAttributes() {
+		this.defaultValues = new HashSet<String>();
 		attributeList = new TreeMap<String, String>();
 		timeInstance = new SimpleDateFormat(LibrisConstants.YMD_TIME_TZ);
 		next = null;
@@ -51,6 +54,11 @@ public class LibrisAttributes implements Iterable<String[]> {
 	}
 
 	public void setAttribute(String key, String value) {
+		attributeList.put(key, value);
+	}
+
+	public void setDefaultAttribute(String key, String value) {
+		defaultValues.add(key);
 		attributeList.put(key, value);
 	}
 
@@ -111,6 +119,7 @@ public class LibrisAttributes implements Iterable<String[]> {
 		return null;
 	}
 
+	// TODO change to SimpleEntry<String, String>
 	private class AttributeIterator implements Iterator<String[]> {
 		Iterator<String> iter;
 		public AttributeIterator() {
@@ -132,8 +141,7 @@ public class LibrisAttributes implements Iterable<String[]> {
 		@Override
 		public void remove() {
 			return;
-		}
-		
+		}		
 	}
 	@Override
 	public Iterator<String[]> iterator() {
@@ -164,5 +172,9 @@ public class LibrisAttributes implements Iterable<String[]> {
 	public boolean contains(String attrName) {
 		String value = attributeList.get(attrName);
 		return Objects.nonNull(value) && !value.isEmpty();
+	}
+	
+	public boolean isDefault(String key) {
+		return defaultValues.contains(key);
 	}
 }

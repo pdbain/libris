@@ -24,6 +24,8 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 
+import static java.util.Objects.nonNull;
+
 public class ElementManager implements Iterable<ElementManager>, Iterator<ElementManager> {
 	ElementReader xmlReader;
 	XMLEvent startEvent;
@@ -69,6 +71,7 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 		return parseOpenTag();
 	}
 
+	@Deprecated
 	public HashMap<String, String> parseOpenTag() throws InputException {
 		XMLEvent nextEvt = null;
 		try {
@@ -89,7 +92,7 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 		}
 		atEndOfElement = checkEndElement(nextEvt);
 
-		HashMap<String, String> values = parseAttributes(openEvent, xmlShape);
+		HashMap<String, String> values = parseAttributesOld(openEvent, xmlShape);
 		values.forEach((String k, String v) -> elementAttributes.setAttribute(k, v));
 		if (!hasSubElements() && hasNext()) {
 			throw new InputException(nextEvt.toString()+" is not an empty element");
@@ -97,25 +100,76 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 		return values;
 	}
 
-	public static HashMap<String, String> parseAttributes(StartElement openEvent, ElementShape myShape) throws XmlException {
-		HashMap<String, String> values = new HashMap<String, String>();
-		for (QName attrQname: myShape.getRequiredAttributes()) {
-			Attribute attr = openEvent.getAttributeByName(attrQname);
-			final String attrName = attrQname.toString();
-			if ((null == attr)) {
-				throw new XmlException(openEvent, openEvent.getName().toString()+" missing attribute: "+attrName);
-			}
-			String v = attr.getValue();
-			values.put(attrName, v);
+	public LibrisAttributes parseOpenTagNew() throws InputException {
+		XMLEvent nextEvt = null;
+		try {
+			do {
+				if ((null == nextEvt) || nextEvt.isStartDocument() || nextEvt.isCharacters()) {
+					nextEvt = xmlReader.nextEvent();
+				} else {
+					throw new XmlException(nextEvt, "expected opening "+tagQname.toString());
+				}
+			} while (!nextEvt.isStartElement());
+		} catch (XMLStreamException e) {
+			throw new XmlException(nextEvt, "XML exception", e);
 		}
-		for (QName attrQname: myShape.getOptionalAttributes()) {
-			Attribute attr = openEvent.getAttributeByName(attrQname);
-			String v = (null == attr) ?
-					myShape.getDefaultValue(attrQname) : attr.getValue();
-					values.put(attrQname.toString(), v);
+		startEvent = nextEvt;
+		StartElement openEvent = nextEvt.asStartElement();
+		if (!openEvent.getName().equals(tagQname)) {
+			throw new XmlException(nextEvt, "expected opening "+tagQname.toString());
 		}
-		return values;
+		atEndOfElement = checkEndElement(nextEvt);
+
+		LibrisAttributes attrs = parseAttributes(openEvent, xmlShape);
+		if (!hasSubElements() && hasNext()) {
+			throw new InputException(nextEvt.toString()+" is not an empty element");
+		}
+		return attrs;
 	}
+@Deprecated
+private static HashMap<String, String> parseAttributesOld(StartElement openEvent, ElementShape myShape) throws XmlException {
+	HashMap<String, String> values = new HashMap<String, String>();
+	for (QName attrQname: myShape.getRequiredAttributes()) {
+		Attribute attr = openEvent.getAttributeByName(attrQname);
+		final String attrName = attrQname.toString();
+		if ((null == attr)) {
+			throw new XmlException(openEvent, openEvent.getName().toString()+" missing attribute: "+attrName);
+		}
+		String v = attr.getValue();
+		values.put(attrName, v);
+	}
+	for (QName attrQname: myShape.getOptionalAttributes()) {
+		Attribute attr = openEvent.getAttributeByName(attrQname);
+		String v = (null == attr) ?
+				myShape.getDefaultValue(attrQname) : attr.getValue();
+				values.put(attrQname.toString(), v);
+	}
+	return values;
+}
+
+private static LibrisAttributes parseAttributes(StartElement openEvent, ElementShape myShape) throws XmlException {
+	LibrisAttributes attrs = new LibrisAttributes();
+	for (QName attrQname: myShape.getRequiredAttributes()) {
+		Attribute attr = openEvent.getAttributeByName(attrQname);
+		final String attrName = attrQname.toString();
+		if ((null == attr)) {
+			throw new XmlException(openEvent, openEvent.getName().toString()+" missing attribute: "+attrName);
+		}
+		String v = attr.getValue();
+		attrs.setAttribute(attrName, v);
+	}
+	for (QName attrQname: myShape.getOptionalAttributes()) {
+		Attribute attr = openEvent.getAttributeByName(attrQname);
+		String attrNameString = attrQname.toString();
+		if (nonNull(attr)) {
+			attrs.setAttribute(attrNameString, attr.getValue());
+		} else {
+			attrs.setDefaultAttribute(attrNameString, myShape.getDefaultValue(attrQname));
+		}
+
+	}
+	return attrs;
+}
 
 	public LibrisAttributes getElementAttributes() {
 		return elementAttributes;
