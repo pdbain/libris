@@ -70,7 +70,7 @@ public class GroupDef extends FieldTemplate implements XMLElement {
 
 	@Override
 	public void fromXml(ElementManager mgr) throws InputException  {
-		LibrisAttributes attrs = mgr.parseOpenTagNew();
+		LibrisAttributes attrs = mgr.parseOpenTag();
 		fieldId = attrs.get(XML_GROUPDEF_ID_ATTR).intern();
 		fieldTitle = attrs.get(XML_GROUPDEF_TITLE_ATTR);
 		String structureTypeName = attrs.get(XML_GROUPDEF_STRUCTURE_ATTR);

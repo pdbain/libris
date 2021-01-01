@@ -1,8 +1,9 @@
 package org.lasalledebain.libris.xmlUtils;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 
@@ -33,8 +34,8 @@ public class LibrisEmptyAttributes extends LibrisAttributes {
 	}
 
 	@Override
-	public Iterator<String[]> iterator() {;
-		return (new ArrayList<String[]>(0)).iterator();
+	public Iterator<Entry<String, String>> iterator() {
+		return Collections.emptyIterator();
 	}
 
 	@Override

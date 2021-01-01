@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.xmlUtils;
 
 import java.io.OutputStream;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -43,9 +44,10 @@ public class ElementWriter implements LibrisXMLConstants {
 				increaseIndent();
 			}
 			if (null != attributes) {
-				for (String[] pair: attributes) {
-					if (!attributes.isDefault(pair[0])) {
-						elemWriter.writeAttribute(pair[0], pair[1]);
+				for (Entry<String, String> keyValue: attributes) {
+					String key = keyValue.getKey();
+					if (!attributes.isDefault(key)) {
+						elemWriter.writeAttribute(key, keyValue.getValue());
 					}
 				}
 			}
