@@ -260,7 +260,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		
 	}
 	public void fromXml(ElementManager mgr) throws LibrisException  {
-		this.attributes = new LibrisAttributes(mgr.parseOpenTag());
+		this.attributes = mgr.parseOpenTag();
 		setRecordId(RecordId.toId(attributes.get(XML_RECORD_ID_ATTR)));
 		setName(attributes.get(XML_RECORD_NAME_ATTR));
 		if (attributes.contains(XML_RECORD_ARTIFACT_ATTR)) {

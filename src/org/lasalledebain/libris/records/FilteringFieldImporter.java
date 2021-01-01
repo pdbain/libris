@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.records;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.LibrisConstants;
@@ -13,6 +12,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.field.FieldValueStringList;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 class FilteringFieldImporter implements LibrisXMLConstants, LibrisConstants {
@@ -23,7 +23,7 @@ class FilteringFieldImporter implements LibrisXMLConstants, LibrisConstants {
 	public FilteringFieldImporter(ElementManager fmgr, Schema schem) throws DatabaseException, InputException, XmlException {
 		
 		sources = new ArrayList<FieldDataSource>();
-		HashMap<String, String> attrs = fmgr.parseOpenTag();
+		LibrisAttributes attrs = fmgr.parseOpenTag();
 		String idString = attrs.get(XML_LIBRISIMPORT_FIELD_ID_ATTR);
 		fieldNum = schem.getFieldNum(idString);
 		if (NULL_FIELD_NUM == fieldNum) {
@@ -75,7 +75,7 @@ class FilteringFieldImporter implements LibrisXMLConstants, LibrisConstants {
 		private String fieldData;
 
 		DefaultFieldDataSource(ElementManager srcMgr) throws InputException {
-			HashMap<String, String> attrs = srcMgr.parseOpenTag();
+			LibrisAttributes attrs = srcMgr.parseOpenTag();
 			fieldData = attrs.get(XML_LIBRISIMPORT_DEFAULT_DATA_ATTR);
 			srcMgr.parseClosingTag();
 		}
@@ -95,7 +95,7 @@ class FilteringFieldImporter implements LibrisXMLConstants, LibrisConstants {
 		private boolean includeOnMatch;
 
 		ColumnFieldDataSource(ElementManager srcMgr) throws DatabaseException, InputException, XmlException {
-			HashMap<String, String> attrs = srcMgr.parseOpenTag();
+			LibrisAttributes attrs = srcMgr.parseOpenTag();
 			String columnNumString = attrs.get(XML_LIBRISIMPORT_COLUMN_NUM_ATTR);
 			try {
 				columnNum = Short.parseShort(columnNumString);
@@ -107,7 +107,7 @@ class FilteringFieldImporter implements LibrisXMLConstants, LibrisConstants {
 			includeOnMatch = Boolean.parseBoolean(attrs.get(XML_LIBRISIMPORT_COLUMN_INCLUDE_ATTR));
 			translations = new ArrayList<String[]>();
 			for (ElementManager translateManager: srcMgr) {
-				HashMap<String, String> translateAttrs = translateManager.parseOpenTag();
+				LibrisAttributes translateAttrs = translateManager.parseOpenTag();
 				String[] fromTo = new String[2];
 				fromTo[0] = translateAttrs.get(XML_LIBRISIMPORT_TRANSLATE_FROM_ATTR);
 				fromTo[1] = translateAttrs.get(XML_LIBRISIMPORT_TRANSLATE_TO_ATTR);

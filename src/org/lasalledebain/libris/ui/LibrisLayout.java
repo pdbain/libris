@@ -58,7 +58,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 
 	@Override
 	public void fromXml(ElementManager mgr) throws LibrisException {
-		HashMap<String, String> values = mgr.parseOpenTag();
+		LibrisAttributes values = mgr.parseOpenTag();
 		setHeight(values.get("height"));
 		setWidth(values.get("width"));
 		setIdAndTitle(values.get("title"), values.get("id"));
@@ -128,7 +128,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 	}
 
 	private void parseUsage(ElementManager layoutMgr) throws InputException {
-		HashMap<String, String> attrs = layoutMgr.parseOpenTag();
+		LibrisAttributes attrs = layoutMgr.parseOpenTag();
 		String usedBy = attrs.get(XML_LAYOUT_USEDBY_ATTR);
 		layoutUsers.add(usedBy);
 	}
