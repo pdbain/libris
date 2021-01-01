@@ -1,7 +1,0 @@
-{"g_pub1"
-"g_pub1_v1"
-"g_fred_foobar"
-"a_record"
-"b_record"
-"ab_record"
-"bb_record"};
