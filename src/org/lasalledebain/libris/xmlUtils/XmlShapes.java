@@ -2,8 +2,10 @@ package org.lasalledebain.libris.xmlUtils;
 
 import java.util.HashMap;
 
+import org.lasalledebain.libris.ArtifactDatabase;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.FieldTemplate;
+import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
@@ -38,19 +40,19 @@ public class XmlShapes implements LibrisXMLConstants {
 			break;
 		}
 	}
+	@Deprecated
 	private static String[] emptyList = new String[0];
+	@Deprecated
 	private static String[][] emptyListList = new String[0][];
-
 	private static HashMap<String, ElementShape> initializeXmlShapes() {
 		HashMap<String, ElementShape> shapes = new HashMap<String, ElementShape>();
 
-		makeShape(shapes, XML_LIBRIS_TAG, new String[] {XML_INSTANCE_TAG, XML_METADATA_TAG, XML_RECORDS_TAG, XML_ARTIFACTS_TAG}, 
-				new String[] {XML_DATABASE_SCHEMA_NAME_ATTR, XML_SCHEMA_VERSION_ATTR},
-				new String[][] {{XML_DATABASE_NAME_ATTR, "unknown"}, {XML_DATABASE_DATE_ATTR, ""},
-						{XML_DATABASE_METADATA_LOCATION_ATTR, ""},
-						{XML_DATABASE_REPOSITORY_LOCATION_ATTR, ""}});
-		makeShape(shapes, XML_ARTIFACTS_TAG, new String[] {XML_RECORDS_TAG }, 
-				emptyRequiredAttributesList, emptyOptionalAttributesList);
+		makeShape(shapes, LibrisDatabase.getXmlTag(), LibrisDatabase.subElementNames, 
+				LibrisDatabase.requiredAttributeNames, LibrisDatabase.optionalAttributeNamesAndValues);
+
+		makeShape(shapes, ArtifactDatabase.getXmlTag(), ArtifactDatabase.subElementNames, 
+				ArtifactDatabase.requiredAttributesList, ArtifactDatabase.optionalAttributesList);
+
 		makeShape(shapes, XML_METADATA_TAG, 
 				new String[] {XML_SCHEMA_TAG, XML_LAYOUTS_TAG}, emptyList, emptyListList);
 		makeShape(shapes, XML_INSTANCE_TAG, 
@@ -59,31 +61,31 @@ public class XmlShapes implements LibrisXMLConstants {
 		makeShape(shapes, XML_ENUMCHOICE_TAG, emptyList, new String[] {XML_ENUMCHOICE_ID_ATTR},
 				new String[][]{{XML_ENUMCHOICE_VALUE_ATTR, ""}});
 		shapes.put(XML_ENUMSET_TAG, makeEnumsetXmlShape());
-		
+
 		shapes.put(GroupDefs.getXmlTag(), GroupDefs.getXmlShape());
 		shapes.put(GroupDef.getTag(), GroupDef.getShape());
 		makeShape(shapes, XML_FIELDDEF_TAG, 
 				emptyList, 
 				new String[] {XML_FIELDDEF_ID_ATTR},
 				new String[][] {
-				{XML_FIELDDEF_TITLE_ATTR, ""}, 
-				{XML_FIELDDEF_TYPE_TAG, XML_FIELDDEF_DEFAULT_VALUE_ATTR}, {XML_FIELDDEF_ENUMSET_TAG, ""}, 
-				{XML_FIELDDEF_DEFAULT_VALUE_ATTR, ""},
-				{XML_FIELDDEF_RESTRICTED_ATTR, "false"}, 
-				{XML_FIELDDEF_EDITABLE_ATTR, "true"}, {XML_VALUESEPARATOR_ATTR, ""}, {XML_INHERIT_ATTR, ""}
+			{XML_FIELDDEF_TITLE_ATTR, ""}, 
+			{XML_FIELDDEF_TYPE_TAG, XML_FIELDDEF_DEFAULT_VALUE_ATTR}, {XML_FIELDDEF_ENUMSET_TAG, ""}, 
+			{XML_FIELDDEF_DEFAULT_VALUE_ATTR, ""},
+			{XML_FIELDDEF_RESTRICTED_ATTR, "false"}, 
+			{XML_FIELDDEF_EDITABLE_ATTR, "true"}, {XML_VALUESEPARATOR_ATTR, ""}, {XML_INHERIT_ATTR, ""}
 		});
-		
+
 		makeShape(shapes, XML_FIELD_TAG, 
 				emptyList, 
 				new String[] {XML_RECORD_ID_ATTR},
-		new String[][] {{XML_ENUMCHOICE_VALUE_ATTR, ""}, {XML_EXTRA_VALUE_ATTR, ""}}, 
-		true);
+				new String[][] {{XML_ENUMCHOICE_VALUE_ATTR, ""}, {XML_EXTRA_VALUE_ATTR, ""}}, 
+				true);
 
 		makeShape(shapes, XML_LAYOUTFIELD_TAG,
 				emptyList, 
 				new String[] {"id"},
 				new String[][] {{"title", ""}, {"row", ""}, {"column",""}, {"height", ""}, {"width", ""}, 
-						{"return", "false"}, {"hspan", "1"}, {"vspan", "1"}, {"control", DEFAULT_GUI_CONTROL}});
+			{"return", "false"}, {"hspan", "1"}, {"vspan", "1"}, {"control", DEFAULT_GUI_CONTROL}});
 		makeShape(shapes, XML_FIELDDEFS_TAG, 
 				new String[] {XML_FIELDDEF_ENUMSET_TAG, FieldTemplate.getXmlTag()},
 				emptyList,
@@ -99,19 +101,19 @@ public class XmlShapes implements LibrisXMLConstants {
 				new String[] {IndexField.getXmlTag()},
 				new String[] {XML_INDEXDEF_ID_ATTR},
 				emptyListList);		
-		
+
 		makeShape(shapes,
 				IndexField.getXmlTag(), 
 				emptyList, 
 				new String[] {XML_INDEXFIELD_ID_ATTR},
 				new String[][] {{XML_INDEXFIELD_STOPLIST_ATTR, "false"}});		
-		
+
 		makeShape(shapes,
 				LibrisLayout.getXmlTag(), 
 				new String[] {XML_LAYOUTFIELD_TAG, XML_LAYOUTUSAGE_TAG},
 				new String[] {LibrisXMLConstants.XML_LAYOUT_ID_ATTR},
 				new String[][] {{"title", ""}, {"type","table"}, {"height", "300"}, {"width", "400"}});		
-		
+
 		makeShape(shapes, Layouts.getXmlTag(), new String [] {XML_LAYOUT_TAG},
 				emptyRequiredAttributesList, emptyOptionalAttributesList);
 
@@ -120,8 +122,8 @@ public class XmlShapes implements LibrisXMLConstants {
 				emptyList,
 				new String[] {XML_LAYOUT_USEDBY_ATTR},
 				emptyListList);
-		 ElementShape s = new ElementShape(XML_LAYOUTUSAGE_TAG);
-			s.setRequiredAttributeNames(new String[] {XML_LAYOUT_USEDBY_ATTR});
+		ElementShape s = new ElementShape(XML_LAYOUTUSAGE_TAG);
+		s.setRequiredAttributeNames(new String[] {XML_LAYOUT_USEDBY_ATTR});
 
 		shapes.put(Record.getXmlTag(), Record.getShape());
 		makeShape(shapes, GroupMember.getMemberTag(),
@@ -151,29 +153,29 @@ public class XmlShapes implements LibrisXMLConstants {
 				new String[] {XML_LIBRISIMPORT_TRANSLATE_FROM_ATTR, XML_LIBRISIMPORT_TRANSLATE_TO_ATTR}, null);
 		return shapes;
 	}
-	
+
 	private static ElementShape makeShape(HashMap<String,ElementShape> shapes, final String xmlTag,
-			 String[] subElementNames,
-			 String[] requiredAttributeNames,
-			 String[][] optionalAttributeNamesAndValues) {
+			String[] subElementNames,
+			String[] requiredAttributeNames,
+			String[][] optionalAttributeNamesAndValues) {
 		return makeShape(shapes, xmlTag,
-				 subElementNames,
-				 requiredAttributeNames,
-				 optionalAttributeNamesAndValues, false);
+				subElementNames,
+				requiredAttributeNames,
+				optionalAttributeNamesAndValues, false);
 	}
 
 	private static ElementShape makeShape(HashMap<String,ElementShape> shapes, final String xmlTag,
-			 String[] subElementNames,
-			 String[] requiredAttributeNames,
-			 String[][] optionalAttributeNamesAndValues,
-			 boolean hasContent) {
+			String[] subElementNames,
+			String[] requiredAttributeNames,
+			String[][] optionalAttributeNamesAndValues,
+			boolean hasContent) {
 		ElementShape s = makeShape(xmlTag, subElementNames,
 				requiredAttributeNames, optionalAttributeNamesAndValues,
 				hasContent);
 		shapes.put(xmlTag, s);
 		return s;
-	
-		
+
+
 	}
 
 	/**

@@ -34,8 +34,8 @@ public class ArtifactManager {
 	private ArtifactDatabase myDb;
 	private ReservationManager reservationMgr;
 
-	public ArtifactManager(DatabaseUi theUi, File artifactDirectory, FileManager theFileMgr) throws DatabaseException {
-		this.artifactDirectory = artifactDirectory;
+	public ArtifactManager(DatabaseUi theUi, File theArtifactDirectory, FileManager theFileMgr) throws DatabaseException {
+		artifactDirectory = theArtifactDirectory;
 		myFileMgr = theFileMgr;
 		myUi = theUi;
 		myDb = new ArtifactDatabase(theUi, theFileMgr);

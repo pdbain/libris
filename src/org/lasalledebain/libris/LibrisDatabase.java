@@ -69,6 +69,11 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	private FileAccessManager metadataFileMgr;
 	private final ReservationManager reservationMgr;
 	private final LibrisDatabaseConfiguration myConfiguration;
+	public static final String[][] optionalAttributeNamesAndValues = new String[][] {{XML_DATABASE_NAME_ATTR, "unknown"}, {XML_DATABASE_DATE_ATTR, ""},
+	{XML_DATABASE_METADATA_LOCATION_ATTR, ""},
+	{XML_DATABASE_REPOSITORY_LOCATION_ATTR, ""}};
+	public static final String[] requiredAttributeNames = new String[] {XML_DATABASE_SCHEMA_NAME_ATTR, XML_SCHEMA_VERSION_ATTR};
+	public static final String[] subElementNames = new String[] {XML_INSTANCE_TAG, XML_METADATA_TAG, XML_RECORDS_TAG, XML_ARTIFACTS_TAG};
 
 	public LibrisDatabase(LibrisDatabaseConfiguration config, DatabaseUi theUi) throws LibrisException {
 		super(theUi,new FileManager(getDatabaseAuxDirectory(config)));
@@ -325,7 +330,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		return getXmlTag();
 	}
 
-	public String getXmlTag() {
+	public static String getXmlTag() {
 		return XML_LIBRIS_TAG;
 	}
 
