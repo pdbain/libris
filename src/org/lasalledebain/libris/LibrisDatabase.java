@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Level;

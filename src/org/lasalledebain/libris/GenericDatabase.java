@@ -28,7 +28,7 @@ import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
-public abstract class GenericDatabase<RecordType extends Record> implements XMLElement {
+public abstract class GenericDatabase<RecordType extends Record> implements XMLElement, AutoCloseable {
 	protected boolean dbOpen;
 	protected GroupManager<RecordType> groupMgr;
 	protected IndexManager<RecordType> indexMgr;
@@ -92,6 +92,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		}
 		getDatabaseRecordsUnchecked();
 		dbOpen = true;
+	}
+	
+	public void close() throws DatabaseException {
+		boolean closed = closeDatabase(false);
+		if (!closed) throw new DatabaseException("Unable to close database");
 	}
 
 	public boolean closeDatabase(boolean force) throws DatabaseException {
