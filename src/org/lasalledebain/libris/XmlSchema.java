@@ -41,7 +41,7 @@ public class XmlSchema extends Schema {
 
 	public void fromXml(ElementManager schemaManager) throws DatabaseException, InputException
 	{
-		xmlAttributes = schemaManager.parseOpenTag(getXmlTag());
+		xmlAttributes = schemaManager.checkAndParseOpenTag(getXmlTag());
 		if (!schemaManager.hasNext()) {
 			throw new XmlException(schemaManager, "<schema> cannot be empty");
 		}

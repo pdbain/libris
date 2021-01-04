@@ -9,18 +9,17 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
-import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 public class DiagnosticDatabase extends LibrisDatabase {
 
 	public DiagnosticDatabase(File databaseFile) throws LibrisException, DatabaseException {
 		super(new LibrisDatabaseConfiguration(databaseFile, false), new HeadlessUi(databaseFile, false));
 		getFileMgr().createAuxFiles(true);
-		LibrisAttributes attrs = new LibrisAttributes();
+		DatabaseAttributes attrs = new DatabaseAttributes();
 		attrs.setAttribute(XML_DATABASE_NAME_ATTR, "unknown");
 		attrs.setAttribute(XML_DATABASE_SCHEMA_NAME_ATTR, "unknown");
 		attrs.setAttribute(XML_SCHEMA_VERSION_ATTR, "unknown");
-		xmlAttributes = new DatabaseAttributes(attrs);
+		dbAttributes = new DatabaseAttributes(attrs);
 	}
 
 	/* (non-Javadoc)

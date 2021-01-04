@@ -64,7 +64,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	private RecordTemplate mainRecordTemplate;
 	protected LibrisDatabaseMetadata databaseMetadata;
 	public static final Logger librisLogger = setupLogger();
-	protected DatabaseAttributes xmlAttributes;
+	protected DatabaseAttributes dbAttributes;
 	private FileAccessManager databaseFileMgr;
 	private FileAccessManager metadataFileMgr;
 	private final ReservationManager reservationMgr;
@@ -205,7 +205,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		if (XML_METADATA_TAG.equals(nextElementId)) {
 			metadataMgr = librisMgr.nextElement();
 		} else {
-			final String metadataLocation = xmlAttributes.getMetadataLocation();
+			final String metadataLocation = dbAttributes.getMetadataLocation();
 			File metadataFile = new File(metadataLocation);
 			if (!metadataFile.isAbsolute()) {
 				metadataFile = new File(getDatabaseDirectoryPath(), metadataLocation);
@@ -331,7 +331,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	@Override
 	public void fromXml(ElementManager librisMgr) throws LibrisException {
-		LibrisAttributes attrs = librisMgr.parseOpenTag();
+		dbAttributes = new DatabaseAttributes();
+		LibrisAttributes attrs = librisMgr.parseOpenTag(dbAttributes);
 		String dateString = attrs.get(XML_DATABASE_DATE_ATTR);
 		if ((null == dateString) || dateString.isEmpty()) {
 			databaseMetadata.setDatabaseDate(new Date());
@@ -350,15 +351,14 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			databaseMetadata.setInstanceInfo(instanceInfo);
 			nextElement = librisMgr.getNextId();
 		}
-		xmlAttributes = new DatabaseAttributes(attrs);
-		if (xmlAttributes.isLocked()) {
+		if (dbAttributes.isLocked()) {
 			readOnly = true;
 		}
 	}
 
 	@Override
 	public void toXml(ElementWriter outWriter) throws LibrisException {
-		String metadataLocation = xmlAttributes.getMetadataLocation();
+		String metadataLocation = dbAttributes.getMetadataLocation();
 		boolean includeMetadata = StringUtils.isStringEmpty(metadataLocation);		
 		toXml(outWriter, includeMetadata, databaseRecords, false);
 	}
@@ -444,8 +444,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		ElementManager incrementManager = makeLibrisElementManager(incrementFile);
 		LibrisAttributes incElementAttrs = incrementManager.parseOpenTag();
 		if (
-				!assertEquals(ui, "increment databasename attribute does not match database", xmlAttributes.getDatabaseName(), incElementAttrs.get(XML_DATABASE_NAME_ATTR))
-				|| !		assertEquals(ui, "increment databasename attribute does not match database", xmlAttributes.getSchemaName(), incElementAttrs.get(XML_DATABASE_SCHEMA_NAME_ATTR))
+				!assertEquals(ui, "increment databasename attribute does not match database", dbAttributes.getDatabaseName(), incElementAttrs.get(XML_DATABASE_NAME_ATTR))
+				|| !		assertEquals(ui, "increment databasename attribute does not match database", dbAttributes.getSchemaName(), incElementAttrs.get(XML_DATABASE_SCHEMA_NAME_ATTR))
 				) {
 			return false;
 		}
@@ -627,15 +627,15 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	}
 	@Override
 	public LibrisAttributes getAttributes() {
-		return xmlAttributes;
+		return dbAttributes;
 	}
 
 	public DatabaseAttributes getDatabaseAttributes() {
-		return xmlAttributes;
+		return dbAttributes;
 	}
 
 	public void setAttributes(DatabaseAttributes attrs) {
-		xmlAttributes = attrs;
+		dbAttributes = attrs;
 	}
 
 	public Layouts<DatabaseRecord> getLayouts() {
@@ -772,7 +772,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	}
 
 	public boolean isLocked() {
-		return xmlAttributes.isLocked();
+		return dbAttributes.isLocked();
 	}
 
 	public boolean isFork() {
@@ -785,7 +785,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	}
 
 	public void lockDatabase() {
-		xmlAttributes.setLocked(true);
+		dbAttributes.setLocked(true);
 		readOnly = true;
 	}
 

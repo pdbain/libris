@@ -1,11 +1,13 @@
 package org.lasalledebain.libris.xmlUtils;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
 
@@ -23,8 +25,6 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
-
-import static java.util.Objects.nonNull;
 
 public class ElementManager implements Iterable<ElementManager>, Iterator<ElementManager> {
 	ElementReader xmlReader;
@@ -65,13 +65,18 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 		}
 	}
 	
-	public LibrisAttributes parseOpenTag(String expectedTag) throws InputException {
+	public LibrisAttributes checkAndParseOpenTag(String expectedTag) throws InputException {
 		Assertion.assertEqualsInputException("Wrong tag", expectedTag, tagQname.toString());
 		return parseOpenTag();
 	}
 
 	public LibrisAttributes parseOpenTag() throws InputException {
+		return parseOpenTag(null);
+	}
+
+	public LibrisAttributes parseOpenTag(LibrisAttributes attrs) throws InputException {
 		XMLEvent nextEvt = null;
+		
 		try {
 			do {
 				if ((null == nextEvt) || nextEvt.isStartDocument() || nextEvt.isCharacters()) {
@@ -90,15 +95,17 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 		}
 		atEndOfElement = checkEndElement(nextEvt);
 
-		LibrisAttributes attrs = parseAttributes(openEvent, xmlShape);
+		LibrisAttributes result = parseAttributes(openEvent, xmlShape, attrs);
 		if (!hasSubElements() && hasNext()) {
 			throw new InputException(nextEvt.toString()+" is not an empty element");
 		}
-		return attrs;
+		return result;
 	}
 
-	private static LibrisAttributes parseAttributes(StartElement openEvent, ElementShape myShape) throws XmlException {
-	LibrisAttributes attrs = new LibrisAttributes();
+	private static LibrisAttributes parseAttributes(StartElement openEvent, ElementShape myShape, LibrisAttributes attrs) throws XmlException {
+	if (isNull(attrs)) {
+		attrs = new LibrisAttributes();
+	}
 	for (QName attrQname: myShape.getRequiredAttributes()) {
 		Attribute attr = openEvent.getAttributeByName(attrQname);
 		final String attrName = attrQname.toString();
