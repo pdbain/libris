@@ -291,7 +291,7 @@ public class ArtifactManagerTest  extends TestCase {
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
 		DatabaseUi ui = new HeadlessUi();
 		ArtifactManager dut = new ArtifactManager(ui, repoRoot, fileMgr);
-		boolean initializeStatus = dut.initialize(false);
+		boolean initializeStatus = dut.initialize();
 		assertTrue("Could not initialize artifact manager", initializeStatus);
 		dut.open();
 		return dut;

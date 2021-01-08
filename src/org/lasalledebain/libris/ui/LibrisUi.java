@@ -1,5 +1,8 @@
 package org.lasalledebain.libris.ui;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.util.Objects;
 import java.util.logging.Handler;
@@ -172,11 +175,15 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	}
 
 	public boolean rebuildDatabase() throws LibrisException {
-		setDatabaseFile(databaseFile);
+		assertTrue("Database not opened", isDatabaseOpen());
+		assertFalse("Database has unsaved changes", isDatabaseModified());
+		currentDatabase.exportDatabaseXml();
+		closeDatabase(false);
 		return Libris.buildIndexes(databaseFile, this);
 	}
 
 	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
+		closeDatabase(false);
 		return Libris.buildIndexes(config, this);
 	}
 

@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.Assertion;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -67,9 +68,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	}
 
 	public synchronized void openDatabase() throws LibrisException {
-		if (dbOpen) {
-			throw new DatabaseException("Database already open");
-		}
+		assertClosed("open database");
 		DatabaseMetadata metadata = getMetadata();
 		FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.PROPERTIES_FILENAME);
 		synchronized (propsMgr) {
@@ -123,9 +122,6 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	}
 
 	public boolean isOkayToClose(boolean force) throws DatabaseException {
-		if (!force && !dbOpen) {
-			throw new DatabaseException("Database not open");
-		}
 		return !isModified() || force;
 	}
 
@@ -389,5 +385,16 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public void assertDatabaseOpen(String message) {
 		Assertion.assertTrueError("Closed database: ", message, isDatabaseOpen());
+	}
+
+	protected void assertClosed(String message) throws DatabaseError {
+		if (dbOpen) {
+			throw new DatabaseError(message + ": not allowed while database open");
+		}
+	}
+	protected void assertOpen(String message) throws DatabaseError {
+		if (!dbOpen) {
+			throw new DatabaseError(message + ": not allowed while database closed");
+		}
 	}
 }

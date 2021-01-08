@@ -18,7 +18,11 @@ public class ArtifactParameters {
 	private int parentId;
 	String recordName;
 	private URI sourcePath;
-	private URI archivepath;
+	
+	/**
+	 * Path relative to repository root
+	 */
+	private String archivepath;
 	
 	public ArtifactParameters() {
 		this.sourcePath = null;
@@ -38,12 +42,6 @@ public class ArtifactParameters {
 			return null;
 		}
 		return sourcePath.toASCIIString();
-	}
-	public String getArchivePathString() {
-		if (null == archivepath) {
-			return null;
-		}
-		return archivepath.toASCIIString();
 	}
 	public String getDate() {
 		return date;
@@ -144,7 +142,7 @@ public class ArtifactParameters {
 		}
 		buff.append("recordParentName", recordParentName);
 		buff.append("source", getSourceString());
-		buff.append("archivePath", getArchivePathString());
+		buff.append("archivePath", getArchivePath());
 		buff.append("title", title);
 		return buff.toString();
 	}
@@ -178,10 +176,10 @@ public class ArtifactParameters {
 	public void setParentId(int parentId) {
 		this.parentId = parentId;
 	}
-	public URI getArchivepath() {
+	public String getArchivePath() {
 		return archivepath;
 	}
-	public void setArchivepPath(URI archivepath) {
+	public void setArchivepPath(String archivepath) {
 		this.archivepath = archivepath;
 	}
 	public URI getSourcePath() {

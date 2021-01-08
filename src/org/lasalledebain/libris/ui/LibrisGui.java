@@ -580,7 +580,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 					artifactId = currentDatabase.addArtifact(rec, artifactSourceFile);
 					ArtifactParameters artifactInfo = currentDatabase.getArtifactInfo(artifactId);
 					currentRecordWindow.setModified(true);
-					currentRecordWindow.addArtifactButton(artifactInfo);
+					currentRecordWindow.addArtifactButton(artifactId, artifactInfo.getTitle());
 				}
 			} catch (BackingStoreException | LibrisException | IOException e1) {
 				throw new DatabaseError(e1);

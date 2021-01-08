@@ -452,7 +452,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		chooser.setAccessory(buttonPanel);
 		FileNameExtensionFilter librisFileFilter = new FileNameExtensionFilter(
 				"Libris files",
-				LibrisConstants.FILENAME_XML_FILES_SUFFIX, "xml");
+				LibrisConstants.FILENAME_LIBRIS_FILES_SUFFIX, "xml");
 
 		chooser.setFileFilter(librisFileFilter);
 		if (dbLocation.isFile()) {
