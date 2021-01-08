@@ -131,6 +131,7 @@ public class TermCountIndex {
 	}
 
 	public void generateReport(Reporter rpt) {
+		rpt.reportValue(Reporter.INDEXING_TERMCOUNT_BUCKETS_ACTUAL, termHashFile.getNumBuckets());
 		rpt.reportValue(Reporter.INDEXING_NUM_TERMS, numTerms);
 		rpt.reportValue(Reporter.INDEXING_NUM_UNIQUE_TERMS, numUniqueTerms);
 		rpt.reportValue(Reporter.INDEXING_TERMS_BUCKETS_NUM, termHashFile.getNumBuckets());

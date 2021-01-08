@@ -100,6 +100,8 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 		DataOutputStream affiliateOpStreams[] = new DataOutputStream[numGroups];
 		int numChildren[] = new int[numGroups];
 		int numAffiliates[] = new int[numGroups];
+		final var indexRpt = config.getIndexingReporter();
+		
 		try {
 			openInternal(false);
 			sigMgr.createFiles(config);
@@ -148,9 +150,9 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 				addKeywords(id, keywordList.wordStream());
 				keywordList.wordStream().forEach(t -> termCounts.incrementTermCount(t));
 			}
-			config.getIndexingReporter().reportValue(Reporter.INDEXING_RECORDS_NUM_RECS, recordCount);
-			config.getIndexingReporter().reportValue(Reporter.INDEXING_KEYWORD_COUNT, keywordCount);
-			termCounts.generateReport(config.getIndexingReporter());
+			indexRpt.reportValue(Reporter.INDEXING_RECORDS_NUM_RECS, recordCount);
+			indexRpt.reportValue(Reporter.INDEXING_KEYWORD_COUNT, keywordCount);
+			termCounts.generateReport(indexRpt);
 
 			for (int g = 0; g < numGroups; ++g) {
 				childTempFiles[g].close();
@@ -162,11 +164,13 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 				buildAffiliateIndex(l, childTempFiles[g], hashTableFileMgr, overflowFileMgr, numChildren[g], true);
 				buildAffiliateIndex(l, affiliateTempFiles[g], hashTableFileMgr, overflowFileMgr, numAffiliates[g], false);
 			}
-			database.getMetadata().setSignatureLevels(sigMgr.getSigLevels());
+			final var sigLevels = sigMgr.getSigLevels();
+			database.getMetadata().setSignatureLevels(sigLevels);
+			indexRpt.reportValue(Reporter.INDEXING_SIGNATURE_LEVELS_ACTUAL, sigLevels);
 
 			setIndexed(true);
 			try (FileOutputStream reportFile = fileMgr.getUnmanagedOutputFile(INDEXING_REPORT_FILE)) {
-				config.getIndexingReporter().writeReport(reportFile);
+				indexRpt.writeReport(reportFile);
 			};
 		} catch (IOException e) {
 			throw new InputException("Error rebuilding indexes", e);
