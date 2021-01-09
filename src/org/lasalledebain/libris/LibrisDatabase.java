@@ -332,7 +332,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 	@Override
 	public void fromXml(ElementManager librisMgr) throws LibrisException {
-		LibrisAttributes attrs = librisMgr.parseOpenTag();
+		HashMap<String, String> dbElementAttrs = librisMgr.parseOpenTag();
+		LibrisAttributes attrs = new LibrisAttributes(dbElementAttrs);
 		String dateString = attrs.get(XML_DATABASE_DATE_ATTR);
 		if ((null == dateString) || dateString.isEmpty()) {
 			databaseMetadata.setDatabaseDate(new Date());
@@ -351,7 +352,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			databaseMetadata.setInstanceInfo(instanceInfo);
 			nextElement = librisMgr.getNextId();
 		}
-		xmlAttributes = new DatabaseAttributes(attrs);
+		xmlAttributes = new DatabaseAttributes(dbElementAttrs);
 		if (xmlAttributes.isLocked()) {
 			readOnly = true;
 		}
@@ -443,7 +444,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 */
 	public boolean importIncrement(File incrementFile) throws FileNotFoundException, LibrisException {
 		ElementManager incrementManager = makeLibrisElementManager(incrementFile);
-		LibrisAttributes incElementAttrs = incrementManager.parseOpenTag();
+		HashMap<String, String> incElementAttrs = incrementManager.parseOpenTag();
 		if (
 				!assertEquals(ui, "increment databasename attribute does not match database", xmlAttributes.getDatabaseName(), incElementAttrs.get(XML_DATABASE_NAME_ATTR))
 				|| !		assertEquals(ui, "increment databasename attribute does not match database", xmlAttributes.getSchemaName(), incElementAttrs.get(XML_DATABASE_SCHEMA_NAME_ATTR))

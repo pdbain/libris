@@ -128,12 +128,12 @@ public class EnumFieldChoices implements XMLElement {
 	}
 
 	public void fromXml(ElementManager enumSetManager) throws InputException, DatabaseException  {
-		LibrisAttributes attributes = enumSetManager.parseOpenTag();
+		HashMap<String, String> attributes = enumSetManager.parseOpenTag();
 		
 		setId = attributes.get(LibrisXMLConstants.XML_SET_ID_ATTR);
 		while (enumSetManager.hasNext()) {
 			ElementManager enumChoiceManager = enumSetManager.nextElement();
-			LibrisAttributes choiceAttributes = enumChoiceManager.parseOpenTag();
+			HashMap<String, String> choiceAttributes = enumChoiceManager.parseOpenTag();
 			String id = choiceAttributes.get(LibrisXMLConstants.XML_ENUMCHOICE_ID_ATTR);
 			String value = choiceAttributes.get(LibrisXMLConstants.XML_ENUMCHOICE_VALUE_ATTR);
 			enumChoiceManager.parseClosingTag();

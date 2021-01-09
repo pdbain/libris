@@ -3,7 +3,6 @@ package org.lasalledebain.libris;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -21,7 +20,7 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 		super.setAttribute(key, value);
 	}
 	
-	public DatabaseAttributes(LibrisAttributes attrs) throws DatabaseException {
+	public DatabaseAttributes(Map<String, String> attrs) throws DatabaseException {
 		super(attrs);
 		String schemaversion = attrs.get(XML_SCHEMA_VERSION_ATTR);
 		schemaName = attrs.get(XML_DATABASE_SCHEMA_NAME_ATTR);
@@ -35,7 +34,6 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 		String lockedString = attrs.get(XML_DATABASE_LOCKED_ATTR);
 		locked = Boolean.parseBoolean(lockedString);
 	}
-
 	public String getDatabaseName() {
 		return databaseName;
 	}
@@ -47,7 +45,7 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	}
 	
 	@Override
-	public Iterator<Entry<String, String>> iterator() {	
+	public Iterator<String[]> iterator() {	
 		if (null != modificationDate) {
 			super.setAttribute(XML_DATABASE_DATE_ATTR, timeInstance.format(modificationDate));		
 		}

@@ -71,7 +71,7 @@ public class FieldTemplate implements XMLElement {
 	}
 	
 	public void fromXml(ElementManager fieldDefManager) throws InputException {
-			fieldAttributes = fieldDefManager.parseOpenTag();
+			fieldAttributes = fieldDefManager.parseOpenTagNew();
 	
 			String id = fieldAttributes.get(XML_FIELDDEF_ID_ATTR);
 	

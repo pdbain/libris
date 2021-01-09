@@ -33,6 +33,7 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 	boolean atEndOfElement;
 	String nextId;
 	private ElementShape xmlShape;
+	private LibrisAttributes elementAttributes;
 	private LibrisException lastException;
 	private XmlShapes shapes;
 
@@ -46,6 +47,7 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 		} else {
 			throw new XmlException("No shape defined for "+elementName);
 		}
+		elementAttributes = new LibrisAttributes();
 	}
 
 	public String getSourceFilePath() {
@@ -64,13 +66,41 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 			return srcFile;
 		}
 	}
-	
-	public LibrisAttributes parseOpenTag(String expectedTag) throws InputException {
+	public HashMap<String, String> parseOpenTag(String expectedTag) throws InputException {
 		Assertion.assertEqualsInputException("Wrong tag", expectedTag, tagQname.toString());
 		return parseOpenTag();
 	}
 
-	public LibrisAttributes parseOpenTag() throws InputException {
+	@Deprecated
+	public HashMap<String, String> parseOpenTag() throws InputException {
+		XMLEvent nextEvt = null;
+		try {
+			do {
+				if ((null == nextEvt) || nextEvt.isStartDocument() || nextEvt.isCharacters()) {
+					nextEvt = xmlReader.nextEvent();
+				} else {
+					throw new XmlException(nextEvt, "expected opening "+tagQname.toString());
+				}
+			} while (!nextEvt.isStartElement());
+		} catch (XMLStreamException e) {
+			throw new XmlException(nextEvt, "XML exception", e);
+		}
+		startEvent = nextEvt;
+		StartElement openEvent = nextEvt.asStartElement();
+		if (!openEvent.getName().equals(tagQname)) {
+			throw new XmlException(nextEvt, "expected opening "+tagQname.toString());
+		}
+		atEndOfElement = checkEndElement(nextEvt);
+
+		HashMap<String, String> values = parseAttributesOld(openEvent, xmlShape);
+		values.forEach((String k, String v) -> elementAttributes.setAttribute(k, v));
+		if (!hasSubElements() && hasNext()) {
+			throw new InputException(nextEvt.toString()+" is not an empty element");
+		}
+		return values;
+	}
+
+	public LibrisAttributes parseOpenTagNew() throws InputException {
 		XMLEvent nextEvt = null;
 		try {
 			do {
@@ -96,8 +126,28 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 		}
 		return attrs;
 	}
+@Deprecated
+private static HashMap<String, String> parseAttributesOld(StartElement openEvent, ElementShape myShape) throws XmlException {
+	HashMap<String, String> values = new HashMap<String, String>();
+	for (QName attrQname: myShape.getRequiredAttributes()) {
+		Attribute attr = openEvent.getAttributeByName(attrQname);
+		final String attrName = attrQname.toString();
+		if ((null == attr)) {
+			throw new XmlException(openEvent, openEvent.getName().toString()+" missing attribute: "+attrName);
+		}
+		String v = attr.getValue();
+		values.put(attrName, v);
+	}
+	for (QName attrQname: myShape.getOptionalAttributes()) {
+		Attribute attr = openEvent.getAttributeByName(attrQname);
+		String v = (null == attr) ?
+				myShape.getDefaultValue(attrQname) : attr.getValue();
+				values.put(attrQname.toString(), v);
+	}
+	return values;
+}
 
-	private static LibrisAttributes parseAttributes(StartElement openEvent, ElementShape myShape) throws XmlException {
+private static LibrisAttributes parseAttributes(StartElement openEvent, ElementShape myShape) throws XmlException {
 	LibrisAttributes attrs = new LibrisAttributes();
 	for (QName attrQname: myShape.getRequiredAttributes()) {
 		Attribute attr = openEvent.getAttributeByName(attrQname);
@@ -120,6 +170,10 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 	}
 	return attrs;
 }
+
+	public LibrisAttributes getElementAttributes() {
+		return elementAttributes;
+	}
 
 	public boolean checkEndElement(XMLEvent nextEvt) {
 		if (nextEvt.isEndElement()) {

@@ -36,7 +36,7 @@ public class IndexField extends EmptyXmlElement {
 	}
 
 	public void fromXml(ElementManager mgr) throws InputException  {
-		LibrisAttributes attrs = mgr.parseOpenTag();
+		HashMap<String, String> attrs = mgr.parseOpenTag();
 		String fieldIdString = attrs.get(XML_INDEXFIELD_ID_ATTR);
 		Assertion.assertNotNullInputException("indexDef."+XML_INDEXFIELD_ID_ATTR, fieldIdString);
 		fieldNum = databaseSchema.getFieldNum(fieldIdString);

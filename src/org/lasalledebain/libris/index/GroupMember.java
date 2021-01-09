@@ -64,7 +64,7 @@ public class GroupMember extends GenericField implements XMLElement {
 
 	@Override
 	public void fromXml(ElementManager mgr) throws LibrisException {
-		LibrisAttributes attrs = mgr.parseOpenTag();
+		HashMap<String, String> attrs = mgr.parseOpenTag();
 		String groupId = attrs.get(XML_MEMBER_GROUP_ATTR);
 		def = defs.getGroupDef(groupId);
 		if (null == def) {
@@ -83,7 +83,7 @@ public class GroupMember extends GenericField implements XMLElement {
 			}
 			do {
 				ElementManager subMgr = mgr.nextElement();
-				LibrisAttributes affiliationAttrs = subMgr.parseOpenTag();
+				HashMap<String, String> affiliationAttrs = subMgr.parseOpenTag();
 				String affId = affiliationAttrs.get(XML_AFFILIATE_ATTR);
 				tempAffiliations.add(Integer.parseInt(affId));
 			} while (mgr.hasNext());

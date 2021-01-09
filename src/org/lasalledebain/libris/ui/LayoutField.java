@@ -186,7 +186,7 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 
 	@Override
 	public void fromXml(ElementManager mgr) throws LibrisException {
-		LibrisAttributes values = mgr.parseOpenTag();
+		HashMap<String, String> values = mgr.parseOpenTag();
 
 		id = values.get("id");
 		title = values.get("title");

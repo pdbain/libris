@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -21,7 +20,7 @@ import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 
-public class LibrisAttributes implements Iterable<Entry<String, String>> {
+public class LibrisAttributes implements Iterable<String[]> {
 	private final TreeMap<String, String> attributeList;
 	private final HashSet<String> defaultValues;
 	private LibrisAttributes next;
@@ -43,13 +42,6 @@ public class LibrisAttributes implements Iterable<Entry<String, String>> {
 		this();
 		for (String[] keyValue: attrs) {
 			setAttribute(keyValue[0], keyValue[1]);
-		}
-	}
-
-	public LibrisAttributes(LibrisAttributes attrs) {
-		this();
-		for (Entry<String, String> keyValue: attrs.attributeList.entrySet()) {
-			setAttribute(keyValue.getKey(), keyValue.getValue());
 		}
 	}
 
@@ -127,10 +119,11 @@ public class LibrisAttributes implements Iterable<Entry<String, String>> {
 		return null;
 	}
 
-	private class AttributeIterator implements Iterator<Entry<String, String>> {
-		Iterator<Entry<String, String>> iter;
+	// TODO change to SimpleEntry<String, String>
+	private class AttributeIterator implements Iterator<String[]> {
+		Iterator<String> iter;
 		public AttributeIterator() {
-			iter = attributeList.entrySet().iterator();
+			iter = attributeList.navigableKeySet().iterator();
 		}
 		@Override
 		public boolean hasNext() {
@@ -138,18 +131,20 @@ public class LibrisAttributes implements Iterable<Entry<String, String>> {
 		}
 
 		@Override
-		public Entry<String, String> next() {
-			Entry<String, String> result = iter.next();
+		public String[] next() {
+			String key = iter.next();
+			String value = attributeList.get(key);
+			String result[] = {key, value};
 			return result;
 		}
 
 		@Override
 		public void remove() {
 			return;
-		}
+		}		
 	}
 	@Override
-	public Iterator<Entry<String, String>> iterator() {
+	public Iterator<String[]> iterator() {
 		return new AttributeIterator();
 	}
 
