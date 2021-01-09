@@ -14,12 +14,11 @@ import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 
-	protected final DatabaseUi<RecordType> parentUi;
+	protected final DatabaseUi<DatabaseRecord> parentUi;
 
 	public ChildUi(DatabaseUi<DatabaseRecord> ui, boolean readOnly) {
 		super(readOnly);
-		this.parentUi = null;
-		// TODO Auto-generated constructor stub
+		this.parentUi = ui;
 	}
 
 	@Override

@@ -57,8 +57,8 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 	}
 
 	@Override
-	public GenericDatabase getDatabase() {
-		return nonNull(parentUi)? parentUi.getDatabase(): null;
+	public LibrisDatabase getDatabase() {
+		return nonNull(parentUi)? parentUi.getLibrisDatabase(): null;
 	}
 
 	public LibrisDatabase getLibrisDatabase() {

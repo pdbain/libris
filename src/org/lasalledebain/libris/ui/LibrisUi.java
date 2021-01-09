@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import org.lasalledebain.libris.DatabaseAttributes;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
@@ -47,7 +48,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	}
 
 	@Override
-	public GenericDatabase getDatabase() {
+	public GenericDatabase<DatabaseRecord> getDatabase() {
 		return currentDatabase;
 	}
 	@Deprecated
