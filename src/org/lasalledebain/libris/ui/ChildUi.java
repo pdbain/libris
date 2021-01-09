@@ -2,6 +2,7 @@ package org.lasalledebain.libris.ui;
 
 import static java.util.Objects.nonNull;
 
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -11,13 +12,14 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> {
+public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 
-	protected final LibrisUi<?> parentUi;
+	protected final DatabaseUi<RecordType> parentUi;
 
-	public ConsoleUi(LibrisUi<?> theParentUi) {
-		super(nonNull(theParentUi)? theParentUi.isDatabaseReadOnly(): true);
-		parentUi = theParentUi;
+	public ChildUi(DatabaseUi<DatabaseRecord> ui, boolean readOnly) {
+		super(readOnly);
+		this.parentUi = null;
+		// TODO Auto-generated constructor stub
 	}
 
 	@Override
@@ -61,10 +63,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 		return nonNull(parentUi)? parentUi.getDatabase(): null;
 	}
 
-	public LibrisDatabase getLibrisDatabase() {
-		return nonNull(parentUi)? parentUi.getLibrisDatabase(): null;
-		}
-	
 	@Override
 	public String getUiTitle() {
 		return nonNull(parentUi)? parentUi.getUiTitle(): "";	
@@ -179,11 +177,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 		if (nonNull(parentUi)) {
 			parentUi.saveDatabase();	
 		}
-	}
-
-	@Override
-	public void sendChooseDatabase() {
-		alert("Operation not available");
 	}
 
 	@Override

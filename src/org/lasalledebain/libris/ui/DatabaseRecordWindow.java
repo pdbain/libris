@@ -63,7 +63,7 @@ public class DatabaseRecordWindow extends RecordWindow<DatabaseRecord> {
 			navPanel.remove(artifactButton);
 		}
 		if (Objects.nonNull(artifactId)) {
-			final File artifactFile = ui.getDatabase().getArtifactFile(artifactId);
+			final File artifactFile = ui.getLibrisDatabase().getArtifactFile(artifactId);
 			artifactButton = new JButton(title);
 			navPanel.add(artifactButton, BorderLayout.SOUTH);
 			artifactButton.addActionListener(e -> {

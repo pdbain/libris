@@ -41,6 +41,8 @@ import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.DelimitedTextRecordsReader;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.records.XmlRecordsReader;
+import org.lasalledebain.libris.ui.ChildUi;
+import org.lasalledebain.libris.ui.ConsoleUi;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
@@ -143,7 +145,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				getDatabaseRecordsUnchecked();
 				if (hasDocumentRepository()) {
 					FileManager artifactFileMgr = new FileManager(getDatabaseArtifactDirectory(myConfiguration));
-					documentRepository = new ArtifactManager(getUi(), databaseMetadata.getRepositoryRoot(), artifactFileMgr);
+					DatabaseUi<ArtifactRecord> theUi = new ChildUi<ArtifactRecord>(getUi(), readOnly); // TODO Fix this
+					documentRepository = new ArtifactManager(theUi, databaseMetadata.getRepositoryRoot(), artifactFileMgr);
 				}
 			}
 		}

@@ -23,7 +23,7 @@ public class LayoutTests extends TestCase {
 	@Test
 	public void testLayouts() throws FileNotFoundException, IOException, LibrisException {
 		TestGUI myGui = rebuildAndOpenDatabase(getName(), workingDirectory, Utilities.EXAMPLE_DATABASE1_FILE);
-		LibrisDatabase myDb = myGui.getDatabase();
+		LibrisDatabase myDb = myGui.getLibrisDatabase();
 		BrowserWindow resultsWindow = myGui.getResultsWindow();
 		resultsWindow.setSelectedRecordIndex(3);
 		RecordDisplayPanel dispPanel = myGui.getDisplayPanel();

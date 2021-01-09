@@ -62,7 +62,7 @@ public class ConfigTest extends TestCase {
 		ui = new HeadlessUi();
 		config.setReadOnly(true);
 		ui.openDatabase(config);
-		currentDb = ui.getDatabase();
+		currentDb = ui.getLibrisDatabase();
 		try {
 			rec = currentDb.newRecord();
 			assertNull("Record created in read-only mode", rec);

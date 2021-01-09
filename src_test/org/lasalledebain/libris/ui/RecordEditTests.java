@@ -75,10 +75,6 @@ public class RecordEditTests extends TestCase {
 		try {
 			final String testName = getName();
 			TestGUI gui = rebuildAndOpenDatabase(testName);
-			LibrisDatabase db = gui.getDatabase();
-			File dbFile = db.getDatabaseFile();
-			BrowserWindow resultsWindow = gui.getResultsWindow();
-			int recId = 0;
 			Record rec;
 
 			RecordWindow rw = gui.newRecordWindow();
@@ -120,9 +116,8 @@ public class RecordEditTests extends TestCase {
 		try {
 			final String testName = getName();
 			TestGUI gui = rebuildAndOpenDatabase(testName);
-			LibrisDatabase db = gui.getDatabase();
+			LibrisDatabase db = gui.getLibrisDatabase();
 			File dbFile = db.getDatabaseFile();
-			BrowserWindow resultsWindow = gui.getResultsWindow();
 			int recId = 0;
 			DatabaseRecord rec;
 			{
@@ -307,7 +302,7 @@ public class RecordEditTests extends TestCase {
 		try {
 			final String testName = getName();
 			TestGUI gui = rebuildAndOpenDatabase(testName);
-			LibrisDatabase db = gui.getDatabase();
+			LibrisDatabase db = gui.getLibrisDatabase();
 			File dbFile = db.getDatabaseFile();
 			BrowserWindow resultsWindow = gui.getResultsWindow();
 			int lastRecord = resultsWindow.getNumRecords() - 1;
@@ -320,12 +315,10 @@ public class RecordEditTests extends TestCase {
 			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
 			MultipleValueUiField pubField = (MultipleValueUiField) recWindow.getField(ID_PUB);
 			assertNotNull("Could not find "+ID_PUB, pubField);
-			GuiControl pubCtrl = pubField.getCtrl(0);
 			GuiControl newControl = pubField.addControl(true);
 			String PUB_NEW_VALUE = "PubNewValue";
 			newControl.setFieldValue(PUB_NEW_VALUE);
 			Utilities.pause();
-			Record currentRec = recWindow.getRecord();
 			gui.enterRecord();
 			db.save();
 			Utilities.pause();
@@ -340,7 +333,6 @@ public class RecordEditTests extends TestCase {
 			assertTrue("Could not close database", gui.quit(false));
 
 			TestGUI newGui = Utilities.openGuiAndDatabase(testName, dbFile);
-			GenericDatabase<DatabaseRecord> newDb = newGui.getDatabase();
 			resultsWindow = newGui.getResultsWindow();
 			lastRecord = resultsWindow.getNumRecords() - 1;
 			resultsWindow.setSelectedRecordIndex(lastRecord);

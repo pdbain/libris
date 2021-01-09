@@ -33,7 +33,7 @@ public class LauncherTests extends TestCase {
 		assertTrue("Could not close database", db.closeDatabase(false));
 		LibrisUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {directoryFilePath});
 		assertNotNull("Failed to open database UI", ui);
-		db = ui.getDatabase();
+		db = ui.getLibrisDatabase();
 		assertNotNull("Failed to open database", db);
 		DatabaseRecord rec = db.getRecord(2);
 		assertNotNull("Failed to get record", rec);
@@ -78,7 +78,7 @@ public class LauncherTests extends TestCase {
 		LibrisUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_REBUILD, directoryFilePath});
 		assertNotNull("Failed to open database UI", ui);
 		ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_CMDLINEUI, directoryFilePath});
-		LibrisDatabase db = ui.getDatabase();
+		LibrisDatabase db = ui.getLibrisDatabase();
 		String databaseCopy = (new File(workingDirectory, "databaseCopy.libr")).getAbsolutePath();
 		db.exportDatabaseXml(new FileOutputStream(databaseCopy));
 		String databaseCopyContent = Files.readString(Path.of(databaseCopy));
