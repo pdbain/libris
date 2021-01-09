@@ -522,6 +522,8 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 						f.addValue(sData);
 					} 
 					break;
+					default:
+						break;
 					}
 				}
 			}
@@ -576,6 +578,8 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 					result.addFieldValue(fid, sData);
 					break;
 				}
+				default:
+					break;
 				}
 			}
 			result.setRecordId(recId);

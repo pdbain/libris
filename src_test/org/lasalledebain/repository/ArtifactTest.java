@@ -56,42 +56,45 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testCreateDatabase() throws LibrisException {
 		final int numArtifacts = 16;
-		DatabaseUi myUi = new HeadlessUi(false);
-		ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory);
-		db.initialize();
-		db.openDatabase();
 		ArtifactParameters testArtifacts[] = new ArtifactParameters[numArtifacts];
-		for (int i = 0; i < numArtifacts; ++i) {
-			final int expectedId = i + 1;
-			final String fName = "test_artifact_" + expectedId;
-			File testFile = new File(workingDirectory, fName);
-			testFile.deleteOnExit();
-			URI originalUri = testFile.toURI();
-			ArtifactParameters params = new ArtifactParameters(originalUri);
-			testArtifacts[i] = params;
-			params.setComments("comments_" + expectedId);
-			params.setDate("date_" + expectedId);
-			params.setDoi("doi_" + expectedId);
-			params.setKeywords("keywords_" + expectedId);
-			params.setRecordName(RECORD + expectedId);
-			params.setTitle(TITLE_PREFIX + expectedId);
-			ArtifactRecord rec = db.newRecord(params);
-			db.putRecord(rec);
-			assertEquals(expectedId, rec.getRecordId());
+		DatabaseUi myUi = new HeadlessUi(false);
+		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
+			db.initialize();
+			db.openDatabase();
+			for (int i = 0; i < numArtifacts; ++i) {
+				final int expectedId = i + 1;
+				final String fName = "test_artifact_" + expectedId;
+				File testFile = new File(workingDirectory, fName);
+				testFile.deleteOnExit();
+				URI originalUri = testFile.toURI();
+				ArtifactParameters params = new ArtifactParameters(originalUri);
+				testArtifacts[i] = params;
+				params.setComments("comments_" + expectedId);
+				params.setDate("date_" + expectedId);
+				params.setDoi("doi_" + expectedId);
+				params.setKeywords("keywords_" + expectedId);
+				params.setRecordName(RECORD + expectedId);
+				params.setTitle(TITLE_PREFIX + expectedId);
+				ArtifactRecord rec = db.newRecord(params);
+				db.putRecord(rec);
+				assertEquals(expectedId, rec.getRecordId());
+			}
+			for (int i = 0; i < numArtifacts; ++i) {
+				final int expectedId = i + 1;
+				ArtifactParameters actual = db.getArtifactInfo(expectedId);
+				assertEquals(testArtifacts[i], actual);
+			}
+			db.save();
 		}
-		for (int i = 0; i < numArtifacts; ++i) {
-			final int expectedId = i + 1;
-			ArtifactParameters actual = db.getArtifactInfo(expectedId);
-			assertEquals(testArtifacts[i], actual);
+		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
+			db.openDatabase();
+			for (int i = 0; i < numArtifacts; ++i) {
+				final int expectedId = i + 1;
+				ArtifactParameters actual = db.getArtifactInfo(expectedId);
+				assertEquals(testArtifacts[i], actual);
+			}
 		}
-		db.save();
-		db = new ArtifactDatabase(myUi, workingDirectory);
-		db.openDatabase();
-		for (int i = 0; i < numArtifacts; ++i) {
-			final int expectedId = i + 1;
-			ArtifactParameters actual = db.getArtifactInfo(expectedId);
-			assertEquals(testArtifacts[i], actual);
-		}
+
 	}
 
 	@Test
@@ -133,7 +136,7 @@ public class ArtifactTest extends TestCase {
 			db.toXml(eWriter);
 			db = new ArtifactDatabase(myUi, workingDirectory);
 			db.initialize();
-			
+
 		}
 		try (FileReader reader = new FileReader(exportFile)) {
 			ElementManager mgr = GenericDatabase.getXmlFactory().makeElementManager(reader, exportFile.getAbsolutePath(),
@@ -187,7 +190,7 @@ public class ArtifactTest extends TestCase {
 			db.toXml(eWriter);
 			db = new ArtifactDatabase(myUi, workingDirectory);
 			db.initialize();
-			
+
 		}
 		try (FileReader reader = new FileReader(exportFile)) {
 			ElementManager mgr = GenericDatabase.getXmlFactory().makeElementManager(reader, exportFile.getAbsolutePath(),

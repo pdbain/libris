@@ -11,13 +11,13 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 	public void setAttribute(String key, String value) {
 		super.setAttribute(key, value);
 	}
-	
+
 	public DatabaseAttributes()  {
 		super();
 	}
-		public DatabaseAttributes(LibrisAttributes attrs) throws DatabaseException {
+	
+	public DatabaseAttributes(LibrisAttributes attrs) throws DatabaseException {
 		super(attrs);
-
 	}
 
 	public String getDatabaseName() {
@@ -35,7 +35,7 @@ public class DatabaseAttributes extends LibrisAttributes implements LibrisXMLCon
 		Date modificationDate = parseDate(dbDateString);
 		return modificationDate;
 	}
-	
+
 	public boolean isLocked() {
 		return Boolean.getBoolean(get(XML_DATABASE_LOCKED_ATTR));
 	}

@@ -3,7 +3,6 @@ package org.lasalledebain.libris.index;
 import static org.lasalledebain.libris.LibrisDatabase.log;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Schema;

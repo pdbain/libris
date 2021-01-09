@@ -4,7 +4,6 @@ import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 
 import org.lasalledebain.libris.Field;

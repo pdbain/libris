@@ -1,6 +1,5 @@
 package org.lasalledebain.libris.index;
 
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.EmptyXmlElement;

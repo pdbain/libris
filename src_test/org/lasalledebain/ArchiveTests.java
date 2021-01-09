@@ -28,7 +28,6 @@ import junit.framework.TestCase;
 public class ArchiveTests extends TestCase {
 
 	private File workingDirectory;
-	private boolean b;
 
 	@Override
 	protected void setUp() throws Exception {

@@ -1,18 +1,15 @@
 package org.lasalledebain;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
-import org.lasalledebain.libris.xmlUtils.ElementReader;
-import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
 import junit.framework.TestCase;
 
@@ -27,7 +24,7 @@ public class GuiTests extends TestCase {
 			ElementManager mgr = Utilities.makeElementManagerFromFile(inputFile, "layouts");
 
 			loadSchema();
-			Layouts myLayouts = new Layouts(mySchema);
+			Layouts<Record> myLayouts = new Layouts(mySchema);
 			myLayouts.fromXml(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();

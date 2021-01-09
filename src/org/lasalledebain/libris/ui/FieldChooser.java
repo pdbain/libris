@@ -22,6 +22,7 @@ public class FieldChooser extends JPanel {
 	private int numSearchFields;
 	boolean includeRecordName;
 	private Vector<FieldInfo> searchFieldList;
+	@SuppressWarnings("unused")
 	private boolean multiSelect;
 	public FieldChooser(Schema schem, EnumSet<FieldType> searchFieldTypes, boolean multiSelect, String label) {
 		setLayout(new BorderLayout());

@@ -46,7 +46,6 @@ public class DbDump {
 		try {
 			RandomAccessFile recordsFileStore = rf.getReadOnlyRandomAccessFile();
 			RecordHeader recordList = new RecordHeader(recordsFileStore, 0);
-			RecordHeader freeList = new RecordHeader(recordsFileStore, RecordHeader.getHeaderLength());
 			dumpRecord("recordList", recordsFileStore, recordList, false);
 			RecordHeader hdr = recordList;
 			while (hdr.hasNext()) {

@@ -2,7 +2,6 @@ package org.lasalledebain.libris.ui;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Vector;
 import java.util.stream.Stream;
 

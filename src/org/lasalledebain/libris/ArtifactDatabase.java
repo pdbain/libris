@@ -22,7 +22,6 @@ import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
-import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements LibrisXMLConstants, RecordFactory<ArtifactRecord> {

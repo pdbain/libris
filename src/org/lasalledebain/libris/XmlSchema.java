@@ -3,7 +3,6 @@ package org.lasalledebain.libris;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.HashMap;
 
 import javax.xml.namespace.QName;
 
@@ -16,7 +15,6 @@ import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.IndexDefs;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementReader;
-import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;

@@ -6,7 +6,6 @@ import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Objects;
 
 import javax.swing.JButton;
