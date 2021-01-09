@@ -42,8 +42,8 @@ public class WebUi<RecordType extends Record> extends LibrisUi<RecordType> {
 	}
 
 	@Override
-	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
-		// TODO Auto-generated method stub
+	public boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
+		// TODO write checkAndCloseDatabase
 		return false;
 	}
 

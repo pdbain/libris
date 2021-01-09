@@ -25,11 +25,9 @@ import javax.swing.ProgressMonitor;
 
 import org.lasalledebain.libris.DatabaseAttributes;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.index.GroupDef;
 
 public abstract class LibrisWindowedUi<RecordType extends Record> extends LibrisUi<RecordType> {	
@@ -44,7 +42,7 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 	public abstract boolean closeWindow(boolean allWindows);
 
 	@Override
-	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
+	public boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		boolean result = false;
 		if (!force && currentDatabase.isModified()) {
 			int choice = confirmWithCancel(Messages.getString("LibrisDatabase.save_database_before_close")); //$NON-NLS-1$

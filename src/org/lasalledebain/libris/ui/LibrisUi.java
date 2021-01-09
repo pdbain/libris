@@ -122,7 +122,6 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 		}
 		return result;
 	}
-	protected abstract boolean checkAndCloseDatabase(boolean force) throws DatabaseException;
 
 	@Override
 	public boolean quit(boolean force) throws DatabaseException {
@@ -138,7 +137,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 		return Objects.nonNull(currentDatabase) && currentDatabase.isDatabaseOpen();
 	}
 	
-	protected boolean isDatabaseModified() {
+	public boolean isDatabaseModified() {
 		return (null != currentDatabase) && currentDatabase.isModified();
 	}
 	public void setDatabaseFile(File dbFile) {

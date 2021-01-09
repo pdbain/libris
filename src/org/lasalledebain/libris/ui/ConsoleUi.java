@@ -51,7 +51,7 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 	}
 
 	@Override
-	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
+	public boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		return nonNull(parentUi)? parentUi.checkAndCloseDatabase(force): true;	
 	}
 
@@ -111,7 +111,7 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 	}
 
 	@Override
-	protected boolean isDatabaseModified() {
+	public boolean isDatabaseModified() {
 		return nonNull(parentUi)? parentUi.isDatabaseModified(): true;	
 	}
 

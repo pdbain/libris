@@ -168,7 +168,7 @@ public class CmdlineUi<RecordType extends Record> extends LibrisUi<RecordType> {
 	}
 
 	@Override
-	protected boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
+	public boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		// TODO write checkAndCloseDatabase
 		return currentDatabase.closeDatabase(force);
 	}

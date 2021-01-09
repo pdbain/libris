@@ -101,44 +101,45 @@ public class ArtifactTest extends TestCase {
 	public void testImportExportRecords() throws LibrisException, IOException, XMLStreamException {
 		final int numArtifacts = 16;
 		DatabaseUi myUi = new HeadlessUi(false);
-		ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory);
-		db.initialize();
-		db.openDatabase();
-		String groupId = db.getSchema().getGroupId(0);
-		ArtifactParameters testArtifacts[] = new ArtifactParameters[numArtifacts];
-		for (int i = 0; i < numArtifacts; ++i) {
-			final int expectedId = i + 1;
-			final String fName = "test_artifact_" + expectedId;
-			File testFile = new File(workingDirectory, fName);
-			testFile.deleteOnExit();
-			URI originalUri = testFile.toURI();
-			ArtifactParameters params = new ArtifactParameters(originalUri);
-			testArtifacts[i] = params;
-			params.setRecordName(RECORD + expectedId);
-			params.setTitle(TITLE_PREFIX + expectedId);
-			ArtifactRecord rec = db.newRecord(params);
-			if (expectedId > 1) {
-				ArtifactRecord parent = db.getRecord(expectedId / 2);
-				if (Objects.nonNull(parent.getName()) && ((expectedId % 2) == 0)) {
-					rec.setParent(groupId, parent);
-				} else {
-					rec.setParent(0, parent.getRecordId());
-				}
-				params.setRecordParentName(parent.getName());
-				params.setParentId(parent.getRecordId());
-			}
-			db.putRecord(rec);
-		}
-		db.save();
 		File exportFile = new File(workingDirectory, "database.xml");
-		try (FileOutputStream eStream = new FileOutputStream(exportFile)) {
-			ElementWriter eWriter = ElementWriter.eventWriterFactory(eStream);
-			db.toXml(eWriter);
-			db = new ArtifactDatabase(myUi, workingDirectory);
+		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
+			db.openDatabase();
+			String groupId = db.getSchema().getGroupId(0);
+			ArtifactParameters testArtifacts[] = new ArtifactParameters[numArtifacts];
+			for (int i = 0; i < numArtifacts; ++i) {
+				final int expectedId = i + 1;
+				final String fName = "test_artifact_" + expectedId;
+				File testFile = new File(workingDirectory, fName);
+				testFile.deleteOnExit();
+				URI originalUri = testFile.toURI();
+				ArtifactParameters params = new ArtifactParameters(originalUri);
+				testArtifacts[i] = params;
+				params.setRecordName(RECORD + expectedId);
+				params.setTitle(TITLE_PREFIX + expectedId);
+				ArtifactRecord rec = db.newRecord(params);
+				if (expectedId > 1) {
+					ArtifactRecord parent = db.getRecord(expectedId / 2);
+					if (Objects.nonNull(parent.getName()) && ((expectedId % 2) == 0)) {
+						rec.setParent(groupId, parent);
+					} else {
+						rec.setParent(0, parent.getRecordId());
+					}
+					params.setRecordParentName(parent.getName());
+					params.setParentId(parent.getRecordId());
+				}
+				db.putRecord(rec);
+			}
+			db.save();
+			try (FileOutputStream eStream = new FileOutputStream(exportFile)) {
+				ElementWriter eWriter = ElementWriter.eventWriterFactory(eStream);
+				db.toXml(eWriter);
 
+			}
 		}
-		try (FileReader reader = new FileReader(exportFile)) {
+		;
+		try (FileReader reader = new FileReader(exportFile); ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
+			db.initialize();
 			ElementManager mgr = GenericDatabase.getXmlFactory().makeElementManager(reader, exportFile.getAbsolutePath(),
 					LibrisXMLConstants.XML_ARTIFACTS_TAG, new XmlShapes(XmlShapes.SHAPE_LIST.ARTIFACTS_SHAPES));
 			db.fromXml(mgr);

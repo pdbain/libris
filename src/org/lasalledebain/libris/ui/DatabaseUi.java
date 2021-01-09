@@ -17,13 +17,16 @@ public interface DatabaseUi<RecordType extends Record> {
 	public LibrisDatabase openDatabase() throws DatabaseException;
 	public void saveDatabase();
 	public boolean closeDatabase(boolean force) throws DatabaseException;
+	public boolean checkAndCloseDatabase(boolean force) throws DatabaseException;
 	public boolean quit(boolean force) throws DatabaseException;
 
 	public boolean rebuildDatabase() throws LibrisException;
 	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException;
 	public boolean isDatabaseSelected();
 	public boolean isDatabaseOpen();
+	public boolean isDatabaseModified();
 	public boolean isDatabaseReadOnly();
+	public void setOpenReadOnly(boolean openReadOnly);
 	public GenericDatabase<DatabaseRecord> getDatabase();
 	void setDatabaseFile(File dbFile);
 	public abstract String SelectSchemaFile(String schemaName) throws DatabaseException;
