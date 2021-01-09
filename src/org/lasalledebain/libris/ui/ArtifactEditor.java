@@ -106,7 +106,7 @@ public class ArtifactEditor {
 		sourcePath.setBorder(new TitledBorder("Source path"));
 		sourcePath.setEditable(false);
 
-		archivePath = new JTextField(params.getArchivePathString());
+		archivePath = new JTextField(params.getArchivePath());
 		fieldsPane.add(archivePath);
 		archivePath.setBorder(new TitledBorder("Archive path"));
 		archivePath.setEditable(false);

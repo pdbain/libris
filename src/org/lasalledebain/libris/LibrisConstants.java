@@ -18,7 +18,7 @@ public interface LibrisConstants {
 	public static final String PROPERTY_SIGNATURE_LEVELS = "libris.database.signaturelevels";
 	public static final String FILENAME_JOURNAL_SUFFIX = "lbrj";
 	public static final String FILENAME_NATIVE_RECORDS_SUFFIX = "lbrn";
-	public static final String FILENAME_XML_FILES_SUFFIX = "libr";
+	public static final String FILENAME_LIBRIS_FILES_SUFFIX = "libr";
 	public static final String FILENAME_INSTANCE_INCREMENT_FILES_SUFFIX = "libi";
 	public static final int NULL_RECORD_ID = 0;
 	public static final int MAX_RECORD_ID = Integer.MAX_VALUE;
@@ -47,8 +47,8 @@ public interface LibrisConstants {
 	String LAST_ARTIFACT_SOURCE_DIR = "ARTIFACT_DIR";
 	String REPO_DB = "repo_db";
 	public static final String METADATA_NAME = "METADATA";
-	public static final String DATABASE_AUX_DIRECTORY_NAME = ".libris_db_files";
-	public static final String REPOSITORY_AUX_DIRECTORY_NAME = ".libris_repo_files";
+	public static final String DATABASE_AUX_DIRECTORY_NAME = "_libris_db_files";
+	public static final String REPOSITORY_AUX_DIRECTORY_NAME = "_libris_repo_files";
 	public static final String POSITION_FILENAME = "positions";
 	public static final String PROPERTIES_FILENAME = "properties";
 	public static final String RECORDS_FILENAME = "records";

@@ -30,28 +30,26 @@ public class ArtifactManager {
 	static final int FANOUT = 100;
 	private final FileManager myFileMgr;
 	private final File artifactDirectory;
+	public File getArtifactDirectory() {
+		return artifactDirectory;
+	}
+
+	private final Path artifactDirectoryPath;
 	private final DatabaseUi<DatabaseRecord> myUi;
 	private ArtifactDatabase myDb;
 	private ReservationManager reservationMgr;
 
-	public ArtifactManager(DatabaseUi theUi, File artifactDirectory, FileManager theFileMgr) throws DatabaseException {
-		this.artifactDirectory = artifactDirectory;
+	public ArtifactManager(DatabaseUi theUi, File theArtifactDirectory, FileManager theFileMgr) throws DatabaseException {
+		artifactDirectory = theArtifactDirectory;
+		artifactDirectoryPath = artifactDirectory.toPath();
 		myFileMgr = theFileMgr;
 		myUi = theUi;
 		myDb = new ArtifactDatabase(theUi, theFileMgr);
 	}
 
-	public boolean initialize(boolean force) throws LibrisException {
+	public boolean initialize() throws LibrisException {
 		boolean result = true;
-		if (artifactDirectory.exists()) {
-			if (force || (Dialogue.YES_OPTION == myUi
-					.confirm("Delete directory " + artifactDirectory.getAbsolutePath()))) {
-				artifactDirectory.delete();
-			} else {
-				result= false;
-			}
-		}
-		if (!artifactDirectory.mkdir()) {
+		if (!artifactDirectory.exists() && !artifactDirectory.mkdir()) {
 			LibrisDatabase.log(Level.SEVERE, "Cannot create " + artifactDirectory.getAbsolutePath());
 			result = false;
 		}
@@ -85,7 +83,7 @@ public class ArtifactManager {
 		if (!sourceFile.isFile()) {
 			throw new UserErrorException(sourceUri.toString() + " is not a file");
 		}
-		URI archivePath = copyFileToRepo(sourceFile, id);
+		String archivePath = copyFileToRepo(sourceFile, id);
 		artifactParameters.setArchivepPath(archivePath);
 		putArtifactInfo(artifactParameters, id);
 		return id;
@@ -100,8 +98,7 @@ public class ArtifactManager {
 		return importFile(params);
 	}
 
-	// TODO make this private
-	private URI copyFileToRepo(File original, int id) throws InputException, IOException {
+	private String copyFileToRepo(File original, int id) throws InputException, IOException {
 		File dir = idToDirectoryPath(artifactDirectory, id);
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
@@ -118,7 +115,7 @@ public class ArtifactManager {
 		String nameWithId = ARTIFACT_PREFIX + Integer.toString(id) + "_" + originalName;
 		Path destinationPath = Paths.get(dir.getAbsolutePath(), nameWithId);
 		Files.copy(original.toPath(), destinationPath);
-		return destinationPath.toUri();
+		return artifactDirectoryPath.relativize(destinationPath).toString();
 	}
 
 	private static File idToDirectoryPath(File root, int id) {
@@ -176,10 +173,10 @@ public class ArtifactManager {
 		try {
 			Record record = myDb.getRecord(artifactId);
 			final FieldValue archivePathField = record.getFieldValue(ArtifactDatabase.ID_ARCHIVEPATH);
-			String uriString = archivePathField.getMainValueAsString();
-			File result = new File(new URI(uriString));
+			String relativePath = archivePathField.getMainValueAsString();
+			File result = new File(artifactDirectory, relativePath);
 			return result;
-		} catch (InputException | URISyntaxException e) {
+		} catch (InputException e) {
 			throw new DatabaseError("Error retrieving artifact " + artifactId, e);
 		}
 	}

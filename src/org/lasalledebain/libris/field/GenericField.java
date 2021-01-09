@@ -249,7 +249,7 @@ public abstract class GenericField implements Field {
 	}
 
 	public static Field fromXml(ElementManager fieldManager, Record rec) throws XmlException, DatabaseException, InputException {
-		HashMap<String, String> attrs = fieldManager.parseOpenTag();
+		LibrisAttributes attrs = fieldManager.parseOpenTag();
 		String elementContents;
 		if (fieldManager.hasContent()) {
 			elementContents = fieldManager.getContent();

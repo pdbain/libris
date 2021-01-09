@@ -211,7 +211,7 @@ public class ArtifactRecord extends Record {
 
 	@Override
 	public void fromXml(ElementManager recMgr) throws LibrisException {
-		this.attributes = new LibrisAttributes(recMgr.parseOpenTag());
+		this.attributes = recMgr.parseOpenTag();
 		setRecordId(RecordId.toId(attributes.get(XML_RECORD_ID_ATTR)));
 		setName(attributes.get(XML_RECORD_NAME_ATTR));
 		while (recMgr.hasNext()) {

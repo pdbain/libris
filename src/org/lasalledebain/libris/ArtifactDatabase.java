@@ -29,6 +29,8 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	static final DynamicSchema artifactsSchema = makeSchema();
 	private final DatabaseMetadata myMetadata;
+	public static String[] subElementNames = new String[] {XML_RECORDS_TAG };
+	public static final String xmlArtifactsTag = XML_ARTIFACTS_TAG;
 	
 	/* field IDs */
 	static final String ID_COMMENTS = "ID_comments";
@@ -50,6 +52,8 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	public static int TITLE_FIELD;
 	public static int ARCHIVEPATH_FIELD;
 	public static int numFields;
+	public static String[] requiredAttributesList = LibrisXMLConstants.emptyElementMemberList;
+	public static String[][] optionalAttributesList = LibrisXMLConstants.emptyOptionalAttributesList;
 	public ArtifactDatabase(DatabaseUi<ArtifactRecord> theUi, FileManager theFileManager) throws DatabaseException {
 		super(theUi, theFileManager);
 		myMetadata = new DatabaseMetadata();
@@ -76,8 +80,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	@Override
 	public void toXml(ElementWriter outWriter) throws LibrisException {
-		LibrisAttributes recordsAttrs = new LibrisAttributes();
-		outWriter.writeStartElement(getElementTag(), recordsAttrs, false);
+		outWriter.writeStartElement(getElementTag(), null, false);
 		databaseRecords.toXml(outWriter);
 		outWriter.writeEndElement(); /* records */
 	}
@@ -117,7 +120,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		protected void setRecordFields(ArtifactParameters artifactParameters, ArtifactRecord rec)
 			throws InputException, FieldDataException, DatabaseException {
 		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
-		rec.addFieldValue(ID_ARCHIVEPATH, artifactParameters.getArchivePathString());
+		rec.addFieldValue(ID_ARCHIVEPATH, artifactParameters.getArchivePath());
 		rec.addFieldValue(ID_DATE, artifactParameters.getDate());
 		if (!artifactParameters.recordName.isEmpty()) {
 			rec.setName(artifactParameters.recordName);
@@ -185,7 +188,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 			if (nonNull(fldValue)) {
 				String artifactPath = fldValue.getMainValueAsString();
 				if (nonNull(artifactPath)) {
-					result.setArchivepPath(new URI(artifactPath));
+					result.setArchivepPath(artifactPath);
 				}
 			}
 			result.setDate(record.getFieldValue(ID_DATE).getMainValueAsString());
@@ -262,5 +265,9 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		ArtifactRecord rec = newRecordUnchecked();
 		rec.setEditable(editable);
 		return rec;
+	}
+
+	public static String getXmlTag() {
+		return XML_ARTIFACTS_TAG;
 	}
 }

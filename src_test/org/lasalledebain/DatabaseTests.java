@@ -663,7 +663,6 @@ public class DatabaseTests extends TestCase {
 			rootExpectedRecords.addAll(rootExpectedRecords.size(), incrementExpectedRecords);
 			checkDbRecords(rootDb, rootExpectedRecords);
 			rootDb.closeDatabase(false);
-			;
 			forkDb.closeDatabase(false);
 			dbInstance.delete();
 		} catch (Throwable e) {

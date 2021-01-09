@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.util;
 
 import java.io.File;
-import java.util.HashMap;
 
 import org.lasalledebain.libris.DatabaseAttributes;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -16,11 +15,11 @@ public class DiagnosticDatabase extends LibrisDatabase {
 	public DiagnosticDatabase(File databaseFile) throws LibrisException, DatabaseException {
 		super(new LibrisDatabaseConfiguration(databaseFile, false), new HeadlessUi(databaseFile, false));
 		getFileMgr().createAuxFiles(true);
-		HashMap<String, String> attrs = new HashMap<String, String>();
-		attrs.put(XML_DATABASE_NAME_ATTR, "unknown");
-		attrs.put(XML_DATABASE_SCHEMA_NAME_ATTR, "unknown");
-		attrs.put(XML_SCHEMA_VERSION_ATTR, "unknown");
-		xmlAttributes = new DatabaseAttributes(attrs);
+		DatabaseAttributes attrs = new DatabaseAttributes();
+		attrs.setAttribute(XML_DATABASE_NAME_ATTR, "unknown");
+		attrs.setAttribute(XML_DATABASE_SCHEMA_NAME_ATTR, "unknown");
+		attrs.setAttribute(XML_SCHEMA_VERSION_ATTR, "unknown");
+		dbAttributes = new DatabaseAttributes(attrs);
 	}
 
 	/* (non-Javadoc)

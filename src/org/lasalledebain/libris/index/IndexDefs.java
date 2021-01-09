@@ -37,7 +37,7 @@ public class IndexDefs implements XMLElement {
 
 	@Override
 	public void fromXml(ElementManager mgr) throws InputException  {
-		mgr.parseOpenTag(getXmlTag());
+		mgr.checkAndParseOpenTag(getXmlTag());
 		while (mgr.hasNext()) {
 			ElementManager indexMgr = mgr.nextElement();
 			IndexDef def = new IndexDef(databaseSchema);

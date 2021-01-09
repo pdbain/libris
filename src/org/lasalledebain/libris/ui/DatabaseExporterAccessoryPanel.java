@@ -14,12 +14,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.ui.DatabaseExporter.ExportFormat;
 import org.lasalledebain.libris.util.StringUtils;
 
 @SuppressWarnings("serial")
-public class DatabaseExporterAccessoryPanel extends JPanel {
+public class DatabaseExporterAccessoryPanel extends JPanel implements LibrisConstants {
 	private ButtonGroup formatButton;
 	private JRadioButton librButton;
 	private JRadioButton csvButton;
@@ -55,7 +56,7 @@ public class DatabaseExporterAccessoryPanel extends JPanel {
 		add(sepLabel);
 
 		buttonLayout.setConstraints(librButton, buttonConstraints);
-		librButton.addActionListener(new FileExtensionModifier("libr"));
+		librButton.addActionListener(new FileExtensionModifier(FILENAME_LIBRIS_FILES_SUFFIX));
 		add(librButton);
 
 		buttonLayout.setConstraints(csvButton, buttonConstraints);

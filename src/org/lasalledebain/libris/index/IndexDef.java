@@ -55,7 +55,7 @@ public class IndexDef implements XMLElement {
 		xmlWriter.writeEndElement();
 	}
 	public void fromXml(ElementManager mgr) throws InputException  {
-		HashMap<String, String> attrs = mgr.parseOpenTag(getElementTag());
+		LibrisAttributes attrs = mgr.checkAndParseOpenTag(getElementTag());
 		indexId = attrs.get(XML_INDEXDEF_ID_ATTR);
 		ArrayList<IndexField> fieldArray = new ArrayList<>();
 		while (mgr.hasNext()) {

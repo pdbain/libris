@@ -36,6 +36,7 @@ public class LibrisTestSuite {
 		TestSuite suite = new TestSuite("Test for org.lasalledebain");
 		//$JUnit-BEGIN$
 		suite.addTestSuite(LauncherTests.class);
+		suite.addTestSuite(ArchiveTests.class);
 		suite.addTestSuite(HtmlTests.class);
 		suite.addTestSuite(ConfigTest.class);
 		suite.addTestSuite(LayoutTests.class);

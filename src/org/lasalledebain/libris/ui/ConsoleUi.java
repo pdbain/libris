@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.ui;
 
+import static java.util.Objects.nonNull;
+
 import java.io.File;
 
 import org.lasalledebain.libris.LibrisDatabase;
@@ -10,8 +12,6 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
-
-import static java.util.Objects.nonNull;
 
 public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 

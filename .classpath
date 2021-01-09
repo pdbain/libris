@@ -20,5 +20,6 @@
 	<classpathentry kind="lib" path="resources/jetty-util-9.2.11.v20150529.jar"/>
 	<classpathentry kind="lib" path="resources/jetty-io-9.2.11.v20150529.jar"/>
 	<classpathentry kind="lib" path="resources/jetty-security-9.2.11.v20150529.jar"/>
+	<classpathentry kind="lib" path="resources/commons-compress-1.20.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

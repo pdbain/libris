@@ -51,7 +51,7 @@ public class DatabaseRecordWindow extends RecordWindow<DatabaseRecord> {
 		}
 		ArtifactParameters artifactInfo = ui.currentDatabase.getArtifactInfo(rec.getArtifactId());
 		if (null != artifactInfo) {
-			addArtifactButton(artifactInfo);
+			addArtifactButton(rec.getArtifactId(), artifactInfo.getTitle());
 		}
 		navPanel.setVisible(true);
 		// TODO redundant?
@@ -59,14 +59,13 @@ public class DatabaseRecordWindow extends RecordWindow<DatabaseRecord> {
 		ui.setSelectedField(null);
 	}
 
-	public void addArtifactButton(ArtifactParameters artifactInfo) {
+	public void addArtifactButton(int artifactId, String title) {
 		if (Objects.nonNull(artifactButton)) {
 			navPanel.remove(artifactButton);
 		}
-		if (Objects.nonNull(artifactInfo)) {
-			URI archivepath = artifactInfo.getArchivepath();
-			final File artifactFile = new File(archivepath);
-			artifactButton = new JButton(artifactInfo.getTitle());
+		if (Objects.nonNull(artifactId)) {
+			final File artifactFile = ui.getDatabase().getArtifactFile(artifactId);
+			artifactButton = new JButton(title);
 			navPanel.add(artifactButton, BorderLayout.SOUTH);
 			artifactButton.addActionListener(e -> {
 				try {

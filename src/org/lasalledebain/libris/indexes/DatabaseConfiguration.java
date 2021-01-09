@@ -25,6 +25,7 @@ public class DatabaseConfiguration {
 
 	public void setSignatureLevels(int signatureLevels) {
 		this.signatureLevels = Optional.of(signatureLevels);
+		indexingReporter.reportValue(Reporter.INDEXING_SIGNATURE_LEVELS_CONFIGURATION, signatureLevels);
 	}
 
 	public Optional<Integer> getTermcountBuckets() {
@@ -33,6 +34,7 @@ public class DatabaseConfiguration {
 
 	public void setTermcountBuckets(int termcountBuckets) {
 		this.termcountBuckets = Optional.of(termcountBuckets);
+		indexingReporter.reportValue(Reporter.INDEXING_TERMCOUNT_BUCKETS_CONFIGURATION, termcountBuckets);
 	}
 
 }

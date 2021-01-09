@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import org.junit.After;
@@ -22,8 +21,8 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.PdfRecordImporter;
-import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.DatabaseUi;
+import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.util.ZipUtils;
 
 import junit.framework.TestCase;
