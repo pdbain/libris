@@ -94,13 +94,13 @@ public class XmlSchema extends Schema {
 		}
 		fieldDefsManager.parseClosingTag();
 	}
-	public static Schema loadSchema(File schemaFile) throws LibrisException  {
+	public static XmlSchema loadSchema(File schemaFile) throws LibrisException  {
 		FileReader rdr;
 		try {
 			rdr = new FileReader(schemaFile);
 			LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 			ElementReader xmlReader = xmlFactory.makeReader(rdr, schemaFile.getPath());
-			Schema s = new XmlSchema(xmlReader);
+			XmlSchema s = new XmlSchema(xmlReader);
 			return s;
 		} catch (FileNotFoundException e) {
 			throw new InputException("Cannot open "+schemaFile.getPath(), e);

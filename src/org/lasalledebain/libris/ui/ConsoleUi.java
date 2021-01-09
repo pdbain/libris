@@ -2,12 +2,9 @@ package org.lasalledebain.libris.ui;
 
 import static java.util.Objects.nonNull;
 
-import java.io.File;
-
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.XmlSchema;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -15,9 +12,9 @@ import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 
-	protected final LibrisUi<RecordType> parentUi;
+	protected final LibrisUi<?> parentUi;
 
-	public ConsoleUi(LibrisUi<RecordType> theParentUi) {
+	public ConsoleUi(LibrisUi<?> theParentUi) {
 		super(nonNull(theParentUi)? theParentUi.isDatabaseReadOnly(): true);
 		parentUi = theParentUi;
 	}
@@ -40,16 +37,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 
 	@Override
 	public void repaint() {
-		alert("Operation not available");
-	}
-
-	@Override
-	public void rebuildDatabase(File databaseFile) {
-		alert("rebuildDatabase: Operation not available");
-	}
-
-	@Override
-	public void setRecordName(NamedRecordList<RecordType> namedRecs) throws InputException {
 		alert("Operation not available");
 	}
 
@@ -83,12 +70,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 		if (nonNull(parentUi)) {
 			parentUi.setUiTitle(uiTitle);	
 		}
-	}
-
-	@Override
-	public XmlSchema getSchema() {
-		alert("Operation not available");
-		return null;
 	}
 
 	@Override
@@ -135,18 +116,17 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 	}
 
 	@Override
-	public void setDatabaseFile(File dbFile) {
-		alert("Operation not available");
-	}
-
-	@Override
 	public UiField getSelectedField() {
 		return nonNull(parentUi)? parentUi.getSelectedField(): null;
 	}
 
 	@Override
 	public RecordType newRecord() {
-		alert("Operation not available");
+		try {
+			currentDatabase.newRecord();
+		} catch (InputException e) {
+			throw new DatabaseError("Error creating new record", e);
+		}
 		return null;
 	}
 

@@ -2,6 +2,7 @@ package org.lasalledebain.libris.ui;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static java.util.Objects.nonNull;
 
 import java.io.File;
 import java.util.Objects;
@@ -30,7 +31,6 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	protected String uiTitle;
 	// TODO make this generic
 	protected LibrisDatabase currentDatabase;
-	private XmlSchema mySchema;
 	protected File databaseFile;
 	protected File auxiliaryDirectory;
 	protected File artifactDirectory;
@@ -65,7 +65,10 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	 * @return the mySchema
 	 */
 	public XmlSchema getSchema() {
-		return mySchema;
+		XmlSchema result = null;
+		if (nonNull(currentDatabase))
+			result = currentDatabase.getSchema();
+		return result;
 	}
 
 	/**

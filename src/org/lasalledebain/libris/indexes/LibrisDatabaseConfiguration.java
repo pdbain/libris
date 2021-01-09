@@ -2,7 +2,6 @@ package org.lasalledebain.libris.indexes;
 
 import java.io.File;
 
-import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 public class LibrisDatabaseConfiguration extends DatabaseConfiguration {

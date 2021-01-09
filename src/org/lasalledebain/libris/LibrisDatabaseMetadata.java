@@ -15,7 +15,7 @@ public class LibrisDatabaseMetadata extends LibrisMetadata<DatabaseRecord> {
 
 		metadataMgr.parseOpenTag();
 		schemaMgr = metadataMgr.nextElement();
-		Schema schem = new XmlSchema(schemaMgr);
+		XmlSchema schem = new XmlSchema(schemaMgr);
 		database.setSchema(schem);
 		uiLayouts = new Layouts<DatabaseRecord>(schem);
 		ElementManager layoutsMgr = metadataMgr.nextElement();

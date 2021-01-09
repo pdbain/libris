@@ -101,7 +101,7 @@ public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<Reco
 
 	@Override
 	public void put(Record newRecord) throws DatabaseException {
-	log(Level.FINE, newRecord.toString());
+		log(Level.FINE, newRecord.toString());
 	}
 
 	public void repaint() {

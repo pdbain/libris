@@ -58,7 +58,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 	 * XML representation of the schema and database records
 	 */
 	private File myDatabaseFile;
-	private Schema mySchema;
+	private XmlSchema mySchema;
 	public  LibrisException rebuildException;
 	protected ArtifactManager documentRepository;
 	private RecordTemplate mainRecordTemplate;
@@ -632,12 +632,12 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return databaseMetadata;
 		}
 
-		public void setSchema(Schema schem) {
+		public void setSchema(XmlSchema schem) {
 			this.mySchema = schem;
 		}
 
 		@Override
-		public Schema getSchema() {
+		public XmlSchema getSchema() {
 			return mySchema;
 		}
 

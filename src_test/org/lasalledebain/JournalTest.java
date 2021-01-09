@@ -41,7 +41,7 @@ public class JournalTest extends TestCase implements LibrisConstants, LibrisXMLC
 		workDir = Utilities.makeTempTestDirectory();
 		testDatabase = new DiagnosticDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workDir));
 		File schemaFile = new File(Utilities.getTestDataDirectory(), Utilities.TEST_SCHEMA2_XML_FILE);
-		Schema schem = XmlSchema.loadSchema(schemaFile);
+		XmlSchema schem = XmlSchema.loadSchema(schemaFile);
 		testDatabase.setSchema(schem);
 
 		journalFile = new File(workDir, "JournalTest"+'.'+FILENAME_JOURNAL_SUFFIX);
