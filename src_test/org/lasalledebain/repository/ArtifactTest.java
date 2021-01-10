@@ -100,7 +100,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testImportExportRecords() throws LibrisException, IOException, XMLStreamException {
 		final int numArtifacts = 16;
-		DatabaseUi myUi = new HeadlessUi(false);
+		DatabaseUi<ArtifactRecord> myUi = new HeadlessUi<ArtifactRecord>(false);
 		File exportFile = new File(workingDirectory, "database.xml");
 		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
@@ -163,37 +163,38 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testIndex() throws LibrisException, IOException, XMLStreamException {
 		final int numArtifacts = 16;
-		DatabaseUi myUi = new HeadlessUi(false);
-		ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory);
-		db.initialize();
-		db.openDatabase();
-		ArtifactParameters testArtifacts[] = new ArtifactParameters[numArtifacts];
-		for (int i = 0; i < numArtifacts; ++i) {
-			final int expectedId = i + 1;
-			final String fName = "test_artifact_" + expectedId;
-			File testFile = new File(workingDirectory, fName);
-			testFile.deleteOnExit();
-			URI originalUri = testFile.toURI();
-			ArtifactParameters params = new ArtifactParameters(originalUri);
-			testArtifacts[i] = params;
-			params.setRecordName(RECORD + expectedId);
-			params.setTitle(TITLE_PREFIX + expectedId);
-			if (0 == (expectedId % 2)) {
-				params.setKeywords(EVEN_KEYWORD);
-			}
-			ArtifactRecord rec = db.newRecord(params);
-			db.putRecord(rec);
-		}
-		db.save();
+		DatabaseUi<ArtifactRecord> myUi = new HeadlessUi<ArtifactRecord>(false);
 		File exportFile = new File(workingDirectory, "database.xml");
-		try (FileOutputStream eStream = new FileOutputStream(exportFile)) {
-			ElementWriter eWriter = ElementWriter.eventWriterFactory(eStream);
-			db.toXml(eWriter);
-			db = new ArtifactDatabase(myUi, workingDirectory);
+		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
+			db.openDatabase();
+			ArtifactParameters testArtifacts[] = new ArtifactParameters[numArtifacts];
+			for (int i = 0; i < numArtifacts; ++i) {
+				final int expectedId = i + 1;
+				final String fName = "test_artifact_" + expectedId;
+				File testFile = new File(workingDirectory, fName);
+				testFile.deleteOnExit();
+				URI originalUri = testFile.toURI();
+				ArtifactParameters params = new ArtifactParameters(originalUri);
+				testArtifacts[i] = params;
+				params.setRecordName(RECORD + expectedId);
+				params.setTitle(TITLE_PREFIX + expectedId);
+				if (0 == (expectedId % 2)) {
+					params.setKeywords(EVEN_KEYWORD);
+				}
+				ArtifactRecord rec = db.newRecord(params);
+				db.putRecord(rec);
+			}
+			db.save();
+			try (FileOutputStream eStream = new FileOutputStream(exportFile)) {
+				ElementWriter eWriter = ElementWriter.eventWriterFactory(eStream);
+				db.toXml(eWriter);
 
+			}
 		}
-		try (FileReader reader = new FileReader(exportFile)) {
+		try (FileReader reader = new FileReader(exportFile); ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory);
+				) {
+			db.initialize();
 			ElementManager mgr = GenericDatabase.getXmlFactory().makeElementManager(reader, exportFile.getAbsolutePath(),
 					LibrisXMLConstants.XML_ARTIFACTS_TAG, new XmlShapes(XmlShapes.SHAPE_LIST.ARTIFACTS_SHAPES));
 			db.fromXml(mgr);
@@ -222,56 +223,58 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testGroups() throws LibrisException {
 		final int numArtifacts = 16;
-		DatabaseUi myUi = new HeadlessUi(false);
-		ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory);
-		db.initialize();
-		db.openDatabase();
-		String groupId = db.getSchema().getGroupId(0);
-		ArtifactParameters testArtifacts[] = new ArtifactParameters[numArtifacts];
-		for (int i = 0; i < numArtifacts; ++i) {
-			final int expectedId = i + 1;
-			final String fName = "test_artifact_" + expectedId;
-			File testFile = new File(workingDirectory, fName);
-			testFile.deleteOnExit();
-			URI originalUri = testFile.toURI();
-			ArtifactParameters params = new ArtifactParameters(originalUri);
-			testArtifacts[i] = params;
-			params.setRecordName(RECORD + expectedId);
-			params.setTitle(TITLE_PREFIX + expectedId);
-			ArtifactRecord rec = db.newRecord(params);
-			if (expectedId > 1) {
-				ArtifactRecord parent = db.getRecord(expectedId / 2);
-				if (Objects.nonNull(parent.getName()) && ((expectedId % 2) == 0)) {
-					rec.setParent(groupId, parent);
-				} else {
-					rec.setParent(0, parent.getRecordId());
+		DatabaseUi<ArtifactRecord> myUi = new HeadlessUi<ArtifactRecord>(false);
+		try(ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
+			db.initialize();
+			db.openDatabase();
+			String groupId = db.getSchema().getGroupId(0);
+			ArtifactParameters testArtifacts[] = new ArtifactParameters[numArtifacts];
+			for (int i = 0; i < numArtifacts; ++i) {
+				final int expectedId = i + 1;
+				final String fName = "test_artifact_" + expectedId;
+				File testFile = new File(workingDirectory, fName);
+				testFile.deleteOnExit();
+				URI originalUri = testFile.toURI();
+				ArtifactParameters params = new ArtifactParameters(originalUri);
+				testArtifacts[i] = params;
+				params.setRecordName(RECORD + expectedId);
+				params.setTitle(TITLE_PREFIX + expectedId);
+				ArtifactRecord rec = db.newRecord(params);
+				if (expectedId > 1) {
+					ArtifactRecord parent = db.getRecord(expectedId / 2);
+					if (Objects.nonNull(parent.getName()) && ((expectedId % 2) == 0)) {
+						rec.setParent(groupId, parent);
+					} else {
+						rec.setParent(0, parent.getRecordId());
+					}
+					assertEquals("wrong parent for " + expectedId, expectedId / 2, rec.getParent(0));
+					params.setRecordParentName(parent.getName());
+					params.setParentId(parent.getRecordId());
 				}
-				assertEquals("wrong parent for " + expectedId, expectedId / 2, rec.getParent(0));
-				params.setRecordParentName(parent.getName());
-				params.setParentId(parent.getRecordId());
+				db.putRecord(rec);
+				assertEquals(expectedId, rec.getRecordId());
 			}
-			db.putRecord(rec);
-			assertEquals(expectedId, rec.getRecordId());
+			for (int i = 0; i < numArtifacts; ++i) {
+				final int expectedId = i + 1;
+				ArtifactParameters actual = db.getArtifactInfo(expectedId);
+				assertEquals(testArtifacts[i], actual);
+			}
+			db.save();
 		}
-		for (int i = 0; i < numArtifacts; ++i) {
-			final int expectedId = i + 1;
-			ArtifactParameters actual = db.getArtifactInfo(expectedId);
-			assertEquals(testArtifacts[i], actual);
-		}
-		db.save();
-		db = new ArtifactDatabase(myUi, workingDirectory);
-		db.openDatabase();
-		for (int i = 0; i < numArtifacts; ++i) {
-			final int expectedId = i + 1;
-			ArtifactRecord actual = db.getRecord(expectedId);
-			int numAff = actual.getNumAffiliatesAndParent(0);
-			if (1 == expectedId) {
-				assertEquals("Wrong affiliate list size for record 1", 0, numAff);
-				assertEquals("wrong parent for " + expectedId, 0, actual.getParent(0));
-			} else {
-				assertEquals("Wrong affiliate list size for record " + expectedId, 1, numAff);
-				assertEquals("wrong parent for " + expectedId, expectedId / 2, actual.getParent(0));
+		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
+			db.openDatabase();
+			for (int i = 0; i < numArtifacts; ++i) {
+				final int expectedId = i + 1;
+				ArtifactRecord actual = db.getRecord(expectedId);
+				int numAff = actual.getNumAffiliatesAndParent(0);
+				if (1 == expectedId) {
+					assertEquals("Wrong affiliate list size for record 1", 0, numAff);
+					assertEquals("wrong parent for " + expectedId, 0, actual.getParent(0));
+				} else {
+					assertEquals("Wrong affiliate list size for record " + expectedId, 1, numAff);
+					assertEquals("wrong parent for " + expectedId, expectedId / 2, actual.getParent(0));
 
+				}
 			}
 		}
 	}

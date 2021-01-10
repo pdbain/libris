@@ -2,7 +2,6 @@ package org.lasalledebain.libris.ui;
 
 import static java.util.Objects.nonNull;
 
-import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;

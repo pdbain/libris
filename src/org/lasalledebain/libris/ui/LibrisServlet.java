@@ -1,5 +1,8 @@
 package org.lasalledebain.libris.ui;
 
+import static java.util.Objects.isNull;
+import static org.lasalledebain.libris.exception.Assertion.assertNotNullInputException;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;
@@ -10,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.runner.notification.RunListener.ThreadSafe;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
@@ -20,9 +22,6 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-
-import static java.util.Objects.isNull;
-import static org.lasalledebain.libris.exception.Assertion.assertNotNullInputException;
 
 public class LibrisServlet<RecordType extends Record> extends HttpServlet implements LibrisHTMLConstants{
 	LibrisUi myUi;
@@ -79,7 +78,7 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 			theLayout.layOutPage(database.getRecords(), new HttpParameters(recId, startId, resp), summaryLayout, myUi);
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());
-			database.log(Level.SEVERE, "Error formatting web page: ", t);
+			LibrisDatabase.log(Level.SEVERE, "Error formatting web page: ", t);
 			resp.setStatus(HttpStatus.BAD_REQUEST_400);
 		}
 	}

@@ -57,8 +57,8 @@ public class GuiManualTests extends TestCase {
 	private static final String LAYOUT1 = "layout1";
 	private static final String LAYOUT1A = "layout1a";
 	private Schema mySchema;
-	private LibrisLayout myGuiLayout;
-	private LibrisWindowedUi myUi;
+	private LibrisLayout<DatabaseRecord> myGuiLayout;
+	private LibrisWindowedUi<DatabaseRecord> myUi;
 
 	public void testWindowSanity() {
 		JFrame frame = new JFrame("testWindowSanity");
@@ -161,7 +161,7 @@ public class GuiManualTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
 			Schema schem = XmlSchema.loadSchema(schemaFile);
-			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
+			Layouts<DatabaseRecord> myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
 			assertNotNull("could not load "+Utilities.LAYOUT2, myGuiLayout);
@@ -184,7 +184,7 @@ public class GuiManualTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
 			Schema schem = XmlSchema.loadSchema(schemaFile);
-			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
+			Layouts<DatabaseRecord> myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
@@ -222,7 +222,7 @@ public class GuiManualTests extends TestCase {
 		try {
 			template = RecordTemplate.templateFactory(mySchema);
 			DatabaseRecord rec = template.makeRecord(true);
-			Layouts myLayouts = loadFromLayout(rec);
+			Layouts<DatabaseRecord> myLayouts = loadFromLayout(rec);
 			try {
 				myGuiLayout = (LibrisLayout) myLayouts.getLayout(LAYOUT1);
 			} catch (ClassCastException e) {
@@ -250,7 +250,7 @@ public class GuiManualTests extends TestCase {
 		try {
 			template = RecordTemplate.templateFactory(mySchema);
 			DatabaseRecord rec = template.makeRecord(true);
-			Layouts myLayouts = loadFromLayout(rec);
+			Layouts<DatabaseRecord> myLayouts = loadFromLayout(rec);
 			try {
 				myGuiLayout = (LibrisLayout) myLayouts.getLayout(LAYOUT1);
 			} catch (ClassCastException e) {
@@ -340,7 +340,7 @@ public class GuiManualTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA_XML_FILE);
 		try {
 			Schema schem = XmlSchema.loadSchema(schemaFile);
-			Layouts myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
+			Layouts<DatabaseRecord> myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = myLayouts.getLayout(LAYOUT1A);

@@ -51,7 +51,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	public GenericDatabase<DatabaseRecord> getDatabase() {
 		return currentDatabase;
 	}
-	@Deprecated
+
 	public LibrisDatabase getLibrisDatabase() {
 		return currentDatabase;
 	}

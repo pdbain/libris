@@ -15,15 +15,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.BoxLayout;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 
-public class LocationField extends ValuePairField {
+public class LocationField<RecordType extends Record> extends ValuePairField<RecordType> {
 
 	JTextField urlBox, linkTextBox;
 	static final JLabel urlLabel = new JLabel("URL: ");
