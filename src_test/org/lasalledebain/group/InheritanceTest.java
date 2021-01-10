@@ -347,7 +347,7 @@ public class InheritanceTest extends TestCase {
 
 	private void initializeExpectedChildren(HashMap<Integer, HashSet<Integer>> expectedChildren, int lastId) {
 		for (int i = 1; i <= lastId; ++i) {
-			HashSet s = new HashSet<>();
+			HashSet<Integer> s = new HashSet<>();
 			expectedChildren.put(i, s);
 			 Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
 			for (Record c: children) {
@@ -358,7 +358,7 @@ public class InheritanceTest extends TestCase {
 
 	private void initializeExpectedAffiliates(HashMap<Integer, HashSet<Integer>> expectedAffiliates, int lastId) {
 		for (int i = 1; i <= lastId; ++i) {
-			HashSet s = new HashSet<>();
+			HashSet<Integer> s = new HashSet<>();
 			expectedAffiliates.put(i, s);
 			 Iterable<DatabaseRecord> affiliates = db.getAffiliateRecords(i, 0);
 			for (Record c: affiliates) {

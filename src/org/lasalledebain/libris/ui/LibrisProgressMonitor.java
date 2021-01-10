@@ -2,6 +2,7 @@ package org.lasalledebain.libris.ui;
 
 import javax.swing.SwingWorker;
 
+@Deprecated
 public class LibrisProgressMonitor {
 	final Runnable task;
 	public LibrisProgressMonitor(Runnable theTask) {

@@ -48,7 +48,6 @@ public class Libris {
 		boolean readOnly = false;
 		boolean doRebuild = false;
 		String auxDirPath = null;
-		String artifactDirpath = null;
 		String databaseFilePath = null;
 		int webPort = LibrisHttpServer.default_port;
 		boolean batch = false;
@@ -229,15 +228,16 @@ public class Libris {
 			databaseUi.alert("Cannot build indexes if read-only set");
 			return false;
 		}
-		LibrisDatabase db = new LibrisDatabase(config, databaseUi);
-		if (!db.isDatabaseReserved()) {
-			boolean buildResult = db.buildDatabase();
-			if (!buildResult) {
+		try (LibrisDatabase db = new LibrisDatabase(config, databaseUi)) {
+			if (!db.isDatabaseReserved()) {
+				boolean buildResult = db.buildDatabase();
+				if (!buildResult) {
+					return false;
+				}
+				return db.closeDatabase(true);
+			} else {
 				return false;
 			}
-			return db.closeDatabase(true);
-		} else {
-			return false;
 		}
 	}
 

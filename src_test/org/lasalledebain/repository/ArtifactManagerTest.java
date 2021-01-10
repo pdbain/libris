@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamException;
 import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.ArtifactManager;
 import org.lasalledebain.libris.ArtifactParameters;
+import org.lasalledebain.libris.ArtifactRecord;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.Libris;
@@ -286,10 +287,9 @@ public class ArtifactManagerTest  extends TestCase {
 		return expectedParentId;
 	}
 
-	@SuppressWarnings("rawtypes")
 	private ArtifactManager createManager()
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
-		DatabaseUi ui = new HeadlessUi();
+		DatabaseUi<ArtifactRecord> ui = new HeadlessUi<ArtifactRecord>();
 		ArtifactManager dut = new ArtifactManager(ui, repoRoot, fileMgr);
 		boolean initializeStatus = dut.initialize();
 		assertTrue("Could not initialize artifact manager", initializeStatus);

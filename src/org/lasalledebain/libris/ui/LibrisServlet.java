@@ -28,7 +28,7 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 	private final Layouts<DatabaseRecord> myLayouts;
 	String[] layoutIds;
 	private LibrisLayout<DatabaseRecord> summaryDisplay;
-	public LibrisServlet(LibrisUi myUi) throws DatabaseException, InputException {
+	public LibrisServlet(LibrisUi<RecordType> myUi) throws DatabaseException, InputException {
 		this.myUi = myUi;
 		database = myUi.getLibrisDatabase();
 		myLayouts = database.getLayouts();

@@ -22,7 +22,7 @@ public class LibrisRecordMapTest extends TestCase {
 		try {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 			GenericDatabase<DatabaseRecord> db = Libris.buildAndOpenDatabase(testDatabaseFile);
-			final DatabaseUi myUi = db.getUi();
+			final DatabaseUi<DatabaseRecord> myUi = db.getUi();
 			
 			assertTrue("Could not close database", myUi.closeDatabase(false));
 			db = myUi.openDatabase();

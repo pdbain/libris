@@ -143,8 +143,6 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 
 			contentPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, resultsPanel, displayPanel);
 			contentPane.setOneTouchExpandable(true);
-			Preferences prefs = getLibrisPrefs();
-
 			contentPane.setOneTouchExpandable(true);
 			mainFrame.add(contentPane);
 			mainframeContents = contentPane;
@@ -324,7 +322,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	}
 
 	public boolean isCurrentRecordWindowEditable() {
-		RecordWindow rw = null;
+		RecordWindow<DatabaseRecord> rw = null;
 		if (null != displayPanel) {
 			rw = displayPanel.getCurrentRecordWindow();
 		}
@@ -438,7 +436,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	@Override
 	public void fieldSelected(boolean selected) {
 		if (null != menu) {
-			RecordWindow crw = getCurrentRecordWindow();
+			RecordWindow<DatabaseRecord> crw = getCurrentRecordWindow();
 			if ((null != crw) && crw.isEditable()) {
 				menu.enableFieldValueOperations(selected);
 			}
@@ -447,10 +445,10 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 
 	@Override
 	public void newFieldValue() {
-		RecordWindow currentRecordWindow = getCurrentRecordWindow();
+		RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
 		final UiField selectedField = getSelectedField();
 		if ((null != selectedField) && selectedField.isMultiControl()) {
-			GuiControl ctrl;
+			GuiControl<DatabaseRecord> ctrl;
 			try {
 				ctrl = ((MultipleValueUiField) selectedField).addControl(true);
 				ctrl.requestFocusInWindow();
@@ -469,7 +467,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 
 	@Override
 	public void removeFieldValue() {
-		RecordWindow currentRecordWindow = getCurrentRecordWindow();
+		RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
 		UiField f = getSelectedField();
 		Field recordField = f.getRecordField();
 		try {
@@ -484,7 +482,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 
 	@Override
 	public void arrangeValues() {
-		RecordWindow currentRecordWindow = getCurrentRecordWindow();
+		RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
 		UiField f = getSelectedField();
 		final JFrame frame = new JFrame("Arrange values");
 		if (f.isMultiControl()) {
@@ -531,7 +529,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 
 	@Override
 	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException {
-		RecordWindow currentRecordWindow = getCurrentRecordWindow();
+		RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
 		if (null != currentRecordWindow) {
 			Record rec = currentRecordWindow.getRecord();
 			String newName = JOptionPane.showInputDialog("New record name", rec.getName());
