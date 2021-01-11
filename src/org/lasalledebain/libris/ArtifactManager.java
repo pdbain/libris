@@ -22,14 +22,19 @@ import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
-public class ArtifactManager {
+public class ArtifactManager implements LibrisConstants {
 	private static final String LEVEL_PREFIX = "_L";
 	private static final String DIRECTORY_PREFIX = "D_";
 	private static final String ARTIFACT_PREFIX = "A_";
 	static final int FANOUT = 100;
 	private final FileManager myFileMgr;
 	private final File artifactDirectory;
-	public File getArtifactDirectory() {
+	private final File repositoryDirectory;
+	public File getRepositoryDirectory() {
+		return repositoryDirectory;
+	}
+
+	public File getArtifactDatabaseDirectory() {
 		return artifactDirectory;
 	}
 
@@ -39,6 +44,7 @@ public class ArtifactManager {
 
 	public ArtifactManager(DatabaseUi<ArtifactRecord> theUi, File theArtifactDirectory, FileManager theFileMgr) throws DatabaseException {
 		artifactDirectory = theArtifactDirectory;
+		repositoryDirectory = new File(artifactDirectory, ARTIFACTS_REPOSITORY_DIRECTORY);
 		artifactDirectoryPath = artifactDirectory.toPath();
 		myFileMgr = theFileMgr;
 		myDb = new ArtifactDatabase(theUi, theFileMgr);
@@ -48,6 +54,10 @@ public class ArtifactManager {
 		boolean result = true;
 		if (!artifactDirectory.exists() && !artifactDirectory.mkdir()) {
 			LibrisDatabase.log(Level.SEVERE, "Cannot create " + artifactDirectory.getAbsolutePath());
+			result = false;
+		}
+		if (!repositoryDirectory.exists() && !repositoryDirectory.mkdir()) {
+			LibrisDatabase.log(Level.SEVERE, "Cannot create " + repositoryDirectory.getAbsolutePath());
 			result = false;
 		}
 		myDb.initialize();
@@ -96,7 +106,7 @@ public class ArtifactManager {
 	}
 
 	private String copyFileToRepo(File original, int id) throws InputException, IOException {
-		File dir = idToDirectoryPath(artifactDirectory, id);
+		File dir = idToDirectoryPath(repositoryDirectory, id);
 		if (!dir.exists()) {
 			if (!dir.mkdirs()) {
 				throw new InputException("Cannot create directory " + dir.getAbsolutePath() + " to hold artifact " + id

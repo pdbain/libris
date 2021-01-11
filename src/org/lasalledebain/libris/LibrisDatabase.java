@@ -444,20 +444,23 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 
 		public void archiveDatabaseAndArtifacts(File archiveFile, boolean includeSchema, boolean includeArtifacts) throws LibrisException, IOException {
+			archiveDatabaseAndArtifacts(new FileOutputStream(archiveFile), includeSchema, includeArtifacts);
+		}
+
+		public void archiveDatabaseAndArtifacts(OutputStream archiveStream, boolean includeSchema, boolean includeArtifacts) throws LibrisException, IOException {
 			File tempDir = new File(System.getProperty("java.io.tmpdir"));
 			File databaseXml = File.createTempFile("libris", null, tempDir);
-			try (ArchiveWriter archWriter = new ArchiveWriter(archiveFile)) {
+			try (ArchiveWriter archWriter = new ArchiveWriter(archiveStream)) {
 				exportDatabaseXml(new FileOutputStream(databaseXml), includeSchema, true, true);
 				archWriter.addFileToArchive(databaseXml, myConfiguration.getDatabaseFile().getName());
-				if (includeArtifacts) {
-					File artifactDir = getArtifactDirectory();
-					archWriter.addDirectoryToArchive(artifactDir, artifactDir.getParentFile());
+				if (hasDocumentRepository() && includeArtifacts) {
+					File repoDir = getArtifactRepositoryDirectory();
+					archWriter.addDirectoryToArchive(repoDir, getArtifactDatabaseDirectory().getParentFile());
 				}
 			} finally {
 				databaseXml.delete();
 			}
 		}
-
 
 		/**
 		 * Read records from a database forked instance and merge them to the current database.
@@ -589,9 +592,15 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return myDatabaseFile.getParent();
 		}
 
-		public File getArtifactDirectory() {
+		public File getArtifactDatabaseDirectory() {
 			if (hasDocumentRepository()) {
-				return documentRepository.getArtifactDirectory();
+				return documentRepository.getArtifactDatabaseDirectory();
+			} else return null;
+		}
+
+		public File getArtifactRepositoryDirectory() {
+			if (hasDocumentRepository()) {
+				return documentRepository.getRepositoryDirectory();
 			} else return null;
 		}
 
@@ -619,7 +628,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			}
 			File parentDrectory = theDatabaseFile.getParentFile();
 			String auxDirectoryNameRoot = theDatabaseFile.getName();
-			int suffixPosition = auxDirectoryNameRoot.lastIndexOf(FILENAME_LIBRIS_FILES_SUFFIX);
+			int suffixPosition = auxDirectoryNameRoot.lastIndexOf('.'+FILENAME_LIBRIS_FILES_SUFFIX);
 			if (suffixPosition < 0) {
 				suffixPosition = auxDirectoryNameRoot.lastIndexOf(".xml");
 			}

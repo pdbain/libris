@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -22,7 +23,11 @@ public class ArchiveWriter implements Closeable {
 	private final TarArchiveOutputStream archiveOutputStream;
 
 	public ArchiveWriter(File archiveFile) throws IOException {
-		archiveOutputStream = new TarArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(archiveFile, true)));
+		this(new FileOutputStream(archiveFile, false));
+	}
+
+	public ArchiveWriter(OutputStream archiveStream) throws IOException {
+		archiveOutputStream = new TarArchiveOutputStream(new BufferedOutputStream(archiveStream));
 		archiveOutputStream.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
 		archiveOutputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
 	}

@@ -19,6 +19,9 @@ public interface LibrisConstants {
 	public static final String FILENAME_JOURNAL_SUFFIX = "lbrj";
 	public static final String FILENAME_NATIVE_RECORDS_SUFFIX = "lbrn";
 	public static final String FILENAME_LIBRIS_FILES_SUFFIX = "libr";
+	public static final String FILENAME_CSV_FILES_SUFFIX = "csv";
+	public static final String FILENAME_TEXT_FILES_SUFFIX = "txt";
+	public static final String FILENAME_ARCHIVE_FILES_SUFFIX = "tar";
 	public static final String FILENAME_INSTANCE_INCREMENT_FILES_SUFFIX = "libi";
 	public static final int NULL_RECORD_ID = 0;
 	public static final int MAX_RECORD_ID = Integer.MAX_VALUE;
@@ -68,5 +71,5 @@ public interface LibrisConstants {
 	static final String TEMP_AFFILIATE_FILE = TEMP_ROOT+"affiliate_";
 	public static final String CSV_FILE = "CSV_FILE";
 	public static final int MAX_BLOOM_FILTER_LEVELS = 6;
-	public static final String ARTIFACTS_DIRECTORY = "artifacts_directory";
+	public static final String ARTIFACTS_REPOSITORY_DIRECTORY = "artifacts";
 }

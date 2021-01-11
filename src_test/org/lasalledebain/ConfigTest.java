@@ -12,6 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -116,7 +117,8 @@ public class ConfigTest extends TestCase {
 		assertEquals("Wrong number of files in working directory", 4, workingDirectory.list().length);
 		assertEquals("Wrong number of files in database directory", 1, dbDir.list().length);
 		boolean found = false;
-		for (String f: artDir.list()) {
+		File repoDir = new File(artDir, LibrisConstants.ARTIFACTS_REPOSITORY_DIRECTORY);
+		for (String f: repoDir.list()) {
 			if (f.startsWith("r_1")) {
 				found = true;
 				break;

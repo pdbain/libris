@@ -74,6 +74,7 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 		StringBuilder buff = new StringBuilder(msg);
 		LibrisDatabase.log(Level.WARNING, e.getMessage(), e);
 		String emessage = "";
+		buff.append(": ");
 		buff.append(e.getClass().getSimpleName());
 		buff.append("\n");
 		

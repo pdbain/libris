@@ -128,7 +128,7 @@ public class FileAccessManager {
 			for (InputStream s: ipStreams) {
 				s.close();
 			}
-			ipStreams.removeAll(raRoFiles);
+			ipStreams.clear();
 			for (RandomAccessFile r: raRoFiles) {
 				r.close();
 			}
