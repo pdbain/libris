@@ -111,7 +111,7 @@ public class MockVariableSizeHashEntry extends AbstractVariableSizeHashEntry imp
 	}
 
 	public Integer getIntegerKey() {
-		return new Integer(key);
+		return Integer.valueOf(key);
 	}
 
 }

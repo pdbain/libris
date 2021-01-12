@@ -609,7 +609,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	}
 
 	public Record newChildRecord(Record currentRecord, int groupNum) {
-		RecordWindow rw = newRecordWindow();
+		RecordWindow<DatabaseRecord> rw = newRecordWindow();
 		Record newRec = rw.getRecord();
 		try {
 			newRec.setParent(groupNum, currentRecord.getRecordId());

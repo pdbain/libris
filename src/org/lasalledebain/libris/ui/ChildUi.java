@@ -58,7 +58,7 @@ public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 	}
 
 	@Override
-	public GenericDatabase getDatabase() {
+	public GenericDatabase<DatabaseRecord> getDatabase() {
 		return nonNull(parentUi)? parentUi.getDatabase(): null;
 	}
 
