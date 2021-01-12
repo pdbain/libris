@@ -557,8 +557,9 @@ public class LibrisMenu extends AbstractLibrisMenu {
 			try {
 				boolean result = guiMain.setRecordWindowEditable(!wasEditable);
 				editRecord.setState(!result);
-				if (wasEditable && !result)
+				if (!wasEditable && !result) {
 					guiMain.alert(LibrisConstants.DATABASE_OR_RECORD_ARE_READ_ONLY);
+				} else 
 				enableFieldValueOperations(!wasEditable);
 			} catch (LibrisException e) {
 				guiMain.alert("Problem toggling editable", e);

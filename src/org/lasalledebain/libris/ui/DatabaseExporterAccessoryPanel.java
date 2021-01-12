@@ -13,7 +13,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.event.ChangeEvent;
 
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.InputException;
@@ -52,11 +51,11 @@ public class DatabaseExporterAccessoryPanel extends JPanel implements LibrisCons
 		GridBagLayout buttonLayout = new GridBagLayout();
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		JLabel sepLabel = new JLabel("Select output format");
-		
+
 		GridBagConstraints buttonConstraints = new GridBagConstraints();
 		buttonConstraints.gridwidth = GridBagConstraints.REMAINDER;
 		buttonConstraints.anchor = GridBagConstraints.WEST;
-		
+
 		buttonLayout.setConstraints(sepLabel, buttonConstraints);
 		add(sepLabel);
 
@@ -75,7 +74,6 @@ public class DatabaseExporterAccessoryPanel extends JPanel implements LibrisCons
 		buttonLayout.setConstraints(tarButton, buttonConstraints);
 		tarButton.addActionListener(new FileExtensionModifier(FILENAME_ARCHIVE_FILES_SUFFIX));
 		add(tarButton);
-
 		if 	(lastExportFormat.equals(ExportFormat.EXPORT_CSV.toString())) {
 			csvButton.setSelected(true);
 		} else if (lastExportFormat.equals(ExportFormat.EXPORT_TEXT.toString())) {
@@ -85,7 +83,7 @@ public class DatabaseExporterAccessoryPanel extends JPanel implements LibrisCons
 		} else if (lastExportFormat.equals(ExportFormat.EXPORT_LIBR.toString())) {
 			librButton.setSelected(true);
 		} 
-		
+
 
 		add(includeSchemaControl = new JCheckBox("Include schema"));
 		add(includeRecordsControl = new JCheckBox("Include records"));
@@ -93,6 +91,7 @@ public class DatabaseExporterAccessoryPanel extends JPanel implements LibrisCons
 		includeSchemaControl.setSelected(true);
 		includeRecordsControl.setSelected(true);
 		includeArtifactsControl.setSelected(true);
+		includeArtifactsControl.setEnabled(tarButton.isSelected());
 	}
 	
 	ExportFormat getFormat() throws InputException {

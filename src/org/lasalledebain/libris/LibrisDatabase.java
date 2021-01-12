@@ -451,7 +451,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			File tempDir = new File(System.getProperty("java.io.tmpdir"));
 			File databaseXml = File.createTempFile("libris", null, tempDir);
 			try (ArchiveWriter archWriter = new ArchiveWriter(archiveStream)) {
-				exportDatabaseXml(new FileOutputStream(databaseXml), includeSchema, true, true);
+				exportDatabaseXml(new FileOutputStream(databaseXml), includeSchema, true, false);
 				archWriter.addFileToArchive(databaseXml, myConfiguration.getDatabaseFile().getName());
 				if (hasDocumentRepository() && includeArtifacts) {
 					File repoDir = getArtifactRepositoryDirectory();
