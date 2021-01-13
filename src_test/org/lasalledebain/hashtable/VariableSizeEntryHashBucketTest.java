@@ -1,7 +1,5 @@
 package org.lasalledebain.hashtable;
 
-import static org.lasalledebain.Utilities.trace;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
