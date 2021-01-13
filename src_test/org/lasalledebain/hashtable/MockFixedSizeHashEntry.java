@@ -124,6 +124,6 @@ public class MockFixedSizeHashEntry<T extends FixedSizeHashEntry> extends Abstra
 	}
 
 	public Integer getIntegerKey() {
-		return Integer.valueOf(key);
+		return new Integer(key);
 	}
 }

@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 
 public class HashFileTest extends TestCase {
 
+	private File workingDirectory;
 	private File testFileObject;
 	private MockVariableSizeEntryFactory vFactory = null;
 	private MockFixedSizeEntryFactory fFactory = null;
@@ -252,7 +253,7 @@ public class HashFileTest extends TestCase {
 
 	public void testAffiliates() {
 		try {
-			FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
+			FileSpaceManager mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
 			MockOverflowManager oversizeEntryManager = new MockOverflowManager(mgr);
 			AffiliateHashFile htable = new AffiliateHashFile(backingStore, oversizeEntryManager);
 
@@ -383,7 +384,7 @@ public class HashFileTest extends TestCase {
 	}
 
 	private MockVariableSizeEntryNumericKeyHashFile makeVHashTable() throws IOException {
-		FileSpaceManager mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
+		FileSpaceManager mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
 		MockOverflowManager overflowMgr = new MockOverflowManager(mgr);
 		MockVariableSizeEntryNumericKeyHashFile htable = new MockVariableSizeEntryNumericKeyHashFile(backingStore, overflowMgr);
 		return htable;
@@ -404,6 +405,7 @@ public class HashFileTest extends TestCase {
 	}
 
 	protected void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 		trace("\nStarting "+getName());
 		if (null == vFactory) {
 			vFactory = new MockVariableSizeEntryFactory(28);

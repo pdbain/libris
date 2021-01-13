@@ -1,5 +1,7 @@
 package org.lasalledebain.hashtable;
 
+import static org.lasalledebain.Utilities.trace;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -23,6 +25,7 @@ import junit.framework.TestCase;
 
 public class VariableSizeEntryHashBucketTest extends TestCase{
 
+	private File workingDirectory;
 	private File testFile;
 	private MockVariableSizeEntryBucket buck;
 	private RandomAccessFile backingStore;
@@ -474,11 +477,12 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 
 	@Before
 	public void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 		if (null == testFile) {
 			testFile = Utilities.makeTestFileObject("variableHashFile");
 		}
 		backingStore = HashUtils.MakeHashFile(testFile);
-		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
+		mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
 		oversizeEntryManager = new MockOverflowManager(mgr);
 		buck = makeBucket();
 		oversizeThreshold = -1;
@@ -490,6 +494,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			backingStore.close();
 		}
 		Utilities.destroyFileSpaceManager(mgr);
+		Utilities.deleteWorkingDirectory();
 	}
 
 	private MockVariableSizeEntryBucket makeBucket() {

@@ -40,6 +40,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
+import static org.lasalledebain.Utilities.info;
 
 @SuppressWarnings("rawtypes")
 public class TestRecordFilter extends TestCase {
@@ -346,6 +347,7 @@ public class TestRecordFilter extends TestCase {
 	}
 
 	public void testIndexStress() throws FileNotFoundException, IOException, LibrisException {
+		info("copyAndBuildDatabase");
 		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
 
 		Random rand = new Random(3141592);
@@ -356,19 +358,24 @@ public class TestRecordFilter extends TestCase {
 		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
 		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, keywordRatio);
 		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, keywordRatio);
+		info("makeDatabase");
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
+		info("exportDatabaseXml");
 		database.exportDatabaseXml(new BufferedOutputStream(new FileOutputStream(config.getDatabaseFile())), true, true,
 				true);
+		info("check database");
 		for (int i=1 ; i<4; ++i) {
 			Record r = database.getRecord(i);
 			assertNotNull("Record "+i+" null", r);
 		}
 		DatabaseUi ui = database.getUi();
 		assertTrue("Database not closed", ui.closeDatabase(false));
+		info("rebuildDatabase");
 		ui.rebuildDatabase(config);
 		database = ui.openDatabase();
 
+		info("checkReturnedRecords");
 		for (String term : keyWordsAndRecords.keySet()) {
 			FilteredRecordList<DatabaseRecord> filteredList = database
 					.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, keywordFieldNums, term);
@@ -380,6 +387,7 @@ public class TestRecordFilter extends TestCase {
 				throw afe;
 			}
 		}
+		info("Finished");
 
 	}
 
