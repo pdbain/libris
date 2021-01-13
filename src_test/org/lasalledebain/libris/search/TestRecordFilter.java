@@ -345,13 +345,72 @@ public class TestRecordFilter extends TestCase {
 		doCompoundQuery(database, keywordFieldNums, keyWordsAndRecords, newKeyWords);
 
 	}
+	@SuppressWarnings("serial")
+	static class BiasedRandom extends Random {
 
+		public BiasedRandom(int seed) {
+			super(seed);
+		}
+
+		@Override
+		protected int next(int bits) {
+			int result = super.next(bits);
+			return (int) Math.sqrt(result);
+		}
+
+	}
+	
 	public void testIndexStress() throws FileNotFoundException, IOException, LibrisException {
 		info("copyAndBuildDatabase");
 		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
 
-		Random rand = new Random(3141592);
+		Random rand = new BiasedRandom(3141592);
 		final int numRecs = 40000; // TODO increase to 10^6
+		config.setTermcountBuckets(numRecs / 4);
+		final FieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
+		final int keywordRatio = 15 * numRecs;
+		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
+		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, keywordRatio);
+		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, keywordRatio);
+		info("makeDatabase");
+		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
+				keywordFieldNums);
+		info("exportDatabaseXml");
+		database.exportDatabaseXml(new BufferedOutputStream(new FileOutputStream(config.getDatabaseFile())), true, true,
+				true);
+		info("check database");
+		for (int i=1 ; i<4; ++i) {
+			Record r = database.getRecord(i);
+			assertNotNull("Record "+i+" null", r);
+		}
+		DatabaseUi ui = database.getUi();
+		assertTrue("Database not closed", ui.closeDatabase(false));
+		info("rebuildDatabase");
+		ui.rebuildDatabase(config);
+		database = ui.openDatabase();
+
+		info("checkReturnedRecords");
+		for (String term : keyWordsAndRecords.keySet()) {
+			FilteredRecordList<DatabaseRecord> filteredList = database
+					.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, keywordFieldNums, term);
+			try {
+				checkReturnedRecords(filteredList, keyWordsAndRecords.get(term));
+			} catch (AssertionFailedError e) {
+				AssertionFailedError afe = new AssertionFailedError("missing term " + term);
+				afe.initCause(e);
+				throw afe;
+			}
+		}
+		info("Finished");
+
+	}
+
+	public void testIndexUniformDistribution() throws FileNotFoundException, IOException, LibrisException {
+		info("copyAndBuildDatabase");
+		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
+
+		Random rand = new Random(3141592);
+		final int numRecs = 4000;
 		config.setTermcountBuckets(numRecs / 4);
 		final FieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
 		final int keywordRatio = 15 * numRecs;
@@ -401,7 +460,7 @@ public class TestRecordFilter extends TestCase {
 
 	private void doCompoundQuery(GenericDatabase<DatabaseRecord> database, int[] fieldNums,
 			HashMap<String, List<Integer>> keyWordsAndRecords, String[] searchTerms)
-			throws UserErrorException, IOException {
+					throws UserErrorException, IOException {
 		List<Integer> recordList = keyWordsAndRecords.get(searchTerms[0]);
 		TreeSet<Integer> recordSet = new TreeSet<>(recordList);
 		for (int i = 1; i < searchTerms.length; ++i) {
@@ -415,7 +474,7 @@ public class TestRecordFilter extends TestCase {
 
 	private void doSubstringQuery(GenericDatabase<DatabaseRecord> database, int[] fieldNums,
 			HashMap<String, List<Integer>> keyWordsAndRecords, String[] searchTerms, String key)
-			throws UserErrorException, IOException {
+					throws UserErrorException, IOException {
 		List<Integer> recordList = keyWordsAndRecords.get(searchTerms[0]);
 		TreeSet<Integer> recordSet = new TreeSet<>(recordList);
 		for (int i = 1; i < searchTerms.length; ++i) {

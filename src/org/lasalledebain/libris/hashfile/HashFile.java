@@ -3,9 +3,11 @@ package org.lasalledebain.libris.hashfile;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 
 public abstract class HashFile<EntryType extends HashEntry, BucketType extends HashBucket<EntryType>> {
@@ -15,8 +17,8 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 	int bucketAge;
 	int bucketModulus;
 	private int bucketSize;
-	static final int CACHESIZE=8;
-	HashMap<Integer, BucketType> bucketCache;
+	static final int CACHESIZE=1000;
+	LinkedHashMap<Integer, BucketType> bucketCache;
 
 	private int expansionCount, bucketLoadCount, flushCount;
 
@@ -28,7 +30,7 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 		long fileLength = backingStore.length();
 		bucketSize = NumericKeyHashBucket.getBucketSize();
 		setNumBuckets((int) fileLength/bucketSize + 1);
-		bucketCache = new HashMap<Integer, BucketType>();
+		bucketCache = new BucketCacheMap(100, 0.75f);
 	}
 
 	public int getBucketLoadCount() {
@@ -88,12 +90,9 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 			bucketAge = 0;
 		}
 		if (null == buck) {
-			if (bucketCache.size() >= CACHESIZE) {
-				flush(true);
-			}
+			bucketLoadCount++;
 			buck = createBucket(bucketNum);
 			buck.read();
-			bucketLoadCount++;
 			bucketCache.put(bucketNum, buck);
 		}
 		buck.setAge(bucketAge);
@@ -124,22 +123,12 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 		bucketCache.clear();
 	}
 
-	private void flush(boolean removeOldest) throws IOException, DatabaseException {
-		++flushCount;
-		HashBucket<EntryType> oldestBucket = null;
-		for (HashBucket<EntryType> b: bucketCache.values()) {
-			if ((null == oldestBucket) || (b.getAge() < oldestBucket.getAge())) {
-				oldestBucket = b;
-			}
-			b.write();
-		}
-		if (removeOldest) {
-			bucketCache.remove(oldestBucket);
-		}
-	}
-
 	public void flush() throws IOException, DatabaseException {
-		flush(false);
+		++flushCount;
+		for (Entry<Integer, BucketType> e: bucketCache.entrySet()) {
+			if (e.getValue().dirty)
+				e.getValue().write();
+		}
 	}
 
 	public int getNumEntries() throws DatabaseException {
@@ -262,5 +251,31 @@ public abstract class HashFile<EntryType extends HashEntry, BucketType extends H
 				addEntry(entry);
 			}
 		}
+	}
+	
+	@SuppressWarnings("serial")
+	class BucketCacheMap extends LinkedHashMap<Integer, BucketType> {
+
+		public BucketCacheMap(int initialCapacity, float loadFactor) {
+			super(initialCapacity, loadFactor, true);
+		}
+
+		@Override
+		protected boolean removeEldestEntry(Entry<Integer, BucketType> eldest) {
+			boolean result = false;
+			if (size() > CACHESIZE) {
+				final BucketType eldestValue = eldest.getValue();
+				if (eldestValue.dirty) {
+					try {
+						eldestValue.write();
+					} catch (DatabaseException e) {
+						throw new DatabaseError("Error writing hash bucket", e);
+					}
+				}
+				result = true;
+			}
+			return result;
+		}
+
 	}
 }
