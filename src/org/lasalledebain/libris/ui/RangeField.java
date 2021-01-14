@@ -8,7 +8,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class RangeField extends ValuePairField {
+import org.lasalledebain.libris.Record;
+
+public class RangeField<RecordType extends Record> extends ValuePairField<RecordType> {
 	protected JTextField mainControl, extraControl;
 	private static final JLabel dashLabel = new JLabel("-");
 

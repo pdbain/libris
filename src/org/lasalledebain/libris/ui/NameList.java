@@ -2,7 +2,6 @@ package org.lasalledebain.libris.ui;
 
 import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 
-import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Iterator;
@@ -30,7 +29,7 @@ public class NameList<RecordType extends Record> extends GuiControl<RecordType> 
 	private final GroupDef grpDef;
 	private final GenericDatabase<DatabaseRecord> dBase;
 	Vector <KeyIntegerTuple> affiliateInfo;
-	private final LibrisWindowedUi windowedUi;
+	private final LibrisWindowedUi<RecordType> windowedUi;
 	final Record currentRecord;
 	public static final KeyIntegerTuple NULL_ID_TUPLE = makeNullTuple();
 
@@ -42,7 +41,7 @@ public class NameList<RecordType extends Record> extends GuiControl<RecordType> 
 		}
 	}
 
-	public NameList(LibrisWindowedUi ui, GenericDatabase<DatabaseRecord> db, Record rec, GroupDef gd, boolean editable) throws InputException {
+	public NameList(LibrisWindowedUi<RecordType> ui, GenericDatabase<DatabaseRecord> db, Record rec, GroupDef gd, boolean editable) throws InputException {
 		super(0, 0, editable);
 		grpDef = gd;
 		windowedUi = ui;
@@ -178,7 +177,7 @@ public class NameList<RecordType extends Record> extends GuiControl<RecordType> 
 			case 1: 
 				break;
 			case 2: 
-				new AffiliateEditor(currentRecord, uiField, windowedUi, dBase.getNamedRecordIndex(), affiliateInfo, control, grpDef);
+				new AffiliateEditor<RecordType>(currentRecord, uiField, windowedUi, dBase.getNamedRecordIndex(), affiliateInfo, control, grpDef);
 				break;
 			} 
 		}

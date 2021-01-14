@@ -57,7 +57,6 @@ public GroupDefs(ElementManager groupDefsManager) throws InputException {
 			GroupDef newGroup = new GroupDef(null, numGroups);
 			ElementManager groupMgr = mgr.nextElement();
 			newGroup.fromXml(groupMgr);
-			String groupName = newGroup.getFieldId();
 			addGroup(newGroup);
 		}
 		mgr.parseClosingTag();
