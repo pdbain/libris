@@ -6,6 +6,7 @@ import static org.lasalledebain.Utilities.testLogger;
 import static org.lasalledebain.Utilities.info;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 
@@ -161,8 +163,7 @@ public class RecordEditTests extends TestCase {
 		}
 	}
 	
-	public void testDefaultValue() {
-		try {
+	public void testDefaultValue() throws FileNotFoundException, DatabaseException, IOException, InputException {
 			TestGUI gui = Utilities.rebuildAndOpenDatabase(getName(), workingDirectory, TEST_DB_WITH_DEFAULTS_XML_FILE);
 			GenericDatabase<DatabaseRecord> db = gui.getDatabase();
 			int pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
@@ -178,10 +179,6 @@ public class RecordEditTests extends TestCase {
 			assertTrue("ID_hardcopy default wrong", fldVal.isTrue());
 			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(false));
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception");
-		}
 	}
 
 	public void testFieldCounts() {
