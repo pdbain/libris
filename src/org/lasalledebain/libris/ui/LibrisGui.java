@@ -4,6 +4,7 @@ import static java.util.Objects.nonNull;
 
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Desktop.Action;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -70,21 +71,24 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	// TODO 1 menu option to auto-generate keywords
 	// TODO bulk import artifacts
 	protected void initializeGui() throws DatabaseException {
-		Desktop.getDesktop().setQuitHandler(new QuitHandler() {
-			@Override
-			public void handleQuitRequestWith(QuitEvent quitEvt, QuitResponse quitResp) {
-				try {
-					if ((null == currentDatabase) || currentDatabase.closeDatabase(false)) {
-						quitResp.performQuit();
-					} else {
-						quitResp.cancelQuit();
+		final Desktop myDesktop = Desktop.getDesktop();
+		if (myDesktop.isSupported(Action.APP_QUIT_HANDLER)) {
+			myDesktop.setQuitHandler(new QuitHandler() {
+				@Override
+				public void handleQuitRequestWith(QuitEvent quitEvt, QuitResponse quitResp) {
+					try {
+						if ((null == currentDatabase) || currentDatabase.closeDatabase(false)) {
+							quitResp.performQuit();
+						} else {
+							quitResp.cancelQuit();
+						}
+					} catch (DatabaseException e) {
+						throw new DatabaseError(e);
 					}
-				} catch (DatabaseException e) {
-					throw new DatabaseError(e);
 				}
-			}
 
-		});
+			});
+		}
 		databaseSelected = isDatabaseSelected();
 		systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 		System.setProperty("Title", "Libris");
