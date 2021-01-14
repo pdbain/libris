@@ -7,7 +7,6 @@ import org.lasalledebain.hashtable.MockVariableSizeEntryBucket;
 import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeEntryNumericKeyHashFile;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
-import org.lasalledebain.libris.indexes.BucketOverflowFileManager;
 
 public class MockVariableSizeEntryNumericKeyHashFile extends VariableSizeEntryNumericKeyHashFile {
 

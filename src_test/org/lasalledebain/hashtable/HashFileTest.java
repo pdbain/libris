@@ -29,8 +29,6 @@ import org.lasalledebain.libris.indexes.MockVariableSizeEntryNumericKeyHashFile;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-@SuppressWarnings("rawtypes")
-
 public class HashFileTest extends TestCase {
 
 	private File workingDirectory;

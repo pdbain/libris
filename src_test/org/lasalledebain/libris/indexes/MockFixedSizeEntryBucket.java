@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 import org.lasalledebain.hashtable.MockFixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.FixedSizeEntryHashBucket;
 
-public class MockFixedSizeEntryBucket extends FixedSizeEntryHashBucket {
+public class MockFixedSizeEntryBucket extends FixedSizeEntryHashBucket<MockFixedSizeHashEntry> {
 
 	final int len;
 	public MockFixedSizeEntryBucket(RandomAccessFile backingStore, int bucketNum) {

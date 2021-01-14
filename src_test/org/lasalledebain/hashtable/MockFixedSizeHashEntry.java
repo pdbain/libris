@@ -6,11 +6,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.index.AbstractFixedSizeHashEntry;
 
-public class MockFixedSizeHashEntry<T extends FixedSizeHashEntry> extends AbstractFixedSizeHashEntry {
+public class MockFixedSizeHashEntry extends AbstractFixedSizeHashEntry {
 
 	final byte data[];
 	/**
@@ -124,6 +123,6 @@ public class MockFixedSizeHashEntry<T extends FixedSizeHashEntry> extends Abstra
 	}
 
 	public Integer getIntegerKey() {
-		return new Integer(key);
+		return Integer.valueOf(key);
 	}
 }
