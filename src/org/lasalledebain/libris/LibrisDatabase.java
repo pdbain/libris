@@ -509,6 +509,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				}
 				putRecord(newRec);
 			}
+			save();
 			return true;
 		}
 
