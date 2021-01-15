@@ -77,8 +77,8 @@ public class Utilities extends TestCase {
 	public static final String TEST_DB4_XML_FILE = "testDatabase4.xml";
 	public static final String TEST_DB4_NOMETADATA_FILE = "testDatabase4_nometadata.libr";
 	public static final String TEST_DB4_METADATAONLY_FILE = "testDatabase4_metadataonly.libr";
-	public static final String TEST_DB_WITH_DEFAULTS_XML_FILE = "databaseWithDefaults.xml";
-	public static final String TEST_DB_WITH_GROUPS_XML_FILE = "databaseWithGroups.xml";
+	public static final String TEST_DB_WITH_DEFAULTS_XML_FILE = "DatabaseWithDefaults.xml";
+	public static final String TEST_DB_WITH_GROUPS_XML_FILE = "DatabaseWithGroups.xml";
 	public static final String EMPTY_DATABASE_FILE = "emptyDatabase1.xml";
 	public static final String SCHEMA_WITH_GROUP_DEFS_XML = "schemaWithGroupDefs.xml";
 	public static final String SCHEMA_WITH_DEFAULTS = "SchemaWithDefaults.xml";
