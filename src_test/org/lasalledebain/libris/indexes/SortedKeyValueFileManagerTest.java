@@ -12,9 +12,9 @@ import java.util.TreeSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

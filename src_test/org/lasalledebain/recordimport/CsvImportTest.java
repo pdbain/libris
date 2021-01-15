@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FileAccessManager;
@@ -23,6 +22,7 @@ import org.lasalledebain.libris.records.FilteringRecordImporter;
 import org.lasalledebain.libris.records.RecordImporter;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.util.DiagnosticDatabase;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
 import junit.framework.TestCase;

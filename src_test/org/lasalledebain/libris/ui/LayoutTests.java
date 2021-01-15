@@ -1,7 +1,7 @@
 package org.lasalledebain.libris.ui;
 
-import static org.lasalledebain.Utilities.rebuildAndOpenDatabase;
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.rebuildAndOpenDatabase;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

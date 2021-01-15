@@ -11,13 +11,13 @@ import java.util.Random;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.AffiliateHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 import org.lasalledebain.libris.index.AffiliateListEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

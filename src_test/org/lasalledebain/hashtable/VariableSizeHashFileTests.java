@@ -1,6 +1,6 @@
 package org.lasalledebain.hashtable;
 
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,13 +10,13 @@ import java.util.Random;
 import java.util.logging.Level;
 
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 import org.lasalledebain.libris.index.AbstractVariableSizeHashEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 import org.lasalledebain.libris.indexes.MockVariableSizeEntryNumericKeyHashFile;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;

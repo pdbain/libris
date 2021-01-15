@@ -1,6 +1,6 @@
 package org.lasalledebain.group;
 
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.GenericDatabase;
@@ -22,6 +21,7 @@ import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
 import junit.framework.TestCase;

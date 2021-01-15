@@ -1,7 +1,7 @@
 package org.lasalledebain.libris.indexes;
 
 
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,8 +14,6 @@ import java.util.logging.Level;
 
 import org.junit.After;
 import org.junit.Before;
-import org.lasalledebain.MockSchema;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
@@ -29,6 +27,8 @@ import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.util.DiagnosticDatabase;
+import org.lasalledebain.libris.util.MockSchema;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

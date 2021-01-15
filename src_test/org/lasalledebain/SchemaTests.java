@@ -16,6 +16,7 @@ import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XmlSchema;
+import org.lasalledebain.libris.util.Utilities;
 
 public class SchemaTests extends TestCase{
 

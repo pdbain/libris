@@ -1,6 +1,6 @@
 package org.lasalledebain.repository;
 
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -18,7 +18,6 @@ import java.util.logging.Level;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.ArtifactManager;
 import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.ArtifactRecord;
@@ -31,6 +30,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.ui.DatabaseUi;
 
 import junit.framework.TestCase;

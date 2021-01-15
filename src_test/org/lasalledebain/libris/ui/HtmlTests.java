@@ -1,6 +1,6 @@
 package org.lasalledebain.libris.ui;
 
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,12 +12,12 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.logging.Level;
 
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import junit.framework.TestCase;

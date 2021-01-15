@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
@@ -14,6 +13,8 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.util.Utilities;
+
 import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;;
 
 public class ImportTests extends TestCase {

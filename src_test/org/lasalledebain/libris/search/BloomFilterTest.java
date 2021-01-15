@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.indexes.BloomFilterSection;
@@ -23,6 +22,7 @@ import org.lasalledebain.libris.indexes.BloomFilterSectionQuery;
 import org.lasalledebain.libris.indexes.SignatureFilteredIdList;
 import org.lasalledebain.libris.util.Lorem;
 import org.lasalledebain.libris.util.StringUtils;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

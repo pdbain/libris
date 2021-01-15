@@ -8,11 +8,11 @@ import java.util.HashMap;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.TermCountHashBucket;
 import org.lasalledebain.libris.index.TermCountEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

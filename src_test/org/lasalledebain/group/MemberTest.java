@@ -1,6 +1,6 @@
 package org.lasalledebain.group;
 
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
@@ -10,12 +10,12 @@ import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
-import org.lasalledebain.MockSchema;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
+import org.lasalledebain.libris.util.MockSchema;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;

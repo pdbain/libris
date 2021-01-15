@@ -1,4 +1,4 @@
-package org.lasalledebain;
+package org.lasalledebain.libris.util;
 
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.LibrisException;

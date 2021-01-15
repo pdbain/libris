@@ -1,7 +1,10 @@
 package org.lasalledebain;
 
+import static org.lasalledebain.libris.util.Utilities.testLogger;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
 
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -9,6 +12,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.ui.Layouts;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 import junit.framework.TestCase;
@@ -76,6 +80,7 @@ public class GuiTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		workingDirectory = Utilities.makeTempTestDirectory();
+		testLogger.log(Level.INFO,"running "+getName());
 	}
 // TODO test required fields
 }

@@ -8,6 +8,9 @@ import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
+import org.lasalledebain.libris.util.MockEnumFieldChoices;
+import org.lasalledebain.libris.util.MockSchema;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

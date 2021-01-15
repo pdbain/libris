@@ -1,10 +1,13 @@
 package org.lasalledebain;
 
+import static org.lasalledebain.libris.util.Utilities.testLogger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -18,7 +21,6 @@ PDFTextStripper stripper;
 		File pdfFile = new File("/Users/pdbain/Documents/publications/chen_aberer_1999.pdf");
 		try {
 			PDDocument doc = PDDocument.load(pdfFile);
-			int nPages = doc.getNumberOfPages();
 			PDDocumentInformation docInfo = doc.getDocumentInformation();
 			System.out.println("author: "+docInfo.getAuthor());
 			System.out.println("keywords: "+docInfo.getKeywords());
@@ -41,6 +43,10 @@ PDFTextStripper stripper;
 			e.printStackTrace();
 		}
 		
+	}
+	@Override
+	protected void setUp() throws Exception {
+		testLogger.log(Level.INFO,"running "+getName());
 	}
 
 }

@@ -6,13 +6,13 @@ import java.util.HashSet;
 
 import junit.framework.TestCase;
 
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.DatabaseUi;
+import org.lasalledebain.libris.util.Utilities;
 
 public class LibrisRecordMapTest extends TestCase {
 	private File workingDirectory;

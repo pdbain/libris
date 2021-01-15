@@ -1,7 +1,7 @@
 package org.lasalledebain.libris.indexes;
 
 
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -16,8 +16,8 @@ import junit.framework.TestCase;
 
 import org.junit.After;
 import org.junit.Before;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.util.Utilities;
 
 public class FileSpaceManagerTests extends TestCase {
 

@@ -1,15 +1,15 @@
 package org.lasalledebain.libris.indexes;
 
 import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;
-import static org.lasalledebain.Utilities.trace;
+import static org.lasalledebain.libris.util.Utilities.trace;
 
 import java.io.File;
 import java.util.Random;
 
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.FileManager;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

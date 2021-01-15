@@ -1,6 +1,6 @@
 package org.lasalledebain;
 
-import static org.lasalledebain.Utilities.EMPTY_DATABASE_FILE;
+import static org.lasalledebain.libris.util.Utilities.EMPTY_DATABASE_FILE;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +14,7 @@ import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

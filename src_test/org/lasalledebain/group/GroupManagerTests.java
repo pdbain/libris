@@ -5,12 +5,12 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.indexes.GroupManager;
+import org.lasalledebain.libris.util.Utilities;
 
 public class GroupManagerTests extends TestCase {
 

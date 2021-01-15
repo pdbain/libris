@@ -1,9 +1,9 @@
 package org.lasalledebain.group;
 
 
-import static org.lasalledebain.Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML;
-import static org.lasalledebain.Utilities.DATABASE_WITH_GROUPS_XML;
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML;
+import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_XML;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.util.HashMap;
@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.logging.Level;
 
 import org.junit.After;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
@@ -20,6 +19,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 @SuppressWarnings("rawtypes")

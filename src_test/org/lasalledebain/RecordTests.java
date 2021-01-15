@@ -1,6 +1,6 @@
 package org.lasalledebain;
 
-import static org.lasalledebain.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.info;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,7 +22,9 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.ExactKeywordList;
 import org.lasalledebain.libris.indexes.PrefixKeywords;
 import org.lasalledebain.libris.indexes.RecordKeywords;
+import org.lasalledebain.libris.util.MockSchema;
 import org.lasalledebain.libris.util.StringUtils;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
 import junit.framework.TestCase;

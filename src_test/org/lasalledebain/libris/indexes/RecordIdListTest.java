@@ -1,7 +1,7 @@
 package org.lasalledebain.libris.indexes;
 
 
-import static org.lasalledebain.Utilities.DATABASE_WITH_GROUPS_XML;
+import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_XML;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import org.junit.After;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
+import org.lasalledebain.libris.util.Utilities;
 
 public class RecordIdListTest extends TestCase {
 	File testDatabaseFileCopy;

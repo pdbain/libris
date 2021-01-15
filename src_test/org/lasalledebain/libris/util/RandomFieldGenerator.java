@@ -3,8 +3,6 @@ package org.lasalledebain.libris.util;
 import java.util.HashSet;
 import java.util.Random;
 
-import org.lasalledebain.Utilities;
-
 public class RandomFieldGenerator implements FieldGenerator {
 	int minWordLength, maxWordLength, minFieldLength, MaxFieldLength;
 	Random rand;

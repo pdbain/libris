@@ -6,13 +6,13 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 import org.lasalledebain.libris.indexes.MockFixedSizeEntryBucket;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

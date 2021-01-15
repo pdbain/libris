@@ -13,11 +13,11 @@ import java.util.Arrays;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.ui.DatabaseUi;
 
 import junit.framework.TestCase;

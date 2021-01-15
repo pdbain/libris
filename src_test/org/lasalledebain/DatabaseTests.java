@@ -1,9 +1,9 @@
 package org.lasalledebain;
 
-import static org.lasalledebain.Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML;
-import static org.lasalledebain.Utilities.DATABASE_WITH_GROUPS_XML;
-import static org.lasalledebain.Utilities.checkRecords;
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML;
+import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_XML;
+import static org.lasalledebain.libris.util.Utilities.checkRecords;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,6 +31,7 @@ import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.DatabaseUi;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 import junit.framework.TestCase;

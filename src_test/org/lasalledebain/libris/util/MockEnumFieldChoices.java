@@ -1,4 +1,4 @@
-package org.lasalledebain;
+package org.lasalledebain.libris.util;
 
 import java.util.ArrayList;
 

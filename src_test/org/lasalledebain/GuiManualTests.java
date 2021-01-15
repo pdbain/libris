@@ -1,6 +1,6 @@
 package org.lasalledebain;
 
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -41,6 +41,7 @@ import org.lasalledebain.libris.ui.LibrisLayout;
 import org.lasalledebain.libris.ui.LibrisWindowedUi;
 import org.lasalledebain.libris.ui.RecordWindow;
 import org.lasalledebain.libris.ui.TextBox;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 import junit.framework.TestCase;

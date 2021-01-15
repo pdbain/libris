@@ -1,7 +1,7 @@
 package org.lasalledebain;
 
 
-import static org.lasalledebain.Utilities.getRecordIdString;
+import static org.lasalledebain.libris.util.Utilities.getRecordIdString;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,6 +20,7 @@ import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

@@ -12,10 +12,10 @@ import java.util.Vector;
 
 import junit.framework.TestCase;
 
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.util.Utilities;
 
 public class TestKeyIntegerTuple extends TestCase {
 	FileAccessManager dataManager;

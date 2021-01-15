@@ -1,6 +1,6 @@
 package org.lasalledebain.repository;
 
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,7 +15,6 @@ import javax.xml.stream.XMLStreamException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.ArtifactDatabase;
 import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.ArtifactRecord;
@@ -25,6 +24,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.DatabaseConfiguration;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;

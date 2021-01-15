@@ -6,6 +6,7 @@ import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

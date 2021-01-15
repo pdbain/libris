@@ -1,9 +1,9 @@
 package org.lasalledebain.libris.ui;
 
-import static org.lasalledebain.Utilities.TEST_DB4_XML_FILE;
-import static org.lasalledebain.Utilities.TEST_DB_WITH_DEFAULTS_XML_FILE;
-import static org.lasalledebain.Utilities.testLogger;
-import static org.lasalledebain.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.TEST_DB4_XML_FILE;
+import static org.lasalledebain.libris.util.Utilities.TEST_DB_WITH_DEFAULTS_XML_FILE;
+import static org.lasalledebain.libris.util.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
 
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.GenericDatabase;
@@ -23,6 +22,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 

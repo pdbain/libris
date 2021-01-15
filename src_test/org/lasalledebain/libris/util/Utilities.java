@@ -1,4 +1,4 @@
-package org.lasalledebain;
+package org.lasalledebain.libris.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -59,7 +59,7 @@ public class Utilities extends TestCase {
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
 	public static final String KEYWORD_DATABASE1_XML = "KeywordDatabase1.xml";
 	public static final String KEYWORD_DATABASE0_XML = "KeywordDatabase0.xml";
-	static final String LAYOUT_DECLARATIONS_XML_FILE = "layoutDeclarations.xml";
+	public static final String LAYOUT_DECLARATIONS_XML_FILE = "layoutDeclarations.xml";
 	public static final String TEST_RECORD1_XML_FILE = "TestRecord1.xml";
 	public static final String TEST_RECORD2_XML_FILE = "TestRecord2.xml";
 	public static final String TEST_RECORD_WITH_GROUPS_XML_FILE = "TestRecordWithGroups.xml";
@@ -92,7 +92,7 @@ public class Utilities extends TestCase {
 	public static final String EXAMPLE_DOCS_ZIP = "example_docs.zip";
 	public static final String EXAMPLE_FILES = "example_pdfs";
 
-	static RecordFactory<DatabaseRecord> makeRecordTemplate(String[] fieldNames,
+	public static RecordFactory<DatabaseRecord> makeRecordTemplate(String[] fieldNames,
 			FieldType[] fts) throws DatabaseException, LibrisException {
 		Schema s = new MockSchema();
 		for (int i = 0; i < fts.length; ++i) {
@@ -137,7 +137,7 @@ public class Utilities extends TestCase {
 		return myLayouts;
 	}
 
-	static DatabaseRecord loadRecordFromXml(File schemaFile, File recordFile)
+	public static DatabaseRecord loadRecordFromXml(File schemaFile, File recordFile)
 			throws LibrisException, XMLStreamException,
 			LibrisException, RecordDataException,
 			FactoryConfigurationError, DatabaseException, FileNotFoundException {
@@ -149,7 +149,7 @@ public class Utilities extends TestCase {
 		return rec;
 	}
 
-	static Record loadRecordFromXml(File schemaFile, InputStream xmlStream, File sourceFile) throws 
+	public static Record loadRecordFromXml(File schemaFile, InputStream xmlStream, File sourceFile) throws 
 	LibrisException, FileNotFoundException, XMLStreamException, FactoryConfigurationError {
 		Schema s = XmlSchema.loadSchema(schemaFile);
 		RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(s);
@@ -171,7 +171,7 @@ public class Utilities extends TestCase {
 		}
 	}
 
-	static final String LAYOUT2 = "layout2";
+	public static final String LAYOUT2 = "layout2";
 	public static ElementManager makeElementManager(
 			ByteArrayInputStream xmlInput, File sourceFile, String elementNameString) {
 		String sourcePath = (null == sourceFile)? null : sourceFile.getPath();
@@ -358,14 +358,14 @@ public class Utilities extends TestCase {
 		return b.toString();
 	}
 
-	static String getRecordIdString(Record recData) {
+	public static String getRecordIdString(Record recData) {
 		return RecordId.toString(recData.getRecordId());
 	}
 
 	public static final Logger testLogger;
 	static {
 		testLogger = Logger.getLogger("org.lasalledebain.test");
-		testLogger.setLevel(Boolean.getBoolean("org.lasalledebain.test.verbose")? Level.ALL: Level.WARNING);
+		testLogger.setLevel(Boolean.getBoolean("org.lasalledebain.test.verbose")? Level.ALL: Level.INFO);
 	}
 
 	public static void trace(String msg) {

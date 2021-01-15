@@ -1,8 +1,8 @@
 package org.lasalledebain.hashtable;
 
-import static org.lasalledebain.Utilities.checkForDuplicates;
-import static org.lasalledebain.Utilities.compareIntLists;
-import static org.lasalledebain.Utilities.trace;
+import static org.lasalledebain.libris.util.Utilities.checkForDuplicates;
+import static org.lasalledebain.libris.util.Utilities.compareIntLists;
+import static org.lasalledebain.libris.util.Utilities.trace;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Random;
 
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.hashfile.AffiliateHashFile;
 import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
@@ -26,6 +25,7 @@ import org.lasalledebain.libris.index.AffiliateListEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 import org.lasalledebain.libris.indexes.MockFixedSizedEntryHashFile;
 import org.lasalledebain.libris.indexes.MockVariableSizeEntryNumericKeyHashFile;
+import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;

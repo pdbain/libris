@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.search;
 
+import static org.lasalledebain.libris.util.Utilities.info;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,7 +20,6 @@ import java.util.TreeSet;
 
 import org.junit.After;
 import org.junit.Before;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.GenericDatabase;
@@ -36,11 +37,11 @@ import org.lasalledebain.libris.util.DeterministicFieldGenerator;
 import org.lasalledebain.libris.util.FieldGenerator;
 import org.lasalledebain.libris.util.Lorem;
 import org.lasalledebain.libris.util.RandomFieldGenerator;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
-import static org.lasalledebain.Utilities.info;
 
 @SuppressWarnings("rawtypes")
 public class TestRecordFilter extends TestCase {

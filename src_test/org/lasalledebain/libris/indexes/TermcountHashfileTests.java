@@ -9,7 +9,6 @@ import java.util.Objects;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.lasalledebain.Utilities;
 import org.lasalledebain.hashtable.HashUtils;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
@@ -27,6 +26,7 @@ import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.util.ByteArraySlice;
 import org.lasalledebain.libris.util.Lorem;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import junit.framework.TestCase;
 

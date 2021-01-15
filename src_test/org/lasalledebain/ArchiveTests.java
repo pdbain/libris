@@ -1,7 +1,7 @@
 package org.lasalledebain;
 
-import static org.lasalledebain.Utilities.KEYWORD_DATABASE1_XML;
-import static org.lasalledebain.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.KEYWORD_DATABASE1_XML;
+import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,6 +21,7 @@ import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.DatabaseUi;
+import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.util.ZipUtils;
 
 import junit.framework.TestCase;
