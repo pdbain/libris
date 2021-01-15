@@ -72,7 +72,7 @@ public class RecordEditTests extends TestCase {
 			fail("unexpected exception");
 		}
 	}
-	
+
 	public void testNewRecordWindow() {
 		try {
 			final String testName = getName();
@@ -113,7 +113,7 @@ public class RecordEditTests extends TestCase {
 		}
 		assertFalse("Too many values", expectedValues.hasNext());
 	}
-	
+
 	public void testRecordReEdit() {
 		try {
 			final String testName = getName();
@@ -162,23 +162,23 @@ public class RecordEditTests extends TestCase {
 			fail("unexpected exception");
 		}
 	}
-	
+
 	public void testDefaultValue() throws FileNotFoundException, DatabaseException, IOException, InputException {
-			TestGUI gui = Utilities.rebuildAndOpenDatabase(getName(), workingDirectory, TEST_DB_WITH_DEFAULTS_XML_FILE);
-			GenericDatabase<DatabaseRecord> db = gui.getDatabase();
-			int pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
-			Record rec = gui.newRecord();
-			rec.setEditable(false);
-			Field fld = rec.getField("ID_auth");
-			assertNull("author field not empty", fld);
-			fld = rec.getField(pubFieldNum);
-			assertNull("publisher not empty", fld);
-			String valString = rec.getFieldValue(pubFieldNum).getValueAsString();
-			assertEquals("wrong default for publisher","IBM", valString);
-			FieldValue fldVal = rec.getFieldValue("ID_hardcopy");
-			assertTrue("ID_hardcopy default wrong", fldVal.isTrue());
-			Utilities.pause("Close database");
-			assertTrue("Could not close database", gui.quit(false));
+		TestGUI gui = Utilities.rebuildAndOpenDatabase(getName(), workingDirectory, TEST_DB_WITH_DEFAULTS_XML_FILE);
+		GenericDatabase<DatabaseRecord> db = gui.getDatabase();
+		int pubFieldNum = db.getSchema().getFieldNum("ID_publisher");
+		Record rec = gui.newRecord();
+		rec.setEditable(false);
+		Field fld = rec.getField("ID_auth");
+		assertNull("author field not empty", fld);
+		fld = rec.getField(pubFieldNum);
+		assertNull("publisher not empty", fld);
+		String valString = rec.getFieldValue(pubFieldNum).getValueAsString();
+		assertEquals("wrong default for publisher","IBM", valString);
+		FieldValue fldVal = rec.getFieldValue("ID_hardcopy");
+		assertTrue("ID_hardcopy default wrong", fldVal.isTrue());
+		Utilities.pause("Close database");
+		assertTrue("Could not close database", gui.quit(false));
 	}
 
 	public void testFieldCounts() {
@@ -232,6 +232,7 @@ public class RecordEditTests extends TestCase {
 			assertNotNull("Null: "+ID_PUB, pubUiField);
 			int numValues = pubUiField.getNumValues();
 			assertEquals("Wrong number of values for editable "+ID_PUB, 0, numValues);
+			@SuppressWarnings("unused")
 			String val = pubUiField.getRecordField().getValuesAsString();
 			gui.setRecordWindowEditable(false);
 			numValues = pubUiField.getNumValues();
@@ -245,7 +246,7 @@ public class RecordEditTests extends TestCase {
 		}
 	}
 
-	
+
 	public void testEditRecord() {
 		try {
 			TestGUI gui = rebuildAndOpenDatabase(getName());
@@ -294,11 +295,10 @@ public class RecordEditTests extends TestCase {
 			fail("unexpected exception");
 		}
 	}
-	
-	public void testEditRecordWithExtraValues() {
-		try {
-			final String testName = getName();
-			TestGUI gui = rebuildAndOpenDatabase(testName);
+
+	public void testEditRecordWithExtraValues() throws Exception {
+		final String testName = getName();
+		try (TestGUI gui = rebuildAndOpenDatabase(testName)) {
 			LibrisDatabase db = gui.getLibrisDatabase();
 			File dbFile = db.getDatabaseFile();
 			BrowserWindow resultsWindow = gui.getResultsWindow();
@@ -327,7 +327,7 @@ public class RecordEditTests extends TestCase {
 			dispPanel = gui.getDisplayPanel();
 			recWindow = dispPanel.getCurrentRecordWindow();			
 			Utilities.pause("Close database");
-			assertTrue("Could not close database", gui.quit(false));
+			assertTrue("Could not close database", gui.closeDatabase(false));
 
 			TestGUI newGui = Utilities.openGuiAndDatabase(testName, dbFile);
 			resultsWindow = newGui.getResultsWindow();
@@ -336,51 +336,50 @@ public class RecordEditTests extends TestCase {
 			rid = resultsWindow.getSelectedRecordId();
 			info("selected "+rid);
 			resultsWindow.displaySelectedRecord();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception");
+			gui.closeDatabase(false);
 		}
 	}
-	
-	public void testDeleteValue() throws IOException, LibrisException {
-		TestGUI gui = rebuildAndOpenDatabase(getName());
-		BrowserWindow resultsWindow = gui.getResultsWindow();
-		resultsWindow.setSelectedRecordIndex(3);
-		gui.displaySelectedRecord();
-		gui.setRecordWindowEditable(true);
-		RecordDisplayPanel dispPanel = gui.getDisplayPanel();
-		RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
-		int originalId = resultsWindow.getSelectedRecordId();
-		Record originalRecord = recWindow.getRecord();
-		info("selected "+originalId);
-		gui.duplicateRecord();
-		gui.enterRecord();
-		gui.setRecordWindowEditable(true);
-		recWindow = dispPanel.getCurrentRecordWindow();
-		Record newRec = recWindow.getRecord();
-		assertEquals("Duplicate record != original record", originalRecord, newRec);
-		UiField authUiField = recWindow.getField(ID_AUTH);
-		MultipleValueUiField pagesUiField = (MultipleValueUiField) recWindow.getField(ID_PAGES);
-		FieldValue pagesValue = pagesUiField.getCtrl(0).getFieldValue();
-		String originalMainValue = pagesValue.getMainValueAsString();
-		String originalExtraValue = pagesValue.getExtraValueAsString();
-		assertNotNull("Could not find "+ID_AUTH, authUiField);
-		Record currentRec = recWindow.getRecord();
-		authUiField.doSelect();
-		Utilities.pause("Remove field");
-		gui.removeFieldValue();
-		gui.enterRecord();
 
-		gui.displayRecord(currentRec.getRecordId());
-		pagesValue = pagesUiField.getCtrl(0).getFieldValue();
-		String newMainValue = pagesValue.getMainValueAsString();
-		String newExtraValue = pagesValue.getExtraValueAsString();
-		assertEquals("pages field main values differ", originalMainValue, newMainValue);
-		assertEquals("pages field Extra values differ", originalExtraValue, newExtraValue);
-		String newAuthFieldValues = currentRec.getField(ID_AUTH).getValuesAsString();
-		assertEquals("auth field value deletion failed", "Rec4Fld1Val2", newAuthFieldValues);
-		Utilities.pause("Close database");
-		assertTrue("Could not close database", gui.quit(true));
+	public void testDeleteValue() throws Exception {
+		try (TestGUI gui = rebuildAndOpenDatabase(getName())) {
+			BrowserWindow resultsWindow = gui.getResultsWindow();
+			resultsWindow.setSelectedRecordIndex(3);
+			gui.displaySelectedRecord();
+			gui.setRecordWindowEditable(true);
+			RecordDisplayPanel dispPanel = gui.getDisplayPanel();
+			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
+			int originalId = resultsWindow.getSelectedRecordId();
+			Record originalRecord = recWindow.getRecord();
+			info("selected "+originalId);
+			gui.duplicateRecord();
+			gui.enterRecord();
+			gui.setRecordWindowEditable(true);
+			recWindow = dispPanel.getCurrentRecordWindow();
+			Record newRec = recWindow.getRecord();
+			assertEquals("Duplicate record != original record", originalRecord, newRec);
+			UiField authUiField = recWindow.getField(ID_AUTH);
+			MultipleValueUiField pagesUiField = (MultipleValueUiField) recWindow.getField(ID_PAGES);
+			FieldValue pagesValue = pagesUiField.getCtrl(0).getFieldValue();
+			String originalMainValue = pagesValue.getMainValueAsString();
+			String originalExtraValue = pagesValue.getExtraValueAsString();
+			assertNotNull("Could not find "+ID_AUTH, authUiField);
+			Record currentRec = recWindow.getRecord();
+			authUiField.doSelect();
+			Utilities.pause("Remove field");
+			gui.removeFieldValue();
+			gui.enterRecord();
+
+			gui.displayRecord(currentRec.getRecordId());
+			pagesValue = pagesUiField.getCtrl(0).getFieldValue();
+			String newMainValue = pagesValue.getMainValueAsString();
+			String newExtraValue = pagesValue.getExtraValueAsString();
+			assertEquals("pages field main values differ", originalMainValue, newMainValue);
+			assertEquals("pages field Extra values differ", originalExtraValue, newExtraValue);
+			String newAuthFieldValues = currentRec.getField(ID_AUTH).getValuesAsString();
+			assertEquals("auth field value deletion failed", "Rec4Fld1Val2", newAuthFieldValues);
+			Utilities.pause("Close database");
+			assertTrue("Could not close database", gui.closeDatabase(true));
+		}
 	}
 
 	public void testAddUnsetEnumValue() {
@@ -418,8 +417,8 @@ public class RecordEditTests extends TestCase {
 			e.printStackTrace();
 			fail("unexpected exception "+e.getClass()+e.getMessage());
 		}
-	
-		
+
+
 	}
 
 
@@ -497,7 +496,7 @@ public class RecordEditTests extends TestCase {
 	}
 
 	private TestGUI rebuildAndOpenDatabase(String testName) throws IOException,
-			DatabaseException {
+	DatabaseException {
 		String databaseFileName = TEST_DB4_XML_FILE;
 		return Utilities.rebuildAndOpenDatabase(testName, workingDirectory, databaseFileName);
 	}

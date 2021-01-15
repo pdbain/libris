@@ -98,7 +98,7 @@ public class LauncherTests extends TestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
-		testLogger.log(Level.INFO, "Starting "+getName());
+		testLogger.log(Level.INFO,this.getClass().getName()+" running "+getName());
 		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 

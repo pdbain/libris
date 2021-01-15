@@ -189,7 +189,7 @@ public class DatabaseTests extends TestCase {
 				DatabaseRecord rec = rootDb.getRecord(i);
 				rec.setName("Name_"+i);
 				rec.addFieldValue(ID_AUTH, "new value "+i);
-				testLogger.log(Level.INFO,rec.toString());
+				testLogger.log(Level.FINE,rec.toString());
 				rootDb.putRecord(rec);
 			}
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
@@ -298,9 +298,9 @@ public class DatabaseTests extends TestCase {
 		}
 	}
 
-	public void testDatabaseToXml() {
-		try {
-			rootDb = buildTestDatabase(getTestDatabase());
+	public void testDatabaseToXml() throws IOException, LibrisException {
+			try (LibrisDatabase myDb = buildTestDatabase(getTestDatabase())) {
+				rootDb = myDb;
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			copyDbXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
@@ -312,10 +312,7 @@ public class DatabaseTests extends TestCase {
 			assertNotNull("Error rebuilding database copy", forkDb);
 			assertTrue("database copy does not match original", forkDb.equals(rootDb));
 			copyDbXml.delete();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception");
-		}
+			}
 	}
 
 	public void testXmlExportAllWithGroups() {
@@ -602,74 +599,71 @@ public class DatabaseTests extends TestCase {
 	}
 
 	@Test
-	public void testAdjustIds() {
+	public void testAdjustIds() throws IOException, LibrisException {
 
 		ArrayList<Record> rootExpectedRecords = new ArrayList<>();
 		int newRecordNumber;
-		try {
-			File dbInstance = new File(workingDirectory, "database_instance.xml");
-			File dbIncrement = new File(workingDirectory, "database_increment.xml");
-			rootDb = buildTestDatabase(getTestDatabase());
-			for (Record rec: rootDb.getRecords()) {
+		File dbInstance = new File(workingDirectory, "database_instance.xml");
+		File dbIncrement = new File(workingDirectory, "database_increment.xml");
+		try (LibrisDatabase myOriginalDb = buildTestDatabase(getTestDatabase())) {
+			for (Record rec: myOriginalDb.getRecords()) {
 				rootExpectedRecords.add(rec);
 			}
 			@SuppressWarnings("unchecked")
 			ArrayList<Record> forkExpectedRecords = (ArrayList<Record>) rootExpectedRecords.clone();
 			ArrayList<Record> incrementExpectedRecords = new ArrayList<>();
-			newRecordNumber = rootDb.getLastRecordId() + 1;
+			newRecordNumber = myOriginalDb.getLastRecordId() + 1;
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
 			copyDbXml.deleteOnExit();
 			dbInstance.deleteOnExit();
 			FileOutputStream instanceStream = new FileOutputStream(dbInstance);
 			testLogger.log(Level.INFO,getName()+": copy database to "+dbInstance);
-			rootDb.exportFork(instanceStream);
-			int baseId = rootDb.getLastRecordId();
+			myOriginalDb.exportFork(instanceStream);
+			int baseId = myOriginalDb.getLastRecordId();
 			instanceStream.close();
 			int extraBaseRecords = 5;
 			for (int i = baseId+1; i <= baseId+extraBaseRecords; ++i) {
-				DatabaseRecord rec = rootDb.newRecord();
+				DatabaseRecord rec = myOriginalDb.newRecord();
 				rec.addFieldValue("ID_title", "Record"+newRecordNumber++);
-				int recNum = rootDb.putRecord(rec);
+				int recNum = myOriginalDb.putRecord(rec);
 				assertEquals("wrong ID for new record",  i, recNum);
 				rootExpectedRecords.add(rec);
 			}
-			checkDbRecords(rootDb, rootExpectedRecords);
-			rootDb.save();
+			checkDbRecords(myOriginalDb, rootExpectedRecords);
+			myOriginalDb.save();
 
-			forkDb = Libris.buildAndOpenDatabase(dbInstance);
-			assertNotNull("Error rebuilding database copy", forkDb);
-			assertFalse("database copy not changed from original", forkDb.equals(rootDb));
+			try (LibrisDatabase myForkDb = Libris.buildAndOpenDatabase(dbInstance)) {
+				assertNotNull("Error rebuilding database copy", myForkDb);
+				assertFalse("database copy not changed from original", myForkDb.equals(myOriginalDb));
 
-			DatabaseInstance inst = forkDb.getMetadata().getInstanceInfo();
-			assertNotNull("Database instance information missing", inst);
-			assertEquals("Wrong base ID", baseId, inst.getRecordIdBase());
-			final int numIncrementRecs = 10;
-			for (int i = baseId+1; i <= numIncrementRecs; ++i) {
-				DatabaseRecord rec = forkDb.newRecord();
-				rec.addFieldValue("ID_title", "DatabaseRecord"+newRecordNumber++);
-				int recNum = forkDb.putRecord(rec);
-				assertEquals("wrong ID for new record",  i, recNum);
-				incrementExpectedRecords.add(rec);
+				DatabaseInstance inst = myForkDb.getMetadata().getInstanceInfo();
+				assertNotNull("Database instance information missing", inst);
+				assertEquals("Wrong base ID", baseId, inst.getRecordIdBase());
+				final int numIncrementRecs = 10;
+				for (int i = baseId+1; i <= numIncrementRecs; ++i) {
+					DatabaseRecord rec = myForkDb.newRecord();
+					rec.addFieldValue("ID_title", "DatabaseRecord"+newRecordNumber++);
+					int recNum = myForkDb.putRecord(rec);
+					assertEquals("wrong ID for new record",  i, recNum);
+					incrementExpectedRecords.add(rec);
+				}
+				myForkDb.save();
+				forkExpectedRecords.addAll(forkExpectedRecords.size(), incrementExpectedRecords);
+				checkDbRecords(myForkDb, forkExpectedRecords);
+				myForkDb.exportIncrement(new FileOutputStream(dbIncrement));
+				myOriginalDb.importIncrement(dbIncrement);
+				for (Record r: incrementExpectedRecords) {
+					r.setRecordId(r.getRecordId() + extraBaseRecords);
+				}
+
+				rootExpectedRecords.addAll(rootExpectedRecords.size(), incrementExpectedRecords);
+				checkDbRecords(myOriginalDb, rootExpectedRecords);
+				assertTrue("Failed to close original database", myOriginalDb.closeDatabase(false));
+				assertTrue("Failed to close fork database", myForkDb.closeDatabase(false));
 			}
-			forkDb.save();
-			forkExpectedRecords.addAll(forkExpectedRecords.size(), incrementExpectedRecords);
-			checkDbRecords(forkDb, forkExpectedRecords);
-			forkDb.exportIncrement(new FileOutputStream(dbIncrement));
-			rootDb.importIncrement(dbIncrement);
-			for (Record r: incrementExpectedRecords) {
-				r.setRecordId(r.getRecordId() + extraBaseRecords);
-			}
-
-			rootExpectedRecords.addAll(rootExpectedRecords.size(), incrementExpectedRecords);
-			checkDbRecords(rootDb, rootExpectedRecords);
-			rootDb.closeDatabase(false);
-			forkDb.closeDatabase(false);
-			dbInstance.delete();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception");
 		}
+		dbInstance.delete();
 	}
 
 	@Override

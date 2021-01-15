@@ -60,7 +60,7 @@ public class FileSpaceManagerTests extends TestCase {
 					addedEntries.add( Integer.valueOf(id));
 				}
 
-				testLogger.log(Level.INFO, getName()+": round "+round+" file size = "+mgr.getFileSize());
+				testLogger.log(Level.FINE, getName()+": round "+round+" file size = "+mgr.getFileSize());
 				mgr.flush();
 				for (RecordHeader r: mgr) {
 					short id = r.getInput().readShort();

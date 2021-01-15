@@ -1,6 +1,7 @@
 package org.lasalledebain;
 
 import static org.lasalledebain.libris.util.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.trace;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -388,7 +389,7 @@ public class RecordTests extends TestCase {
 			RecordKeywords kw = new ExactKeywordList(true);
 			kw.addKeywords(Arrays.asList(new String[] 
 					{"lorem", "ipsum", "dolor", "sit", "ametl", "consectetur", "adipiscing", "elit,", "sed", "do", "eiusmod", "tempor", "incididunt"}));
-			StringUtils.wordStreamToHashStream(kw.wordStream()).forEach(i -> info("hash = "+i));
+			StringUtils.wordStreamToHashStream(kw.wordStream()).forEach(i -> trace("hash = "+i));
 	}
 	
 	public void testGetPrefixKeywords() {

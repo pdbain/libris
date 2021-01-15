@@ -80,7 +80,7 @@ public class GuiTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		workingDirectory = Utilities.makeTempTestDirectory();
-		testLogger.log(Level.INFO,"running "+getName());
+		testLogger.log(Level.INFO,this.getClass().getName()+" running "+getName());
 	}
 // TODO test required fields
 }
