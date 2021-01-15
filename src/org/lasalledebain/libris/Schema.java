@@ -7,7 +7,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
-import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;

@@ -69,7 +69,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			for (int key = 1; key < numEntries; key++ ) {
 				int length = entryCount + 1;
 				VariableSizeHashEntry newEntry = makeVariableSizeEntry(key, length);
-				entries.put(new Integer(key), newEntry);
+				entries.put(Integer.valueOf(key), newEntry);
 				boolean result = buck.addEntry(newEntry);
 				++entryCount;
 				expectedOccupancy += 4 + 2 + length;
@@ -149,7 +149,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 			for (int key = 1; key < numEntries; key++ ) {
 				int length = Math.min(32, NumericKeyHashBucket.getBucketSize()-(expectedOccupancy + 6));
 				VariableSizeHashEntry newEntry = makeVariableSizeEntry(key, length);
-				entries.put(new Integer(key), newEntry);
+				entries.put(Integer.valueOf(key), newEntry);
 				boolean result = buck.addEntry(newEntry);
 				++entryCount;
 				expectedOccupancy += 4 + 2 + length;
@@ -318,7 +318,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 				VariableSizeHashEntry e = iter.next();
 				assertNotNull("missing entry after "+actualCount+" entries", e);
 				int key = e.getKey();
-				VariableSizeHashEntry comparand = entries.get(new Integer(key));
+				VariableSizeHashEntry comparand = entries.get(Integer.valueOf(key));
 				assertNotNull("key "+key+" missing", comparand);
 				assertEquals(e, comparand);
 				iter.remove();
@@ -539,7 +539,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 		for (VariableSizeHashEntry e: testBucket) {
 			assertNotNull("missing entry after "+actualCount+" entries", e);
 			int key = e.getKey();
-			VariableSizeHashEntry comparand = entries.get(new Integer(key));
+			VariableSizeHashEntry comparand = entries.get(Integer.valueOf(key));
 			assertNotNull("key "+key+" missing", comparand);
 			assertEquals(comparand, e);
 			++actualCount ;

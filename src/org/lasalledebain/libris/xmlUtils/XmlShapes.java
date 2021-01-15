@@ -40,10 +40,8 @@ public class XmlShapes implements LibrisXMLConstants {
 			break;
 		}
 	}
-	@Deprecated
-	private static String[] emptyList = new String[0];
-	@Deprecated
-	private static String[][] emptyListList = new String[0][];
+	private static final String[] emptyList = new String[0];
+	private static final String[][] emptyListList = new String[0][];
 	private static HashMap<String, ElementShape> initializeXmlShapes() {
 		HashMap<String, ElementShape> shapes = new HashMap<String, ElementShape>();
 

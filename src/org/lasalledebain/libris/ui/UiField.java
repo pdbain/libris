@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.ui;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 

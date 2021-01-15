@@ -593,21 +593,6 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		}
 	}
 
-	@Deprecated
-	class RebuildIndexListener implements ActionListener {
-		public void actionPerformed(ActionEvent arg0) {
-			if (guiMain.isDatabaseOpen()) {
-				guiMain.alert("Please save database before rebuildiing");
-			} else {
-				try {
-					guiMain.rebuildDatabase();
-				} catch (LibrisException e) {
-					guiMain.alert("error rebuilding database", e);
-				}
-			}
-		}
-	}
-
 	class editLayoutListener implements ActionListener {
 		private JCheckBoxMenuItem menuItem;
 

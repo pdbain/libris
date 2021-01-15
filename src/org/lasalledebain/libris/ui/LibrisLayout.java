@@ -132,10 +132,6 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		layoutUsers.add(usedBy);
 	}
 
-	@Deprecated
-	protected void validate() throws InputException {
-	}
-
 	@Override
 	public LibrisAttributes getAttributes() {
 		LibrisAttributes attrs = new LibrisAttributes();
