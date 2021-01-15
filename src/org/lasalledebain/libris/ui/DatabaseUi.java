@@ -17,6 +17,12 @@ public interface DatabaseUi<RecordType extends Record> {
 	public LibrisDatabase openDatabase() throws DatabaseException;
 	public void saveDatabase();
 	public boolean closeDatabase(boolean force) throws DatabaseException;
+	/**
+	 * Close database if it has no unsaved changes
+	 * @param force Close regardless of unsaved changes
+	 * @return true if database closed
+	 * @throws DatabaseException if database is not reserved
+	 */
 	public boolean checkAndCloseDatabase(boolean force) throws DatabaseException;
 	public boolean quit(boolean force) throws DatabaseException;
 

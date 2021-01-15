@@ -80,7 +80,7 @@ public class DatabaseExporterAccessoryPanel extends JPanel implements LibrisCons
 			textButton.setSelected(true);
 		} else if (lastExportFormat.equals(ExportFormat.EXPORT_TAR.toString())) {
 			tarButton.setSelected(true);
-		} else if (lastExportFormat.equals(ExportFormat.EXPORT_LIBR.toString())) {
+		} else {
 			librButton.setSelected(true);
 		} 
 

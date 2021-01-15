@@ -19,6 +19,7 @@ public interface LibrisConstants {
 	public static final String FILENAME_JOURNAL_SUFFIX = "lbrj";
 	public static final String FILENAME_NATIVE_RECORDS_SUFFIX = "lbrn";
 	public static final String FILENAME_LIBRIS_FILES_SUFFIX = "libr";
+	public static final String FILENAME_XML_FILES_SUFFIX = "xml";
 	public static final String FILENAME_CSV_FILES_SUFFIX = "csv";
 	public static final String FILENAME_TEXT_FILES_SUFFIX = "txt";
 	public static final String FILENAME_ARCHIVE_FILES_SUFFIX = "tar";

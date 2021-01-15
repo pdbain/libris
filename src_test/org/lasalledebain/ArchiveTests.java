@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import org.junit.Test;
-import org.lasalledebain.libris.ArchiveWriter;
+import org.lasalledebain.libris.DatabaseArchive;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
@@ -47,11 +47,11 @@ public class ArchiveTests extends TestCase {
 		Stream<Path> fileList = Files.walk(docDir.toPath()).filter(Files::isRegularFile);
 		File archiveFile = new File(workingDirectory, "test.tar");
 		archiveFile.createNewFile();
-		try (ArchiveWriter archWriter  = new ArchiveWriter(archiveFile)) {
+		try (DatabaseArchive archWriter  = new DatabaseArchive(archiveFile)) {
 			archWriter.addFilesToArchive(fileList, docDir);
 		}
 		final File extractDir = new File(workingDirectory, "extract");
-		ArchiveWriter.getFilesFromArchive(archiveFile, extractDir);
+		DatabaseArchive.getFilesFromArchive(archiveFile, extractDir);
 
 		Files.walk(docDir.toPath()).filter(Files::isRegularFile)
 		.forEach(f -> {String foo = docDir.toPath().relativize(f).toString();
@@ -68,13 +68,13 @@ public class ArchiveTests extends TestCase {
 		archiveFile.delete();
 		archiveFile.createNewFile();
 		Stream<Path> fileList = Files.walk(docDir.toPath()).filter(Files::isRegularFile).limit(10);
-		try (ArchiveWriter archWriter  = new ArchiveWriter(archiveFile)) {
+		try (DatabaseArchive archWriter  = new DatabaseArchive(archiveFile)) {
 			archWriter.addFilesToArchive(fileList, docDir);
 			fileList = Files.walk(docDir.toPath()).filter(Files::isRegularFile).skip(10);
 			archWriter.addFilesToArchive(fileList, docDir);
 		}
 		final File extractDir = new File(workingDirectory, "extract");
-		ArchiveWriter.getFilesFromArchive(archiveFile, extractDir);
+		DatabaseArchive.getFilesFromArchive(archiveFile, extractDir);
 
 		Files.walk(docDir.toPath()).filter(Files::isRegularFile)
 		.forEach(f -> {String foo = docDir.toPath().relativize(f).toString();
@@ -89,12 +89,12 @@ public class ArchiveTests extends TestCase {
 		final File sourceDir = getArtifacts();
 		File archiveFile = new File(workingDirectory, "test.tar");
 		archiveFile.createNewFile();
-		try (ArchiveWriter archWriter  = new ArchiveWriter(archiveFile)) {
+		try (DatabaseArchive archWriter  = new DatabaseArchive(archiveFile)) {
 			archWriter.addDirectoryToArchive(sourceDir, workingDirectory);
 		}
 		final File extractDir = new File(workingDirectory, "extract");
 
-		ArchiveWriter.getFilesFromArchive(archiveFile, extractDir);
+		DatabaseArchive.getFilesFromArchive(archiveFile, extractDir);
 
 		Files.walk(sourceDir.toPath()).filter(Files::isRegularFile)
 		.forEach(f -> {
@@ -131,7 +131,7 @@ public class ArchiveTests extends TestCase {
 			db.archiveDatabaseAndArtifacts(databaseExport, true, true);
 
 			File extractDir = new File(workingDirectory, "extract");
-			ArchiveWriter.getFilesFromArchive(databaseExport, extractDir);
+			DatabaseArchive.getFilesFromArchive(databaseExport, extractDir);
 			File extractedDatabase = new File(extractDir, KEYWORD_DATABASE1_XML);
 			assertTrue("original database not open", db.isDatabaseOpen());
 			try (LibrisDatabase recoveredDb = Libris.buildAndOpenDatabase(extractedDatabase)) {
@@ -181,7 +181,7 @@ public class ArchiveTests extends TestCase {
 			db.archiveDatabaseAndArtifacts(databaseExport, true, true);
 
 			File extractDir = new File(workingDirectory, "extract");
-			ArchiveWriter.getFilesFromArchive(databaseExport, extractDir);
+			DatabaseArchive.getFilesFromArchive(databaseExport, extractDir);
 			File extractedDatabase = new File(extractDir, KEYWORD_DATABASE1_XML);
 			assertTrue("original database not open", db.isDatabaseOpen());
 			try (LibrisDatabase recoveredDb = Libris.buildAndOpenDatabase(extractedDatabase)) {
@@ -228,7 +228,7 @@ public class ArchiveTests extends TestCase {
 			db.archiveDatabaseAndArtifacts(databaseExport, true, false);
 
 			File extractDir = new File(workingDirectory, "extract");
-			ArchiveWriter.getFilesFromArchive(databaseExport, extractDir);
+			DatabaseArchive.getFilesFromArchive(databaseExport, extractDir);
 			File extractedDatabase = new File(extractDir, KEYWORD_DATABASE1_XML);
 			try (GenericDatabase<DatabaseRecord> recoveredDb = Libris.buildAndOpenDatabase(extractedDatabase)) {
 				assertEquals("recovered database does not match",  db, recoveredDb);

@@ -21,6 +21,7 @@ import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.lasalledebain.libris.DatabaseArchive;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
@@ -31,8 +32,11 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
 import static java.util.Objects.nonNull;
+import static org.junit.Assert.assertTrue;
 
-public class LibrisMenu extends AbstractLibrisMenu {
+public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
+
+	private static final String ERROR_BUILDING_INDEXES_MESSAGE = "Error building indexes";
 
 	public class DuplicateRecordListener implements ActionListener {
 
@@ -68,7 +72,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	private final ArrayList<JMenuItem> editMenuArtifactCommands;
 	private JMenuItem duplicateRecord;
 	private JMenuItem searchRecords;
-	private HashSet<JMenuItem> databaseAccessCommands;
+	private final HashSet<JMenuItem> databaseAccessibleCommands, databaseNotAccessibleCommands;
 	private JMenuItem openArtifactInfoMenuItem;
 
 	public LibrisMenu(LibrisGui gui) {
@@ -78,6 +82,9 @@ public class LibrisMenu extends AbstractLibrisMenu {
 
 	public LibrisMenu() {
 		this.database = null;
+		databaseAccessibleCommands = new HashSet<JMenuItem>();
+		databaseNotAccessibleCommands = new HashSet<JMenuItem>();
+
 		editMenuFieldValueCommands = new ArrayList<JMenuItem>(2);
 		editMenuRecordCommands = new ArrayList<JMenuItem>(2);
 		editMenuArtifactCommands = new ArrayList<JMenuItem>(2);
@@ -112,11 +119,11 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	protected JMenu createFileMenu() {
 		JMenu menu = new JMenu("File");
 		fileMenuModifyCommands = new HashSet<JMenuItem>();
-		databaseAccessCommands = new HashSet<JMenuItem>();
 		openDatabase = new JMenuItem(OPEN_DATABASE);
 		openDatabase.addActionListener(new OpenDatabaseListener());
 		openDatabase.setAccelerator(getAcceleratorKeystroke('O'));
 		menu.add(openDatabase);
+		databaseNotAccessibleCommands.add(openDatabase);
 
 		JMenuItem saveDatabase = new JMenuItem("Save");
 		saveDatabase.setAccelerator(getAcceleratorKeystroke('S'));
@@ -132,32 +139,32 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		JMenuItem print = new JMenuItem("Print...");
 		print.setAccelerator(getAcceleratorKeystroke('P'));
 		menu.add(print);
-		databaseAccessCommands.add(print);
+		databaseAccessibleCommands.add(print);
 
 		JMenuItem closeWindow = new JMenuItem("Close window");
 		closeWindow.addActionListener(new CloseWindowListener(false));
 		closeWindow.setAccelerator(getAcceleratorKeystroke('W'));
 		menu.add(closeWindow);
-		databaseAccessCommands.add(closeWindow);
+		databaseAccessibleCommands.add(closeWindow);
 
 		JMenuItem closeAllWindows = new JMenuItem("Close all windows");
 		closeAllWindows.addActionListener(new CloseWindowListener(true));
 		closeAllWindows.setAccelerator(getAcceleratorKeystroke('W', java.awt.event.InputEvent.SHIFT_DOWN_MASK));
 		menu.add(closeAllWindows);
-		databaseAccessCommands.add(closeAllWindows);
+		databaseAccessibleCommands.add(closeAllWindows);
 
-		JMenuItem closeDatabase = new JMenuItem("Close database");
+		closeDatabase = new JMenuItem("Close database");
 		closeDatabase.addActionListener(new CloseDatabaseListener());
 		closeDatabase.setAccelerator(getAcceleratorKeystroke('W', java.awt.event.InputEvent.CTRL_DOWN_MASK));
 		menu.add(closeDatabase);
-		databaseAccessCommands.add(closeDatabase);
+		databaseAccessibleCommands.add(closeDatabase);
 
 		JMenuItem quit = new JMenuItem("Quit");
 		quit.addActionListener(new QuitListener());
 		quit.setAccelerator(getAcceleratorKeystroke('Q'));
 		menu.add(quit);
 		for (JMenuItem m: fileMenuModifyCommands) {
-			databaseAccessCommands.add(m);
+			databaseAccessibleCommands.add(m);
 		}
 		return menu;
 	}
@@ -167,8 +174,11 @@ public class LibrisMenu extends AbstractLibrisMenu {
 	 * @param accessible if database is opened
 	 */
 	public void databaseAccessible(boolean accessible) {
-		for (JMenuItem m: databaseAccessCommands) {
+		for (JMenuItem m: databaseAccessibleCommands) {
 			m.setEnabled(accessible);
+		}
+		for (JMenuItem m: databaseNotAccessibleCommands) {
+			m.setEnabled(!accessible);
 		}
 		dbMenu.databaseAccessible(database, accessible);
 	}
@@ -438,7 +448,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		File dbLocation = null;
 		String userDir = System.getProperty("user.dir");
 		Preferences librisPrefs = LibrisUi.getLibrisPrefs();
-		String lastDbFileName = librisPrefs.get(LibrisConstants.DATABASE_FILE, userDir);
+		String lastDbFileName = librisPrefs.get(DATABASE_FILE, userDir);
 		dbLocation = new File(lastDbFileName);
 		if (!dbLocation.exists()) {
 			dbLocation = new File(userDir);
@@ -449,10 +459,12 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		buttonPanel.add(roCheckbox);
 		JCheckBox reIndexCheckbox = new JCheckBox("Build indexes", false);
 		buttonPanel.add(reIndexCheckbox);
+		JCheckBox buildFromArchiveCheckbox = new JCheckBox("Build from archive", false);
+		buttonPanel.add(buildFromArchiveCheckbox);
 		chooser.setAccessory(buttonPanel);
 		FileNameExtensionFilter librisFileFilter = new FileNameExtensionFilter(
 				"Libris files",
-				LibrisConstants.FILENAME_LIBRIS_FILES_SUFFIX, "xml");
+				FILENAME_LIBRIS_FILES_SUFFIX, FILENAME_XML_FILES_SUFFIX, FILENAME_ARCHIVE_FILES_SUFFIX);
 
 		chooser.setFileFilter(librisFileFilter);
 		if (dbLocation.isFile()) {
@@ -460,21 +472,35 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		}
 		int option = chooser.showOpenDialog(guiMain.getMainFrame());
 		if (option == JFileChooser.APPROVE_OPTION) {
-			roCheckbox.isSelected();
+			roCheckbox.isSelected(); // TODO check read-only but no action
 			File sf = chooser.getSelectedFile();
 			if (sf != null) {
 				boolean openDatabase = true;
+			File databaseFile = sf;
 				if (reIndexCheckbox.isSelected()) {
 					try {
 						Libris.buildIndexes(sf, guiMain);
 					} catch (Exception e) {
-						guiMain.alert("Error building indexes", e);
+						guiMain.alert(ERROR_BUILDING_INDEXES_MESSAGE, e);
+						return false;
+					}
+					openDatabase = (Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database successfully indexed\nOpen now?") == Dialogue.YES_OPTION);
+				} else if (buildFromArchiveCheckbox.isSelected()) {
+					String errorMessage = "Error reading TAR archive "+sf.getPath();
+					try {
+						ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(sf, sf.getParentFile());
+						errorMessage = ERROR_BUILDING_INDEXES_MESSAGE;
+						assertTrue("Archive file is empty", fileList.size() > 0);
+						databaseFile = fileList.get(0);
+						Libris.buildIndexes(databaseFile, guiMain);
+					} catch (Exception e) {
+						guiMain.alert(errorMessage, e);
 						return false;
 					}
 					openDatabase = (Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database successfully indexed\nOpen now?") == Dialogue.YES_OPTION);
 				}
 				if (openDatabase)
-					result = openDatabaseImpl(sf);
+					result = openDatabaseImpl(databaseFile);
 			}
 			try {
 				librisPrefs.sync();
@@ -567,6 +593,7 @@ public class LibrisMenu extends AbstractLibrisMenu {
 		}
 	}
 
+	@Deprecated
 	class RebuildIndexListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			if (guiMain.isDatabaseOpen()) {

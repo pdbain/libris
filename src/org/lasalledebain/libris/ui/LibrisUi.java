@@ -125,6 +125,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 		if (result) {
 			currentDatabase = null;
 			setUiTitle(NO_DATABASE_OPENED);
+			recordsAccessible(false);
 		}
 		return result;
 	}

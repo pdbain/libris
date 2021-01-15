@@ -20,6 +20,7 @@ public abstract class AbstractLibrisMenu {
 	protected JMenu fileMenu;
 	protected JMenu editMenu;
 	protected JMenuItem openDatabase;
+	protected JMenuItem closeDatabase;
 
 	protected abstract JMenuBar createMenus();
 

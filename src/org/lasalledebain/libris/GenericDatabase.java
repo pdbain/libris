@@ -121,7 +121,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		}
 	}
 
-	public boolean isOkayToClose(boolean force) throws DatabaseException {
+	public boolean isOkayToClose(boolean force) {
 		return !isModified() || force;
 	}
 

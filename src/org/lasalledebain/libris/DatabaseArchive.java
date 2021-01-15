@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -18,15 +19,15 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.lasalledebain.libris.exception.DatabaseError;
 
-public class ArchiveWriter implements Closeable {
+public class DatabaseArchive implements Closeable {
 
 	private final TarArchiveOutputStream archiveOutputStream;
 
-	public ArchiveWriter(File archiveFile) throws IOException {
+	public DatabaseArchive(File archiveFile) throws IOException {
 		this(new FileOutputStream(archiveFile, false));
 	}
 
-	public ArchiveWriter(OutputStream archiveStream) throws IOException {
+	public DatabaseArchive(OutputStream archiveStream) throws IOException {
 		archiveOutputStream = new TarArchiveOutputStream(new BufferedOutputStream(archiveStream));
 		archiveOutputStream.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
 		archiveOutputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
@@ -64,18 +65,21 @@ public class ArchiveWriter implements Closeable {
 		archiveOutputStream.close();
 	}
 	
-	public static void getFilesFromArchive(File archiveFile, File rootDir) throws IOException {
+	public static ArrayList<File> getFilesFromArchive(File archiveFile, File rootDir) throws IOException {
+		ArrayList<File> fileList = new ArrayList<>();
 		try (TarArchiveInputStream archiveInputStream = new TarArchiveInputStream(new FileInputStream(archiveFile))){
 				TarArchiveEntry tarEntry;
 				while (nonNull(tarEntry = archiveInputStream.getNextTarEntry())) {
 					if (tarEntry.isDirectory()) continue;
 					File tarContent = new File(rootDir, tarEntry.getName());
+					fileList.add(tarContent);
 					File parentDirectory = tarContent.getParentFile();
 					if (!parentDirectory.exists())
 						parentDirectory.mkdirs();
 					Files.copy(archiveInputStream, tarContent.toPath());
 				}
 		}
+		return fileList;
 	}
 
 }

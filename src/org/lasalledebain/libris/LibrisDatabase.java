@@ -159,9 +159,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 
 		/**
+		 * Close database if it is not modified or force is true
 		 * @param force close without saving
-		 * @return true if database is not modified or force is true.
-		 * @throws DatabaseException  if database is not reserved
+		 * @return true if database closed
+		 * @throws DatabaseException if database is not reserved
 		 */
 		public boolean closeDatabase(boolean force) throws DatabaseException {
 			if (!isOkayToClose(force)) {
@@ -450,7 +451,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		public void archiveDatabaseAndArtifacts(OutputStream archiveStream, boolean includeSchema, boolean includeArtifacts) throws LibrisException, IOException {
 			File tempDir = new File(System.getProperty("java.io.tmpdir"));
 			File databaseXml = File.createTempFile("libris", null, tempDir);
-			try (ArchiveWriter archWriter = new ArchiveWriter(archiveStream)) {
+			try (DatabaseArchive archWriter = new DatabaseArchive(archiveStream)) {
 				exportDatabaseXml(new FileOutputStream(databaseXml), includeSchema, true, false);
 				archWriter.addFileToArchive(databaseXml, myConfiguration.getDatabaseFile().getName());
 				if (hasDocumentRepository() && includeArtifacts) {
