@@ -36,7 +36,7 @@ public class LibrisFileChooser extends JFileChooser {
 
 	public File chooseOutputFile(String fileName) throws HeadlessException {
 		setSelectedFile(new File(fileName));
-		int option = showSaveDialog(Objects.nonNull(gui)? gui.mainFrame: null);
+		int option = showDialog(Objects.nonNull(gui)? gui.mainFrame: null, "Export");
 		File result = null;
 		if (JFileChooser.APPROVE_OPTION == option) {
 			result = getSelectedFile();

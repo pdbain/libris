@@ -30,6 +30,7 @@ public class DatabaseExporter {
 	private boolean includeSchema;
 	private boolean includeRecords;
 	private boolean includeArtifacts;
+	private int totalWorkItems;
 
 	void doExport() throws LibrisException {
 		if (null == fmt) {
@@ -76,6 +77,7 @@ public class DatabaseExporter {
 		JPanel importPanel = new JPanel(new GridLayout(1,0));
 		exportFrame.setContentPane(importPanel);
 		LibrisFileChooser exportFileChooser = new LibrisFileChooser(gui, "Export to...");
+		exportFileChooser.setFileFilter(LibrisMenu.librisFileFilter);
 		final DatabaseExporterAccessoryPanel sepPanel = 
 				new DatabaseExporterAccessoryPanel(exportFileChooser, lastExportFormat);
 		if ((null != lastExportFile) && lastExportFile.isFile()) {
@@ -93,6 +95,10 @@ public class DatabaseExporter {
 			includeSchema = sepPanel.isIncludeSchema();
 			includeRecords = sepPanel.isIncludeRecords();
 			includeArtifacts = sepPanel.isIncludeArtifacts();
+			int numDbRecords = db.getNumRecords();
+			int numArtifactRecords = db.getNumArtifacts();
+			int numArchiveFiles = includeArtifacts? numArtifactRecords + 1: 1;
+			totalWorkItems = numDbRecords + numArtifactRecords + numArchiveFiles;
 			try {
 				librisPrefs.sync();
 			} catch (BackingStoreException e) {
@@ -102,5 +108,9 @@ public class DatabaseExporter {
 		} else {
 			return false;
 		}
+	}
+
+	public int getTotalWorkItems() {
+		return totalWorkItems;
 	}
 }

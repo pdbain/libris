@@ -37,7 +37,28 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	protected File auxiliaryDirectory;
 	protected File artifactDirectory;
 	private boolean readOnly;
+	private int expectedWork, accomplishedWork;
 
+	public int getAccomplishedWork() {
+		return accomplishedWork;
+	}
+	public int addAccomplishedWork(int theWork) {
+		accomplishedWork += theWork;
+		return accomplishedWork;
+	}
+	public int getExpectedWork() {
+		return expectedWork;
+	}
+	/**
+	 * Set the total amount of anticipated work for progress monitoring
+	 * and reset the accomplished work to zero.
+	 * @param theTotal
+	 */
+	public void setExpectedWork(int theTotal) {
+		expectedWork = theTotal;
+		accomplishedWork = 0;
+	}
+	
 	public LibrisUi(boolean readOnly) {
 		this();
 		this.readOnly = readOnly;
@@ -118,7 +139,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	
 	@Override
 	public boolean closeDatabase(boolean force) throws DatabaseException {
-		boolean result = false;
+		boolean result = true;
 		if (Objects.nonNull(currentDatabase) && currentDatabase.isDatabaseOpen()) {
 			result = checkAndCloseDatabase(force);
 		}

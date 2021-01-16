@@ -91,4 +91,7 @@ public interface DatabaseUi<RecordType extends Record> {
 	public default void setCurrentProgress(int currentProgress) {
 		return;
 	}
+	public default void addProgress(int progress) {
+		return;
+	}
 }

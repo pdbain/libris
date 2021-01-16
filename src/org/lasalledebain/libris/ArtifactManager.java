@@ -188,6 +188,9 @@ public class ArtifactManager implements LibrisConstants {
 		}
 	}
 
+	public int getNumArtifacts() {
+		return myDb.getNumRecords();
+	}
 	public ArtifactParameters getArtifactInfo(int artifactId) {
 		return myDb.getArtifactInfo(artifactId);
 	}

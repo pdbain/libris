@@ -98,6 +98,10 @@ public class DatabaseMetadata implements LibrisXMLConstants {
 		return lastRecordId;
 	}
 
+	public int getNumRecords() {
+		return lastRecordId;
+	}
+	
 	public synchronized void setLastRecordId(final int recId) {
 		if ((RecordId.isNull(lastRecordId)) || ((recId > lastRecordId))) {
 			lastRecordId = recId;

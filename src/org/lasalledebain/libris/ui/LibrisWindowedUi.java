@@ -190,9 +190,17 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 
 
 	@Override
-	public void setCurrentProgress(int currentProgress) {
+	public void setCurrentProgress(int currentPercentProgress) {
 		if (nonNull(progressWorker)) {
-			progressWorker.setWorkerProgress(currentProgress);
+			progressWorker.setWorkerProgress(currentPercentProgress);
+		}
+	}
+
+	@Override
+	public void addProgress(int progress) {
+		final int expectedWork = getExpectedWork();
+		if (expectedWork > 0) {
+			setCurrentProgress(addAccomplishedWork(progress));
 		}
 	}
 

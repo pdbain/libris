@@ -462,10 +462,6 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		JCheckBox buildFromArchiveCheckbox = new JCheckBox("Build from archive", false);
 		buttonPanel.add(buildFromArchiveCheckbox);
 		chooser.setAccessory(buttonPanel);
-		FileNameExtensionFilter librisFileFilter = new FileNameExtensionFilter(
-				"Libris files",
-				FILENAME_LIBRIS_FILES_SUFFIX, FILENAME_XML_FILES_SUFFIX, FILENAME_ARCHIVE_FILES_SUFFIX);
-
 		chooser.setFileFilter(librisFileFilter);
 		if (dbLocation.isFile()) {
 			chooser.setSelectedFile(dbLocation);
@@ -614,6 +610,9 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 	private EditRecordListenerImpl editRecordListener;
 	private JMenuItem recordWindowItems[];
 	private JMenuItem addArtifactMenuItem;
+	protected static final FileNameExtensionFilter librisFileFilter = new FileNameExtensionFilter(
+			"Libris files",
+			FILENAME_LIBRIS_FILES_SUFFIX, FILENAME_XML_FILES_SUFFIX, FILENAME_ARCHIVE_FILES_SUFFIX);
 	public void setRecordDuplicateRecordEnabled(boolean enabled) {
 		duplicateRecord.setEnabled(enabled);
 	}

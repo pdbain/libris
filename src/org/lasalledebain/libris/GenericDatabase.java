@@ -285,6 +285,9 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		return rec;
 	}
 
+	public int getNumRecords() {
+		return getMetadata().getNumRecords();
+	}
 	public RecordType getRecord(String recordName) throws InputException {
 		assertDatabaseOpen("get record");
 		return getRecordUnchecked(recordName);

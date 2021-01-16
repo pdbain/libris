@@ -422,6 +422,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	public void exportData(LibrisDatabase db) throws LibrisException {
 		DatabaseExporter exporter = new DatabaseExporter(db);
 		if (exporter.chooseExportFile(this)) {
+			setExpectedWork(exporter.getTotalWorkItems());
 			LibrisUiWorker theWorker = new LibrisUiWorker(new Runnable() {
 
 				@Override
