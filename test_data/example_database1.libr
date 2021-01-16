@@ -1,4 +1,4 @@
-<libris databasename="pdbain_biblio" date="2011-06-02 20:00:00 EDT" repositorylocation="" schemalocation="file:pdbain_biblio_schema.libr" schemaname="pdbain_biblio" schemaversion="1.0">
+<libris databasename="Example Database 1" date="2011-06-02 20:00:00 EDT" repositorylocation="" schemalocation="file:pdbain_biblio_schema.libr" schemaname="pdbain_biblio" schemaversion="1.0">
 	<metadata>
 		<schema>
 			<groupdefs>

@@ -25,14 +25,6 @@ public class Murmur3 {
 	 */
 
 
-	public Murmur3(int seed) {
-		this.hash32 = hash32;
-	}
-
-	public Murmur3() {
-		this.hash32 = DEFAULT_SEED;
-	}
-
 	/**
 	 * Murmur3 is successor to Murmur2 fast non-crytographic hash algorithms.
 	 *
@@ -57,7 +49,8 @@ public class Murmur3 {
 	  private static final int N_32 = 0xe6546b64;
 
 	  // Constants for 128 bit variant
-	  private static final long C1 = 0x87c37b91114253d5L;
+	  @SuppressWarnings("unused")
+	private static final long C1 = 0x87c37b91114253d5L;
 	  private static final long C2 = 0x4cf5ad432745937fL;
 	  private static final int R1 = 31;
 	  private static final int R2 = 27;
@@ -68,7 +61,6 @@ public class Murmur3 {
 
 	  public static final int DEFAULT_SEED = 104729;
 
-	  private int hash32;
 	  /**
 	   * Murmur3 32-bit variant.
 	   *
@@ -140,7 +132,8 @@ public class Murmur3 {
 	    return hash;
 	  }
 
-	  private static long fmix64(long h) {
+	  @SuppressWarnings("unused")
+	private static long fmix64(long h) {
 	    h ^= (h >>> 33);
 	    h *= 0xff51afd7ed558ccdL;
 	    h ^= (h >>> 33);

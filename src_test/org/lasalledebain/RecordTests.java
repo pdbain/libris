@@ -367,7 +367,7 @@ public class RecordTests extends TestCase {
 			String fieldNames[] = {"s1", "s2", "s3"};
 			FieldType fts[] = {FieldType.T_FIELD_STRING, FieldType.T_FIELD_STRING, FieldType.T_FIELD_STRING};
 
-			RecordFactory rt = Utilities.makeRecordTemplate(fieldNames, fts);
+			RecordFactory<DatabaseRecord> rt = Utilities.makeRecordTemplate(fieldNames, fts);
 			Record rec = rt.makeRecord(true);
 			String recData[] = {"The quick brown fox", "jumps over", "the lazy dog"};
 			rec.setAllFields(recData);

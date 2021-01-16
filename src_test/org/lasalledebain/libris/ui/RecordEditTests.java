@@ -20,7 +20,6 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.util.Utilities;
 

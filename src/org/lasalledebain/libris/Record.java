@@ -201,7 +201,6 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 		StringBuffer buff = new StringBuffer("[");
 		int wordLimit = 8;
 		final int MAX_WORD_LENGTH = 8;
-		final char ELLIPSIS_CHAR = '\u2026';
 		final String ELLIPSIS_STRING = "...";
 		String idString = (NULL_RECORD_ID == id)? "<unknown>": RecordId.toString(id);
 		buff.append(idString);

@@ -365,15 +365,14 @@ class Stemmer
     * output. Note that the word stemmed is expected to be in lower case:
     * forcing lower case must be done outside the Stemmer class.
     * Usage: Stemmer file-name file-name ...
+    * @throws IOException 
     */
-   public static void main(String[] args)
+   public static void main(String[] args) throws IOException
    {
       char[] w = new char[501];
       Stemmer s = new Stemmer();
       for (int i = 0; i < args.length; i++)
-      try
-      {
-         FileInputStream in = new FileInputStream(args[i]);
+      try (FileInputStream in = new FileInputStream(args[i])) {
 
          try
          { while(true)
