@@ -79,15 +79,13 @@ public abstract class AbstractLibrisMenu {
 	public class QuitListener implements ActionListener {		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (null != database) {
-				try {
-					guiMain.quit(false);
-				} catch (DatabaseException e) {
-					throw new DatabaseError(e);
-				}
-				// TODO check if there are new, modified records
+
+			try {
+				guiMain.quit(false);
+			} catch (DatabaseException e) {
+				throw new DatabaseError(e);
 			}
-		}	
+		}
 	}
 }
 

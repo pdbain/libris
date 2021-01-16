@@ -123,6 +123,12 @@ public class CmdlineUi<RecordType extends Record> extends LibrisUi<RecordType> {
 		stop();
 		
 	}
+	/**
+	 * Process a user-entered command
+	 * @param command user command
+	 * @return true if the process should exit
+	 * @throws DatabaseException
+	 */
 	private boolean processCommand(String command) throws DatabaseException {
 		String[] parts = command.split("\\s+");
 		if (parts.length == 0) return false;
