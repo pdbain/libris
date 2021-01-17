@@ -14,12 +14,14 @@ import org.lasalledebain.libris.exception.DatabaseException;
 
 public abstract class AbstractLibrisMenu {
 	static final String OPEN_DATABASE = "Open database...";
+	static final String BUILD_DATABASE = "Build database...";
 
 	protected LibrisDatabase database;
 	protected LibrisGui guiMain;
 	protected JMenu fileMenu;
 	protected JMenu editMenu;
 	protected JMenuItem openDatabase;
+	protected JMenuItem buildDatabase;
 	protected JMenuItem closeDatabase;
 
 	protected abstract JMenuBar createMenus();
@@ -44,14 +46,25 @@ public abstract class AbstractLibrisMenu {
 		this.database = database;
 	}
 
-	public abstract boolean openDatabaseDialogue();
+	abstract boolean openDatabaseDialogue();
 
-	public class OpenDatabaseListener implements ActionListener {
+	abstract boolean buildDatabaseDialogue();
+
+	public class BuildOpenDatabaseListener implements ActionListener {
+		private final boolean buildDatabaseSelected;
+
+		public BuildOpenDatabaseListener(boolean doBuild) {
+			buildDatabaseSelected = doBuild;
+		}
+
 		public void actionPerformed(ActionEvent arg0) {
-			openDatabaseDialogue();
+			if (buildDatabaseSelected)
+				buildDatabaseDialogue();
+			else
+				openDatabaseDialogue();
 		}
 	}
-	
+
 	public class CloseWindowListener implements ActionListener {
 		boolean closeAllWindows;
 		public CloseWindowListener(boolean allWindows) {

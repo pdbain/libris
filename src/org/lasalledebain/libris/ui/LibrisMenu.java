@@ -119,11 +119,17 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 	protected JMenu createFileMenu() {
 		JMenu menu = new JMenu("File");
 		fileMenuModifyCommands = new HashSet<JMenuItem>();
+		
 		openDatabase = new JMenuItem(OPEN_DATABASE);
-		openDatabase.addActionListener(new OpenDatabaseListener());
+		openDatabase.addActionListener(new BuildOpenDatabaseListener(false));
 		openDatabase.setAccelerator(getAcceleratorKeystroke('O'));
 		menu.add(openDatabase);
 		databaseNotAccessibleCommands.add(openDatabase);
+
+		buildDatabase = new JMenuItem(BUILD_DATABASE);
+		buildDatabase.addActionListener(new BuildOpenDatabaseListener(true));
+		menu.add(buildDatabase);
+		databaseNotAccessibleCommands.add(buildDatabase);
 
 		JMenuItem saveDatabase = new JMenuItem("Save");
 		saveDatabase.setAccelerator(getAcceleratorKeystroke('S'));
@@ -442,7 +448,7 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 	}
 
 	@Override
-	public boolean openDatabaseDialogue() {
+	boolean openDatabaseDialogue() {
 		boolean result = false;
 		JFileChooser chooser;
 		File dbLocation = null;
@@ -457,10 +463,6 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		Box buttonPanel = new Box(BoxLayout.Y_AXIS);
 		JCheckBox roCheckbox = new JCheckBox("Read-only", false);
 		buttonPanel.add(roCheckbox);
-		JCheckBox reIndexCheckbox = new JCheckBox("Build indexes", false);
-		buttonPanel.add(reIndexCheckbox);
-		JCheckBox buildFromArchiveCheckbox = new JCheckBox("Build from archive", false);
-		buttonPanel.add(buildFromArchiveCheckbox);
 		chooser.setAccessory(buttonPanel);
 		chooser.setFileFilter(librisFileFilter);
 		if (dbLocation.isFile()) {
@@ -468,35 +470,10 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		}
 		int option = chooser.showOpenDialog(guiMain.getMainFrame());
 		if (option == JFileChooser.APPROVE_OPTION) {
-			roCheckbox.isSelected(); // TODO check read-only but no action
+			boolean readOnlySelected = roCheckbox.isSelected(); // TODO check read-only but no action
 			File sf = chooser.getSelectedFile();
 			if (sf != null) {
-				boolean openDatabase = true;
-			File databaseFile = sf;
-				if (reIndexCheckbox.isSelected()) {
-					try {
-						Libris.buildIndexes(sf, guiMain);
-					} catch (Exception e) {
-						guiMain.alert(ERROR_BUILDING_INDEXES_MESSAGE, e);
-						return false;
-					}
-					openDatabase = (Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database successfully indexed\nOpen now?") == Dialogue.YES_OPTION);
-				} else if (buildFromArchiveCheckbox.isSelected()) {
-					String errorMessage = "Error reading TAR archive "+sf.getPath();
-					try {
-						ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(sf, sf.getParentFile());
-						errorMessage = ERROR_BUILDING_INDEXES_MESSAGE;
-						assertTrue("Archive file is empty", fileList.size() > 0);
-						databaseFile = fileList.get(0);
-						Libris.buildIndexes(databaseFile, guiMain);
-					} catch (Exception e) {
-						guiMain.alert(errorMessage, e);
-						return false;
-					}
-					openDatabase = (Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database successfully indexed\nOpen now?") == Dialogue.YES_OPTION);
-				}
-				if (openDatabase)
-					result = openDatabaseImpl(databaseFile);
+					result = openDatabaseImpl(sf, readOnlySelected);
 			}
 			try {
 				librisPrefs.sync();
@@ -507,9 +484,54 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		return result;
 	}
 
-	private boolean openDatabaseImpl(File dbFile) {
+	@Override
+	boolean buildDatabaseDialogue() {
+		boolean result = false;
+		JFileChooser chooser;
+		File archiveLocation = null;
+		String userDir = System.getProperty("user.dir");
+		archiveLocation = new File(userDir);
+		if (!archiveLocation.exists()) {
+			archiveLocation = new File(userDir);
+		}
+		chooser = new JFileChooser(archiveLocation);
+		Box buttonPanel = new Box(BoxLayout.Y_AXIS);
+		JCheckBox buildFromArchiveCheckbox = new JCheckBox("Build from archive", false);
+		buttonPanel.add(buildFromArchiveCheckbox);
+		chooser.setAccessory(buttonPanel);
+		chooser.setFileFilter(librisFileFilter);
+		if (archiveLocation.isFile()) {
+			chooser.setSelectedFile(archiveLocation);
+		}
+		int option = chooser.showOpenDialog(guiMain.getMainFrame());
+		if (option == JFileChooser.APPROVE_OPTION) {
+			File archiveFile =  chooser.getSelectedFile();
+			if (archiveFile != null) {
+				String errorMessage = "Error reading TAR archive "+archiveFile.getPath();
+				try {
+					if (buildFromArchiveCheckbox.isSelected()) {
+						ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(archiveFile, archiveFile.getParentFile());
+						errorMessage = ERROR_BUILDING_INDEXES_MESSAGE;
+						assertTrue("Archive file is empty", fileList.size() > 0);
+						archiveFile = fileList.get(0);
+					}
+					Libris.buildIndexes(archiveFile, guiMain);
+				} catch (Exception e) {
+					guiMain.alert(errorMessage, e);
+					return false;
+				}
+			}
+			boolean doOpenDatabase = (Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database built successfully\nOpen now?") == Dialogue.YES_OPTION);
+			if (doOpenDatabase)
+				result = openDatabaseImpl(archiveFile, false);
+		}
+		return result;
+	}
+
+	private boolean openDatabaseImpl(File dbFile, boolean readOnlySelected) {
 		guiMain.setDatabaseFile(dbFile);
 		try {
+			guiMain.setOpenReadOnly(readOnlySelected);
 			database = guiMain.openDatabase();
 		} catch (Exception e) {
 			guiMain.alert("Error opening database\n", e);
