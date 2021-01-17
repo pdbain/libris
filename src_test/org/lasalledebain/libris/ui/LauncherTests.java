@@ -38,6 +38,8 @@ public class LauncherTests extends TestCase {
 		DatabaseRecord rec = db.getRecord(2);
 		assertNotNull("Failed to get record", rec);
 		ui.stop();
+		assertTrue("Failed to close database", ui.closeDatabase(false));
+		assertTrue("Failed to quit", ui.quit(false));
 	}
 
 	@Test

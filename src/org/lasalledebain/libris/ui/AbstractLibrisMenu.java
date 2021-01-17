@@ -81,7 +81,7 @@ public abstract class AbstractLibrisMenu {
 		public void actionPerformed(ActionEvent arg0) {
 
 			try {
-				guiMain.quit(false);
+				if (guiMain.quit(false)) System.exit(0);
 			} catch (DatabaseException e) {
 				throw new DatabaseError(e);
 			}

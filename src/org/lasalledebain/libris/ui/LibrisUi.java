@@ -156,10 +156,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	 */
 	@Override
 	public boolean quit(boolean force) throws DatabaseException {
-		if (closeDatabase(force)) {
-			System.exit(0);
-		}
-		return false;
+		return closeDatabase(force);
 	}
 
 	public boolean isDatabaseSelected() {
