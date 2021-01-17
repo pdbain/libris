@@ -80,6 +80,7 @@ public class TestKeyIntegerTuple extends TestCase {
 				b.append(Utilities.ALPHANUMS);
 			}
 			b.setLength(LibrisConstants.KEY_MAX_LENGTH+1);
+			@SuppressWarnings("unused")
 			KeyValueTuple tup2 = new KeyIntegerTuple(b.toString(), 123456789);
 		} catch (InputException e) {
 			exceptionOccurred = true;

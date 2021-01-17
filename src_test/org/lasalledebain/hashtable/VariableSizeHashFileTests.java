@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 public class VariableSizeHashFileTests extends TestCase {
 	private static final int oversizeThreshold = 42;
 	private File testFileObject;
+	private File workingDirectory;
 
 	@Test
 	public void testAddAndGet() {
@@ -238,15 +239,16 @@ public class VariableSizeHashFileTests extends TestCase {
 	}
 
 	protected void setUp() throws Exception {
+		workingDirectory = Utilities.makeTempTestDirectory();
 		logBuffer = new StringBuffer();
-		testLogger.log(Level.INFO, "start "+getName());
+		testLogger.log(Level.INFO, getClass().getName()+" start "+getName());
 		if (null == testFileObject) {
-			testFileObject = Utilities.makeTestFileObject("hashFile");
+			testFileObject = Utilities.makeTestFileObject(workingDirectory, "hashFile");
 		}
 		if (!testFileObject.exists()) {
 			backingStore = new RandomAccessFile(testFileObject, "rw");
 		}
-		mgr = Utilities.makeFileSpaceManager(getName()+"_mgr");
+		mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
 	}
 
 	@Override
@@ -256,6 +258,7 @@ public class VariableSizeHashFileTests extends TestCase {
 			testFileObject.delete();
 		}
 		Utilities.destroyFileSpaceManager(mgr);
+		Utilities.deleteWorkingDirectory();
 	}
 
 	private void print(String msg) {

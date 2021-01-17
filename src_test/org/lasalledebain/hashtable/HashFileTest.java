@@ -412,7 +412,7 @@ public class HashFileTest extends TestCase {
 			fFactory = new MockFixedSizeEntryFactory(28);
 		}
 		if (null == testFileObject) {
-			testFileObject = Utilities.makeTestFileObject("hashFile");
+			testFileObject = Utilities.makeTestFileObject(workingDirectory, "hashFile");
 		}
 		testFileObject.delete();
 		backingStore = new RandomAccessFile(testFileObject, "rw");

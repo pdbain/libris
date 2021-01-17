@@ -33,7 +33,7 @@ public class ArchiveTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		Utilities.deleteWorkingDirectory();
-		testLogger.log(Level.INFO,"running "+getName());
+		testLogger.log(Level.INFO,getClass().getName()+" running "+getName());
 		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 

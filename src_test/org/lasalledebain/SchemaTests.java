@@ -9,14 +9,13 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import junit.framework.TestCase;
-
 import org.lasalledebain.libris.EnumFieldChoices;
-import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.util.Utilities;
+
+import junit.framework.TestCase;
 
 public class SchemaTests extends TestCase{
 
@@ -79,7 +78,7 @@ public class SchemaTests extends TestCase{
 		boolean exceptionThrown = false;
 		try {
 			Schema s = XmlSchema.loadSchema(inputFile);
-			RecordFactory rt = RecordTemplate.templateFactory(s);
+			RecordTemplate.templateFactory(s);
 		} catch (Exception e) {
 			assertTrue(e.getMessage().contains("line 4 element \"fielddef\" : fielddef missing attribute: id"));
 			exceptionThrown = true;

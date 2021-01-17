@@ -93,7 +93,6 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 		try {
 			final int numEntries = 20;
 			final int affiliateScale = 10;
-			int entryCount = 0;
 			Random r = new Random(314126535);
 			HashMap<Integer, int[][]> entries= new HashMap<Integer, int[][]>(numEntries);
 			AffiliateHashBucket affiliateBucket = new AffiliateHashBucket(null, 0, null);
@@ -256,7 +255,6 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 				VariableSizeHashEntry newEntry = createEntry(key, length);
 				entries.put(key, newEntry);
 				boolean result = buck.addEntry(newEntry);
-				int occupancy = buck.getOccupancy();
 				assertTrue("bucket add failed on key "+key, result);
 				length *= 2;
 			}			
@@ -285,7 +283,6 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 				int length = Math.abs(lengthGen.nextInt() % (1 << range));
 				VariableSizeHashEntry newEntry = createEntry(key, length);
 				addMore = buck.addEntry(newEntry);
-				int occupancy = buck.getOccupancy();
 				if (addMore) {
 					entries.put(key, newEntry);
 					++numEntries;
@@ -435,7 +432,6 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 					VariableSizeHashEntry newEntry = createEntry(key, length);
 					entries.put(key, newEntry);
 					boolean result = tempBuck.addEntry(newEntry);
-					int occupancy = tempBuck.getOccupancy();
 					assertTrue("bucket add failed on key "+key, result);
 					length *= 2;
 				}			
@@ -458,7 +454,6 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 					newEntry.setOversize((length > 128) || (key %2) == 1);
 					entries.put(key, newEntry);
 					boolean result = tempBuck.addEntry(newEntry);
-					int occupancy = tempBuck.getOccupancy();
 					assertTrue("bucket add failed on key "+key, result);
 					length /= 2;
 				}			
@@ -477,7 +472,7 @@ public class VariableSizeEntryHashBucketTest extends TestCase{
 	public void setUp() throws Exception {
 		workingDirectory = Utilities.makeTempTestDirectory();
 		if (null == testFile) {
-			testFile = Utilities.makeTestFileObject("variableHashFile");
+			testFile = Utilities.makeTestFileObject(workingDirectory, "variableHashFile");
 		}
 		backingStore = HashUtils.MakeHashFile(testFile);
 		mgr = Utilities.makeFileSpaceManager(workingDirectory, getName()+"_mgr");
