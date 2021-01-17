@@ -168,13 +168,13 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			if (!isOkayToClose(force)) {
 				return false;
 			}
+			if (isDatabaseReserved()) {
+				reservationMgr.freeDatabase();
+			}
 			if (!isDatabaseOpen()) {
 				return true;
 			}
 			myDatabaseFile = null;
-			if (isDatabaseReserved()) {
-				reservationMgr.freeDatabase();
-			}
 			if (hasDocumentRepository()) {
 				documentRepository.close(force);
 			}
