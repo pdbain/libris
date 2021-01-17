@@ -22,11 +22,12 @@ import org.lasalledebain.libris.ui.LibrisUi;
 public class Libris {
 	private static final String OPTION_AUXDIR = "-x";
 	public static final String OPTION_GUI = "-g";
-	public static final String OPTION_ARCHIVEDIR = "-a";
+	public static final String OPTION_REPODIR = "-a";
 	public static final String OPTION_REBUILD = "-b";
 	public static final String OPTION_CMDLINEUI = "-c";
 	public static final String OPTION_WEBUI = "-w";
 	public static final String OPTION_PORT = "-p";
+	public static final String OPTION_EXPORT = "-e";
 
 	enum IfType {
 		UI_HTML, UI_CMDLINE, UI_WEB, UI_GUI
@@ -44,6 +45,7 @@ public class Libris {
 	}
 
 	protected static LibrisUi<DatabaseRecord> mainImpl(String[] args) {
+		Thread.currentThread().setName("Console");
 		IfType myUiType = IfType.UI_GUI;
 		boolean readOnly = false;
 		boolean doRebuild = false;
@@ -84,7 +86,7 @@ public class Libris {
 			} else if (arg.equals("-h")) {
 				printHelpString();
 				System.exit(0);
-			} else if (arg.equals(OPTION_ARCHIVEDIR)) {
+			} else if (arg.equals(OPTION_REPODIR)) {
 				notImplemented(arg);
 			} else if (arg.equals(OPTION_AUXDIR)) {
 				++i;
@@ -189,7 +191,7 @@ public class Libris {
 				+ OPTION_PORT + ": specify port (web server only)"
 				+ OPTION_AUXDIR + ": specify auxiliary directory\n" 
 				+ "-r: open database read-only\n"
-				+ OPTION_ARCHIVEDIR + ": specify arifact repository location";
+				+ OPTION_REPODIR + ": specify artifact repository location";
 		System.out.println(helpString);
 
 	}
