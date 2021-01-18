@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.util;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,6 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
@@ -19,6 +22,7 @@ import java.util.logging.Logger;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
+import org.lasalledebain.libris.DatabaseArchive;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Field.FieldType;
@@ -44,6 +48,7 @@ import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.DatabaseUi;
+import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.TestGUI;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -55,6 +60,7 @@ import junit.framework.TestCase;
 @SuppressWarnings("rawtypes")
 
 public class Utilities extends TestCase {
+	public static final String KEYWORD_DATABASE1_ARCHIVE = "KeywordDatabase1_archive.tar";
 	public static final String HTML_TEST_DATABASE = "htmlTestDatabase1.libr";
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
 	public static final String KEYWORD_DATABASE1_XML = "KeywordDatabase1.xml";
@@ -537,6 +543,17 @@ public class Utilities extends TestCase {
 	public static void pause(String msg) {
 		info("Pause: "+msg);
 		pause();
+	}
+
+	public static LibrisDatabase extractBuildAndOpenDatabase(File archiveFile) throws LibrisException, IOException {
+		ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(archiveFile, archiveFile.getParentFile());
+		assertTrue("Archive file is empty", fileList.size() > 0);
+		File databaseFile = fileList.get(0);
+		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
+		Libris.buildIndexes(databaseFile, ui);
+		LibrisDatabase result = ui.openDatabase();
+		assertNotNull("Database not opened", result);
+		return result;
 	}
 
 }

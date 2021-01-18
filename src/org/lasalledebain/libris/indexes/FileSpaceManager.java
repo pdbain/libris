@@ -53,7 +53,7 @@ public class FileSpaceManager implements Iterable<RecordHeader> {
 	 */
 	public void reset() throws LibrisException {
 		if (readOnly) {
-			throw new UserErrorException("attempting to recreate records file of read-only database");
+			throw new UserErrorException("attempting to modify file of read-only database");
 		}
 
 		try {

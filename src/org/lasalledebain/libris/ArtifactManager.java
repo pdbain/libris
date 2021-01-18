@@ -42,12 +42,12 @@ public class ArtifactManager implements LibrisConstants {
 	private ArtifactDatabase myDb;
 	private ReservationManager reservationMgr;
 
-	public ArtifactManager(DatabaseUi<ArtifactRecord> theUi, File theArtifactDirectory, FileManager theFileMgr) throws DatabaseException {
+	public ArtifactManager(DatabaseUi<ArtifactRecord> theUi, File theArtifactDirectory, FileManager theFileMgr, boolean readOnly) throws DatabaseException {
 		artifactDirectory = theArtifactDirectory;
 		repositoryDirectory = new File(artifactDirectory, ARTIFACTS_REPOSITORY_DIRECTORY);
 		artifactDirectoryPath = artifactDirectory.toPath();
 		myFileMgr = theFileMgr;
-		myDb = new ArtifactDatabase(theUi, theFileMgr);
+		myDb = new ArtifactDatabase(theUi, theFileMgr, readOnly);
 	}
 
 	public boolean initialize() throws LibrisException {

@@ -40,13 +40,14 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	 */
 	protected LibrisJournalFileManager<RecordType> journalFileMgr;
 	protected Records<RecordType> databaseRecords;
-	protected boolean readOnly;
+	private final boolean readOnly;
 	protected boolean isModified;
 	protected final FileManager fileMgr;
 	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 
-	public GenericDatabase(DatabaseUi<RecordType> theUi, FileManager theFileManager) throws DatabaseException {
+	public GenericDatabase(DatabaseUi<RecordType> theUi, FileManager theFileManager, boolean theReadOnly) throws DatabaseException {
 		ui = theUi;
+		readOnly = theReadOnly;
 		fileMgr = theFileManager;
 		indexMgr = new IndexManager<RecordType>(this, fileMgr);
 		modifiedRecords = readOnly? new EmptyRecordList<>(): new ModifiedRecordList<RecordType>();			

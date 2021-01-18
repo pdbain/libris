@@ -77,10 +77,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		public static final String[] subElementNames = new String[] {XML_INSTANCE_TAG, XML_METADATA_TAG, XML_RECORDS_TAG, XML_ARTIFACTS_TAG};
 
 		public LibrisDatabase(LibrisDatabaseConfiguration config, DatabaseUi theUi) throws LibrisException {
-			super(theUi,new FileManager(getDatabaseAuxDirectory(config)));
+			super(theUi,new FileManager(getDatabaseAuxDirectory(config)), config.isReadOnly());
 			myConfiguration = config;
 			myDatabaseFile = config.getDatabaseFile();
-			readOnly = config.isReadOnly();
 			mySchema = null;
 
 			FileAccessManager lockFileManager = fileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.LOCK_FILENAME);
@@ -137,15 +136,16 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 						} catch (IOException e) { /* empty */ }					
 					}
 				}
-				indexMgr.open(readOnly);
+				final boolean databaseReadOnly = isDatabaseReadOnly();
+				indexMgr.open(databaseReadOnly);
 				if (!databaseMetadata.isMetadataOkay()) {
 					throw new DatabaseException("Error in metadata");
 				}
 				getDatabaseRecordsUnchecked();
 				if (hasDocumentRepository()) {
 					FileManager artifactFileMgr = new FileManager(getDatabaseArtifactDirectory(myConfiguration));
-					DatabaseUi<ArtifactRecord> theUi = new ChildUi<ArtifactRecord>(getUi(), readOnly);
-					documentRepository = new ArtifactManager(theUi, databaseMetadata.getRepositoryRoot(), artifactFileMgr);
+					DatabaseUi<ArtifactRecord> theUi = new ChildUi<ArtifactRecord>(getUi(), databaseReadOnly);
+					documentRepository = new ArtifactManager(theUi, databaseMetadata.getRepositoryRoot(), artifactFileMgr, databaseReadOnly);
 				}
 			}
 		}
@@ -157,6 +157,12 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		public boolean isDatabaseReserved() {
 			return Objects.nonNull(reservationMgr) && reservationMgr.isDatabaseReserved();
 		}
+
+		@Override
+		public boolean isDatabaseReadOnly() {
+			return isLocked() || super.isDatabaseReadOnly();
+		}
+
 
 		/**
 		 * Close database if it is not modified or force is true
@@ -192,9 +198,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				fromXml(librisMgr);
 				if (doLoadMetadata) {
 					loadMetadata(librisMgr);
-				}
-				if (isLocked()) {
-					readOnly = true;
 				}
 				librisMgr.closeFile();
 				databaseFileMgr.releaseIpStream(fileIpStream);
@@ -322,7 +325,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				artifactDirectory = getDatabaseArtifactDirectory(myConfiguration);
 			}
 			FileManager artifactFileMgr = new FileManager(artifactDirectory);
-			documentRepository = new ArtifactManager(databaseUi, artifactDirectory, artifactFileMgr);
+			documentRepository = new ArtifactManager(databaseUi, artifactDirectory, artifactFileMgr, isDatabaseReadOnly());
 			documentRepository.initialize();
 			databaseMetadata.hasDocumentRepository(true);
 			databaseMetadata.setRepositoryRoot(artifactDirectory);
@@ -357,9 +360,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				instanceInfo.fromXml(instanceMgr);
 				databaseMetadata.setInstanceInfo(instanceInfo);
 				nextElement = librisMgr.getNextId();
-			}
-			if (dbAttributes.isLocked()) {
-				readOnly = true;
 			}
 		}
 
@@ -827,13 +827,12 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 		public void lockDatabase() {
 			dbAttributes.setLocked(true);
-			readOnly = true;
 		}
 
 		@Override
 		public boolean isRecordReadOnly(int recordId) {
 			boolean result;
-			if (readOnly) {
+			if (isDatabaseReadOnly()) {
 				result = true;
 			} else {
 				result = (recordId <= getMetadata().getRecordIdBase());
@@ -933,6 +932,11 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			} else {
 				return null;
 			}
+		}
+
+		public File getArtifactFileForRecord(DatabaseRecord rec) throws InputException, DatabaseException {
+			assertNotNull(ui, "Record is null", rec);
+			return getArtifactFileForRecord(rec.getRecordId());
 		}
 
 		public File getArtifactFileForRecord(int recordId) throws InputException, DatabaseException {

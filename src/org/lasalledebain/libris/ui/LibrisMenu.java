@@ -505,17 +505,20 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		}
 		int option = chooser.showOpenDialog(guiMain.getMainFrame());
 		if (option == JFileChooser.APPROVE_OPTION) {
-			File archiveFile =  chooser.getSelectedFile();
-			if (archiveFile != null) {
-				String errorMessage = "Error reading TAR archive "+archiveFile.getPath();
+			File selectedFile =  chooser.getSelectedFile();
+			if (selectedFile != null) {
+				String errorMessage = "Error reading TAR archive "+selectedFile.getPath();
+				File databaseFile;
 				try {
 					if (buildFromArchiveCheckbox.isSelected()) {
-						ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(archiveFile, archiveFile.getParentFile());
+						ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(selectedFile, selectedFile.getParentFile());
 						errorMessage = ERROR_BUILDING_INDEXES_MESSAGE;
 						assertTrue("Archive file is empty", fileList.size() > 0);
-						archiveFile = fileList.get(0);
+						databaseFile = fileList.get(0);
+					} else {
+						databaseFile = selectedFile;
 					}
-					Libris.buildIndexes(archiveFile, guiMain);
+					Libris.buildIndexes(databaseFile, guiMain);
 				} catch (Exception e) {
 					guiMain.alert(errorMessage, e);
 					return false;
@@ -523,7 +526,7 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 			}
 			boolean doOpenDatabase = (Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database built successfully\nOpen now?") == Dialogue.YES_OPTION);
 			if (doOpenDatabase)
-				result = openDatabaseImpl(archiveFile, false);
+				result = openDatabaseImpl(selectedFile, false);
 		}
 		return result;
 	}

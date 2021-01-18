@@ -53,13 +53,13 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	public static int numFields;
 	public static String[] requiredAttributesList = LibrisXMLConstants.emptyElementMemberList;
 	public static String[][] optionalAttributesList = LibrisXMLConstants.emptyOptionalAttributesList;
-	public ArtifactDatabase(DatabaseUi<ArtifactRecord> theUi, FileManager theFileManager) throws DatabaseException {
-		super(theUi, theFileManager);
+	public ArtifactDatabase(DatabaseUi<ArtifactRecord> theUi, FileManager theFileManager, boolean readOnly) throws DatabaseException {
+		super(theUi, theFileManager, readOnly);
 		myMetadata = new DatabaseMetadata();
 	}
 	
 	public ArtifactDatabase(DatabaseUi<ArtifactRecord> theUi, File workingDirectory) throws DatabaseException {
-		this(theUi, new FileManager(new File(workingDirectory, LibrisConstants.REPOSITORY_AUX_DIRECTORY_NAME)));
+		this(theUi, new FileManager(new File(workingDirectory, LibrisConstants.REPOSITORY_AUX_DIRECTORY_NAME)), false);
 	}
 	@Override
 	public String getElementTag() {

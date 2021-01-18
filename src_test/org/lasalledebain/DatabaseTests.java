@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
@@ -17,6 +18,7 @@ import java.util.logging.Level;
 
 import org.junit.Test;
 import org.lasalledebain.libris.ArtifactParameters;
+import org.lasalledebain.libris.DatabaseArchive;
 import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
@@ -28,9 +30,13 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordTemplate;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.field.FieldValue;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.ui.DatabaseUi;
+import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
@@ -63,6 +69,122 @@ public class DatabaseTests extends TestCase {
 			assertTrue("error closing exported database", dbx.closeDatabase(false));
 		}
 		exportedFile.delete();
+	}
+	
+	public void testBuildFromArchive() throws FileNotFoundException, IOException, LibrisException {
+		File testArchiveFile = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE1_ARCHIVE, workingDirectory);
+		LibrisDatabase db = Utilities.extractBuildAndOpenDatabase(testArchiveFile);
+		for (DatabaseRecord r:db.getRecords()) {
+			assertTrue("Record has no artifact", r.hasArtifact());
+			File artifactFile = db.getArtifactFileForRecord(r);
+			assertTrue("Artifact file missing", artifactFile.exists());
+		}
+	}
+
+	public void testOpenReadOnlyNoArtifacts() throws FileNotFoundException, IOException, LibrisException {
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
+		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(testDatabaseFileCopy, false);
+		Libris.buildIndexes(testDatabaseFileCopy, ui);
+		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(testDatabaseFileCopy, true));
+		{
+			boolean exceptionThrown = false;
+			try {
+				db.newRecord();
+			} catch (DatabaseError e) {
+				exceptionThrown = true;
+			}
+			assertTrue("no exception when creating new record in read-only database", exceptionThrown);
+		}
+		
+		{
+			boolean exceptionThrown = false;
+			try {
+				DatabaseRecord rec = db.getRecord(2);
+				assertNotNull("record not found", rec);
+				FieldValue fv = rec.getFieldValue("ID_auth");
+				assertFalse("Missing field value", fv.isEmpty());
+				rec.setFieldValue("ID_auth", "foo");
+			} catch (DatabaseException e) {
+				exceptionThrown = true;
+			}
+			assertTrue("no exception when changing record in read-only database", exceptionThrown);
+		}
+	}
+
+	public void testRepoReadOnly() throws FileNotFoundException, IOException, LibrisException {
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
+		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(testDatabaseFileCopy, false);
+		Libris.buildIndexes(testDatabaseFileCopy, ui);
+		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(testDatabaseFileCopy, true));
+		{
+			boolean exceptionThrown = false;
+			try {
+				db.newRecord();
+			} catch (DatabaseError e) {
+				exceptionThrown = true;
+			}
+			assertTrue("no exception when creating new record in read-only database", exceptionThrown);
+		}
+		
+		{
+			boolean exceptionThrown = false;
+			try {
+				DatabaseRecord rec = db.getRecord(2);
+				assertNotNull("record not found", rec);
+				FieldValue fv = rec.getFieldValue("ID_auth");
+				assertFalse("Missing field value", fv.isEmpty());
+				rec.setFieldValue("ID_auth", "foo");
+			} catch (DatabaseException e) {
+				exceptionThrown = true;
+			}
+			assertTrue("no exception when changing record in read-only database", exceptionThrown);
+		}
+		{
+			boolean exceptionThrown = false;
+			try {
+				File newArtifact = new File(workingDirectory, "newArtifact.txt");
+				Files.writeString(newArtifact.toPath(), "test data");
+				DatabaseRecord rec = db.getRecord(3);
+				assertNotNull("record not found", rec);
+				db.addArtifact(rec, newArtifact);
+			} catch (DatabaseException e) {
+				exceptionThrown = true;
+			}
+			assertTrue("no exception when adding artifact to record in read-only database", exceptionThrown);
+		} 
+	}
+
+	public void testOpenReadOnlyWithArtifacts() throws FileNotFoundException, IOException, LibrisException {
+		File archiveFile = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE1_ARCHIVE, workingDirectory);
+		ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(archiveFile, archiveFile.getParentFile());
+		assertTrue("Archive file is empty", fileList.size() > 0);
+		File databaseFile = fileList.get(0);
+		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
+		Libris.buildIndexes(databaseFile, ui);
+		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(databaseFile, true));
+		{
+			boolean exceptionThrown = false;
+			try {
+				db.newRecord();
+			} catch (DatabaseError e) {
+				exceptionThrown = true;
+			}
+			assertTrue("no exception when creating new record in read-only database", exceptionThrown);
+		}
+		
+		{
+			boolean exceptionThrown = false;
+			try {
+				DatabaseRecord rec = db.getRecord(2);
+				assertNotNull("record not found", rec);
+				FieldValue fv = rec.getFieldValue("ID_auth");
+				assertFalse("Missing field value", fv.isEmpty());
+				rec.setFieldValue("ID_auth", "foo");
+			} catch (DatabaseException e) {
+				exceptionThrown = true;
+			}
+			assertTrue("no exception when changing record in read-only database", exceptionThrown);
+		} 
 	}
 
 	public void testAddArtifact() throws FileNotFoundException, IOException, LibrisException {

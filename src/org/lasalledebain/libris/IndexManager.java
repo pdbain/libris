@@ -300,7 +300,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 	public LibrisRecordsFileManager<RecordType> getRecordsFileMgr() throws LibrisException {
 		if (null == recordsFile) {
 			recordsFile = new LibrisRecordsFileManager<RecordType>(database, 
-					database.readOnly, 
+					database.isDatabaseReadOnly(), 
 					database.getSchema(), 
 					fileMgr.getAuxiliaryFileMgr(LibrisConstants.RECORDS_FILENAME),
 					database.getRecordPositions()
@@ -357,7 +357,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 	public synchronized RecordPositions getRecordPositions() throws DatabaseException {
 		if (null == myRecordPositions) {
 			FileAccessManager positionsFileManager = fileMgr.getAuxiliaryFileMgr(LibrisConstants.POSITION_FILENAME);
-			myRecordPositions = new RecordPositions(positionsFileManager, database.readOnly);
+			myRecordPositions = new RecordPositions(positionsFileManager, database.isDatabaseReadOnly());
 		}
 		return myRecordPositions;
 	}

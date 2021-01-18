@@ -14,7 +14,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.hashfile.AffiliateHashFile;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.index.AffiliateListEntry;
-import org.lasalledebain.libris.ui.Messages;
 
 public class AffiliateList<RecordType extends Record> {
 
@@ -36,10 +35,12 @@ public class AffiliateList<RecordType extends Record> {
 				overflowFileMgr.getReadWriteRandomAccessFile();
 
 			overflowSpaceMgr = new FileSpaceManager(overflowFile, overflowFileMgr.getFile(), readOnly);
-			overflowSpaceMgr.reset();
+			if (!readOnly) {
+				overflowSpaceMgr.reset();
+			}
 			bucketOverflowMgr = new BucketOverflowFileManager(overflowSpaceMgr);
 		} catch (FileNotFoundException | LibrisException exc) {
-			throw new DatabaseException(Messages.getString("AffiliateList.0")+theFileMgr.getPath(), exc); //$NON-NLS-1$
+			throw new DatabaseException("Error creating file manager "+theFileMgr.getPath(), exc); //$NON-NLS-1$
 		}
 		try {
 			myHashFile = new AffiliateHashFile(hashTableFile,bucketOverflowMgr);
