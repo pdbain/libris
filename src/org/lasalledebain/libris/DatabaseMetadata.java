@@ -32,19 +32,29 @@ public class DatabaseMetadata implements LibrisXMLConstants {
 		usageProperties = new Properties();
 	}
 
-	public void readProperties(FileInputStream ipFile) throws IOException, DatabaseException {
-		usageProperties.load(ipFile);
+	public boolean readProperties(FileInputStream ipFile) {
+		try {
+			usageProperties.load(ipFile);
+		} catch (IOException e) {
+			LibrisDatabase.log(Level.SEVERE, "Error reading properties file", e);
+			return false;
+		}
 		usageProperties.setProperty(LibrisConstants.PROPERTY_LAST_OPENED, LibrisMetadata.getCurrentDateAndTimeString());
 		String recordIdString = usageProperties.getProperty(LibrisConstants.PROPERTY_LAST_RECORD_ID);
 		String recCount = usageProperties.getProperty(LibrisConstants.PROPERTY_RECORD_COUNT);
 		if (null != recCount) try {
 			savedRecords = Integer.parseInt(recCount);
 		} catch (NumberFormatException exc) {
-			LibrisDatabase.log(Level.WARNING, "Error reading "+LibrisConstants.PROPERTY_RECORD_COUNT+" value = "+recCount, exc);
-			savedRecords = 0;
+			LibrisDatabase.log(Level.SEVERE, "Error reading "+LibrisConstants.PROPERTY_RECORD_COUNT+" value = "+recCount, exc);
+			return false;
 		}
 		if ((null != recordIdString) && !recordIdString.isEmpty()) {
-			lastRecordId = RecordId.toId(recordIdString);
+			try {
+				lastRecordId = RecordId.toId(recordIdString);
+			} catch (DatabaseException e) {
+				LibrisDatabase.log(Level.SEVERE, "Invalid last record ID "+lastRecordId, e);
+				return false;
+			}
 			lastRecOkay = true;
 		} else {
 			lastRecordId = RecordId.NULL_RECORD_ID;
@@ -55,6 +65,7 @@ public class DatabaseMetadata implements LibrisXMLConstants {
 		} else {
 			signatureLevels = 1;
 		}
+		return true;
 	}
 
 	public void saveProperties(FileOutputStream propertiesFile) throws IOException {

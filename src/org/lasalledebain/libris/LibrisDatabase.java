@@ -98,21 +98,24 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return myLogger;
 		}
 
-		public void openDatabase() throws LibrisException {
+		public boolean openDatabase() throws DatabaseNotIndexedException, DatabaseException, LibrisException {
 			assertClosed("open database");
 			if (!reserveDatabase()) {
-				throw new UserErrorException("database is in use");
-			}
-			if (Objects.nonNull(mySchema)) {
-				loadDatabaseInfo(false);
+				alert("database is in use");
+				dbOpen = false;
 			} else {
-				loadDatabaseInfo(true);
-			}
-			openDatabaseImpl();
-			if (hasDocumentRepository()) {
-				documentRepository.open();
+				if (Objects.nonNull(mySchema)) {
+					loadDatabaseInfo(false);
+				} else {
+					loadDatabaseInfo(true);
+				}
+				openDatabaseImpl();
+				if (hasDocumentRepository()) {
+					documentRepository.open();
+				}
 			}
 			dbOpen = true;
+			return dbOpen;
 		}
 
 
@@ -127,7 +130,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					try {
 						ipFile = propsMgr.getIpStream();
 						databaseMetadata.readProperties(ipFile);
-					} catch (IOException | LibrisException e) {
+					} catch (IOException e) {
 						propsMgr.delete();
 						throw new DatabaseException("Exception reading properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
 					} finally {

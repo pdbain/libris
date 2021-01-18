@@ -99,7 +99,8 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 		open();
 	}
 
-	public void open() throws LibrisException {
+	public boolean open() throws LibrisException {
+		boolean result = false;
 		try {
 			if (!recordsFile.exists()) {
 				recordsFile.createNewFile();
@@ -110,10 +111,12 @@ public class LibrisRecordsFileManager<RecordType extends Record> implements Iter
 			}
 			recordList = new RecordHeader(recordsFileStore, 0);
 			freeList = new RecordHeader(recordsFileStore, RecordHeader.getHeaderLength());
+			result = true;
 		} catch (IOException e) {
-			throw new DatabaseException("error opening records file", e);
+			database.alert("error opening records file", e);  // TODO change to logging
 		}
-		}
+		return result;
+	}
 
 	public void flush() throws DatabaseException {
 		if (null != recordList) {

@@ -68,7 +68,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		saveUnchecked();
 	}
 
-	public synchronized void openDatabase() throws LibrisException {
+	public synchronized boolean openDatabase() throws LibrisException {
 		assertClosed("open database");
 		DatabaseMetadata metadata = getMetadata();
 		FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.PROPERTIES_FILENAME);
@@ -76,10 +76,11 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 			FileInputStream ipFile = null;
 			try {
 				ipFile = propsMgr.getIpStream();
-				metadata.readProperties(ipFile);
-			} catch (IOException | LibrisException e) {
+				if (!metadata.readProperties(ipFile)) return false;
+			} catch (IOException e) {
 				propsMgr.delete();
-				throw new DatabaseException("Exception reading properties file"+propsMgr.getPath(), e); //$NON-NLS-1$
+				LibrisDatabase.log(Level.SEVERE, "Exception reading properties file: "+propsMgr.getPath(), e); //$NON-NLS-1$
+				return false;
 			} finally {
 				try {
 					propsMgr.releaseIpStream(ipFile);
@@ -88,10 +89,12 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 		}
 		indexMgr.open(readOnly);
 		if (!metadata.isMetadataOkay()) {
-			throw new DatabaseException("Error in metadata");
+			LibrisDatabase.log(Level.SEVERE, "Error in metadata");
+			return false;
 		}
 		getDatabaseRecordsUnchecked();
 		dbOpen = true;
+		return dbOpen;
 	}
 	
 	public void close() throws DatabaseException {

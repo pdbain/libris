@@ -95,10 +95,12 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	public LibrisDatabase openDatabase(LibrisDatabaseConfiguration config) throws DatabaseException {
 		setDatabaseFile(config.getDatabaseFile());
 		if (!isDatabaseSelected()) {
-			throw new DatabaseException("Database file not set");
+			alert("Database file not set");
+			return null;
 		}
 		if (isDatabaseOpen()) {
 			alert("Cannot open "+databaseFile.getAbsolutePath()+" because "+currentDatabase.getDatabaseFile().getAbsolutePath()+" is open");
+			return null;
 		}
 		try {
 			currentDatabase = new LibrisDatabase(config, this);

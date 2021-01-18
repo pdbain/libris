@@ -64,11 +64,11 @@ public class ArtifactManager implements LibrisConstants {
 		return result;
 	}
 
-	public void open() throws LibrisException {
+	public boolean open() throws LibrisException {
 		reservationMgr = new ReservationManager(
 				myFileMgr.makeAuxiliaryFileAccessManager(LibrisConstants.LOCK_FILENAME));
 		reservationMgr.reserveDatabase();
-		myDb.openDatabase();
+		return myDb.openDatabase();
 	}
 
 	public boolean isDatabaseReserved() {

@@ -561,6 +561,7 @@ public class Utilities extends TestCase {
 		Libris.buildIndexes(databaseFile, ui);
 	
 		LibrisDatabase result = ui.openDatabase();
+		assertNotNull("Database not opened", result);
 		return result;
 	}
 

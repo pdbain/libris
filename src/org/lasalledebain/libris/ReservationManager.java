@@ -20,12 +20,12 @@ class ReservationManager {
 		this.lockFile = lockFile;
 	}
 
-	public synchronized boolean reserveDatabase() throws DatabaseException {
+	public synchronized boolean reserveDatabase() {
 		LibrisDatabase.log(Level.INFO, " > lock database lock file " + lockFile.getPath());
+		boolean result = false;
 		if (databaseReserved) {
-			throw new DatabaseException("Database already reserved");
-		}
-		try {
+			LibrisDatabase.log(Level.SEVERE, "Database already reserved");
+		} else try {
 			lockFile.createNewFile();
 			FileOutputStream lockFileStream = lockFile.getOpStream();
 			dbLock = lockFileStream.getChannel().tryLock();
@@ -33,14 +33,14 @@ class ReservationManager {
 				String dateString = "Reserved " + DateFormat.getDateInstance().format(new Date());
 				lockFileStream.write(dateString.getBytes());
 				databaseReserved = true;
-				return true;
+				result = true;
 			} else {
 				lockFileStream.close();
 			}
 		} catch (IOException e) {
 			LibrisDatabase.log(Level.SEVERE, "Error creating lock file", e);
 		}
-		return false;
+		return result;
 	}
 
 	public boolean isDatabaseReserved() {
