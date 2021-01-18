@@ -22,6 +22,7 @@ import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.indexes.BulkImporter;
 import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.RecordPositions;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.util.Reporter;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -114,8 +115,10 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
 		output.writeStartElement(XML_RECORDS_TAG);
+		DatabaseUi<RecordType> ui = myDatabase.getUi();
 		for (Record r: myDatabase.getRecordReader()) {
 			r.toXml(output);
+			ui.addProgress(1);
 		}
 		output.writeEndElement();
 	}

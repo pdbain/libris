@@ -432,6 +432,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 					} catch (LibrisException e) {
 						db.alert("Error exporting database", e);
 					}
+					setCurrentProgress(100);
 				}
 			});
 			runProgressMonitoredTask(theWorker, "Exporting database...");

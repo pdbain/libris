@@ -390,7 +390,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					r.toXml(outWriter);
 					ui.addProgress(1);
 				}
-				ui.setCurrentProgress(100);
 				outWriter.writeEndElement(); /* records */
 			}
 			if (hasDocumentRepository()) {
@@ -446,7 +445,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		public void archiveDatabaseAndArtifacts(OutputStream archiveStream, boolean includeSchema, boolean includeArtifacts) throws LibrisException, IOException {
 			File tempDir = new File(System.getProperty("java.io.tmpdir"));
 			File databaseXml = File.createTempFile("libris", null, tempDir);
-			try (DatabaseArchive archWriter = new DatabaseArchive(archiveStream)) {
+			try (DatabaseArchive archWriter = new DatabaseArchive(archiveStream, ui)) {
 				exportDatabaseXml(new FileOutputStream(databaseXml), includeSchema, true, false);
 				archWriter.addFileToArchive(databaseXml, myConfiguration.getDatabaseFile().getName());
 				if (hasDocumentRepository() && includeArtifacts) {

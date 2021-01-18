@@ -18,16 +18,19 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.lasalledebain.libris.exception.DatabaseError;
+import org.lasalledebain.libris.ui.ProgressTracker;
 
 public class DatabaseArchive implements Closeable {
 
 	private final TarArchiveOutputStream archiveOutputStream;
+	private final ProgressTracker myTracker;
 
-	public DatabaseArchive(File archiveFile) throws IOException {
-		this(new FileOutputStream(archiveFile, false));
+	public DatabaseArchive(File archiveFile, ProgressTracker theTracker) throws IOException {
+		this(new FileOutputStream(archiveFile, false), theTracker);
 	}
 
-	public DatabaseArchive(OutputStream archiveStream) throws IOException {
+	public DatabaseArchive(OutputStream archiveStream, ProgressTracker theTracker) throws IOException {
+		myTracker = theTracker;
 		archiveOutputStream = new TarArchiveOutputStream(new BufferedOutputStream(archiveStream));
 		archiveOutputStream.setBigNumberMode(TarArchiveOutputStream.BIGNUMBER_STAR);
 		archiveOutputStream.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
@@ -42,6 +45,8 @@ public class DatabaseArchive implements Closeable {
 				archiveOutputStream.putArchiveEntry(tarEntry);
 				Files.copy(f, archiveOutputStream);
 				archiveOutputStream.closeArchiveEntry();
+				if (nonNull(myTracker))
+					myTracker.addProgress(1);
 			} catch (IOException e) {
 				throw new DatabaseError(e);
 			}

@@ -12,7 +12,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public interface DatabaseUi<RecordType extends Record> {
+public interface DatabaseUi<RecordType extends Record> extends ProgressTracker{
 
 	public LibrisDatabase openDatabase() throws DatabaseException;
 	public void saveDatabase();
@@ -89,9 +89,6 @@ public interface DatabaseUi<RecordType extends Record> {
 	public boolean stop();
 	
 	public default void setCurrentProgress(int currentProgress) {
-		return;
-	}
-	public default void addProgress(int progress) {
 		return;
 	}
 }

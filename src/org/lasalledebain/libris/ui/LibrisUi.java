@@ -39,26 +39,6 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	private boolean readOnly;
 	private int expectedWork, accomplishedWork;
 
-	public int getAccomplishedWork() {
-		return accomplishedWork;
-	}
-	public int addAccomplishedWork(int theWork) {
-		accomplishedWork += theWork;
-		return accomplishedWork;
-	}
-	public int getExpectedWork() {
-		return expectedWork;
-	}
-	/**
-	 * Set the total amount of anticipated work for progress monitoring
-	 * and reset the accomplished work to zero.
-	 * @param theTotal
-	 */
-	public void setExpectedWork(int theTotal) {
-		expectedWork = theTotal;
-		accomplishedWork = 0;
-	}
-	
 	public LibrisUi(boolean readOnly) {
 		this();
 		this.readOnly = readOnly;
@@ -318,8 +298,34 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	public void saveDatabase() {
 		currentDatabase.save();
 	}
+	
 	public void sendChooseDatabase() {
 		alert("No database selected");
+	}
+
+	@Override
+	public int getAccomplishedWork() {
+		return accomplishedWork;
+	}
+	
+	@Override
+	public int addAccomplishedWork(int theWork) {
+		accomplishedWork += theWork;
+		return accomplishedWork;
+	}
+	
+	@Override
+	public int getExpectedWork() {
+		return expectedWork;
+	}
+	/**
+	 * Set the total amount of anticipated work for progress monitoring
+	 * and reset the accomplished work to zero.
+	 * @param theTotal
+	 */
+	public void setExpectedWork(int theTotal) {
+		expectedWork = theTotal;
+		accomplishedWork = 0;
 	}
 	@Override
 	public boolean start() {

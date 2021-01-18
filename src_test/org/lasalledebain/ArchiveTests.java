@@ -47,7 +47,7 @@ public class ArchiveTests extends TestCase {
 		Stream<Path> fileList = Files.walk(docDir.toPath()).filter(Files::isRegularFile);
 		File archiveFile = new File(workingDirectory, "test.tar");
 		archiveFile.createNewFile();
-		try (DatabaseArchive archWriter  = new DatabaseArchive(archiveFile)) {
+		try (DatabaseArchive archWriter  = new DatabaseArchive(archiveFile, null)) {
 			archWriter.addFilesToArchive(fileList, docDir);
 		}
 		final File extractDir = new File(workingDirectory, "extract");
@@ -68,7 +68,7 @@ public class ArchiveTests extends TestCase {
 		archiveFile.delete();
 		archiveFile.createNewFile();
 		Stream<Path> fileList = Files.walk(docDir.toPath()).filter(Files::isRegularFile).limit(10);
-		try (DatabaseArchive archWriter  = new DatabaseArchive(archiveFile)) {
+		try (DatabaseArchive archWriter  = new DatabaseArchive(archiveFile, null)) {
 			archWriter.addFilesToArchive(fileList, docDir);
 			fileList = Files.walk(docDir.toPath()).filter(Files::isRegularFile).skip(10);
 			archWriter.addFilesToArchive(fileList, docDir);
@@ -89,7 +89,7 @@ public class ArchiveTests extends TestCase {
 		final File sourceDir = getArtifacts();
 		File archiveFile = new File(workingDirectory, "test.tar");
 		archiveFile.createNewFile();
-		try (DatabaseArchive archWriter  = new DatabaseArchive(archiveFile)) {
+		try (DatabaseArchive archWriter  = new DatabaseArchive(archiveFile, null)) {
 			archWriter.addDirectoryToArchive(sourceDir, workingDirectory);
 		}
 		final File extractDir = new File(workingDirectory, "extract");

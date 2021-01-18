@@ -200,7 +200,7 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 	public void addProgress(int progress) {
 		final int expectedWork = getExpectedWork();
 		if (expectedWork > 0) {
-			setCurrentProgress(addAccomplishedWork(progress));
+			setCurrentProgress((100 * addAccomplishedWork(progress))/expectedWork);
 		}
 	}
 

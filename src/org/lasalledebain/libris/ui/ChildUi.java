@@ -14,6 +14,11 @@ import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 
+	@Override
+	public void addProgress(int theWork) {
+		parentUi.addProgress(theWork);
+	}
+
 	protected final DatabaseUi<DatabaseRecord> parentUi;
 
 	public ChildUi(DatabaseUi<DatabaseRecord> ui, boolean readOnly) {
