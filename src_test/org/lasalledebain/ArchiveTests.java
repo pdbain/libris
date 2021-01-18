@@ -17,7 +17,6 @@ import org.junit.Test;
 import org.lasalledebain.libris.DatabaseArchive;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.DatabaseUi;
@@ -135,7 +134,7 @@ public class ArchiveTests extends TestCase {
 			DatabaseArchive.getFilesFromArchive(databaseExport, extractDir);
 			File extractedDatabase = new File(extractDir, KEYWORD_DATABASE1_XML);
 			assertTrue("original database not open", db.isDatabaseOpen());
-			try (LibrisDatabase recoveredDb = Libris.buildAndOpenDatabase(extractedDatabase)) {
+			try (LibrisDatabase recoveredDb = Utilities.buildAndOpenDatabase(extractedDatabase)) {
 				assertTrue("recovered database not open", recoveredDb.isDatabaseOpen());
 				assertEquals("recovered database does not match",  db, recoveredDb);
 				File[] originalFiles = docDir.listFiles();
@@ -185,7 +184,7 @@ public class ArchiveTests extends TestCase {
 			DatabaseArchive.getFilesFromArchive(databaseExport, extractDir);
 			File extractedDatabase = new File(extractDir, KEYWORD_DATABASE1_XML);
 			assertTrue("original database not open", db.isDatabaseOpen());
-			try (LibrisDatabase recoveredDb = Libris.buildAndOpenDatabase(extractedDatabase)) {
+			try (LibrisDatabase recoveredDb = Utilities.buildAndOpenDatabase(extractedDatabase)) {
 				assertTrue("recovered database not open", recoveredDb.isDatabaseOpen());
 				assertEquals("recovered database does not match",  db, recoveredDb);
 				for (int recordCount = 1; recordCount <= documentCount; ++recordCount) {
@@ -231,7 +230,7 @@ public class ArchiveTests extends TestCase {
 			File extractDir = new File(workingDirectory, "extract");
 			DatabaseArchive.getFilesFromArchive(databaseExport, extractDir);
 			File extractedDatabase = new File(extractDir, KEYWORD_DATABASE1_XML);
-			try (GenericDatabase<DatabaseRecord> recoveredDb = Libris.buildAndOpenDatabase(extractedDatabase)) {
+			try (GenericDatabase<DatabaseRecord> recoveredDb = Utilities.buildAndOpenDatabase(extractedDatabase)) {
 				assertEquals("recovered database does not match",  db, recoveredDb);
 			}
 		}

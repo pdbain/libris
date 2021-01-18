@@ -391,7 +391,7 @@ public class Utilities extends TestCase {
 		File testDatabaseFileCopy = copyTestDatabaseFile(databaseFileName, workingDirectory);			
 		LibrisDatabase db = null;
 		try {
-			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			DatabaseUi ui = db.getUi();
 			ui.closeDatabase(false);
 			db = ui.openDatabase();
@@ -406,7 +406,7 @@ public class Utilities extends TestCase {
 			throws FileNotFoundException, IOException {
 		LibrisDatabase db = null;
 		try {
-			db = Libris.buildAndOpenDatabase(config);
+			db = Utilities.buildAndOpenDatabase(config);
 			DatabaseUi ui = db.getUi();
 			ui.closeDatabase(false);
 			db = ui.openDatabase();
@@ -553,6 +553,21 @@ public class Utilities extends TestCase {
 		Libris.buildIndexes(databaseFile, ui);
 		LibrisDatabase result = ui.openDatabase();
 		assertNotNull("Database not opened", result);
+		return result;
+	}
+
+	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
+		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
+		Libris.buildIndexes(databaseFile, ui);
+	
+		LibrisDatabase result = ui.openDatabase();
+		return result;
+	}
+
+	public static LibrisDatabase buildAndOpenDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
+		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>();
+		Libris.buildIndexes(config, ui);
+		LibrisDatabase result = ui.openDatabase(config);
 		return result;
 	}
 

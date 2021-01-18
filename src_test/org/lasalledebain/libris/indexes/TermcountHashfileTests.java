@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.lasalledebain.hashtable.HashUtils;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -153,7 +152,7 @@ public class TermcountHashfileTests extends TestCase {
 	public void testBuildIndex() {
 		try {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE4_XML, workingDirectory);
-			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFile);
+			LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFile);
 			IndexField[] indexFieldList = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
 			final DatabaseUi myUi = db.getUi();
 			

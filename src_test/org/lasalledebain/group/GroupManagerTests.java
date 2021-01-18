@@ -6,7 +6,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.indexes.GroupManager;
@@ -22,7 +21,7 @@ public class GroupManagerTests extends TestCase {
 		workingDirectory = Utilities.makeTempTestDirectory();
 		File testDatabaseFileCopy1 = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 		File testDatabaseFileCopy = testDatabaseFileCopy1;
-		db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 	}
 
 	@Test

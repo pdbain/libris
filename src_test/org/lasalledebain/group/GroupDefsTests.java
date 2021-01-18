@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.Schema;
@@ -103,7 +102,7 @@ public class GroupDefsTests extends TestCase {
 	public void testFieldInheritance() {
 		try {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE, workingDirectory);
-			GenericDatabase<DatabaseRecord> db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			GenericDatabase<DatabaseRecord> db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
 			ArrayList<DatabaseRecord> recList = new ArrayList<DatabaseRecord>();
 			{
@@ -195,7 +194,7 @@ public class GroupDefsTests extends TestCase {
 
 	public void testSetParent() throws FileNotFoundException, IOException, LibrisException {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE, workingDirectory);
-			GenericDatabase<DatabaseRecord> db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			GenericDatabase<DatabaseRecord> db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
 			ArrayList<DatabaseRecord> recList = new ArrayList<DatabaseRecord>();
 			{

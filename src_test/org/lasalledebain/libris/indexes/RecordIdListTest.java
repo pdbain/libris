@@ -11,7 +11,6 @@ import junit.framework.TestCase;
 import org.junit.After;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.util.Utilities;
 
 public class RecordIdListTest extends TestCase {
@@ -32,7 +31,7 @@ public class RecordIdListTest extends TestCase {
 		try {
 			workingDirectory = Utilities.makeTempTestDirectory();
 			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(DATABASE_WITH_GROUPS_XML, workingDirectory);
-			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			System.out.println("database rebuilt");
 		} catch (Exception e) {
 			e.printStackTrace();

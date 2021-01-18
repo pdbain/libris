@@ -337,7 +337,7 @@ public class InheritanceTest extends TestCase {
 	private void setupDatabase(String dbFile) {
 		try {
 			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile, workingDirectory);
-			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
 		} catch (Exception e) {
 			e.printStackTrace();

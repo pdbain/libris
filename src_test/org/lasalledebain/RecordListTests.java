@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.ModifiedRecordList;
 import org.lasalledebain.libris.Record;
@@ -50,7 +49,7 @@ public class RecordListTests extends TestCase {
 
 	public void testDatabaseRecordList () {
 		try {
-			testDb = Libris.buildAndOpenDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory));
+			testDb = Utilities.buildAndOpenDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory));
 			RecordList<DatabaseRecord> list = testDb.getRecords();
 			int recordCount = 0;
 			for (Record r: list) {
@@ -70,7 +69,7 @@ public class RecordListTests extends TestCase {
 
 	public void testModifiedList () {
 		try {
-			testDb = Libris.buildAndOpenDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory));
+			testDb = Utilities.buildAndOpenDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory));
 			RecordList<DatabaseRecord> list = testDb.getRecords();
 			ModifiedRecordList modList = new ModifiedRecordList();
 			ArrayList<Record> foundRecords = new ArrayList<Record>();
@@ -101,7 +100,7 @@ public class RecordListTests extends TestCase {
 		File testDatabaseFileCopy;
 		try {
 			testDatabaseFileCopy = getTestDatabase();
-			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			testDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			final DatabaseUi myUi = testDb.getUi();
 			DatabaseRecord rec = testDb.newRecord();
 			rec.addFieldValue(ID_AUTH, "new record");
@@ -128,7 +127,7 @@ public class RecordListTests extends TestCase {
 		File testDatabaseFileCopy;
 		try {
 			testDatabaseFileCopy = getTestDatabase();
-			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			testDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			final DatabaseUi myUi = testDb.getUi();
 			DatabaseRecord rec = testDb.newRecord();
 			rec.addFieldValue(ID_AUTH, "new record");
@@ -161,7 +160,7 @@ public class RecordListTests extends TestCase {
 		File testDatabaseFileCopy;
 		try {
 			testDatabaseFileCopy = getTestDatabase();
-			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			testDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			testDb.getUi().quit(true);
 			final DatabaseUi myUi = testDb.getUi();
 			for (int r=1; r <= expectedIds.length; ++r) {
@@ -190,7 +189,7 @@ public class RecordListTests extends TestCase {
 		String expectedData[] = {null, "record1", "record2", "record3", "record4"};
 		try {
 			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbName, workingDirectory);
-			 testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			 testDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 
 			checkRecordOrder(testDb, expectedData);
 
@@ -209,7 +208,7 @@ public class RecordListTests extends TestCase {
 			
 			testDb.exportDatabaseXml(new FileOutputStream(testDatabaseFileCopy), true, true, false);
 			ui.quit(true);
-			testDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			testDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			checkRecordOrder(testDb, expectedData);
 			/*
 			 * load database with unordered records

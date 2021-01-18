@@ -196,21 +196,6 @@ public class Libris {
 
 	}
 
-	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
-		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
-		buildIndexes(databaseFile, ui);
-
-		LibrisDatabase result = ui.openDatabase();
-		return result;
-	}
-
-	public static LibrisDatabase buildAndOpenDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
-		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>();
-		buildIndexes(config, ui);
-		LibrisDatabase result = ui.openDatabase(config);
-		return result;
-	}
-
 	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi<DatabaseRecord> ui) throws LibrisException {
 		if (null == ui) {
 			ui = new HeadlessUi<DatabaseRecord>(false);

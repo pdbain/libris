@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.util.Utilities;
@@ -69,7 +68,7 @@ public class DatabaseStressTests extends TestCase {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(EMPTY_DATABASE_FILE, workingDirectory);			
 		GenericDatabase<DatabaseRecord> db = null;
 		try {
-			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		} catch (LibrisException e) {
 			e.printStackTrace();
 			fail("could not open database:"+e.getMessage());

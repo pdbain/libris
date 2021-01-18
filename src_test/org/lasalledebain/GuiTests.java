@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
@@ -57,7 +56,7 @@ public class GuiTests extends TestCase {
 		File testDatabaseFileCopy = testDatabaseFileCopy1;
 		LibrisDatabase db = null;
 		try {
-			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("Unexpected exception "+e);

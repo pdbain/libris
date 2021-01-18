@@ -57,14 +57,14 @@ public class DatabaseTests extends TestCase {
 		File exportedFile;
 		{
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
-			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			assertTrue("No repo in original database", db.hasDocumentRepository());
 			exportedFile = new File(workingDirectory, "exportedFile.xml");
 			db.exportDatabaseXml(exportedFile);
 			assertTrue("error closing database", db.closeDatabase(false));
 		}
 		{
-			LibrisDatabase dbx = Libris.buildAndOpenDatabase(exportedFile);
+			LibrisDatabase dbx = Utilities.buildAndOpenDatabase(exportedFile);
 			assertTrue("No repo in original database", dbx.hasDocumentRepository());
 			assertTrue("error closing exported database", dbx.closeDatabase(false));
 		}
@@ -191,7 +191,7 @@ public class DatabaseTests extends TestCase {
 
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
 		File myArtifact = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_ARTIFACT_PDF, workingDirectory);
-		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		DatabaseUi myUi = db.getUi();
 		DatabaseRecord rec = db.getRecord(1);
 		rec.setEditable(true);
@@ -213,7 +213,7 @@ public class DatabaseTests extends TestCase {
 		{
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
 			File myArtifact = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_ARTIFACT_PDF, workingDirectory);
-			LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			DatabaseRecord rec = db.getRecord(1);
 			rec.setEditable(true);
 			db.addArtifact(rec, myArtifact);
@@ -226,7 +226,7 @@ public class DatabaseTests extends TestCase {
 			assertTrue("error closing database", db.closeDatabase(false));
 		}
 		{
-			LibrisDatabase dbx = Libris.buildAndOpenDatabase(exportedFile);
+			LibrisDatabase dbx = Utilities.buildAndOpenDatabase(exportedFile);
 			DatabaseRecord rec = dbx.getRecord(1);
 			int artifactId = rec.getArtifactId();
 			assertFalse("artifact is missing in re-opened database", RecordId.isNull(artifactId));
@@ -239,7 +239,7 @@ public class DatabaseTests extends TestCase {
 	public void testReadRecordsFromSingleFile() {
 		try {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
-			rootDb =  Libris.buildAndOpenDatabase(testDatabaseFile);
+			rootDb =  Utilities.buildAndOpenDatabase(testDatabaseFile);
 			RecordFactory<DatabaseRecord> rt = RecordTemplate.templateFactory(rootDb.getSchema(), null);
 			Vector<Record> recordList = new Vector<Record>();
 			ElementManager librisMgr = Utilities.makeElementManagerFromFile(testDatabaseFile, "libris");
@@ -349,13 +349,13 @@ public class DatabaseTests extends TestCase {
 	public void testMultipleRebuild() {
 		try {			
 			File testDatabaseFileCopy = getTestDatabase();			
-			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			rootDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			DatabaseUi ui = rootDb.getUi();
 			LibrisMetadata meta = rootDb.getMetadata();
 			int numRecs = meta.getSavedRecords();
 			assertEquals("Wrong number of records initial build", 4, numRecs);
 			ui.closeDatabase(false);
-			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			rootDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			ui = rootDb.getUi();
 			ui.closeDatabase(false);
 			forkDb = ui.openDatabase();
@@ -410,7 +410,7 @@ public class DatabaseTests extends TestCase {
 			rootDb.exportDatabaseXml(copyStream, true, true, false);
 			copyStream.close();
 
-			forkDb = Libris.buildAndOpenDatabase(copyDbXml);
+			forkDb = Utilities.buildAndOpenDatabase(copyDbXml);
 			assertNotNull("Error rebuilding database copy", forkDb);
 			assertTrue("database copy does not match original", forkDb.equals(rootDb));
 			copyDbXml.delete();
@@ -430,7 +430,7 @@ public class DatabaseTests extends TestCase {
 			rootDb.exportDatabaseXml(copyStream);
 			copyStream.close();
 
-			forkDb = Libris.buildAndOpenDatabase(copyDbXml);
+			forkDb = Utilities.buildAndOpenDatabase(copyDbXml);
 			assertNotNull("Error rebuilding database copy", forkDb);
 			assertTrue("database copy does not match original", forkDb.equals(rootDb));
 			copyDbXml.delete();
@@ -448,7 +448,7 @@ public class DatabaseTests extends TestCase {
 			db.exportDatabaseXml(copyStream, true, true, false);
 			copyStream.close();
 
-			GenericDatabase<DatabaseRecord> dbCopy = Libris.buildAndOpenDatabase(copyDbXml);
+			GenericDatabase<DatabaseRecord> dbCopy = Utilities.buildAndOpenDatabase(copyDbXml);
 			assertNotNull("Error rebuilding database copy", dbCopy);
 			assertTrue("database copy does not match original", dbCopy.equals(db));
 			db.closeDatabase(false);
@@ -466,7 +466,7 @@ public class DatabaseTests extends TestCase {
 		String dbFile = DATABASE_WITH_GROUPS_XML;
 		try {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile, workingDirectory);
-			rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			rootDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			testLogger.log(Level.INFO, "database rebuilt");
 			int lastId = rootDb.getLastRecordId();
 			for (int i = lastId+1; i <= numRecs; ++i) {
@@ -496,7 +496,7 @@ public class DatabaseTests extends TestCase {
 			instanceStream.close();
 		}
 		int lastId = rootDb.getLastRecordId();
-		forkDb = Libris.buildAndOpenDatabase(dbInstance);
+		forkDb = Utilities.buildAndOpenDatabase(dbInstance);
 		assertNotNull("Error rebuilding database copy", forkDb);
 		assertTrue("database copy does not match original", forkDb.equals(rootDb));
 
@@ -557,7 +557,7 @@ public class DatabaseTests extends TestCase {
 			rootDb.exportFork(instanceStream);
 			instanceStream.close();
 			int lastId = rootDb.getLastRecordId();
-			forkDb = Libris.buildAndOpenDatabase(dbIncrement);
+			forkDb = Utilities.buildAndOpenDatabase(dbIncrement);
 			assertNotNull("Error rebuilding database copy", forkDb);
 			assertTrue("database copy does not match original", forkDb.equals(rootDb));
 
@@ -621,7 +621,7 @@ public class DatabaseTests extends TestCase {
 			}
 			int incrementNumber = 0;
 			for (File forkFile: forkFiles) {
-				forkDb = Libris.buildAndOpenDatabase(forkFile);
+				forkDb = Utilities.buildAndOpenDatabase(forkFile);
 				DatabaseRecord recCopy;
 				{
 					DatabaseRecord newForkRec = rootDb.newRecord();
@@ -679,7 +679,7 @@ public class DatabaseTests extends TestCase {
 			rootDb.putRecord(newRootRec);
 			rootDb.save();
 
-			forkDb = Libris.buildAndOpenDatabase(dbInstance);
+			forkDb = Utilities.buildAndOpenDatabase(dbInstance);
 			assertNotNull("Error rebuilding database copy", forkDb);
 
 			DatabaseRecord newForkRec1 = forkDb.newRecord();
@@ -755,7 +755,7 @@ public class DatabaseTests extends TestCase {
 			checkDbRecords(myOriginalDb, rootExpectedRecords);
 			myOriginalDb.save();
 
-			try (LibrisDatabase myForkDb = Libris.buildAndOpenDatabase(dbInstance)) {
+			try (LibrisDatabase myForkDb = Utilities.buildAndOpenDatabase(dbInstance)) {
 				assertNotNull("Error rebuilding database copy", myForkDb);
 				assertFalse("database copy not changed from original", myForkDb.equals(myOriginalDb));
 
@@ -821,7 +821,7 @@ public class DatabaseTests extends TestCase {
 
 	private LibrisDatabase buildTestDatabase(File testDatabaseFileCopy) throws IOException, LibrisException {			
 		rootDb = null;
-		rootDb = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		rootDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		rootDb.getUi();
 		return rootDb;
 	}

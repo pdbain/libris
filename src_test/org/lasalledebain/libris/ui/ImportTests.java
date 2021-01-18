@@ -8,7 +8,6 @@ import junit.framework.TestCase;
 
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -34,7 +33,7 @@ public class ImportTests extends TestCase {
 		}
 	
 		try {
-			db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+			db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("unexpected exception "+e);

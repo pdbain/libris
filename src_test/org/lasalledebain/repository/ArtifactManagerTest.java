@@ -23,7 +23,6 @@ import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.ArtifactRecord;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileManager;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -97,7 +96,7 @@ public class ArtifactManagerTest  extends TestCase {
 		File repoRoot = new File(workingDirectory, "TestRoot");
 		repoRoot.mkdir();
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
-		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		db.addDocumentRepository(repoRoot); // use default
 		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
 		String[] testFileNames = filterTestFilenames(testPdfDirectory);
@@ -124,7 +123,7 @@ public class ArtifactManagerTest  extends TestCase {
 		testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
 		 
 		db.exportDatabaseXml(copyStream);
-		LibrisDatabase db2 = Libris.buildAndOpenDatabase(copyDbXml);
+		LibrisDatabase db2 = Utilities.buildAndOpenDatabase(copyDbXml);
 		checkRecordArtifacts(db2);
 		
 		for (Record r: db.getRecords()) {
@@ -159,7 +158,7 @@ public class ArtifactManagerTest  extends TestCase {
 	public void testDatabaseWithDefaultDocumentRepo() throws FileNotFoundException, IOException, LibrisException {
 		File repoRoot = null;
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
-		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		db.addDocumentRepository(repoRoot); // use default
 		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
 		String[] testFileNames = filterTestFilenames(testPdfDirectory);
@@ -176,7 +175,7 @@ public class ArtifactManagerTest  extends TestCase {
 		testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
 		 
 		db.exportDatabaseXml(copyStream);
-		LibrisDatabase db2 = Libris.buildAndOpenDatabase(copyDbXml);
+		LibrisDatabase db2 = Utilities.buildAndOpenDatabase(copyDbXml);
 		checkRecordArtifacts(db2);
 		
 		for (Record r: db.getRecords()) {
@@ -194,7 +193,7 @@ public class ArtifactManagerTest  extends TestCase {
 
 	public void testPutGet() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
-		LibrisDatabase db = Libris.buildAndOpenDatabase(testDatabaseFileCopy);
+		LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		File testPdfDirectory = new File(Utilities.getTestDataDirectory(), Utilities.EXAMPLE_FILES);
 		String[] testFileNames = filterTestFilenames(testPdfDirectory);
 		assertTrue("wrong number of test files", testFileNames.length >= 4);
