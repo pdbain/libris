@@ -22,7 +22,6 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
-@SuppressWarnings("rawtypes")
 
 public class InheritanceTest extends TestCase {
 	File testDatabaseFileCopy;

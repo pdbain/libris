@@ -10,7 +10,6 @@ import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.ui.GuiControlFactory.StaticControlConstructor;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -24,7 +23,6 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 	int height = -1, width = -1, vpos = -1, hpos = -1, hspan = -1, vspan = -1;
 	private LayoutField<RecordType> prevLink;
 	private LibrisLayout<RecordType> containingLayout;
-	protected StaticControlConstructor control;
 	protected GuiControlConstructor<RecordType> ctrlConstructor;
 	private boolean carriageReturn = false;
 	private int myRightEdge;
@@ -69,10 +67,6 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 			cursor = cursor.prevLink;
 		}
 		return myRightEdge;
-	}
-
-	public StaticControlConstructor getStaticControlContructor() {
-		return control;
 	}
 
 	public GuiControlConstructor<RecordType> getControlContructor() {
@@ -205,10 +199,6 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 			controlType = defaultControlType.get(containingLayout.getFieldType(id));
 		} else {
 			controlTypeName = controlType;
-		}
-		control=GuiControlFactory.staticgetControlConstructor(controlTypeName);
-		if (null == control) {
-			throw new DatabaseException("unrecognized control type "+controlTypeName);
 		}
 		
 		Assertion.assertNotNullError("unrecognized control type "+controlTypeName, ctrlConstructor = ctrlFactory.getControlConstructor(controlTypeName));
