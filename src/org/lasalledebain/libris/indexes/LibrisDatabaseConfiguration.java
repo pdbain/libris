@@ -6,7 +6,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 
 public class LibrisDatabaseConfiguration extends DatabaseConfiguration {
 	private File myDatabaseFile;
-	private File artifactDirectory;
+	private File repositoryDirectory;
 	private File auxiliaryDirectory;
 	private boolean loadMetadata;
 	private boolean readOnly;
@@ -16,7 +16,7 @@ public class LibrisDatabaseConfiguration extends DatabaseConfiguration {
 		readOnly = false;
 		auxiliaryDirectory = null;
 		myDatabaseFile = null;
-		artifactDirectory = null;
+		repositoryDirectory = null;
 		loadMetadata = true;
 	}
 
@@ -55,12 +55,12 @@ public class LibrisDatabaseConfiguration extends DatabaseConfiguration {
 		return myDatabaseFile;
 	}
 
-	public File getArtifactDirectory() {
-		return artifactDirectory;
+	public File getRepositoryDirectory() {
+		return repositoryDirectory;
 	}
 
-	public void setArtifactDirectory(File artifactDirectory) {
-		this.artifactDirectory = artifactDirectory;
+	public void setRepositoryDirectory(File repositoryDir) {
+		repositoryDirectory = repositoryDir;
 	}
 
 	public boolean isReadOnly() {

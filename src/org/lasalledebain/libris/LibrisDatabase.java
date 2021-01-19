@@ -303,7 +303,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					nextElement = librisMgr.getNextId();
 					if (XmlRecordsReader.XML_ARTIFACTS_TAG.equals(nextElement)) {
 						ElementManager artifactsMgr = librisMgr.nextElement();
-						File artifactDirectory = myConfiguration.getArtifactDirectory();
+						File artifactDirectory = myConfiguration.getRepositoryDirectory();
 						DatabaseUi<DatabaseRecord> databaseUi = new HeadlessUi<DatabaseRecord>();
 						initializeDocumentRepository(databaseUi, artifactDirectory);
 						documentRepository.fromXml(artifactsMgr);
@@ -613,7 +613,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 
 		public static File getDatabaseArtifactDirectory(LibrisDatabaseConfiguration config) throws DatabaseException {
-			File auxDir = config.getArtifactDirectory();
+			File auxDir = config.getRepositoryDirectory();
 			if (isNull(auxDir)) {
 				File theDatabaseFile = config.getDatabaseFile();
 				auxDir = getDatabaseAuxDirectory(theDatabaseFile, REPOSITORY_AUX_DIRECTORY_NAME);
@@ -661,7 +661,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				throw new DatabaseException("Document repository already set");
 			}
 			if (Objects.isNull(repositoryRoot)) {
-				repositoryRoot = FileManager.getDefautlArtifactsDirectory(myConfiguration);
+				repositoryRoot = FileManager.getDefautlRepositoryDirectory(myConfiguration);
 			}
 			initializeDocumentRepository(ui, repositoryRoot);
 			if (isDatabaseOpen()) {

@@ -105,7 +105,7 @@ public class ConfigTest extends TestCase {
 		
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setAuxiliaryDirectory(auxDir);
-		config.setArtifactDirectory(artDir);
+		config.setRepositoryDirectory(artDir);
 		LibrisUi ui = new HeadlessUi();
 		ui.rebuildDatabase(config);
 		currentDb = ui.openDatabase(config);

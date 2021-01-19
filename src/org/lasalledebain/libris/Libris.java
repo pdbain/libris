@@ -20,17 +20,21 @@ import org.lasalledebain.libris.ui.LibrisHttpServer;
 import org.lasalledebain.libris.ui.LibrisUi;
 
 public class Libris {
-	private static final String OPTION_AUXDIR = "-x";
+	private static final String OPTION_HELP = "-h";
+	private static final String OPTION_AUXDIR = "-u";
 	public static final String OPTION_GUI = "-g";
 	public static final String OPTION_REPODIR = "-a";
 	public static final String OPTION_REBUILD = "-b";
+	public static final String OPTION_ARCHIVE = "-a";
 	public static final String OPTION_CMDLINEUI = "-c";
 	public static final String OPTION_WEBUI = "-w";
 	public static final String OPTION_PORT = "-p";
 	public static final String OPTION_EXPORT = "-e";
+	public static final String OPTION_INCLUDE_ARTIFACTS = "-f";
+	public static final String OPTION_READONLY = "-r";
 
 	enum IfType {
-		UI_HTML, UI_CMDLINE, UI_WEB, UI_GUI
+		UI_HTML, UI_CMDLINE, UI_WEB, UI_GUI, UI_DEFAULT
 	};
 
 	/**
@@ -46,10 +50,14 @@ public class Libris {
 
 	protected static LibrisUi<DatabaseRecord> mainImpl(String[] args) {
 		Thread.currentThread().setName("Console");
-		IfType myUiType = IfType.UI_GUI;
+		IfType myUiType = IfType.UI_DEFAULT;
 		boolean readOnly = false;
 		boolean doRebuild = false;
+		boolean doExport = false;
+		boolean includeArtifacts = false;
+		boolean archive = true;
 		String auxDirPath = null;
+		String repoDirPath = null;
 		String databaseFilePath = null;
 		int webPort = LibrisHttpServer.default_port;
 		boolean batch = false;
@@ -58,52 +66,67 @@ public class Libris {
 		int i = 0;
 		while (status && (i < args.length)) {
 			String arg = args[i];
-			if (arg.equals("-r")) {
+			switch (arg) {
+			case OPTION_READONLY: 
 				readOnly = true;
-			} else if (arg.equals(OPTION_REBUILD)) {
+				break;
+			case OPTION_INCLUDE_ARTIFACTS: 
+				includeArtifacts = true;
+				notImplemented(arg);
+				break;
+			case OPTION_REBUILD:
 				doRebuild = true;
 				batch = true;
-			} else if (arg.equals(OPTION_GUI)) {
+				break;
+			case OPTION_EXPORT:
+				doExport = true;
+				batch = true;
+				notImplemented(arg);
+				break;
+			case OPTION_GUI:
 				myUiType = IfType.UI_GUI;
-			} else if (arg.equals(OPTION_CMDLINEUI)) {
+				break;
+			case OPTION_CMDLINEUI:
 				myUiType = IfType.UI_CMDLINE;
-			} else if (arg.equals(OPTION_WEBUI)) {
+				break;
+			case OPTION_WEBUI:
 				myUiType = IfType.UI_WEB;
 				// TODO add port and context for web
-			} else if (arg.equals(OPTION_PORT)) {
-				if ((i + 1) < args.length) {
-					++i;
+				break;
+			case OPTION_PORT:
+				++i;
+				if (status = assertOptionParameter(args, i, OPTION_PORT)) {
 					try {
 						webPort = Integer.parseInt(args[i]);
 					} catch (NumberFormatException e) {
 						cmdlineError("Invalid argument for " + OPTION_PORT + ": " + args[i]);
 						status = false;
 					}
-				} else {
-					cmdlineError("Missing argument for " + OPTION_PORT);
-					status = false;
 				}
-			} else if (arg.equals("-h")) {
+				break;
+			case OPTION_HELP:
 				printHelpString();
 				System.exit(0);
-			} else if (arg.equals(OPTION_REPODIR)) {
-				notImplemented(arg);
-			} else if (arg.equals(OPTION_AUXDIR)) {
+				break;
+			case OPTION_AUXDIR:
 				++i;
-				if (i < args.length) {
-					auxDirPath = args[i + 1];
-				} else {
-					cmdlineError("Missing argument for " + OPTION_AUXDIR);
-				}
-				status = false;
-			} else if (!arg.startsWith("-")) {
-				if (null == databaseFilePath) {
-					databaseFilePath = arg;
-				} else {
-					cmdlineError("only one database name can be specified");
-					status = false;
+				if (status = assertOptionParameter(args, i, OPTION_AUXDIR))	auxDirPath = args[i];
+				break;
+			case OPTION_REPODIR:
+				++i;
+				if (status = assertOptionParameter(args, i, OPTION_REPODIR)) repoDirPath = args[i];
+				break;
+			default: 
+				if (!arg.startsWith("-")) {
+					if (null == databaseFilePath) {
+						databaseFilePath = arg;
+					} else {
+						cmdlineError("only one database name can be specified");
+						status = false;
+					}
 				}
 			}
+
 			++i;
 		}
 
@@ -111,12 +134,12 @@ public class Libris {
 		try {
 			File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
 			LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
-			File auxDir = null;
 			if ((null != dbFile) && (!dbFile.isFile())) {
 				cmdlineError(databaseFilePath + " is not a file");
 				status = false;
 			}
 			if (null != auxDirPath) {
+				File auxDir = null;
 				auxDir = new File(auxDirPath);
 				if (!auxDir.exists()) {
 					cmdlineError("Auxiliary directory "+auxDirPath+" does not exist");
@@ -124,15 +147,30 @@ public class Libris {
 				}
 				config.setAuxiliaryDirectory(auxDir);
 			}
-			// TODO configurable aux dir & artifact dir
+			if (null != repoDirPath) {
+				File repoDirFile = new File(repoDirPath);
+				if (!repoDirFile.exists()) {
+					cmdlineError("Repository directory "+repoDirPath+" does not exist");
+					status = false;
+				}
+				config.setRepositoryDirectory(repoDirFile);
+			}
 			if (status) {
+				{
+					Assertion.assertTrue(ui, "cannot specify both "+OPTION_EXPORT+" and "+OPTION_REBUILD, doExport && doRebuild);
+					Assertion.assertTrue(ui, "cannot specify both "+OPTION_INCLUDE_ARTIFACTS+" without "+OPTION_EXPORT, !doExport && includeArtifacts);
+					Assertion.assertTrue(ui, "cannot specify both "+OPTION_ARCHIVE+" without "+OPTION_EXPORT+" or "+OPTION_REBUILD, 
+							!(doRebuild || doExport) && archive);
+				}
 				if (doRebuild) {
+					Assertion.assertEquals(ui, "cannot specify UI type for batch operations", IfType.UI_DEFAULT, myUiType);
 					Assertion.assertNotNullError("Database file not set", dbFile);
 					ui = new HeadlessUi<DatabaseRecord>(false);
 					status = ui.rebuildDatabase(config);
 				} else {
 					switch (myUiType) {
 					case UI_GUI:
+					case UI_DEFAULT:
 						ui = new LibrisGui(dbFile, readOnly);
 						break;
 					case UI_WEB:
@@ -176,6 +214,16 @@ public class Libris {
 		return result;
 	}
 
+	protected static boolean assertOptionParameter(String[] args, int i, final String optionKey) {
+		boolean status;
+		if (i >= args.length) {
+			cmdlineError("Missing argument for " + optionKey);
+			status = false;
+		}
+		status = true;
+		return status;
+	}
+
 	private static void notImplemented(String arg) {
 		System.err.println(arg + " not implemented");
 		System.exit(1);
@@ -183,15 +231,20 @@ public class Libris {
 
 	private static void printHelpString() {
 		String helpString = "Libris: a record management system.\n" + "Syntax:]\n" 
-				+ OPTION_REBUILD
-				+ ": rebuild database\n" + "libris -[c|g|w] [-p <port>] [-x <path>] [-r] [-a <path>] <database file>\n"
+				+ "libris ["+OPTION_CMDLINEUI+ "|"+OPTION_GUI+ "|"+OPTION_WEBUI+"|+"+OPTION_REBUILD+"]"
+				+ "["+ OPTION_PORT+" <port>]"+ "["+ OPTION_INCLUDE_ARTIFACTS+"]"
+				+ "["
+				+ OPTION_AUXDIR+" <path>]"
+				+ "["+ OPTION_READONLY+"] ["+OPTION_REPODIR + " <path>] "
+				+ "<file>\n"
 				+ OPTION_CMDLINEUI + ": command-line\n" 
 				+ OPTION_GUI + ": graphical user interface\n" 
 				+ OPTION_WEBUI + ": start web server\n"
 				+ OPTION_PORT + ": specify port (web server only)"
 				+ OPTION_AUXDIR + ": specify auxiliary directory\n" 
-				+ "-r: open database read-only\n"
-				+ OPTION_REPODIR + ": specify artifact repository location";
+				+ OPTION_READONLY+": open database read-only\n"
+				+ OPTION_REPODIR + ": specify artifact repository location"
+				+ OPTION_REBUILD + ": rebuild database\n";
 		System.out.println(helpString);
 
 	}

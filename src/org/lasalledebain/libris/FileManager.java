@@ -177,8 +177,8 @@ public class FileManager {
 		activeManagers.values().forEach(f -> f.close());
 	}
 
-	public static File getDefautlArtifactsDirectory(LibrisDatabaseConfiguration config) throws DatabaseException {
-		File artifactDirectoryFile = config.getArtifactDirectory();
+	public static File getDefautlRepositoryDirectory(LibrisDatabaseConfiguration config) throws DatabaseException {
+		File artifactDirectoryFile = config.getRepositoryDirectory();
 		if (isNull(artifactDirectoryFile)) {
 			LibrisDatabase.getDatabaseAuxDirectory(config.getDatabaseFile(), "artifacts");
 		}
