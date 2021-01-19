@@ -37,6 +37,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 	protected final Layouts<RecordType> myLayouts;
 	protected LayoutProcessor<RecordType> layoutProc;
 	private int tableRightEdge;
+	private final GuiControlFactory<RecordType> ctrlFactory;
 
 	public LibrisLayout(Schema schem, Layouts<RecordType> theLayouts) {
 		mySchema = schem;
@@ -44,6 +45,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		layoutUsers = new ArrayList<String>(1);
 		myLayouts = theLayouts;
 		layoutProc = null;
+		ctrlFactory = new GuiControlFactory<RecordType>();
 	}
 
 	public LibrisLayout(Schema schem) {
@@ -96,9 +98,11 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		case XML_LAYOUT_TYPE_TABLE: 
 			result = new TableLayoutProcessor<>(this);
 			break;
-		case XML_LAYOUT_TYPE_FORM: 
-			result = new FormLayoutProcessor<>(this);
+		case XML_LAYOUT_TYPE_FORM: {
+			result = new FormLayoutProcessor<RecordType>(this, ctrlFactory);
 			break;
+		}
+
 		case XML_LAYOUT_TYPE_LIST:
 			result = new ListLayoutProcessor<>(this);
 			break;

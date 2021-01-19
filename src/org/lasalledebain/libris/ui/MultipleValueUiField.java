@@ -13,6 +13,7 @@ import javax.swing.Box;
 
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.FieldValueIterator;
@@ -21,13 +22,13 @@ import org.lasalledebain.libris.field.FieldValueIterator;
  * Holds the individual GUI controls for each value in a field
  *
  */
-public class MultipleValueUiField extends UiField  implements Iterable<FieldValue> {
-	private ArrayList<GuiControl> controlList;
-	private LayoutField fldInfo;
-	public MultipleValueUiField(LayoutField fInfo, boolean labelField, Field fld, int numValues, ModificationTracker modTrk) {
+public class MultipleValueUiField<RecordType extends Record> extends UiField  implements Iterable<FieldValue> {
+	private ArrayList<GuiControl<RecordType>> controlList;
+	private LayoutField<RecordType> fldInfo;
+	public MultipleValueUiField(LayoutField<RecordType> fInfo, boolean labelField, Field fld, int numValues, ModificationTracker modTrk) {
 		super(fld,modTrk);
 		fldInfo = fInfo;
-		controlList = new ArrayList<GuiControl>(numValues);
+		controlList = new ArrayList<GuiControl<RecordType>>(numValues);
 		controlsContainer = Box.createVerticalBox();
 		titledBorder = labelField? BorderFactory.createTitledBorder(LINE_BORDER, fldInfo.getTitle()):
 			BorderFactory.createTitledBorder(LINE_BORDER);
@@ -35,13 +36,13 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 		controlsContainer.addMouseListener(new FieldMouseListener());
 	}
 
-	public void add(GuiControl control) {
+	public void add(GuiControl<RecordType> control) {
 		controlList.add(control);
 		controlsContainer.add(control.getGuiComponent());
 	}
 
-	public GuiControl addControl(boolean editable) throws FieldDataException {
-		GuiControl ctrl = GuiControlFactory.newControl(fldInfo,
+	public GuiControl<RecordType> addControl(boolean editable) throws FieldDataException {
+		GuiControl<RecordType> ctrl = GuiControlFactory.staticnewControl(fldInfo,
 				recordField,  modificationTrack,  editable);
 		FocusListener focusTracker = new SelectFocusListener(this);
 		ctrl.addFocusListener(focusTracker);
@@ -58,7 +59,7 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 	public void setFieldValues(FieldValue[] valueArray) throws FieldDataException {
 		removeAll();
 		for (FieldValue fv: valueArray) {
-			GuiControl c = addControl(true);
+			GuiControl<RecordType> c = addControl(true);
 			c.setFieldValue(fv);
 		}
 	}
@@ -74,9 +75,9 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 	}
 
 	private class UiFieldValueIterator implements FieldValueIterator {
-		private Iterator<GuiControl> controlListIterator;
-		private GuiControl nextControl;
-		private UiFieldValueIterator(Iterator<GuiControl> cListI) {
+		private Iterator<GuiControl<RecordType>> controlListIterator;
+		private GuiControl<RecordType> nextControl;
+		private UiFieldValueIterator(Iterator<GuiControl<RecordType>> cListI) {
 			controlListIterator = cListI;
 			nextControl = null;
 		}
@@ -84,7 +85,7 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 		@Override
 		public boolean hasNext() {
 			if (Objects.isNull(nextControl) && controlListIterator.hasNext()) {
-				GuiControl temp = controlListIterator.next();
+				GuiControl<RecordType> temp = controlListIterator.next();
 				temp.copyValuesFromControls();
 				if (!temp.isEmpty()) {
 					nextControl = temp;
@@ -145,7 +146,7 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 
 	}
 
-	public GuiControl getCtrl(int i) {
+	public GuiControl<RecordType> getCtrl(int i) {
 		return controlList.get(i);
 	}
 

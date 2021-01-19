@@ -10,6 +10,7 @@ import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.GuiControlFactory.ControlConstructor;
+import org.lasalledebain.libris.ui.GuiControlFactory.StaticControlConstructor;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -23,7 +24,8 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 	int height = -1, width = -1, vpos = -1, hpos = -1, hspan = -1, vspan = -1;
 	private LayoutField<RecordType> prevLink;
 	private LibrisLayout<RecordType> containingLayout;
-	protected ControlConstructor control;
+	protected StaticControlConstructor control;
+	protected ControlConstructor ctrlConstructor;
 	private boolean carriageReturn = false;
 	private int myRightEdge;
 
@@ -71,8 +73,12 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 		return myRightEdge;
 	}
 
-	public ControlConstructor getControlContructor() {
+	public StaticControlConstructor getStaticControlContructor() {
 		return control;
+	}
+
+	public ControlConstructor getControlContructor() {
+		return ctrlConstructor;
 	}
 
 	public int getFieldNum() {

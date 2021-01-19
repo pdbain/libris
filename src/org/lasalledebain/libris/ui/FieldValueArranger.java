@@ -17,11 +17,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
 @SuppressWarnings("serial")
-public class FieldValueArranger extends JDialog {
+public class FieldValueArranger<RecordType extends Record> extends JDialog {
 	 
     private JButton upButton;
     private JButton downButton;
@@ -35,7 +36,7 @@ public class FieldValueArranger extends JDialog {
 	private Frame parentFrame;
 	boolean fieldUpdated;
  
-	public FieldValueArranger(JFrame parent, final MultipleValueUiField fld) {
+	public FieldValueArranger(JFrame parent, final MultipleValueUiField<RecordType> fld) {
 		super(parent, "Arrange field values", true);
 		fieldUpdated = false;
 		parentFrame = parent;
