@@ -4,12 +4,12 @@ import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XMLElement;
-import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.ui.GuiControlFactory.ControlConstructor;
 import org.lasalledebain.libris.ui.GuiControlFactory.StaticControlConstructor;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -25,17 +25,15 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 	private LayoutField<RecordType> prevLink;
 	private LibrisLayout<RecordType> containingLayout;
 	protected StaticControlConstructor control;
-	protected ControlConstructor ctrlConstructor;
+	protected GuiControlConstructor<RecordType> ctrlConstructor;
 	private boolean carriageReturn = false;
 	private int myRightEdge;
+	private final GuiControlFactory<RecordType> ctrlFactory;
 
-	public boolean isCarriageReturn() {
-		return carriageReturn;
-	}
-
-	public LayoutField(LibrisLayout<RecordType> containingLayout, LayoutField<RecordType> previous) throws DatabaseException {
+	public LayoutField(LibrisLayout<RecordType> containingLayout, LayoutField<RecordType> previous, GuiControlFactory<RecordType> theFactory) throws DatabaseException {
 		this.containingLayout = containingLayout;
 		prevLink = previous;
+		ctrlFactory = theFactory;
 	}
 
 	public void setFieldNum(int fieldNum) {
@@ -77,7 +75,7 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 		return control;
 	}
 
-	public ControlConstructor getControlContructor() {
+	public GuiControlConstructor<RecordType> getControlContructor() {
 		return ctrlConstructor;
 	}
 
@@ -123,6 +121,10 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 
 	public int getVspan() {
 		return vspan;
+	}
+
+	public boolean isCarriageReturn() {
+		return carriageReturn;
 	}
 
 	@Override
@@ -204,10 +206,12 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 		} else {
 			controlTypeName = controlType;
 		}
-		control=GuiControlFactory.getControlConstructor(controlTypeName);
+		control=GuiControlFactory.staticgetControlConstructor(controlTypeName);
 		if (null == control) {
 			throw new DatabaseException("unrecognized control type "+controlTypeName);
 		}
+		
+		Assertion.assertNotNullError("unrecognized control type "+controlTypeName, ctrlConstructor = ctrlFactory.getControlConstructor(controlTypeName));
 
 		Dimension dims = Layouts.getDefaultDimensions(controlType);
 

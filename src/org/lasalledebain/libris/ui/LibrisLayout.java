@@ -68,7 +68,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		while (mgr.hasNext()) {
 			ElementManager subElementMgr = mgr.nextElement();
 			if (subElementMgr.getElementTag().equals(XML_LAYOUTFIELD_TAG)) {
-				LayoutField<RecordType> l = new LayoutField<>(this, positionList);
+				LayoutField<RecordType> l = new LayoutField<RecordType>(this, positionList, ctrlFactory);
 				l.fromXml(subElementMgr);
 				tableRightEdge = Math.max(l.getRightEdge(), tableRightEdge);
 				l.setFieldNum(mySchema.getFieldNum(l.getId()));
@@ -281,7 +281,13 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 
 	@Override
 	public boolean equals(Object obj) {
-		return (obj.getClass() == this.getClass()) && ((LibrisLayout<RecordType>) obj).getAttributes().equals(getAttributes());
+		if (getClass().isAssignableFrom(obj.getClass())) {
+			@SuppressWarnings("unchecked")
+			LibrisLayout<RecordType> comparand = (LibrisLayout<RecordType>) obj;
+			return comparand.getAttributes().equals(getAttributes());
+		} else {
+			return false;
+		}
 	}
 
 	public void setType(String theType) {

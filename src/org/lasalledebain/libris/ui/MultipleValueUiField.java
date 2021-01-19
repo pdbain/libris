@@ -25,8 +25,10 @@ import org.lasalledebain.libris.field.FieldValueIterator;
 public class MultipleValueUiField<RecordType extends Record> extends UiField  implements Iterable<FieldValue> {
 	private ArrayList<GuiControl<RecordType>> controlList;
 	private LayoutField<RecordType> fldInfo;
-	public MultipleValueUiField(LayoutField<RecordType> fInfo, boolean labelField, Field fld, int numValues, ModificationTracker modTrk) {
+	private final GuiControlFactory<RecordType> ctrlFactory;
+	public MultipleValueUiField(GuiControlFactory<RecordType> theFactory, LayoutField<RecordType> fInfo, boolean labelField, Field fld, int numValues, ModificationTracker modTrk) {
 		super(fld,modTrk);
+		ctrlFactory = theFactory;
 		fldInfo = fInfo;
 		controlList = new ArrayList<GuiControl<RecordType>>(numValues);
 		controlsContainer = Box.createVerticalBox();
@@ -42,7 +44,7 @@ public class MultipleValueUiField<RecordType extends Record> extends UiField  im
 	}
 
 	public GuiControl<RecordType> addControl(boolean editable) throws FieldDataException {
-		GuiControl<RecordType> ctrl = GuiControlFactory.staticnewControl(fldInfo,
+		GuiControl<RecordType> ctrl = ctrlFactory.newControl(fldInfo,
 				recordField,  modificationTrack,  editable);
 		FocusListener focusTracker = new SelectFocusListener(this);
 		ctrl.addFocusListener(focusTracker);

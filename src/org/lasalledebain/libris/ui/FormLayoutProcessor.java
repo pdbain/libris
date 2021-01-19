@@ -37,9 +37,11 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 			MULTICONTROL_CELL_CLASS = "multiControlCell",
 			FIELD_TEXT_MULTILINE_CLASS="fieldTextMultiLine";
 	private final String myStyleString;
-	public FormLayoutProcessor(LibrisLayout<RecordType> theLayout, GuiControlFactory<RecordType> ctrlFactory) {
+	private final GuiControlFactory<RecordType> ctrlFactory;
+	public FormLayoutProcessor(LibrisLayout<RecordType> theLayout, GuiControlFactory<RecordType> theFactory) {
 		super(theLayout);
 		myStyleString = makeStyleString();
+		ctrlFactory = theFactory;
 	}
 
 	private String makeStyleString() {
@@ -126,7 +128,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 			c.gridx = fp.getHpos(); c.gridy = fp.getVpos();
 			c.gridwidth = fp.isCarriageReturn()? GridBagConstraints.REMAINDER: fp.getHspan();
 			c.gridheight = fp.getVspan();
-			MultipleValueUiField guiFld = GuiControlFactory.staticmakeMultiControlField(fp, fld, modTrk);
+			MultipleValueUiField<RecordType> guiFld = ctrlFactory.makeMultiControlField(fp, fld, modTrk);
 			JComponent comp = guiFld.getGuiComponent();
 			panelLayout.setConstraints(comp, c);
 			fieldPanel.add(comp);
