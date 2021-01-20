@@ -27,7 +27,7 @@ public class GuiTests extends TestCase {
 			ElementManager mgr = Utilities.makeElementManagerFromFile(inputFile, "layouts");
 
 			loadSchema();
-			Layouts<Record> myLayouts = new Layouts(mySchema);
+			Layouts<Record> myLayouts = new Layouts<Record>(mySchema);
 			myLayouts.fromXml(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();

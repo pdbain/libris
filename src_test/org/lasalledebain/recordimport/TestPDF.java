@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.PdfRecordImporter;
@@ -50,7 +51,7 @@ public class TestPDF extends TestCase {
 		assertTrue("Could not create "+repoRoot.getPath(), repoRoot.mkdir());
 		final File repoDbFile = Repository.initialize(repoRoot);
 		assertTrue("could not create database", null != repoDbFile);
-		HeadlessUi ui = new HeadlessUi(repoFile, false);
+		HeadlessUi<Record> ui = new HeadlessUi<Record>(repoFile, false);
 		repo = Repository.open(ui, repoRoot);
 		db = null;
 	}

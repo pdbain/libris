@@ -52,7 +52,7 @@ public class GuiManualTests extends TestCase {
 	 */
 	@Override
 	protected void setUp() throws Exception {
-		myUi = new HeadlessUi(null, false);
+		myUi = new HeadlessUi<DatabaseRecord>(null, false);
 	}
 
 	private static final String LAYOUT1 = "layout1";
