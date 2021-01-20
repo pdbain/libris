@@ -5,14 +5,12 @@ import java.io.File;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.NamedRecordList;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public interface DatabaseUi<RecordType extends Record> extends ProgressTracker{
+public interface DatabaseUi extends ProgressTracker{
 
 	public LibrisDatabase openDatabase() throws DatabaseException;
 	public void saveDatabase();
@@ -42,12 +40,7 @@ public interface DatabaseUi<RecordType extends Record> extends ProgressTracker{
 
 	void recordsAccessible(boolean accessible);
 
-	@Deprecated
-	RecordType newRecord();
 	public abstract void displayRecord(int recordId) throws LibrisException;
-	public abstract void put(RecordType newRecord) throws DatabaseException;
-
-	public void addRecord(RecordType newRecord) throws DatabaseException;
 
 	/**
 	 * Create a new, empty, value for a field
@@ -63,7 +56,8 @@ public interface DatabaseUi<RecordType extends Record> extends ProgressTracker{
 	void setSelectedField(UiField selectedField);
 	public abstract String getUiTitle();
 
-	public void setRecordName(NamedRecordList<RecordType> namedRecs) throws InputException;
+	public void setRecordName() throws InputException;
+	
 	public void setRecordArtifact();
 	
 	public abstract void arrangeValues();

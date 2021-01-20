@@ -43,7 +43,6 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
-@SuppressWarnings("rawtypes")
 public class TestRecordFilter extends TestCase {
 
 	private LibrisDatabase db;

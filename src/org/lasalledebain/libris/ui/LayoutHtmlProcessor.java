@@ -10,5 +10,5 @@ public interface LayoutHtmlProcessor<RecordType extends Record> {
 
 	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException;
 	public void layOutPage(RecordList<RecordType> recList, HttpParameters params,
-			LibrisLayout<RecordType> browserLayout, DatabaseUi<RecordType> ui) throws InputException, IOException;
+			LibrisLayout<RecordType> browserLayout, DatabaseUi ui) throws InputException, IOException;
 }

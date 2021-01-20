@@ -253,7 +253,6 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 		return layoutEditPane;
 	}
 
-	@Override
 	public DatabaseRecord newRecord() {
 		DatabaseRecord rec = null;
 		DatabaseRecordWindow rw = newRecordWindow();
@@ -280,14 +279,12 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 		return rw;
 	}
 
-	@Override
 	public void addRecord(DatabaseRecord newRecord) throws DatabaseException {
 		if (null != currentDatabase) {
 			resultsPanel.addRecord(newRecord);
 		}
 	}
 
-	@Override
 	public void put(DatabaseRecord newRecord) throws DatabaseException {
 		resultsPanel.addRecord(newRecord);
 		updateUITitle();
@@ -493,7 +490,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 		UiField f = getSelectedField();
 		final JFrame frame = new JFrame("Arrange values");
 		if (f.isMultiControl()) {
-			FieldValueArranger arrng = new FieldValueArranger(frame, (MultipleValueUiField) f);
+			FieldValueArranger<DatabaseRecord> arrng = new FieldValueArranger<DatabaseRecord> (frame, (MultipleValueUiField) f);
 			arrng.setVisible(true);
 			currentRecordWindow.setModified(arrng.isFieldUpdated());
 		}
@@ -534,8 +531,38 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 
 	}
 
-	@Override
 	public void setRecordName(NamedRecordList<DatabaseRecord> namedRecs) throws InputException {
+		RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
+		if (null != currentRecordWindow) {
+			Record rec = currentRecordWindow.getRecord();
+			String newName = JOptionPane.showInputDialog("New record name", rec.getName());
+			if ((null != newName) && !newName.isEmpty()) {
+				if (!Record.validateRecordName(newName)) {
+					alert(newName + ": invalid record name");
+				} else {
+					int recId = namedRecs.getId(newName);
+					if (!RecordId.isNull(recId)) {
+						alert(newName + " already used by record " + recId);
+					} else {
+						String oldName = rec.getName();
+						if (!newName.equals(oldName)) {
+							if ((null != oldName) && !oldName.isEmpty()) {
+								namedRecs.remove(oldName);
+							}
+							currentRecordWindow.setModified(true);
+							rec.setName(newName);
+							resultsPanel.removeRecord(rec);
+						}
+						displayPanel.setCurrentRecordName(newName);
+						repaint();
+					}
+				}
+			}
+		}
+	}
+
+	public void setRecordName() throws InputException {
+		NamedRecordList<DatabaseRecord> namedRecs = currentDatabase.getNamedRecords();
 		RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
 		if (null != currentRecordWindow) {
 			Record rec = currentRecordWindow.getRecord();

@@ -31,11 +31,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 	}
 
 	@Override
-	public void put(Record newRecord) throws DatabaseException {
-		alert("Operation not available");
-	}
-
-	@Override
 	public void repaint() {
 		alert("Operation not available");
 	}
@@ -118,7 +113,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 		return nonNull(parentUi)? parentUi.getSelectedField(): null;
 	}
 
-	@Override
 	public RecordType newRecord() {
 		try {
 			currentDatabase.newRecord();
@@ -130,11 +124,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 
 	@Override
 	public void arrangeValues() {
-		alert("Operation not available");
-	}
-
-	@Override
-	public void addRecord(RecordType newRecord) throws DatabaseException {
 		alert("Operation not available");
 	}
 

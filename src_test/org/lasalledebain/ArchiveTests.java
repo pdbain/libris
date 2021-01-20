@@ -106,7 +106,7 @@ public class ArchiveTests extends TestCase {
 
 	@Test
 	public void testArchiveWithArtifacts() throws IOException, LibrisException {
-		DatabaseUi<DatabaseRecord> ui;
+		DatabaseUi ui;
 		final File docDir = new File(workingDirectory, "docs");
 		try (LibrisDatabase db = Utilities.buildTestDatabase(workingDirectory, KEYWORD_DATABASE1_XML)) {
 			ui = db.getUi();
@@ -152,7 +152,7 @@ public class ArchiveTests extends TestCase {
 	@Test
 	public void testArchiveWithManyArtifacts() throws IOException, LibrisException {
 		final int documentCount = 500;
-		DatabaseUi<DatabaseRecord> ui;
+		DatabaseUi ui;
 		final File sourceDir = new File(workingDirectory, "docs");
 		final String sourceDirPath = sourceDir.getPath();
 		try (LibrisDatabase db = Utilities.buildTestDatabase(workingDirectory, KEYWORD_DATABASE1_XML)) {

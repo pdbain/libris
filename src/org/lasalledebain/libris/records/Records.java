@@ -115,7 +115,7 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 	@Override
 	public void toXml(ElementWriter output) throws LibrisException {
 		output.writeStartElement(XML_RECORDS_TAG);
-		DatabaseUi<RecordType> ui = myDatabase.getUi();
+		DatabaseUi ui = myDatabase.getUi();
 		for (Record r: myDatabase.getRecordReader()) {
 			r.toXml(output);
 			ui.addProgress(1);

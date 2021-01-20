@@ -216,7 +216,7 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		editMenuFieldValueCommands.add(recordName);
 		recordName.addActionListener(e ->  {
 			try {
-				database.getUi().setRecordName(database.getNamedRecords());
+				database.getUi().setRecordName();
 			} catch (InputException exc) {
 				throw new DatabaseError("Error setting name", exc);
 			}

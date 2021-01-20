@@ -52,7 +52,6 @@ public class ArtifactTest extends TestCase {
 		Utilities.deleteRecursively(workingDirectory);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testCreateDatabase() throws LibrisException {
 		final int numArtifacts = 16;
@@ -100,7 +99,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testImportExportRecords() throws LibrisException, IOException, XMLStreamException {
 		final int numArtifacts = 16;
-		DatabaseUi<ArtifactRecord> myUi = new HeadlessUi<ArtifactRecord>(false);
+		DatabaseUi myUi = new HeadlessUi<ArtifactRecord>(false);
 		File exportFile = new File(workingDirectory, "database.xml");
 		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
@@ -163,7 +162,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testIndex() throws LibrisException, IOException, XMLStreamException {
 		final int numArtifacts = 16;
-		DatabaseUi<ArtifactRecord> myUi = new HeadlessUi<ArtifactRecord>(false);
+		DatabaseUi myUi = new HeadlessUi<ArtifactRecord>(false);
 		File exportFile = new File(workingDirectory, "database.xml");
 		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
@@ -223,7 +222,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testGroups() throws LibrisException {
 		final int numArtifacts = 16;
-		DatabaseUi<ArtifactRecord> myUi = new HeadlessUi<ArtifactRecord>(false);
+		DatabaseUi myUi = new HeadlessUi<ArtifactRecord>(false);
 		try(ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
 			db.openDatabase();

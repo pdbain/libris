@@ -1,17 +1,15 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.libris.LibrisDatabase.log;
+
 import java.awt.Dimension;
 import java.io.File;
 import java.util.logging.Level;
 
-import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-
-import static org.lasalledebain.libris.LibrisDatabase.log;
 
 public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<RecordType> {
 	private String schemaPath;
@@ -99,17 +97,7 @@ public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<Reco
 		this.accessible = accessible;
 	}
 
-	@Override
-	public void put(Record newRecord) throws DatabaseException {
-		log(Level.FINE, newRecord.toString());
-	}
-
 	public void repaint() {
-	}
-
-	@Override
-	public void setRecordName(NamedRecordList<RecordType> namedRecs) throws InputException {
-		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
 	}
 
 	@Override

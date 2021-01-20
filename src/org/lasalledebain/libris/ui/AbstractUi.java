@@ -17,10 +17,16 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public abstract class AbstractUi<RecordType extends Record> implements DatabaseUi<RecordType>, LibrisConstants {
+public abstract class AbstractUi<RecordType extends Record> implements DatabaseUi, LibrisConstants {
+	
+	@Override
+	public void setRecordName() throws InputException {
+		alert("Operation not available");
+	}
 	
 	private static final String NO_DATABASE_OPENED = "No database opened";
 	private UiField selectedField;
@@ -153,19 +159,10 @@ public abstract class AbstractUi<RecordType extends Record> implements DatabaseU
 	public UiField getSelectedField() {
 		return selectedField;
 	}
-	@Override
-	public RecordType newRecord() {
-		return null;
-	}
 
 	@Override
 	public void arrangeValues() {
 		throw new DatabaseError("LibrisUiGeneric.arrangeValues unimplemented");
-	}
-
-	@Override
-	public void addRecord(RecordType newRecord) throws DatabaseException{
-		throw new DatabaseError("LibrisUiGeneric.addRecord unimplemented");
 	}
 
 	@Override

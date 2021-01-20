@@ -112,7 +112,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	}
 
 	protected final LibrisLayout<RecordType> myLayout;
-	protected DatabaseUi<RecordType> myUi;
+	protected DatabaseUi myUi;
 
 	public LayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		myLayout = theLayout;
@@ -128,7 +128,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	}
 
 	/* HTML utilities */
-	protected void generateHeaderAndStylesheet(DatabaseUi<RecordType> ui, StringBuffer buffer) {
+	protected void generateHeaderAndStylesheet(DatabaseUi ui, StringBuffer buffer) {
 		buffer.append("<!DOCTYPE html>\n" + 
 				"<meta charset=utf-8>\n" + 
 				"<head>\n" + 
@@ -304,7 +304,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	}
 
 	public void layOutPage(RecordList<RecordType> recList, HttpParameters params,
-			LibrisLayout<RecordType> browserLayout, DatabaseUi<RecordType> ui) throws InputException, IOException {
+			LibrisLayout<RecordType> browserLayout, DatabaseUi ui) throws InputException, IOException {
 		myUi = ui;
 		StringBuffer buff = new StringBuffer(1000);
 		generateHeaderAndStylesheet(ui, buff);

@@ -116,7 +116,7 @@ public class TestPDF extends TestCase {
 			db = Utilities.buildTestDatabase(workingDirectory, Utilities.KEYWORD_DATABASE1_XML);
 	        Map<String, String> env = new HashMap<>(); 
 	        env.put("create", "true");
-	        DatabaseUi<?> ui = db.getUi();
+	        DatabaseUi ui = db.getUi();
 			int keywordField = db.getSchema().getFieldNum("ID_keywords");
 			int abstractField = db.getSchema().getFieldNum("ID_text");
 			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);

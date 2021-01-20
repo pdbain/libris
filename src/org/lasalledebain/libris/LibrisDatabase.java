@@ -147,7 +147,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				getDatabaseRecordsUnchecked();
 				if (hasDocumentRepository()) {
 					FileManager artifactFileMgr = new FileManager(getDatabaseArtifactDirectory(myConfiguration));
-					DatabaseUi<ArtifactRecord> theUi = new ChildUi<ArtifactRecord>(getUi(), databaseReadOnly);
+					DatabaseUi theUi = new ChildUi(getUi(), databaseReadOnly);
 					documentRepository = new ArtifactManager(theUi, databaseMetadata.getRepositoryRoot(), artifactFileMgr, databaseReadOnly);
 				}
 			}
@@ -304,8 +304,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					if (XmlRecordsReader.XML_ARTIFACTS_TAG.equals(nextElement)) {
 						ElementManager artifactsMgr = librisMgr.nextElement();
 						File artifactDirectory = myConfiguration.getRepositoryDirectory();
-						DatabaseUi<DatabaseRecord> databaseUi = new HeadlessUi<DatabaseRecord>();
-						initializeDocumentRepository(databaseUi, artifactDirectory);
+						DatabaseUi theUi = new HeadlessUi<DatabaseRecord>();
+						initializeDocumentRepository(theUi, artifactDirectory);
 						documentRepository.fromXml(artifactsMgr);
 						documentRepository.buildIndexes(myConfiguration);
 					}

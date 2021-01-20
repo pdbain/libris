@@ -260,12 +260,12 @@ public class Libris {
 		return db;
 	}
 
-	public static boolean buildIndexes(File databaseFile, DatabaseUi<?> ui) throws LibrisException {
+	public static boolean buildIndexes(File databaseFile, DatabaseUi ui) throws LibrisException {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(databaseFile);
 		return buildIndexes(config, ui);
 	}
 
-	public static boolean buildIndexes(LibrisDatabaseConfiguration config, DatabaseUi<?> databaseUi)
+	public static boolean buildIndexes(LibrisDatabaseConfiguration config, DatabaseUi databaseUi)
 			throws LibrisException {
 		if (config.isReadOnly()) {
 			databaseUi.alert("Cannot build indexes if read-only set");

@@ -166,7 +166,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 	};
 	
 	public void layOutPage(RecordList<RecordType> recList, HttpParameters parameterObject, 
-			LibrisLayout<RecordType> browserLayout, DatabaseUi<RecordType> ui) throws InputException, IOException {
+			LibrisLayout<RecordType> browserLayout, DatabaseUi ui) throws InputException, IOException {
 		layoutProc.layOutPage(recList, parameterObject, browserLayout, ui);
 	}
 

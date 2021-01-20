@@ -33,7 +33,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected boolean dbOpen;
 	protected GroupManager<RecordType> groupMgr;
 	protected IndexManager<RecordType> indexMgr;
-	protected final DatabaseUi<RecordType> ui;
+	protected final DatabaseUi ui;
 	protected ModifiedRecordList<RecordType> modifiedRecords;
 	/**
 	 * XML representation of database records added
@@ -45,7 +45,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	protected final FileManager fileMgr;
 	final static LibrisXmlFactory xmlFactory = new LibrisXmlFactory();
 
-	public GenericDatabase(DatabaseUi<RecordType> theUi, FileManager theFileManager, boolean theReadOnly) throws DatabaseException {
+	public GenericDatabase(DatabaseUi theUi, FileManager theFileManager, boolean theReadOnly) throws DatabaseException {
 		ui = theUi;
 		readOnly = theReadOnly;
 		fileMgr = theFileManager;
@@ -173,7 +173,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 
 	public abstract DatabaseMetadata getMetadata();
 
-	public DatabaseUi<RecordType> getUi() {
+	public DatabaseUi getUi() {
 		return ui;
 	}
 

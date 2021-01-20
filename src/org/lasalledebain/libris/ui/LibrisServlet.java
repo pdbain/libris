@@ -24,7 +24,7 @@ import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class LibrisServlet<RecordType extends Record> extends HttpServlet implements LibrisHTMLConstants{
-	AbstractUi myUi;
+	AbstractUi<RecordType> myUi;
 	private final Layouts<DatabaseRecord> myLayouts;
 	String[] layoutIds;
 	private LibrisLayout<DatabaseRecord> summaryDisplay;

@@ -13,12 +13,12 @@ public class Assertion {
 	 * @return result of test
 	 */
 	
-	private static void displayMessage(DatabaseUi<?> ui, String message) {
+	private static void displayMessage(DatabaseUi ui, String message) {
 		if (null == ui)  System.err.println(message);
 		else ui.alert(message);
 	}
 	
-	public static boolean assertTrue(DatabaseUi<?> ui, String message, boolean test) {
+	public static boolean assertTrue(DatabaseUi ui, String message, boolean test) {
 		if (!test) {
 			displayMessage(ui, "Error: "+message);
 		}
@@ -36,7 +36,7 @@ public class Assertion {
 		throw new DatabaseError("Error: "+message);
 	}
 
-	public static boolean assertEquals(DatabaseUi<?> ui, String message, Object expected, Object actual) {
+	public static boolean assertEquals(DatabaseUi ui, String message, Object expected, Object actual) {
 		boolean result = actual.equals(expected);
 		if (!result) {
 			displayMessage(ui, "Error: "+message+" expected: "+expected.toString()+" actual: "+actual.toString());
@@ -104,7 +104,7 @@ public class Assertion {
 		}
 	}
 
-	public static boolean assertNotNull(DatabaseUi<?> ui, String message, Object expected) {
+	public static boolean assertNotNull(DatabaseUi ui, String message, Object expected) {
 		boolean result = Objects.nonNull(expected);
 		if (!result) {
 			displayMessage(ui, "Error: "+message+" object is null");

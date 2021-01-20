@@ -3,18 +3,19 @@ package org.lasalledebain.libris.ui;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.Field;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
-public class SingleControlUiField extends UiField {
+public class SingleControlUiField<RecordType extends Record> extends UiField {
 
-	GuiControl control;
+	GuiControl<RecordType> control;
 	public SingleControlUiField(Field fld, ModificationTracker modTrk) {
 		super(fld, modTrk);
 	}
 
-	public void setControl(GuiControl control) {
+	public void setControl(GuiControl<RecordType> control) {
 		this.control = control;
 		control.setModificationTracker(modificationTrack);
 	}

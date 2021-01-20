@@ -1,7 +1,5 @@
 package org.lasalledebain.libris.util;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,9 +44,9 @@ import org.lasalledebain.libris.indexes.FileSpaceManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.indexes.LibrisJournalFileManager;
-import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.TestGUI;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;

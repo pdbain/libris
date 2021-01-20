@@ -53,10 +53,11 @@ public class Repository extends Libris {
 	 * @throws XMLStreamException
 	 * @throws IOException
 	 */
+	@Deprecated
 	public static File initialize(File repoRoot) throws LibrisException, XMLStreamException, IOException {
 		File databaseFile = getDatabaseFileFromRoot(repoRoot);
-		HeadlessUi theUi = new HeadlessUi(databaseFile, false);
-		Layouts theLayouts = new Layouts(ArtifactDatabase.artifactsSchema);
+		HeadlessUi<ArtifactRecord> theUi = new HeadlessUi<ArtifactRecord>(databaseFile, false);
+		Layouts<ArtifactRecord> theLayouts = new Layouts<ArtifactRecord>(ArtifactDatabase.artifactsSchema);
 		MetadataHolder metadata = new MetadataHolder(ArtifactDatabase.artifactsSchema, theLayouts);
 		boolean success = LibrisDatabase.newDatabase(databaseFile, REPOSITORY, false, theUi, metadata);
 		return success ? databaseFile : null;

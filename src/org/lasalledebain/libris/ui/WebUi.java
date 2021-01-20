@@ -1,22 +1,10 @@
 package org.lasalledebain.libris.ui;
 
-import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
 public class WebUi<RecordType extends Record> extends AbstractUi<RecordType> {
-
-	@Override
-	public void put(RecordType newRecord) throws DatabaseException {
-		return; /* not implemented */
-	}
-
-	@Override
-	public void setRecordName(NamedRecordList<RecordType> namedRecs) throws InputException {
-		return; /* not implemented */
-	}
 
 	@Override
 	public void setRecordArtifact() {

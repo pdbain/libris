@@ -105,7 +105,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 					gm = new GroupMember(defs, def);
 					rec.setMember(groupNum, gm);
 				}
-				SingleControlUiField guiFld = new SingleControlUiField(gm, modTrk);
+				SingleControlUiField<RecordType> guiFld = new SingleControlUiField<RecordType>(gm, modTrk);
 				guiFld.setControl(uiField);
 				groupBox.add(comp);
 				groupPanel.add(groupBox);

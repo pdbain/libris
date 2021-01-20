@@ -13,15 +13,15 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
+	protected final DatabaseUi parentUi;
 
 	@Override
 	public void addProgress(int theWork) {
 		parentUi.addProgress(theWork);
 	}
 
-	protected final DatabaseUi<DatabaseRecord> parentUi;
 
-	public ChildUi(DatabaseUi<DatabaseRecord> ui, boolean readOnly) {
+	public ChildUi(DatabaseUi ui, boolean readOnly) {
 		super(readOnly);
 		this.parentUi = ui;
 	}
@@ -35,11 +35,6 @@ public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 	public String SelectSchemaFile(String schemaName) throws DatabaseException {
 		alert("SelectSchemaFile: Operation not available");
 		return null;
-	}
-
-	@Override
-	public void put(Record newRecord) throws DatabaseException {
-		alert("Operation not available");
 	}
 
 	@Override
@@ -121,7 +116,6 @@ public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 		return nonNull(parentUi)? parentUi.getSelectedField(): null;
 	}
 
-	@Override
 	public RecordType newRecord() {
 		try {
 			currentDatabase.newRecord();
@@ -133,11 +127,6 @@ public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 
 	@Override
 	public void arrangeValues() {
-		alert("Operation not available");
-	}
-
-	@Override
-	public void addRecord(RecordType newRecord) throws DatabaseException {
 		alert("Operation not available");
 	}
 

@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.ui;
 
+import static java.util.Objects.isNull;
 import static org.lasalledebain.libris.LibrisDatabase.log;
 
 import java.io.BufferedReader;
@@ -10,12 +11,9 @@ import java.util.logging.Level;
 
 import javax.swing.JOptionPane;
 
-import org.lasalledebain.libris.NamedRecordList;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import static java.util.Objects.isNull;
 
 public class CmdlineUi<RecordType extends Record> extends AbstractUi<RecordType> {
 
@@ -100,11 +98,6 @@ public class CmdlineUi<RecordType extends Record> extends AbstractUi<RecordType>
 		}
 	}
 
-	@Override
-	public void put(Record newRecord) throws DatabaseException {
-		throw new InternalError(getClass().getName()+".put() not implemented");	
-	}
-
 	protected void repl() {
 		boolean doQuit = false;
 		do {
@@ -147,11 +140,6 @@ public class CmdlineUi<RecordType extends Record> extends AbstractUi<RecordType>
 	}
 
 	public void rebuildDatabase(File databaseFile) {
-	}
-
-	@Override
-	public void setRecordName(NamedRecordList<RecordType> namedRecs) throws InputException {
-		throw new InternalError(getClass().getName()+".setRecordName() not implemented");
 	}
 
 	@Override
