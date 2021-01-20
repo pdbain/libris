@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import javax.xml.stream.FactoryConfigurationError;
-import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -19,9 +18,8 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.field.FieldValue;
-import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.DatabaseUi;
+import org.lasalledebain.libris.ui.HeadlessUi;
 
 public class Repository extends Libris {
 	private static final String LEVEL_PREFIX = "_L";
@@ -29,8 +27,6 @@ public class Repository extends Libris {
 	private static final String DIRECTORY_PREFIX = "D_";
 
 	private static final String ARTIFACT_PREFIX = "A_";
-
-	private static final String REPOSITORY = "Repository";
 
 	GenericDatabase<DatabaseRecord> repoDatabase;
 	static final int FANOUT = 100;
@@ -44,25 +40,6 @@ public class Repository extends Libris {
 		root = theRoot;
 	}
 
-	/**
-	 * Create a database file in the repository directory
-	 * 
-	 * @param repoRoot repository directory
-	 * @return database file on success, null on failure
-	 * @throws LibrisException
-	 * @throws XMLStreamException
-	 * @throws IOException
-	 */
-	@Deprecated
-	public static File initialize(File repoRoot) throws LibrisException, XMLStreamException, IOException {
-		File databaseFile = getDatabaseFileFromRoot(repoRoot);
-		HeadlessUi<ArtifactRecord> theUi = new HeadlessUi<ArtifactRecord>(databaseFile, false);
-		Layouts<ArtifactRecord> theLayouts = new Layouts<ArtifactRecord>(ArtifactDatabase.artifactsSchema);
-		MetadataHolder metadata = new MetadataHolder(ArtifactDatabase.artifactsSchema, theLayouts);
-		boolean success = LibrisDatabase.newDatabase(databaseFile, REPOSITORY, false, theUi, metadata);
-		return success ? databaseFile : null;
-	}
-
 	public static File getDatabaseFileFromRoot(File repoRoot) throws DatabaseException {
 		if (!repoRoot.exists() || !repoRoot.isDirectory() || !repoRoot.canWrite()) {
 			throw new DatabaseException("Cannot access repository directory " + repoRoot.getPath());
@@ -72,7 +49,7 @@ public class Repository extends Libris {
 	}
 
 	public static Repository open(DatabaseUi parent, File repoRoot) throws FactoryConfigurationError, LibrisException {
-		HeadlessUi myUi = new HeadlessUi(getDatabaseFileFromRoot(repoRoot), parent.isDatabaseReadOnly());
+		HeadlessUi<ArtifactRecord> myUi = new HeadlessUi<ArtifactRecord>(getDatabaseFileFromRoot(repoRoot), parent.isDatabaseReadOnly());
 		GenericDatabase<DatabaseRecord> db = myUi.openDatabase();
 		Repository result = new Repository(db, repoRoot);
 		return result;

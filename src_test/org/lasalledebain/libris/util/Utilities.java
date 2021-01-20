@@ -29,6 +29,7 @@ import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordFactory;
 import org.lasalledebain.libris.RecordId;
@@ -49,6 +50,8 @@ import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.TestGUI;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
+import org.lasalledebain.libris.xmlUtils.ElementWriter;
+import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 import org.lasalledebain.libris.xmlUtils.XmlShapes;
@@ -57,7 +60,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 import junit.framework.TestCase;
 @SuppressWarnings("rawtypes")
 
-public class Utilities extends TestCase {
+public class Utilities extends TestCase implements LibrisXMLConstants {
 	public static final String KEYWORD_DATABASE1_ARCHIVE = "KeywordDatabase1_archive.tar";
 	public static final String HTML_TEST_DATABASE = "htmlTestDatabase1.libr";
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
@@ -568,6 +571,33 @@ public class Utilities extends TestCase {
 		Libris.buildIndexes(config, ui);
 		LibrisDatabase result = ui.openDatabase(config);
 		return result;
+	}
+
+	public static boolean newDatabase(File databaseFile, String schemaName, boolean readOnly, DatabaseUi ui, LibrisMetadata<DatabaseRecord> metadata) 
+			throws XMLStreamException, IOException, LibrisException {
+		if (!databaseFile .createNewFile()) {
+			ui.alert("Database file "+databaseFile.getAbsolutePath()+" already exisits");
+			return false;
+		}
+		FileOutputStream databaseStream = new FileOutputStream(databaseFile);
+		ElementWriter databaseWriter = ElementWriter.eventWriterFactory(databaseStream, 0);
+		{
+			LibrisAttributes attrs = new LibrisAttributes();
+			attrs.setAttribute(XML_DATABASE_SCHEMA_NAME_ATTR, schemaName);
+			attrs.setAttribute(XML_SCHEMA_VERSION_ATTR, Schema.currentVersion);
+			attrs.setAttribute(XML_DATABASE_DATE_ATTR, LibrisMetadata.getCurrentDateAndTimeString());
+			databaseWriter.writeStartElement(XML_LIBRIS_TAG, attrs, false);
+		}
+		metadata.toXml(databaseWriter);
+		{
+			LibrisAttributes recordsAttrs = new LibrisAttributes();
+			databaseWriter.writeStartElement(XML_RECORDS_TAG, recordsAttrs, true);
+		}
+		databaseWriter.writeEndElement();
+		databaseWriter.flush();
+		databaseStream.close();
+	
+		return Libris.buildIndexes(databaseFile, ui);
 	}
 
 }

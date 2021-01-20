@@ -26,7 +26,7 @@ import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements LibrisXMLConstants, RecordFactory<ArtifactRecord> {
 
-	static final DynamicSchema artifactsSchema = makeSchema();
+	private static final DynamicSchema artifactsSchema = makeSchema();
 	private final DatabaseMetadata myMetadata;
 	public static String[] subElementNames = new String[] {XML_RECORDS_TAG };
 	public static final String xmlArtifactsTag = XML_ARTIFACTS_TAG;
@@ -86,7 +86,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	@Override
 	public Schema getSchema() {
-		return artifactsSchema;
+		return getArtifactsSchema();
 	}
 
 	@Override
@@ -268,5 +268,9 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 
 	public static String getXmlTag() {
 		return XML_ARTIFACTS_TAG;
+	}
+
+	public static DynamicSchema getArtifactsSchema() {
+		return artifactsSchema;
 	}
 }

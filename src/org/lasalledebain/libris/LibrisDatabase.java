@@ -245,33 +245,6 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			}
 		}
 
-		public static boolean newDatabase(File databaseFile, String schemaName, boolean readOnly, DatabaseUi ui, LibrisMetadata<DatabaseRecord> metadata) 
-				throws XMLStreamException, IOException, LibrisException {
-			if (!databaseFile .createNewFile()) {
-				ui.alert("Database file "+databaseFile.getAbsolutePath()+" already exisits");
-				return false;
-			}
-			FileOutputStream databaseStream = new FileOutputStream(databaseFile);
-			ElementWriter databaseWriter = ElementWriter.eventWriterFactory(databaseStream, 0);
-			{
-				LibrisAttributes attrs = new LibrisAttributes();
-				attrs.setAttribute(XML_DATABASE_SCHEMA_NAME_ATTR, schemaName);
-				attrs.setAttribute(XML_SCHEMA_VERSION_ATTR, Schema.currentVersion);
-				attrs.setAttribute(XML_DATABASE_DATE_ATTR, LibrisMetadata.getCurrentDateAndTimeString());
-				databaseWriter.writeStartElement(XML_LIBRIS_TAG, attrs, false);
-			}
-			metadata.toXml(databaseWriter);
-			{
-				LibrisAttributes recordsAttrs = new LibrisAttributes();
-				databaseWriter.writeStartElement(XML_RECORDS_TAG, recordsAttrs, true);
-			}
-			databaseWriter.writeEndElement();
-			databaseWriter.flush();
-			databaseStream.close();
-
-			return Libris.buildIndexes(databaseFile, ui);
-		}
-
 		boolean buildDatabase() throws LibrisException {
 			boolean result = true;
 			initialize();

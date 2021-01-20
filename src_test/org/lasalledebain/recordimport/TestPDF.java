@@ -15,16 +15,21 @@ import java.util.stream.Collectors;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.lasalledebain.libris.ArtifactDatabase;
+import org.lasalledebain.libris.ArtifactRecord;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.MetadataHolder;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.util.ZipUtils;
+import org.lasalledebain.repository.RepositoryTest;
 
 import junit.framework.TestCase;
 
@@ -49,7 +54,12 @@ public class TestPDF extends TestCase {
 		workingDirectory = Utilities.makeTempTestDirectory();
 		repoRoot = new File(workingDirectory, "repo_root");
 		assertTrue("Could not create "+repoRoot.getPath(), repoRoot.mkdir());
-		final File repoDbFile = Repository.initialize(repoRoot);
+		File databaseFile = Repository.getDatabaseFileFromRoot(repoRoot);
+		HeadlessUi<DatabaseRecord> theUi = new HeadlessUi<DatabaseRecord>(databaseFile, false);
+		Layouts<ArtifactRecord> theLayouts = new Layouts<ArtifactRecord>(ArtifactDatabase.getArtifactsSchema());
+		MetadataHolder<DatabaseRecord> metadata = new MetadataHolder(ArtifactDatabase.getArtifactsSchema(), theLayouts);
+		boolean success = Utilities.newDatabase(databaseFile, RepositoryTest.REPOSITORY, false, theUi, metadata);
+		final File repoDbFile = success ? databaseFile : null;
 		assertTrue("could not create database", null != repoDbFile);
 		HeadlessUi<Record> ui = new HeadlessUi<Record>(repoFile, false);
 		repo = Repository.open(ui, repoRoot);

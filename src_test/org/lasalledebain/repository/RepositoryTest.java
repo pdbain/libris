@@ -13,10 +13,14 @@ import java.util.Arrays;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
+import org.lasalledebain.libris.ArtifactDatabase;
 import org.lasalledebain.libris.ArtifactParameters;
+import org.lasalledebain.libris.ArtifactRecord;
+import org.lasalledebain.libris.MetadataHolder;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.ui.DatabaseUi;
 
@@ -27,6 +31,7 @@ public class RepositoryTest  extends TestCase {
 	private static final String RECORD = "record_";
 	private File workdir;
 	private File repoRoot;
+	public static final String REPOSITORY = "Repository";
 
 	@Override
 	protected void setUp() throws Exception {
@@ -148,7 +153,12 @@ public class RepositoryTest  extends TestCase {
 
 	private Repository createDatabase()
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
-		File dbFile = Repository.initialize(repoRoot);
+		File databaseFile = Repository.getDatabaseFileFromRoot(repoRoot);
+				HeadlessUi<ArtifactRecord> theUi = new HeadlessUi<ArtifactRecord>(databaseFile, false);
+				Layouts<ArtifactRecord> theLayouts = new Layouts<ArtifactRecord>(ArtifactDatabase.getArtifactsSchema());
+				MetadataHolder metadata = new MetadataHolder(ArtifactDatabase.getArtifactsSchema(), theLayouts);
+				boolean success = Utilities.newDatabase(databaseFile, REPOSITORY, false, theUi, metadata);
+		File dbFile = success ? databaseFile : null;
 		assertTrue("could not create database", null != dbFile);
 		DatabaseUi ui = new HeadlessUi(dbFile, false);
 		Repository repo = Repository.open(ui, repoRoot);
