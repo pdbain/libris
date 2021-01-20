@@ -388,7 +388,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	public void pasteToField() {
 		if (systemClipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
 			try {
-				String contents = (String) systemClipboard.getData(DataFlavor.stringFlavor);
+				String contents = systemClipboard.getData(DataFlavor.stringFlavor).toString();
 			} catch (UnsupportedFlavorException e) {
 				/* shouldn't happen */
 				System.err.println(e.getMessage());

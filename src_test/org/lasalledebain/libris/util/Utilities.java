@@ -60,7 +60,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 import junit.framework.TestCase;
 @SuppressWarnings("rawtypes")
 
-public class Utilities extends TestCase implements LibrisXMLConstants {
+public class Utilities<RecordType extends Record> extends TestCase implements LibrisXMLConstants {
 	public static final String KEYWORD_DATABASE1_ARCHIVE = "KeywordDatabase1_archive.tar";
 	public static final String HTML_TEST_DATABASE = "htmlTestDatabase1.libr";
 	public static final String KEYWORD_DATABASE4_XML = "KeywordDatabase4.xml";
@@ -135,11 +135,11 @@ public class Utilities extends TestCase implements LibrisXMLConstants {
 		return testDirectory;
 	}
 
-	public static Layouts loadLayoutsFromXml(Schema schem, File inputFile)
+	public Layouts<RecordType> loadLayoutsFromXml(Schema schem, File inputFile)
 			throws FileNotFoundException, FactoryConfigurationError,
 			XMLStreamException, LibrisException, DatabaseException {
 		ElementManager mgr = makeElementManagerFromFile(inputFile, "layouts");
-		Layouts myLayouts = new Layouts(schem);
+		Layouts<RecordType> myLayouts = new Layouts<RecordType>(schem);
 		myLayouts.fromXml(mgr);
 		return myLayouts;
 	}

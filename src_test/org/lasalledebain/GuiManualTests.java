@@ -50,16 +50,18 @@ public class GuiManualTests extends TestCase {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Override
-	protected void setUp() throws Exception {
-		myUi = new HeadlessUi<DatabaseRecord>(null, false);
-	}
-
 	private static final String LAYOUT1 = "layout1";
 	private static final String LAYOUT1A = "layout1a";
 	private Schema mySchema;
 	private LibrisLayout<DatabaseRecord> myGuiLayout;
 	private LibrisWindowedUi<DatabaseRecord> myUi;
+	Utilities<DatabaseRecord> myUtilities;
+
+	@Override
+	protected void setUp() throws Exception {
+		myUi = new HeadlessUi<DatabaseRecord>(null, false);
+		myUtilities = new Utilities<>();
+	}
 
 	public void testWindowSanity() {
 		JFrame frame = new JFrame("testWindowSanity");
@@ -162,7 +164,7 @@ public class GuiManualTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
 			Schema schem = XmlSchema.loadSchema(schemaFile);
-			Layouts<DatabaseRecord> myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
+			Layouts<DatabaseRecord> myLayouts = myUtilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
 			assertNotNull("could not load "+Utilities.LAYOUT2, myGuiLayout);
@@ -185,7 +187,7 @@ public class GuiManualTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
 			Schema schem = XmlSchema.loadSchema(schemaFile);
-			Layouts<DatabaseRecord> myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
+			Layouts<DatabaseRecord> myLayouts = myUtilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
@@ -225,7 +227,7 @@ public class GuiManualTests extends TestCase {
 			DatabaseRecord rec = template.makeRecord(true);
 			Layouts<DatabaseRecord> myLayouts = loadFromLayout(rec);
 			try {
-				myGuiLayout = (LibrisLayout) myLayouts.getLayout(LAYOUT1);
+				myGuiLayout = myLayouts.getLayout(LAYOUT1);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout1 to FormLayout");
 			}
@@ -253,7 +255,7 @@ public class GuiManualTests extends TestCase {
 			DatabaseRecord rec = template.makeRecord(true);
 			Layouts<DatabaseRecord> myLayouts = loadFromLayout(rec);
 			try {
-				myGuiLayout = (LibrisLayout) myLayouts.getLayout(LAYOUT1);
+				myGuiLayout = myLayouts.getLayout(LAYOUT1);
 			} catch (ClassCastException e) {
 				fail("Cannot cast layout1 to FormLayout");
 			}
@@ -294,11 +296,11 @@ public class GuiManualTests extends TestCase {
 		}
 	}
 
-	private Layouts loadFromLayout(Record rec) throws LibrisException {
+	private Layouts<DatabaseRecord> loadFromLayout(Record rec) throws LibrisException {
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, Utilities.LAYOUT_DECLARATIONS_XML_FILE);
 		try {
-			Layouts myLayouts = new Layouts(mySchema);
+			Layouts<DatabaseRecord> myLayouts = new Layouts<DatabaseRecord>(mySchema);
 			ElementManager mgr = Utilities.makeElementManagerFromFile(inputFile, "layouts");
 			loadSchema();
 			myLayouts.fromXml(mgr);
@@ -320,7 +322,7 @@ public class GuiManualTests extends TestCase {
 		File inputFile = new File(testDir, Utilities.LAYOUT_DECLARATIONS_XML_FILE);
 		try {
 			loadSchema();
-			Layouts myLayouts = Utilities.loadLayoutsFromXml(mySchema, inputFile);
+			Layouts myLayouts = myUtilities.loadLayoutsFromXml(mySchema, inputFile);
 			String ids[] = myLayouts.getLayoutIds();
 			System.err.print("Available ids: ");
 			for (String s: ids) {
@@ -341,7 +343,7 @@ public class GuiManualTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA_XML_FILE);
 		try {
 			Schema schem = XmlSchema.loadSchema(schemaFile);
-			Layouts<DatabaseRecord> myLayouts = Utilities.loadLayoutsFromXml(schem, layoutFile);
+			Layouts<DatabaseRecord> myLayouts = myUtilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = myLayouts.getLayout(LAYOUT1A);

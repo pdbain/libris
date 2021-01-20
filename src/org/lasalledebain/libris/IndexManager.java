@@ -40,7 +40,7 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 
 	private Boolean indexed = null;
 	private SortedKeyValueFileManager<KeyIntegerTuple> namedRecordIndex;
-	private AffiliateList<RecordType> affList[];
+	private ArrayList<AffiliateList<RecordType>> affList;
 
 	private RecordPositions myRecordPositions;
 	private ArrayList<FileAccessManager> namedRecsFileMgrs;
@@ -262,10 +262,10 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 		SortedKeyValueBucketFactory<KeyIntegerTuple> bucketFactory = SortedKeyIntegerBucket.getFactory();
 		namedRecordIndex = new SortedKeyValueFileManager<KeyIntegerTuple>(namedRecsFileMgrs, bucketFactory);
 		numGroups = database.getSchema().getNumGroups();
-		affList = new AffiliateList[numGroups];
+		affList = new ArrayList<AffiliateList<RecordType>>(numGroups);
 		for (int i = 0; i < numGroups; ++i) {
-			affList[i] = new AffiliateList<RecordType>(fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_HASHTABLE_ROOT + i),
-					fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT), readOnly);
+			affList.add(i, new AffiliateList<RecordType>(fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_HASHTABLE_ROOT + i),
+					fileMgr.getAuxiliaryFileMgr(AFFILIATES_FILENAME_OVERFLOW_ROOT), readOnly));
 		}
 		termCounts = new TermCountIndex(fileMgr.getAuxiliaryFileMgr(TERM_COUNT_FILENAME_ROOT), false);
 		indexFields = database.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
@@ -322,18 +322,18 @@ public class IndexManager<RecordType extends Record> implements LibrisConstants 
 	}
 
 	public void addChild(int groupNum, int parent, int child) throws DatabaseException {
-		affList[groupNum].addChild(parent, child);
+		affList.get(groupNum).addChild(parent, child);
 	}
 
 	public void addAffiliate(int groupNum, int dest, int src) throws DatabaseException {
-		affList[groupNum].addAffiliate(dest, src);
+		affList.get(groupNum).addAffiliate(dest, src);
 	}
 
 	public AffiliateList<RecordType> getAffiliateList(int groupNum) {
-		if (groupNum >= affList.length) {
+		if (groupNum >= affList.size()) {
 			throw new DatabaseError("cannot access group " + groupNum);
 		}
-		return affList[groupNum];
+		return affList.get(groupNum);
 	}
 
 	private final static class RecordAffiliates {

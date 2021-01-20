@@ -335,7 +335,7 @@ public class RecordEditTests extends TestCase {
 			rid = resultsWindow.getSelectedRecordId();
 			info("selected "+rid);
 			resultsWindow.displaySelectedRecord();
-			gui.closeDatabase(false);
+			assertTrue("Could not close database", gui.closeDatabase(false));
 		}
 	}
 
@@ -421,9 +421,8 @@ public class RecordEditTests extends TestCase {
 	}
 
 
-	public void testDuplicateTitle() {
-		try {
-			TestGUI gui = rebuildAndOpenDatabase(getName());
+	public void testDuplicateTitle() throws DatabaseException, IOException, Exception {
+		try (TestGUI gui = rebuildAndOpenDatabase(getName())) {
 			BrowserWindow resultsWindow = gui.getResultsWindow();
 			resultsWindow.setSelectedRecordIndex(0);
 			gui.displaySelectedRecord();
@@ -437,7 +436,7 @@ public class RecordEditTests extends TestCase {
 			String oldFieldValues = titleField.getRecordField().getValuesAsString();
 			titleField.doSelect();
 			gui.newFieldValue();
-			assertEquals("wrong number of field values after new value", titleField.getNumValues(), 2);
+			assertEquals("wrong number of field values after new value", 2, titleField.getNumValues());
 
 			GuiControl titleNewValue = titleField.getCtrl(1);
 			assertNotNull("control for new object is null", titleNewValue);
@@ -452,11 +451,9 @@ public class RecordEditTests extends TestCase {
 			assertEquals(ID_PUB+" field mismatch", oldFieldValues+", "+TITLE_NEW_VALUE, actualValues);
 			Utilities.pause("Close database");
 			assertTrue("Could not close database", gui.quit(true));
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception");
 		}
 	}
+
 	public void testDuplicateEnum() {
 		try {
 			TestGUI gui = rebuildAndOpenDatabase(getName());

@@ -19,7 +19,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 
 public class TableLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
-	private final String myStyleString;
 	private static final String RECORD_TABLE_LAYOUT_CLASS = "recordTable",
 			RECORD_FIELD_CELL_CLASS = "recordFieldCell";
 	private static final String RECORD_TABLE_LAYOUT_STYLE = "."+ RECORD_TABLE_LAYOUT_CLASS + " {\n"
@@ -35,7 +34,6 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 
 	public TableLayoutProcessor(LibrisLayout<RecordType> theLayout) {
 		super(theLayout);
-		myStyleString = makeStyleString();
 	}
 
 	private String makeStyleString() {
