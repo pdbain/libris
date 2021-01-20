@@ -13,7 +13,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 import static org.lasalledebain.libris.LibrisDatabase.log;
 
-public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<RecordType> implements DatabaseUi<RecordType> {
+public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<RecordType> {
 	private String schemaPath;
 	private int confirmValue;
 	private boolean accessible; 

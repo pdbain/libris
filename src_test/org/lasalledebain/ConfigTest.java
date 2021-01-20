@@ -18,7 +18,7 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.AbstractUi;
 import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
@@ -45,7 +45,7 @@ public class ConfigTest extends TestCase {
 	public void testReadOnly() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
-		LibrisUi ui = new HeadlessUi();
+		AbstractUi ui = new HeadlessUi();
 		ui.rebuildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();
@@ -81,7 +81,7 @@ public class ConfigTest extends TestCase {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, dbDir);
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setAuxiliaryDirectory(auxDir);
-		LibrisUi ui = new HeadlessUi();
+		AbstractUi ui = new HeadlessUi();
 		ui.rebuildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();
@@ -106,7 +106,7 @@ public class ConfigTest extends TestCase {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setAuxiliaryDirectory(auxDir);
 		config.setRepositoryDirectory(artDir);
-		LibrisUi ui = new HeadlessUi();
+		AbstractUi ui = new HeadlessUi();
 		ui.rebuildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();

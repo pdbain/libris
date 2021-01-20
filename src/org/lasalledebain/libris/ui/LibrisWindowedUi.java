@@ -24,13 +24,14 @@ import javax.swing.JPanel;
 import javax.swing.ProgressMonitor;
 
 import org.lasalledebain.libris.DatabaseAttributes;
+import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.index.GroupDef;
 
-public abstract class LibrisWindowedUi<RecordType extends Record> extends LibrisUi<RecordType> {	
+public abstract class LibrisWindowedUi<RecordType extends Record> extends AbstractUi<RecordType> {	
 	private static final String NO_DATABASE_OPEN = "no database open";
 	private static final String DATABASE_MODIFIED = " (modified)";
 	protected final JFrame mainFrame;
@@ -79,7 +80,7 @@ public abstract class LibrisWindowedUi<RecordType extends Record> extends Libris
 		buff.append("\n");
 		
 		if (null != e) {
-			emessage = LibrisUi.formatConciseStackTrace(e, buff);
+			emessage = Libris.formatConciseStackTrace(e, buff);
 		}
 		
 		String errorString = buff.toString();

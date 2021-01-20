@@ -36,6 +36,7 @@ import javax.swing.table.TableModel;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
+import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -108,7 +109,7 @@ public class DelimitedTextImporter {
 
 	public DelimitedTextImporter(GenericDatabase<DatabaseRecord> db) {
 		this.db = db;
-		librisPrefs = LibrisUi.getLibrisPrefs();
+		librisPrefs = Libris.getLibrisPrefs();
 		importFrame = new JFrame("Import CSV Data");
 		importFrame.setLayout(new BorderLayout());
 	}
@@ -239,7 +240,7 @@ public class DelimitedTextImporter {
 		int response = dataFileChooser.showOpenDialog(sepPanel);
 		dataFile = null;
 		if (JFileChooser.CANCEL_OPTION != response) {
-			Preferences librisPrefs = LibrisUi.getLibrisPrefs();
+			Preferences librisPrefs = Libris.getLibrisPrefs();
 			separatorChar = (tabButton.isSelected()) ? '\t' : ',';				
 			librisPrefs.putBoolean(FIELD_SEPARATOR_TAB, tabButton.isSelected());
 			dataFile = dataFileChooser.getSelectedFile();

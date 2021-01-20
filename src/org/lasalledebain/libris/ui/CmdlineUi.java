@@ -17,7 +17,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import static java.util.Objects.isNull;
 
-public class CmdlineUi<RecordType extends Record> extends LibrisUi<RecordType> {
+public class CmdlineUi<RecordType extends Record> extends AbstractUi<RecordType> {
 
 	protected final BufferedReader cmdlineInput;
 	

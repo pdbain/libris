@@ -42,6 +42,7 @@ public interface DatabaseUi<RecordType extends Record> extends ProgressTracker{
 
 	void recordsAccessible(boolean accessible);
 
+	@Deprecated
 	RecordType newRecord();
 	public abstract void displayRecord(int recordId) throws LibrisException;
 	public abstract void put(RecordType newRecord) throws DatabaseException;

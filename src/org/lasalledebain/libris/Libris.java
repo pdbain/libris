@@ -1,11 +1,12 @@
 package org.lasalledebain.libris;
 
-import static org.lasalledebain.libris.ui.LibrisUi.cmdlineError;
-
 import java.io.File;
 import java.net.URL;
 import java.util.Objects;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -17,7 +18,7 @@ import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
 import org.lasalledebain.libris.ui.LibrisHttpServer;
-import org.lasalledebain.libris.ui.LibrisUi;
+import org.lasalledebain.libris.ui.AbstractUi;
 
 public class Libris {
 	private static final String OPTION_HELP = "-h";
@@ -37,18 +38,20 @@ public class Libris {
 		UI_HTML, UI_CMDLINE, UI_WEB, UI_GUI, UI_DEFAULT
 	};
 
+	private static Object prefsSync = new Object();
+	private static Preferences librisPrefs;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		LibrisUi<DatabaseRecord> result = mainImpl(args);
+		AbstractUi<DatabaseRecord> result = mainImpl(args);
 
 		if (null == result) {
 			System.exit(1);
 		}
 	}
 
-	protected static LibrisUi<DatabaseRecord> mainImpl(String[] args) {
+	protected static AbstractUi<DatabaseRecord> mainImpl(String[] args) {
 		Thread.currentThread().setName("Console");
 		IfType myUiType = IfType.UI_DEFAULT;
 		boolean readOnly = false;
@@ -130,19 +133,19 @@ public class Libris {
 			++i;
 		}
 
-		LibrisUi<DatabaseRecord> ui = null;
+		AbstractUi<DatabaseRecord> ui = null;
 		try {
 			File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
 			LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
 			if ((null != dbFile) && (!dbFile.isFile())) {
-				cmdlineError(databaseFilePath + " is not a file");
+				Libris.cmdlineError(databaseFilePath + " is not a file");
 				status = false;
 			}
 			if (null != auxDirPath) {
 				File auxDir = null;
 				auxDir = new File(auxDirPath);
 				if (!auxDir.exists()) {
-					cmdlineError("Auxiliary directory "+auxDirPath+" does not exist");
+					Libris.cmdlineError("Auxiliary directory "+auxDirPath+" does not exist");
 					status = false;
 				}
 				config.setAuxiliaryDirectory(auxDir);
@@ -150,7 +153,7 @@ public class Libris {
 			if (null != repoDirPath) {
 				File repoDirFile = new File(repoDirPath);
 				if (!repoDirFile.exists()) {
-					cmdlineError("Repository directory "+repoDirPath+" does not exist");
+					Libris.cmdlineError("Repository directory "+repoDirPath+" does not exist");
 					status = false;
 				}
 				config.setRepositoryDirectory(repoDirFile);
@@ -182,7 +185,7 @@ public class Libris {
 						ui = new CmdlineUi<>(false);
 						break;
 					default:
-						LibrisUi.cmdlineError(myUiType.toString() + " not implemented");
+						Libris.cmdlineError(myUiType.toString() + " not implemented");
 						break;
 					}
 					if (null != dbFile) {
@@ -195,11 +198,11 @@ public class Libris {
 			}
 		} catch (LibrisException e) {
 			LibrisDatabase.log(Level.SEVERE, "Error opening database", e);
-			LibrisUi.cmdlineError("Cannot open Libris: " + e.getMessage());
+			Libris.cmdlineError("Cannot open Libris: " + e.getMessage());
 			status = false;
 		}
 
-		LibrisUi<DatabaseRecord> result = null;
+		AbstractUi<DatabaseRecord> result = null;
 		if (status && !batch) {
 			if (IfType.UI_CMDLINE != myUiType) {
 				ConsoleUi<DatabaseRecord> console = new ConsoleUi<DatabaseRecord>(ui);
@@ -217,7 +220,7 @@ public class Libris {
 	protected static boolean assertOptionParameter(String[] args, int i, final String optionKey) {
 		boolean status;
 		if (i >= args.length) {
-			cmdlineError("Missing argument for " + optionKey);
+			Libris.cmdlineError("Missing argument for " + optionKey);
 			status = false;
 		}
 		status = true;
@@ -249,7 +252,7 @@ public class Libris {
 
 	}
 
-	public static LibrisDatabase openDatabase(File databaseFile, LibrisUi<DatabaseRecord> ui) throws LibrisException {
+	public static LibrisDatabase openDatabase(File databaseFile, AbstractUi<DatabaseRecord> ui) throws LibrisException {
 		if (null == ui) {
 			ui = new HeadlessUi<DatabaseRecord>(false);
 		}
@@ -287,5 +290,56 @@ public class Libris {
 			String path = props.getPath();
 			System.setProperty("java.util.logging.config.file", path);
 		}
+	}
+
+	public static String formatConciseStackTrace(Exception e, StringBuilder buff) {
+		String emessage;
+		emessage = e.getMessage();
+		if (null != emessage) {
+			buff.append(": "); buff.append(emessage);
+		} else {
+			buff.append(" at ");
+			String sep = "";
+			for (StackTraceElement t: e.getStackTrace()) {
+				buff.append(sep);
+				String className = t.getClassName();
+				int lastDot = className.lastIndexOf('.');
+				if (lastDot > 0) {
+					buff.append(className.substring(lastDot + 1, className.length()));
+				} else {
+					buff.append(className);
+				}
+				buff.append(".");
+				buff.append(t.getMethodName());
+				buff.append("() line ");
+				buff.append(t.getLineNumber());
+				sep = "\n";
+			}
+		}
+		return emessage;
+	}
+
+	public static Preferences getLibrisPrefs() {
+		synchronized (prefsSync) {
+			if (null == librisPrefs) {
+				librisPrefs = Preferences.userRoot();
+			}
+		}
+		return librisPrefs;
+	}
+
+	public static void setLoggingLevel(Logger myLogger) {
+		String logLevelString = System.getProperty(LibrisConstants.LIBRIS_LOGGING_LEVEL);
+		if (null != logLevelString) {
+			Level logLevel = Level.parse(logLevelString);
+			myLogger.setLevel(logLevel);
+			for (Handler handler : Logger.getLogger("").getHandlers()) {
+				handler.setLevel(logLevel);
+			}
+		}
+	}
+
+	public static void cmdlineError(String msg) {
+		System.err.println(msg);
 	}
 }

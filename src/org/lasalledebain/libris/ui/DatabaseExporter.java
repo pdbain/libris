@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -60,7 +61,7 @@ public class DatabaseExporter {
 
 	public DatabaseExporter(LibrisDatabase db) {
 		this.db = db;
-		librisPrefs = LibrisUi.getLibrisPrefs();
+		librisPrefs = Libris.getLibrisPrefs();
 		exportFrame = new JFrame("Export database");
 		exportFrame.setLayout(new BorderLayout());
 	}
@@ -88,7 +89,7 @@ public class DatabaseExporter {
 
 		exportFile = exportFileChooser.chooseOutputFile(lastExportFileName);
 		if (null != exportFile) {
-			Preferences librisPrefs = LibrisUi.getLibrisPrefs();
+			Preferences librisPrefs = Libris.getLibrisPrefs();
 			fmt = sepPanel.getFormat();
 			librisPrefs.put(DATABASE_EXPORT_FORMAT, fmt.toString());
 			librisPrefs.put(DATABASE_EXPORT_FILE, exportFile.getAbsolutePath());

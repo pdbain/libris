@@ -9,10 +9,10 @@ import java.util.Iterator;
 
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
+import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValueStringList;
-import org.lasalledebain.libris.ui.LibrisUi;
 
 public class DelimitedTextRecordsReader {
 	/**
@@ -38,7 +38,7 @@ public class DelimitedTextRecordsReader {
 	
 	public DelimitedTextRecordsReader(GenericDatabase<DatabaseRecord> db, char separatorChar) {
 		this.db = db;
-		LibrisUi.getLibrisPrefs();
+		Libris.getLibrisPrefs();
 		this.fieldIdsInFirstRow = false;
 		this.separatorChar = separatorChar;
 	}

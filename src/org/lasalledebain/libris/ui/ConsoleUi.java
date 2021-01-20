@@ -12,9 +12,9 @@ import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 
-	protected final LibrisUi<?> parentUi;
+	protected final AbstractUi<?> parentUi;
 
-	public ConsoleUi(LibrisUi<?> theParentUi) {
+	public ConsoleUi(AbstractUi<?> theParentUi) {
 		super(nonNull(theParentUi)? theParentUi.isDatabaseReadOnly(): true);
 		parentUi = theParentUi;
 	}

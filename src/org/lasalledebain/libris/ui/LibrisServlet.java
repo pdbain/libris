@@ -24,11 +24,11 @@ import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class LibrisServlet<RecordType extends Record> extends HttpServlet implements LibrisHTMLConstants{
-	LibrisUi myUi;
+	AbstractUi myUi;
 	private final Layouts<DatabaseRecord> myLayouts;
 	String[] layoutIds;
 	private LibrisLayout<DatabaseRecord> summaryDisplay;
-	public LibrisServlet(LibrisUi<RecordType> myUi) throws DatabaseException, InputException {
+	public LibrisServlet(AbstractUi<RecordType> myUi) throws DatabaseException, InputException {
 		this.myUi = myUi;
 		database = myUi.getLibrisDatabase();
 		myLayouts = database.getLayouts();

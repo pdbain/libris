@@ -17,6 +17,7 @@ public class Assertion {
 		if (null == ui)  System.err.println(message);
 		else ui.alert(message);
 	}
+	
 	public static boolean assertTrue(DatabaseUi<?> ui, String message, boolean test) {
 		if (!test) {
 			displayMessage(ui, "Error: "+message);

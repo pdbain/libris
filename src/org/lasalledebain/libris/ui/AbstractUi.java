@@ -6,10 +6,6 @@ import static java.util.Objects.nonNull;
 
 import java.io.File;
 import java.util.Objects;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import org.lasalledebain.libris.DatabaseAttributes;
 import org.lasalledebain.libris.DatabaseRecord;
@@ -24,11 +20,9 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<RecordType>, LibrisConstants {
+public abstract class AbstractUi<RecordType extends Record> implements DatabaseUi<RecordType>, LibrisConstants {
 	
 	private static final String NO_DATABASE_OPENED = "No database opened";
-	protected static Preferences librisPrefs;
-	protected static Object prefsSync = new Object();
 	private UiField selectedField;
 	protected String uiTitle;
 	// TODO make this generic
@@ -39,11 +33,11 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	private boolean readOnly;
 	private int expectedWork, accomplishedWork;
 
-	public LibrisUi(boolean readOnly) {
+	public AbstractUi(boolean readOnly) {
 		this();
 		this.readOnly = readOnly;
 	}
-	public LibrisUi() {
+	public AbstractUi() {
 		fieldSelected(false);
 		setSelectedField(null);
 	}
@@ -111,7 +105,7 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 			currentDatabase.openDatabase();
 			DatabaseAttributes databaseAttributes = currentDatabase.getDatabaseAttributes();
 			setUiTitle(databaseAttributes.getDatabaseName());
-			getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
+			Libris.getLibrisPrefs().put(LibrisConstants.DATABASE_FILE, databaseFile.getAbsolutePath());
 		} catch (Exception e) {
 			alert("Error opening database", e);
 			throw new DatabaseException(e);
@@ -221,15 +215,6 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	public void recordsAccessible(boolean accessible) {
 	}
 
-	public static Preferences getLibrisPrefs() {
-		synchronized (prefsSync) {
-			if (null == librisPrefs) {
-				librisPrefs = Preferences.userRoot();
-			}
-		}
-		return librisPrefs;
-	}
-
 	@Override
 	public void newFieldValue() {
 		return;
@@ -257,45 +242,6 @@ public abstract class LibrisUi<RecordType extends Record> implements DatabaseUi<
 	}
 
 	
-	public static void cmdlineError(String msg) {
-		System.err.println(msg);
-	}
-	public static String formatConciseStackTrace(Exception e, StringBuilder buff) {
-		String emessage;
-		emessage = e.getMessage();
-		if (null != emessage) {
-			buff.append(": "); buff.append(emessage);
-		} else {
-			buff.append(" at ");
-			String sep = "";
-			for (StackTraceElement t: e.getStackTrace()) {
-				buff.append(sep);
-				String className = t.getClassName();
-				int lastDot = className.lastIndexOf('.');
-				if (lastDot > 0) {
-					buff.append(className.substring(lastDot + 1, className.length()));
-				} else {
-					buff.append(className);
-				}
-				buff.append(".");
-				buff.append(t.getMethodName());
-				buff.append("() line ");
-				buff.append(t.getLineNumber());
-				sep = "\n";
-			}
-		}
-		return emessage;
-	}
-	public static void setLoggingLevel(Logger myLogger) {
-		String logLevelString = System.getProperty(LIBRIS_LOGGING_LEVEL);
-		if (null != logLevelString) {
-			Level logLevel = Level.parse(logLevelString);
-			myLogger.setLevel(logLevel);
-			for (Handler handler : Logger.getLogger("").getHandlers()) {
-				handler.setLevel(logLevel);
-			}
-		}
-	}
 	@Override
 	public void saveDatabase() {
 		currentDatabase.save();

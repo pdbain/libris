@@ -6,7 +6,7 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class WebUi<RecordType extends Record> extends LibrisUi<RecordType> {
+public class WebUi<RecordType extends Record> extends AbstractUi<RecordType> {
 
 	@Override
 	public void put(RecordType newRecord) throws DatabaseException {
