@@ -33,7 +33,6 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
 
 import junit.framework.TestCase;
 
-@SuppressWarnings("rawtypes")
 public class ArtifactTest extends TestCase {
 
 	private static final String EVEN_KEYWORD = "even";
@@ -99,7 +98,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testImportExportRecords() throws LibrisException, IOException, XMLStreamException {
 		final int numArtifacts = 16;
-		DatabaseUi myUi = new HeadlessUi<ArtifactRecord>(false);
+		DatabaseUi myUi = new HeadlessUi(false);
 		File exportFile = new File(workingDirectory, "database.xml");
 		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
@@ -162,7 +161,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testIndex() throws LibrisException, IOException, XMLStreamException {
 		final int numArtifacts = 16;
-		DatabaseUi myUi = new HeadlessUi<ArtifactRecord>(false);
+		DatabaseUi myUi = new HeadlessUi(false);
 		File exportFile = new File(workingDirectory, "database.xml");
 		try (ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
@@ -222,7 +221,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testGroups() throws LibrisException {
 		final int numArtifacts = 16;
-		DatabaseUi myUi = new HeadlessUi<ArtifactRecord>(false);
+		DatabaseUi myUi = new HeadlessUi(false);
 		try(ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
 			db.openDatabase();

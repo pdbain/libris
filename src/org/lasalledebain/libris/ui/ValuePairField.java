@@ -5,13 +5,12 @@ import java.util.Objects;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldSingleStringValue;
 import org.lasalledebain.libris.field.FieldStringPairValue;
 import org.lasalledebain.libris.field.FieldValue;
 
-public abstract class ValuePairField<RecordType extends Record> extends GuiControl<RecordType> {
+public abstract class ValuePairField extends GuiControl {
 
 	protected final JPanel control;
 	JPanel pairArea;

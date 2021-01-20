@@ -50,9 +50,9 @@ public class HtmlTests extends TestCase implements LibrisHTMLConstants {
 	@Test
 	public void testBasicLayout() throws InputException, IOException, DatabaseException {
 		TestResponse resp = new TestResponse();
-		Layouts<DatabaseRecord> myLayouts = db.getLayouts();
-		LibrisLayout<DatabaseRecord> myLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH);
-		LibrisLayout<DatabaseRecord> browserLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
+		Layouts myLayouts = db.getLayouts();
+		LibrisLayout myLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH);
+		LibrisLayout browserLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		myLayout.layOutPage(db.getRecords(), new HttpParameters(2, 0, resp), browserLayout, db.getUi());
 		String result = resp.getResponseText();
 		checkExpectedStrings(result, expectedBasicWords);

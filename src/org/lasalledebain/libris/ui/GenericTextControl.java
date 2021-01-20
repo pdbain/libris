@@ -8,7 +8,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldSingleStringValue;
 import org.lasalledebain.libris.field.FieldValue;
 
-public abstract class GenericTextControl<RecordType extends Record> extends GuiControl<RecordType> {
+public abstract class GenericTextControl<RecordType extends Record> extends GuiControl {
 
 	protected String mainValue;
 	protected final JTextComponent control;

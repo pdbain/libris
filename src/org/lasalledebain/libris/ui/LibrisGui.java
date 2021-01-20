@@ -452,7 +452,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 		RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
 		final UiField selectedField = getSelectedField();
 		if ((null != selectedField) && selectedField.isMultiControl()) {
-			GuiControl<DatabaseRecord> ctrl;
+			GuiControl ctrl;
 			try {
 				ctrl = ((MultipleValueUiField) selectedField).addControl(true);
 				ctrl.requestFocusInWindow();

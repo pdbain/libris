@@ -1,10 +1,9 @@
 package org.lasalledebain.libris.ui;
 
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class WebUi<RecordType extends Record> extends AbstractUi<RecordType> {
+public class WebUi extends AbstractUi {
 
 	@Override
 	public void setRecordArtifact() {

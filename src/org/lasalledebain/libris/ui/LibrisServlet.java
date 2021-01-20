@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.jetty.http.HttpStatus;
-import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
@@ -24,11 +23,11 @@ import org.lasalledebain.libris.util.StringUtils;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public class LibrisServlet<RecordType extends Record> extends HttpServlet implements LibrisHTMLConstants{
-	AbstractUi<RecordType> myUi;
-	private final Layouts<DatabaseRecord> myLayouts;
+	AbstractUi myUi;
+	private final Layouts myLayouts;
 	String[] layoutIds;
-	private LibrisLayout<DatabaseRecord> summaryDisplay;
-	public LibrisServlet(AbstractUi<RecordType> myUi) throws DatabaseException, InputException {
+	private LibrisLayout summaryDisplay;
+	public LibrisServlet(AbstractUi myUi) throws DatabaseException, InputException {
 		this.myUi = myUi;
 		database = myUi.getLibrisDatabase();
 		myLayouts = database.getLayouts();
@@ -49,7 +48,7 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 		PrintWriter writer = resp.getWriter();
 		try {
 			int recId;
-			LibrisLayout<DatabaseRecord> theLayout;
+			LibrisLayout theLayout;
 			{
 				String recIdString = req.getParameter(HTTP_PARAM_RECORD_ID);
 				if (StringUtils.isStringEmpty(recIdString)) {
@@ -73,7 +72,7 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 			theLayout = myLayouts.getLayout(layoutId);
 			Assertion.assertNotNullInputException("Layout not found: ",  layoutId, theLayout);
 			resp.setStatus(HttpStatus.OK_200);
-			LibrisLayout<DatabaseRecord> summaryLayout = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
+			LibrisLayout summaryLayout = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 			Assertion.assertNotNull(myUi, "No layout found for "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryLayout);
 			theLayout.layOutPage(database.getRecords(), new HttpParameters(recId, startId, resp), summaryLayout, myUi);
 		} catch (Throwable t) {

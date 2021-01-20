@@ -154,8 +154,8 @@ public class RepositoryTest  extends TestCase {
 	private Repository createDatabase()
 			throws LibrisException, XMLStreamException, IOException, FactoryConfigurationError {
 		File databaseFile = Repository.getDatabaseFileFromRoot(repoRoot);
-				HeadlessUi<ArtifactRecord> theUi = new HeadlessUi<ArtifactRecord>(databaseFile, false);
-				Layouts<ArtifactRecord> theLayouts = new Layouts<ArtifactRecord>(ArtifactDatabase.getArtifactsSchema());
+				HeadlessUi theUi = new HeadlessUi(databaseFile, false);
+				Layouts theLayouts = new Layouts(ArtifactDatabase.getArtifactsSchema());
 				MetadataHolder metadata = new MetadataHolder(ArtifactDatabase.getArtifactsSchema(), theLayouts);
 				boolean success = Utilities.newDatabase(databaseFile, REPOSITORY, false, theUi, metadata);
 		File dbFile = success ? databaseFile : null;

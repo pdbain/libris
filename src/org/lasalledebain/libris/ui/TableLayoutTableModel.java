@@ -17,11 +17,11 @@ public class TableLayoutTableModel<RecordType extends Record> extends AbstractTa
 
 	public static final String RECORD_ID = "Record ID";
 	private final RecordList<RecordType> myRecList;
-	private final LibrisLayout<RecordType> myLayout;
+	private final LibrisLayout myLayout;
 	private final String[] myFieldIds;
 	final private ArrayList<RecordType> recList;
 	Iterator<RecordType> recIterator;
-	public TableLayoutTableModel(RecordList<RecordType> theRecList, LibrisLayout<RecordType> theLayout) {
+	public TableLayoutTableModel(RecordList<RecordType> theRecList, LibrisLayout theLayout) {
 		myRecList = theRecList;
 		myLayout = theLayout;
 		myFieldIds = myLayout.getFieldIds();

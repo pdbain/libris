@@ -28,8 +28,8 @@ public class AffiliateEditor<RecordType extends Record> {
 	JDialog dLog;
 	final Vector<KeyIntegerTuple> affInfo;
 	final JList<KeyIntegerTuple> affList;
-	private final GuiControl<RecordType> guiCtrl;
-	public AffiliateEditor(Record currentRecord, final GuiControl<RecordType> ctrl, LibrisWindowedUi<RecordType> ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
+	private final GuiControl guiCtrl;
+	public AffiliateEditor(Record currentRecord, final GuiControl ctrl, LibrisWindowedUi<RecordType> ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
 			Vector<KeyIntegerTuple> affiliateInfo, JList<KeyIntegerTuple> affiliateList, GroupDef grpDef) {
 		guiCtrl = ctrl;
 		affInfo = affiliateInfo;

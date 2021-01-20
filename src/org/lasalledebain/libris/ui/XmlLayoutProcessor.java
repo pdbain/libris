@@ -21,7 +21,7 @@ public class XmlLayoutProcessor<RecordType extends Record> extends LayoutProcess
 			+ "border-style: none;"
 			+ "}\n";
 
-	public XmlLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+	public XmlLayoutProcessor(LibrisLayout theLayout) {
 		super(theLayout);
 	}
 

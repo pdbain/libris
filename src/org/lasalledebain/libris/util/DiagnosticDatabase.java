@@ -3,7 +3,6 @@ package org.lasalledebain.libris.util;
 import java.io.File;
 
 import org.lasalledebain.libris.DatabaseAttributes;
-import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -14,7 +13,7 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 public class DiagnosticDatabase extends LibrisDatabase {
 
 	public DiagnosticDatabase(File databaseFile) throws LibrisException, DatabaseException {
-		super(new LibrisDatabaseConfiguration(databaseFile, false), new HeadlessUi<DatabaseRecord>(databaseFile, false));
+		super(new LibrisDatabaseConfiguration(databaseFile, false), new HeadlessUi(databaseFile, false));
 		getFileMgr().createAuxFiles(true);
 		DatabaseAttributes attrs = new DatabaseAttributes();
 		attrs.setAttribute(XML_DATABASE_NAME_ATTR, "unknown");

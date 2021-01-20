@@ -7,12 +7,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 
 import org.lasalledebain.libris.LibrisConstants;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldBooleanValue;
 import org.lasalledebain.libris.field.FieldValue;
 
-public class CheckBoxControl<RecordType extends Record> extends GuiControl<RecordType> {
+public class CheckBoxControl extends GuiControl {
 
 	boolean selected;
 	protected final JCheckBox control;

@@ -111,10 +111,10 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				+ getLayoutSelectStyle();
 	}
 
-	protected final LibrisLayout<RecordType> myLayout;
+	protected final LibrisLayout myLayout;
 	protected DatabaseUi myUi;
 
-	public LayoutProcessor(LibrisLayout<RecordType> theLayout) {
+	public LayoutProcessor(LibrisLayout theLayout) {
 		myLayout = theLayout;
 	}
 
@@ -163,7 +163,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		} endDiv(buff);
 	}
 
-	protected int layoutBrowserPanel(RecordList<RecordType> recList, int start, int currentRecord, LibrisLayout<RecordType> browserLayout, StringBuffer buff) {
+	protected int layoutBrowserPanel(RecordList<RecordType> recList, int start, int currentRecord, LibrisLayout browserLayout, StringBuffer buff) {
 		String[] browserFields = browserLayout.getFieldIds();
 		startDiv(buff, BROWSER_PANEL_CLASS);
 		startDiv(buff);
@@ -304,7 +304,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	}
 
 	public void layOutPage(RecordList<RecordType> recList, HttpParameters params,
-			LibrisLayout<RecordType> browserLayout, DatabaseUi ui) throws InputException, IOException {
+			LibrisLayout browserLayout, DatabaseUi ui) throws InputException, IOException {
 		myUi = ui;
 		StringBuffer buff = new StringBuffer(1000);
 		generateHeaderAndStylesheet(ui, buff);

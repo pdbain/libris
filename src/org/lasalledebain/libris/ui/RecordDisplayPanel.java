@@ -34,8 +34,8 @@ public class RecordDisplayPanel extends JPanel {
 	private JButton newButton;
 	private JButton enterButton;
 	private LibrisDatabase myDatabase;
-	private LibrisLayout<DatabaseRecord> recLayout;
-	private LibrisLayout<DatabaseRecord> titleLayout;
+	private LibrisLayout recLayout;
+	private LibrisLayout titleLayout;
 	private JComboBox<String> layoutSelector;
 	protected String[] layoutIds;
 	private String[] titleFieldIds;
@@ -107,7 +107,7 @@ public class RecordDisplayPanel extends JPanel {
 		prevButton.setEnabled(enable);	
 	}
 
-	public void addLayouts(Layouts<DatabaseRecord> layouts) {
+	public void addLayouts(Layouts layouts) {
 		layoutIds = layouts.getLayoutIds();
 		String lo = "";
 		try {
@@ -123,7 +123,7 @@ public class RecordDisplayPanel extends JPanel {
 		}
 	}
 
-	void setRecLayout(LibrisLayout<DatabaseRecord> theLayout) throws DatabaseException, LibrisException {
+	void setRecLayout(LibrisLayout theLayout) throws DatabaseException, LibrisException {
 		if (theLayout == recLayout) {
 			return;
 		}
@@ -225,7 +225,7 @@ public class RecordDisplayPanel extends JPanel {
 rw.checkClose();
 				}
 				try {
-					LibrisLayout<DatabaseRecord> theLayout = myDatabase.getLayouts().getLayout(layoutIds[selectedLayout]);
+					LibrisLayout theLayout = myDatabase.getLayouts().getLayout(layoutIds[selectedLayout]);
 					setRecLayout(theLayout);
 					boolean singleRecordLayout = theLayout.isSingleRecord();
 					if (singleRecordLayout && nonNull(rw)) {

@@ -32,7 +32,7 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 			+ "vertical-align: top;\n"
 		+	"}\n";
 
-	public TableLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+	public TableLayoutProcessor(LibrisLayout theLayout) {
 		super(theLayout);
 	}
 
@@ -56,7 +56,7 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 		buff.append("<table class = "
 				+ RECORD_TABLE_LAYOUT_CLASS
 				+ ">\n"); {
-					for (LayoutField<RecordType> fp: myLayout.getFields()) {
+					for (LayoutField fp: myLayout.getFields()) {
 						int fieldNum = fp.fieldNum;
 						Field fld = rec.getField(fieldNum);
 						if (null == fld) {
@@ -104,10 +104,10 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 		int columnWidth = myFontMetrics.stringWidth(TableLayoutTableModel.RECORD_ID) + 10;
 		TableColumnModel columns = recordTable.getColumnModel();
 		columns.getColumn(0).setPreferredWidth(columnWidth);
-		ArrayList<LayoutField<RecordType>> bodyFieldList = myLayout.getBodyFieldList();
+		ArrayList<LayoutField> bodyFieldList = myLayout.getBodyFieldList();
 
 		for (int i = 1; i < myTableModel.getColumnCount(); ++i) {
-			LayoutField<RecordType> theFieldPosition = bodyFieldList.get(i-1);
+			LayoutField theFieldPosition = bodyFieldList.get(i-1);
 			columnWidth = theFieldPosition.getWidth();
 			columnWidth = Math.max(columnWidth, myFontMetrics.stringWidth(theFieldPosition.title) + 10);
 			columns.getColumn(i).setPreferredWidth(columnWidth);

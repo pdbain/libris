@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.ui.Layouts;
@@ -27,7 +26,7 @@ public class GuiTests extends TestCase {
 			ElementManager mgr = Utilities.makeElementManagerFromFile(inputFile, "layouts");
 
 			loadSchema();
-			Layouts<Record> myLayouts = new Layouts<Record>(mySchema);
+			Layouts myLayouts = new Layouts(mySchema);
 			myLayouts.fromXml(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();

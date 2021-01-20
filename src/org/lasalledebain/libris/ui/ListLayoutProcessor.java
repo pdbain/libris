@@ -48,7 +48,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 			+ "display: inline;\n"
 			+ "\n}\n";
 
-	public ListLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+	public ListLayoutProcessor(LibrisLayout theLayout) {
 		super(theLayout);
 	}
 
@@ -62,7 +62,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 								+RECORD_LIST_CELL_CLASS
 								+ "\">"
 								+ "Record</th>");
-						for (LayoutField<RecordType> fp: myLayout.getFields()) {
+						for (LayoutField fp: myLayout.getFields()) {
 							buff.append("<th class=\"\n"
 									+ RECORD_LIST_CELL_CLASS
 									+ "\">"
@@ -90,7 +90,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 														buff.append(recName);
 													}
 												} buff.append("</td>\n");
-												for (LayoutField<RecordType> fp: myLayout.getFields()) {
+												for (LayoutField fp: myLayout.getFields()) {
 													int fieldNum = fp.fieldNum;
 													Field fld = rec.getField(fieldNum);
 													buff.append("<td class=\"" 
@@ -114,7 +114,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 
 	@Override
 	protected int layoutBrowserPanel(RecordList<RecordType> recList, int start, int currentRecord,
-			LibrisLayout<RecordType> browserLayout, StringBuffer buff) {
+			LibrisLayout browserLayout, StringBuffer buff) {
 		startDiv(buff);
 		addLayoutSelector(buff);
 
@@ -169,7 +169,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 	public ArrayList<UiField> layOutFields(RecordType theRecord, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		GenericDatabase<DatabaseRecord> db = ui.getDatabase();
-		ListLayoutTableModel<RecordType> myTableModel = new ListLayoutTableModel(theRecord, db, myLayout);
+		ListLayoutTableModel myTableModel = new ListLayoutTableModel(theRecord, db, myLayout);
 		JTable recordTable = new JTable(myTableModel);
 		TableColumnModel columns = recordTable.getColumnModel();
 		FontMetrics myFontMetrics = recordPanel.getFontMetrics(recordTable.getFont());

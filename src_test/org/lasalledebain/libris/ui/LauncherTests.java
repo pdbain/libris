@@ -31,7 +31,7 @@ public class LauncherTests extends TestCase {
 		LibrisDatabase db = Utilities.buildTestDatabase( workingDirectory, Utilities.HTML_TEST_DATABASE);
 		String directoryFilePath = db.getDatabaseFile().getAbsolutePath();
 		assertTrue("Could not close database", db.closeDatabase(false));
-		AbstractUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {directoryFilePath});
+		AbstractUi ui = LibrisTestLauncher.testMain(new String[] {directoryFilePath});
 		assertNotNull("Failed to open database UI", ui);
 		db = ui.getLibrisDatabase();
 		assertNotNull("Failed to open database", db);
@@ -47,7 +47,7 @@ public class LauncherTests extends TestCase {
 		LibrisDatabase db = Utilities.buildTestDatabase( workingDirectory, Utilities.HTML_TEST_DATABASE);
 		String directoryFilePath = db.getDatabaseFile().getAbsolutePath();
 		assertTrue("Could not close database", db.closeDatabase(false));
-		AbstractUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {"-w", directoryFilePath});
+		AbstractUi ui = LibrisTestLauncher.testMain(new String[] {"-w", directoryFilePath});
 		assertNotNull("Failed to open database UI", ui);
 		HttpClient client = HttpClient.newHttpClient();
 		String responseString = HtmlTests.sendHttpRequest(client, "?layout=LO_paragraphDisplay&recId=3");
@@ -61,7 +61,7 @@ public class LauncherTests extends TestCase {
 		String directoryFilePath = db.getDatabaseFile().getAbsolutePath();
 		assertTrue("Could not close database", db.closeDatabase(false));
 		final String port = "8123";
-		AbstractUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_WEBUI, Libris.OPTION_PORT,
+		AbstractUi ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_WEBUI, Libris.OPTION_PORT,
 				port, directoryFilePath});
 		assertNotNull("Failed to open database UI", ui);
 		HttpClient client = HttpClient.newHttpClient();
@@ -77,7 +77,7 @@ public class LauncherTests extends TestCase {
 		Utilities.copyTestDatabaseFile(Utilities.TEST_DB4_NOMETADATA_FILE, workingDirectory);
 		Utilities.copyTestDatabaseFile(Utilities.TEST_DB4_METADATAONLY_FILE, workingDirectory);
 		String directoryFilePath = (new File(workingDirectory, Utilities.TEST_DB4_NOMETADATA_FILE)).getAbsolutePath();
-		AbstractUi<DatabaseRecord> ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_REBUILD, directoryFilePath});
+		AbstractUi ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_REBUILD, directoryFilePath});
 		assertNotNull("Failed to open database UI", ui);
 		ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_CMDLINEUI, directoryFilePath});
 		LibrisDatabase db = ui.getLibrisDatabase();

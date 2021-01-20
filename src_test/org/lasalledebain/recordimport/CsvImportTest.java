@@ -27,7 +27,6 @@ import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
 
 import junit.framework.TestCase;
 
-@SuppressWarnings("rawtypes")
 
 public class CsvImportTest extends TestCase {
 	private static final char CSV_COLUMN_SEP = '\t';

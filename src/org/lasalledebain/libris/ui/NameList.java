@@ -23,7 +23,7 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;;
 
-public class NameList<RecordType extends Record> extends GuiControl<RecordType> {
+public class NameList<RecordType extends Record> extends GuiControl {
 
 	private final JList<KeyIntegerTuple> control;
 	private final GroupDef grpDef;
@@ -164,7 +164,7 @@ public class NameList<RecordType extends Record> extends GuiControl<RecordType> 
 
 	class GroupMouseListener implements MouseListener {
 
-		private GuiControl<RecordType> uiField;
+		private GuiControl uiField;
 		public GroupMouseListener() {
 			uiField = NameList.this;
 		}

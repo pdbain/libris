@@ -8,14 +8,14 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
-public class SingleControlUiField<RecordType extends Record> extends UiField {
+public class SingleControlUiField extends UiField {
 
-	GuiControl<RecordType> control;
+	GuiControl control;
 	public SingleControlUiField(Field fld, ModificationTracker modTrk) {
 		super(fld, modTrk);
 	}
 
-	public void setControl(GuiControl<RecordType> control) {
+	public void setControl(GuiControl control) {
 		this.control = control;
 		control.setModificationTracker(modificationTrack);
 	}

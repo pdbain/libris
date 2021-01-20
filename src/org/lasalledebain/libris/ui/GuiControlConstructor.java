@@ -1,12 +1,10 @@
 package org.lasalledebain.libris.ui;
 
-import org.lasalledebain.libris.Record;
+public abstract class GuiControlConstructor {
+	public abstract GuiControl makeControl(String title, int height, int width, boolean editable);
 
-public abstract class GuiControlConstructor<RecordType extends Record> {
-	public abstract GuiControl<RecordType> makeControl(String title, int height, int width, boolean editable);
-
-	public GuiControl<RecordType> makeControl(LayoutField<RecordType> fieldPosn, ModificationTracker modTrk, boolean editable) {
-		GuiControl<RecordType> ctrl = makeControl(fieldPosn.getTitle(), fieldPosn.getHeight(), 
+	public GuiControl makeControl(LayoutField fieldPosn, ModificationTracker modTrk, boolean editable) {
+		GuiControl ctrl = makeControl(fieldPosn.getTitle(), fieldPosn.getHeight(), 
 				fieldPosn.getWidth(), editable);
 		ctrl.setFieldInfo(fieldPosn);
 		ctrl.setModificationTracker(modTrk);
@@ -17,27 +15,27 @@ public abstract class GuiControlConstructor<RecordType extends Record> {
 	}
 }
 
-class TextboxConstructor<RecordType extends Record> extends GuiControlConstructor<RecordType> {
-	public GuiControl<RecordType> makeControl(String title, int height, int width, boolean editable) {		
-		return new TextBox<RecordType>(height, width, editable);
+class TextboxConstructor extends GuiControlConstructor {
+	public GuiControl makeControl(String title, int height, int width, boolean editable) {		
+		return new TextBox(height, width, editable);
 	}		
 }
 
-class TextfieldConstructor<RecordType extends Record> extends GuiControlConstructor<RecordType> {
-	public GuiControl<RecordType> makeControl(String title, int height, int width, boolean editable) {		
-		return new RecordTextField<RecordType>(height, width, editable);
+class TextfieldConstructor extends GuiControlConstructor {
+	public GuiControl makeControl(String title, int height, int width, boolean editable) {		
+		return new RecordTextField(height, width, editable);
 	}		
 }
 
-class RangefieldConstructor<RecordType extends Record> extends GuiControlConstructor<RecordType> {
-	public GuiControl<RecordType> makeControl(String title, int height, int width, boolean editable) {		
-		return new RangeField<RecordType>(height, width, editable);
+class RangefieldConstructor extends GuiControlConstructor {
+	public GuiControl makeControl(String title, int height, int width, boolean editable) {		
+		return new RangeField(height, width, editable);
 	}		
 }
 
-class CheckboxConstructor<RecordType extends Record> extends GuiControlConstructor<RecordType> {
-	public GuiControl<RecordType> makeControl(String title, int height, int width, boolean editable) {	
-		return new CheckBoxControl<RecordType>(title, height, width, editable);
+class CheckboxConstructor extends GuiControlConstructor {
+	public GuiControl makeControl(String title, int height, int width, boolean editable) {	
+		return new CheckBoxControl(title, height, width, editable);
 	}		
 	public boolean labelField() {
 		return false;

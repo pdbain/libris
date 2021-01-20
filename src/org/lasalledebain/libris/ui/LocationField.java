@@ -20,10 +20,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 
-public class LocationField<RecordType extends Record> extends ValuePairField<RecordType> {
+public class LocationField extends ValuePairField {
 
 	JTextField urlBox, linkTextBox;
 	static final JLabel urlLabel = new JLabel("URL: ");

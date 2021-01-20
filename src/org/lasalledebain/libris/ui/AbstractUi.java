@@ -1,8 +1,8 @@
 package org.lasalledebain.libris.ui;
 
+import static java.util.Objects.nonNull;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static java.util.Objects.nonNull;
 
 import java.io.File;
 import java.util.Objects;
@@ -13,7 +13,6 @@ import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -21,7 +20,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public abstract class AbstractUi<RecordType extends Record> implements DatabaseUi, LibrisConstants {
+public abstract class AbstractUi implements DatabaseUi, LibrisConstants {
 	
 	@Override
 	public void setRecordName() throws InputException {

@@ -11,7 +11,7 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<RecordType> {
+public class HeadlessUi extends LibrisWindowedUi {
 	private String schemaPath;
 	private int confirmValue;
 	private boolean accessible; 

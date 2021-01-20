@@ -113,7 +113,7 @@ public class BrowserWindow extends JPanel {
 	public void initialize(RecordList<DatabaseRecord> records) throws DatabaseException {
 		recordsSource = records;
 		enableNext(false);
-		final Layouts<DatabaseRecord> layouts = database.getLayouts();
+		final Layouts layouts = database.getLayouts();
 		myLayout = layouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		fieldIds = myLayout.getFieldIds();
 		recordsIterator = recordsSource.iterator();
@@ -221,7 +221,7 @@ public class BrowserWindow extends JPanel {
 		}
 	}
 
-	LibrisLayout<DatabaseRecord> myLayout;
+	LibrisLayout myLayout;
 	private String[] fieldIds;
 
 	MouseListener chooserMouseListener = new MouseAdapter() {

@@ -277,7 +277,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					if (XmlRecordsReader.XML_ARTIFACTS_TAG.equals(nextElement)) {
 						ElementManager artifactsMgr = librisMgr.nextElement();
 						File artifactDirectory = myConfiguration.getRepositoryDirectory();
-						DatabaseUi theUi = new HeadlessUi<DatabaseRecord>();
+						DatabaseUi theUi = new HeadlessUi();
 						initializeDocumentRepository(theUi, artifactDirectory);
 						documentRepository.fromXml(artifactsMgr);
 						documentRepository.buildIndexes(myConfiguration);
@@ -654,7 +654,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			dbAttributes = attrs;
 		}
 
-		public Layouts<DatabaseRecord> getLayouts() {
+		public Layouts getLayouts() {
 			return databaseMetadata.getLayouts();
 		}
 		public void viewRecord(int recordId) {
