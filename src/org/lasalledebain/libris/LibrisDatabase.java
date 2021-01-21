@@ -592,15 +592,11 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 
 		public File getArtifactDatabaseDirectory() {
-			if (hasDocumentRepository()) {
-				return documentRepository.getArtifactDatabaseDirectory();
-			} else return null;
+			return hasDocumentRepository()? documentRepository.getArtifactDatabaseDirectory(): null;
 		}
 
 		public File getArtifactRepositoryDirectory() {
-			if (hasDocumentRepository()) {
-				return documentRepository.getRepositoryDirectory();
-			} else return null;
+			return hasDocumentRepository()? documentRepository.getRepositoryDirectory(): null;
 		}
 
 		public static File getDatabaseAuxDirectory(LibrisDatabaseConfiguration config) throws DatabaseException {
@@ -963,7 +959,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 		
 		public int getNumArtifacts() {
-			return documentRepository.getNumArtifacts();
+			return hasDocumentRepository()? documentRepository.getNumArtifacts(): 0;
 		}
 
 		public void updateArtifactInfo(int artifactId, ArtifactParameters params) throws LibrisException {
