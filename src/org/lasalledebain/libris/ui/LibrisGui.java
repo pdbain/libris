@@ -48,7 +48,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
+public class LibrisGui extends LibrisWindowedUi {
 	private static final String CONTENT_PANE_HEIGHT = "CONTENT_PANE_HEIGHT";
 	private static final String CONTENT_PANE_WIDTH = "CONTENT_PANE_WIDTH";
 	private static final String CONTENT_PANE_DIVIDER = "CONTENT_PANE_DIVIDER_LOCATION";

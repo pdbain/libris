@@ -18,7 +18,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 
-public class TableLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
+public class TableLayoutProcessor extends LayoutProcessor {
 	private static final String RECORD_TABLE_LAYOUT_CLASS = "recordTable",
 			RECORD_FIELD_CELL_CLASS = "recordFieldCell";
 	private static final String RECORD_TABLE_LAYOUT_STYLE = "."+ RECORD_TABLE_LAYOUT_CLASS + " {\n"
@@ -49,8 +49,8 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
-		RecordType rec = getRecordOrErrorMessage(recList, recId, buff);
+	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+		Record rec = getRecordOrErrorMessage(recList, recId, buff);
 		if (null == rec) return;
 		layoutRecordTitle(buff, rec);
 		buff.append("<table class = "
@@ -90,15 +90,15 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 	}
 	@Override
 	public
-	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {		
-		return layOutFields(new SingleRecordList<RecordType>(rec), ui, recordPanel, modTrk);
+		return layOutFields(new SingleRecordList<Record>(rec), ui, recordPanel, modTrk);
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+	public ArrayList<UiField> layOutFields(RecordList<Record> recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException {
-		TableLayoutTableModel<RecordType> myTableModel = new TableLayoutTableModel<RecordType>(recList, myLayout);
+		TableLayoutTableModel myTableModel = new TableLayoutTableModel(recList, myLayout);
 		JTable recordTable = new JTable(myTableModel);
 		FontMetrics myFontMetrics = recordPanel.getFontMetrics(recordTable.getFont());
 		int columnWidth = myFontMetrics.stringWidth(TableLayoutTableModel.RECORD_ID) + 10;

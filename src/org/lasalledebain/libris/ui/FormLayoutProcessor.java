@@ -28,7 +28,7 @@ import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 
-public class FormLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
+public class FormLayoutProcessor extends LayoutProcessor {
 
 	private static final String FORM_FIELD_GRID_CLASS = "formFieldGrid";
 	private static final String RECORD_FIELD_CLASS = "recordField";
@@ -78,7 +78,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
+	public ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		final boolean modifiable = modTrk.isModifiable();
 		JComponent fieldPanel = null;
@@ -98,7 +98,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 				TitledBorder affiliateBorder = BorderFactory.createTitledBorder(UiField.LINE_BORDER, groupName);
 				Box groupBox = Box.createHorizontalBox();
 				groupBox.setBorder(affiliateBorder);
-				GuiControl uiField = new NameList<RecordType>(ui, db, rec, def, modifiable);
+				GuiControl uiField = new NameList(ui, db, rec, def, modifiable);
 				JComponent comp = uiField.getGuiComponent();
 				GroupMember gm = rec.getMember(groupNum);
 				if (null == gm) {
@@ -138,8 +138,8 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
-		RecordType rec = getRecordOrErrorMessage(recList, recId, buff);
+	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+		Record rec = getRecordOrErrorMessage(recList, recId, buff);
 		if (null == rec) return;
 		layoutRecordTitle(buff, rec);
 		startDiv(buff, RECORD_PANEL_CLASS); {

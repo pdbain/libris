@@ -282,7 +282,6 @@ public class LibrisLayout implements XMLElement {
 	@Override
 	public boolean equals(Object obj) {
 		if (getClass().isAssignableFrom(obj.getClass())) {
-			@SuppressWarnings("unchecked")
 			LibrisLayout comparand = (LibrisLayout) obj;
 			return comparand.getAttributes().equals(getAttributes());
 		} else {

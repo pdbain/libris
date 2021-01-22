@@ -14,7 +14,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
-public class XmlLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
+public class XmlLayoutProcessor extends LayoutProcessor {
 	private static final String XML_TEXT_CLASS = "xmlText";
 	private static final String XML_TEXT_STYLE = "."+XML_TEXT_CLASS +"{\n"
 			+ "width: 95%;\n"
@@ -39,9 +39,9 @@ public class XmlLayoutProcessor<RecordType extends Record> extends LayoutProcess
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
 
-		RecordType rec = recList.getRecord(recId);
+		Record rec = recList.getRecord(recId);
 		StringBuffer windowText = new StringBuffer();
 		if (null == rec) {
 			windowText.append("Record "+recId+" not found");
@@ -63,7 +63,7 @@ public class XmlLayoutProcessor<RecordType extends Record> extends LayoutProcess
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
+	public ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		String xmlText = getXmlText(rec);
 		recordPanel.add(new TextArea(xmlText));

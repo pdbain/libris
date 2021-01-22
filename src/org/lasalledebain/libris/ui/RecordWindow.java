@@ -16,7 +16,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 @SuppressWarnings("serial")
 public abstract class RecordWindow<RecordType extends Record> extends JScrollPane {
 
-	protected LibrisWindowedUi<RecordType> ui;
+	protected LibrisWindowedUi ui;
 	protected LibrisLayout recordLayout;
 	protected String title;
 	protected int recordId;
@@ -26,7 +26,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 	protected ModificationTracker modTracker;
 	protected JPanel navPanel;
 
-	public RecordWindow(LibrisWindowedUi<RecordType> ui, LibrisLayout layout, RecordType rec, Point position, boolean editable, 
+	public RecordWindow(LibrisWindowedUi ui, LibrisLayout layout, RecordType rec, Point position, boolean editable, 
 			ActionListener modificationListener) throws LibrisException {
 		this.record = rec;
 		recordDisplayArea = new JPanel(new GridLayout());
@@ -42,7 +42,7 @@ public abstract class RecordWindow<RecordType extends Record> extends JScrollPan
 		recordDisplayArea.repaint();
 	}
 
-	protected void layOutWindow(LibrisWindowedUi<RecordType> ui, LibrisLayout layout, RecordType rec) throws LibrisException {
+	protected void layOutWindow(LibrisWindowedUi ui, LibrisLayout layout, RecordType rec) throws LibrisException {
 		recordDisplayArea.removeAll();
 		layOutFields(layout, rec, recordDisplayArea, modTracker);
 		recordDisplayArea.setVisible(true);

@@ -15,8 +15,8 @@ import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-public abstract class LayoutProcessor<RecordType extends Record>
-implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, LibrisHTMLConstants {
+public abstract class LayoutProcessor
+implements LayoutHtmlProcessor<Record>, LayoutSwingProcessor<Record>, LibrisHTMLConstants {
 
 	private final String DATABASE_TITLE_CLASS = "databaseTitle";
 	private final String DATABASE_TITLE_STYLE = '.'+DATABASE_TITLE_CLASS
@@ -121,9 +121,9 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	abstract void validate() throws InputException;
 	@Override
 	public
-	ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
+	ArrayList<UiField> layOutFields(RecordList<Record> recList, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
-		RecordType rec = recList.getFirstRecord();
+		Record rec = recList.getFirstRecord();
 		return layOutFields(rec, ui, recordPanel, modTrk);
 	}
 
@@ -150,7 +150,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				+ ">\n");
 	}
 
-	void layoutRecordTitle(StringBuffer buff, RecordType rec) {
+	void layoutRecordTitle(StringBuffer buff, Record rec) {
 		startDiv(buff, RECORT_TITLE_CLASS); {
 			String recName = rec.getName();
 			buff.append("<b>Record:</b> ");
@@ -163,7 +163,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		} endDiv(buff);
 	}
 
-	protected int layoutBrowserPanel(RecordList<RecordType> recList, int start, int currentRecord, LibrisLayout browserLayout, StringBuffer buff) {
+	protected int layoutBrowserPanel(RecordList<Record> recList, int start, int currentRecord, LibrisLayout browserLayout, StringBuffer buff) {
 		String[] browserFields = browserLayout.getFieldIds();
 		startDiv(buff, BROWSER_PANEL_CLASS);
 		startDiv(buff);
@@ -171,7 +171,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		endDiv(buff);
 		addLayoutSelector(buff);
 		startDiv(buff);
-		Iterator<RecordType> recIter = recList.iterator();
+		Iterator<Record> recIter = recList.iterator();
 		int recCount = 0;
 		int firstRecord = 0;
 		int lastRecord = 0;
@@ -185,7 +185,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 				+ ONCHANGE_THIS_FORM_SUBMIT
 				+ ">\n");
 		while (recIter.hasNext() && (recCount < LIST_LIMIT)) {
-			RecordType rec = recIter.next();
+			Record rec = recIter.next();
 			int recordId = rec.getRecordId();
 			if (recordId < start) {
 				continue;
@@ -303,7 +303,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 		buff.append("</body>\n");
 	}
 
-	public void layOutPage(RecordList<RecordType> recList, HttpParameters params,
+	public void layOutPage(RecordList<Record> recList, HttpParameters params,
 			LibrisLayout browserLayout, DatabaseUi ui) throws InputException, IOException {
 		myUi = ui;
 		StringBuffer buff = new StringBuffer(1000);
@@ -333,8 +333,8 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 
 	}
 
-	protected RecordType getRecordOrErrorMessage(RecordList<RecordType> recList, int recId, StringBuffer buff) throws InputException {
-		RecordType rec = recList.getRecord(recId);
+	protected Record getRecordOrErrorMessage(RecordList<Record> recList, int recId, StringBuffer buff) throws InputException {
+		Record rec = recList.getRecord(recId);
 		if (null == rec) {
 			buff.append("<p>Record "+recId+" not found</p>");
 		}

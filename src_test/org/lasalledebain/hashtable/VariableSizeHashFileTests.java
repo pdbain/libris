@@ -188,7 +188,6 @@ public class VariableSizeHashFileTests extends TestCase {
 			int maximum) throws DatabaseException, IOException {
 		int modulus = Math.max(1, numEntries/64);
 		Random r = new Random(keyBase);
-		MockVariableSizeEntryFactory efactory = new MockVariableSizeEntryFactory(28);
 		for (int i=0; i<numEntries; i++) {
 			int length = r.nextInt(maximum - minimum) + minimum;
 			MockVariableSizeHashEntry e = makeVariableSizeEntry(keyBase+i, length);

@@ -22,15 +22,12 @@ public class FileAccessManager {
 	RandomAccessFile raRwFile;
 	private boolean readOnly;
 	private boolean readWrite;
-	private boolean deleteOnExit;
-
 	public FileAccessManager(File managedFile) {
 		readOnly = false;
 		readWrite = false;
 		this.myFile = managedFile;
 		ipStreams = new HashSet<InputStream>();
 		raRoFiles = new HashSet<RandomAccessFile>();
-		deleteOnExit = false;
 	}
 
 	public FileAccessManager(File directoryPath, String filename) {
@@ -38,7 +35,6 @@ public class FileAccessManager {
 	}
 
 	public void setDeleteOnExit() {
-		this.deleteOnExit = true;
 		myFile.deleteOnExit();
 	}
 
