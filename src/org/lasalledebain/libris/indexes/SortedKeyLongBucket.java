@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import org.lasalledebain.libris.exception.InputException;
 
-public class SortedKeyLongBucket extends SortedKeyValueBucket {
+public class SortedKeyLongBucket extends SortedKeyValueBucket<KeyLongTuple> {
 
 	public SortedKeyLongBucket(DataInput dataIp) throws IOException {
 		super(dataIp);
@@ -14,7 +14,7 @@ public class SortedKeyLongBucket extends SortedKeyValueBucket {
 		super();
 	}
 	@Override
-	protected KeyValueTuple readTuple(DataInput source) throws IOException {
+	protected KeyLongTuple readTuple(DataInput source) throws IOException {
 		KeyLongTuple tuple = new KeyLongTuple(source);
 		return tuple;
 	}

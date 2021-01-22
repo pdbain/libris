@@ -16,7 +16,6 @@ import junit.framework.TestCase;
 
 
 public class FieldTest extends TestCase {
-	private static final String DEFAULT_DATA = "defaultData";
 	public void testBoolean() {
 		FieldTemplate ft = new FieldTemplate(new MockSchema(), "f1", "Field 1", Field.FieldType.T_FIELD_BOOLEAN);
 		try {

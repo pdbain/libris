@@ -3,7 +3,6 @@ package org.lasalledebain.libris.ui;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;

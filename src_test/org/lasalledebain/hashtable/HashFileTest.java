@@ -237,7 +237,15 @@ public class HashFileTest extends TestCase {
 				try {
 					int numEntries = htable.getNumEntries();
 					assertEquals("wrong number of entries", i*NUM_ENTRIES_INCREMENT, numEntries);
-					lastKey = addFixedSizeEntries(htable, entries, NUM_ENTRIES_INCREMENT, lastKey, true);
+					trace("Add "+NUM_ENTRIES_INCREMENT);
+					for (int i1=0; i1<NUM_ENTRIES_INCREMENT; i1++) {
+						MockFixedSizeHashEntry e = fFactory.makeEntry((lastKey+i1));
+						htable.addEntry(e);
+						entries.add(e);
+					}
+					htable.flush();
+					trace(NUM_ENTRIES_INCREMENT+" added");
+					lastKey = lastKey+NUM_ENTRIES_INCREMENT;
 				} catch (Exception e) {
 					e.printStackTrace();
 					fail("Unexpected exception on hashfile:"+e);
@@ -357,21 +365,6 @@ public class HashFileTest extends TestCase {
 		trace("Add "+numEntries);
 		for (int i=0; i<numEntries; i++) {
 			MockVariableSizeHashEntry e = vFactory.makeEntry(countUp? (keyBase+i):(keyBase+numEntries-i));
-			htable.addEntry(e);
-			entries.add(e);
-		}
-		htable.flush();
-		trace(numEntries+" added");
-
-		return keyBase+numEntries;
-	}
-
-	private int addFixedSizeEntries(MockFixedSizedEntryHashFile htable,
-			ArrayList<FixedSizeHashEntry> entries, int numEntries, int keyBase, boolean countUp)
-					throws IOException, DatabaseException {
-		trace("Add "+numEntries);
-		for (int i=0; i<numEntries; i++) {
-			MockFixedSizeHashEntry e = fFactory.makeEntry(countUp? (keyBase+i):(keyBase+numEntries-i));
 			htable.addEntry(e);
 			entries.add(e);
 		}

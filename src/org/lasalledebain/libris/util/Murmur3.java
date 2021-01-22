@@ -51,6 +51,7 @@ public class Murmur3 {
 	  // Constants for 128 bit variant
 	  @SuppressWarnings("unused")
 	private static final long C1 = 0x87c37b91114253d5L;
+	  /*
 	  private static final long C2 = 0x4cf5ad432745937fL;
 	  private static final int R1 = 31;
 	  private static final int R2 = 27;
@@ -58,6 +59,7 @@ public class Murmur3 {
 	  private static final int M = 5;
 	  private static final int N1 = 0x52dce729;
 	  private static final int N2 = 0x38495ab5;
+	  */
 
 	  public static final int DEFAULT_SEED = 104729;
 

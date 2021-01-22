@@ -55,7 +55,7 @@ public class TestPDF extends TestCase {
 		File databaseFile = Repository.getDatabaseFileFromRoot(repoRoot);
 		HeadlessUi theUi = new HeadlessUi(databaseFile, false);
 		Layouts theLayouts = new Layouts(ArtifactDatabase.getArtifactsSchema());
-		MetadataHolder<DatabaseRecord> metadata = new MetadataHolder(ArtifactDatabase.getArtifactsSchema(), theLayouts);
+		MetadataHolder<DatabaseRecord> metadata = new MetadataHolder<DatabaseRecord>(ArtifactDatabase.getArtifactsSchema(), theLayouts);
 		boolean success = Utilities.newDatabase(databaseFile, RepositoryTest.REPOSITORY, false, theUi, metadata);
 		final File repoDbFile = success ? databaseFile : null;
 		assertTrue("could not create database", null != repoDbFile);
@@ -104,7 +104,7 @@ public class TestPDF extends TestCase {
 			DatabaseRecord rec = db.newRecord();
 			File testPdf = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_LARGE_PDF, workingDirectory);
 			importer.importDocument(testPdf.toURI(), t -> 1, rec);
-			String keywordsText = rec.getField(keywordField).getValuesAsString();
+			rec.getField(keywordField).getValuesAsString();
 			String abstractText = rec.getField(abstractField).getValuesAsString();
 			final String expectedAbstractContents = "a number of problems arise which have "
 					+ "not been adequately dealt with: the semantics of nested monitor calls; the various ways of "

@@ -17,23 +17,6 @@ import junit.framework.TestCase;
 
 public class HashUtils extends TestCase {
 
-	/**
-	 * @param buck
-	 * @param entries
-	 */
-	static void checkBucket(HashBucket<NumericKeyHashEntry> buck,
-			ArrayList<NumericKeyHashEntry> entries) {
-		Iterator<NumericKeyHashEntry> ti = entries.iterator();
-		int entryCount = 0;
-		for (NumericKeyHashEntry e: buck) {
-			assertTrue("too many entries in the bucket", ti.hasNext());
-			NumericKeyHashEntry t = ti.next();
-			assertTrue("mismatch in hash entries", t.equals(e));
-			++entryCount;
-		}
-		assertFalse("too few entries in the bucket.  Expected "+entries.size()+" got "+entryCount, ti.hasNext());
-	}
-
 	static void checkBucket2(HashBucket<FixedSizeHashEntry> buck,
 			ArrayList<NumericKeyHashEntry> entries) {
 		Iterator<NumericKeyHashEntry> ti = entries.iterator();
@@ -58,68 +41,6 @@ public class HashUtils extends TestCase {
 			++entryCount;
 		}
 		assertFalse("too few entries in the bucket.  Expected "+entries.size()+" got "+entryCount, ti.hasNext());
-	}
-
-	/**
-	 * @param buck
-	 * @param initialData
-	 * @return
-	 * @throws DatabaseException 
-	 */
-	static ArrayList<NumericKeyHashEntry> variableSizeFillBucket(HashBucket<NumericKeyHashEntry> buck, byte initialData) throws DatabaseException {
-		int bucketSize = NumericKeyHashBucket.getBucketSize();
-		ArrayList<NumericKeyHashEntry> entries;
-		int entryCount = 0;
-		int entryLength = 10; 
-		MockVariableSizeHashEntry newEntry = null;
-		entries = new ArrayList<NumericKeyHashEntry>();
-		
-		do {
-			if (null != newEntry) {
-				entries.add(newEntry);
-			}
-			int occupancy = buck.getOccupancy();
-			newEntry = new MockVariableSizeHashEntry(entryCount+1, entryLength, initialData);
-			/* all buckets have at least 4 bytes */
-			assertEquals("wrong value for occupancy for key "+entryCount, 
-					entryCount*newEntry.getTotalLength()+2, occupancy);
-			++entryCount;
-			++initialData;
-			boolean expectedOccupancy = entryCount <= ((bucketSize/newEntry.getTotalLength()) + 1);
-			assertTrue("bucket overfilled: "+entryCount, expectedOccupancy);
-		} while (buck.addEntry(newEntry));
-		return entries;
-	}
-
-	/**
-	 * @param writeBucket
-	 * @param initialData
-	 * @return
-	 * @throws DatabaseException 
-	 */
-	static ArrayList<NumericKeyHashEntry> variableSizeFillBucket2(HashBucket<NumericKeyHashEntry> writeBucket, byte initialData) throws DatabaseException {
-		int bucketSize = NumericKeyHashBucket.getBucketSize();
-		ArrayList<NumericKeyHashEntry> entries;
-		int entryCount = 0;
-		int entryLength = 10; 
-		MockVariableSizeHashEntry newEntry = null;
-		entries = new ArrayList<NumericKeyHashEntry>();
-		
-		do {
-			if (null != newEntry) {
-				entries.add(newEntry);
-			}
-			int occupancy = writeBucket.getOccupancy();
-			newEntry = new MockVariableSizeHashEntry(entryCount+1, entryLength, initialData);
-			/* all buckets have at least 4 bytes */
-			assertEquals("wrong value for occupancy for key "+entryCount, 
-					entryCount*newEntry.getTotalLength()+2, occupancy);
-			++entryCount;
-			++initialData;
-			boolean expectedOccupancy = entryCount <= ((bucketSize/newEntry.getTotalLength()) + 1);
-			assertTrue("bucket overfilled: "+entryCount, expectedOccupancy);
-		} while (writeBucket.addEntry(newEntry));
-		return entries;
 	}
 
 	/**

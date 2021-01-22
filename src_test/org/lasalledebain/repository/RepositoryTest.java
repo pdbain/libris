@@ -15,14 +15,14 @@ import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.ArtifactDatabase;
 import org.lasalledebain.libris.ArtifactParameters;
-import org.lasalledebain.libris.ArtifactRecord;
+import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.MetadataHolder;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.util.Utilities;
-import org.lasalledebain.libris.ui.DatabaseUi;
 
 import junit.framework.TestCase;
 
@@ -156,7 +156,7 @@ public class RepositoryTest  extends TestCase {
 		File databaseFile = Repository.getDatabaseFileFromRoot(repoRoot);
 				HeadlessUi theUi = new HeadlessUi(databaseFile, false);
 				Layouts theLayouts = new Layouts(ArtifactDatabase.getArtifactsSchema());
-				MetadataHolder metadata = new MetadataHolder(ArtifactDatabase.getArtifactsSchema(), theLayouts);
+				MetadataHolder<DatabaseRecord> metadata = new MetadataHolder<DatabaseRecord>(ArtifactDatabase.getArtifactsSchema(), theLayouts);
 				boolean success = Utilities.newDatabase(databaseFile, REPOSITORY, false, theUi, metadata);
 		File dbFile = success ? databaseFile : null;
 		assertTrue("could not create database", null != dbFile);

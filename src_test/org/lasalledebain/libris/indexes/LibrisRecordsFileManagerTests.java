@@ -550,6 +550,7 @@ public class LibrisRecordsFileManagerTests extends TestCase {
 				switch (fType) {
 				case T_FIELD_BOOLEAN: {
 					int iData = fieldData;
+					result.addFieldValue(fid, iData);
 					break;
 				}
 				case T_FIELD_ENUM: {
