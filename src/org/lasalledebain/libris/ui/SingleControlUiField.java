@@ -14,6 +14,7 @@ public class SingleControlUiField extends UiField {
 
 
 	GuiControl control;
+	@Override
 	public GuiControl getControl() {
 		return control;
 	}
@@ -39,8 +40,7 @@ public class SingleControlUiField extends UiField {
 	}
 
 	@Override
-	public GuiControl addControl(boolean editable) throws FieldDataException {
-		
+	public GuiControl addControl(boolean editable) {	
 		return null;
 	}
 

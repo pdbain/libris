@@ -86,4 +86,6 @@ public abstract class UiField  implements Iterable<FieldValue> {
 
 	abstract public GuiControl addControl(boolean editable) throws FieldDataException;
 
+	abstract public GuiControl getControl();
+
 }

@@ -57,7 +57,7 @@ public class RecordEditTests extends TestCase {
 			assertNotNull("Could not find "+ID_PAGES, pagesUiField);
 			int numValues = pagesUiField.getNumValues();
 			assertEquals("Wrong number of values for "+ID_PAGES, 1, numValues);
-			FieldValue pagesValue = pagesUiField.getCtrl(0).getFieldValue();
+			FieldValue pagesValue = pagesUiField.getControl(0).getFieldValue();
 			String originalMainValue = pagesValue.getMainValueAsString();
 			String originalExtraValue = pagesValue.getExtraValueAsString();
 
@@ -263,13 +263,13 @@ public class RecordEditTests extends TestCase {
 			Utilities.pause();
 			int numAuthValues = authUiField.getNumValues();
 			gui.newFieldValue();
-			GuiControl newCtrl = authUiField.getCtrl(numAuthValues);
+			GuiControl newCtrl = authUiField.getControl(numAuthValues);
 			assertNotNull("GUI control for new value is null", newCtrl);
 			newCtrl.setFieldValue("new value");
 			Utilities.pause();
 			MultipleValueUiField pubField = (MultipleValueUiField) recWindow.getField(ID_PUB);
 			assertNotNull("Could not find "+ID_PUB, pubField);
-			GuiControl pubCtrl = pubField.getCtrl(0);
+			GuiControl pubCtrl = pubField.getControl(0);
 			String PUB_NEW_VALUE = "PubNewValue";
 			pubCtrl.setFieldValue(PUB_NEW_VALUE);
 			Utilities.pause();
@@ -358,7 +358,7 @@ public class RecordEditTests extends TestCase {
 			assertEquals("Duplicate record != original record", originalRecord, newRec);
 			UiField authUiField = recWindow.getField(ID_AUTH);
 			MultipleValueUiField pagesUiField = (MultipleValueUiField) recWindow.getField(ID_PAGES);
-			FieldValue pagesValue = pagesUiField.getCtrl(0).getFieldValue();
+			FieldValue pagesValue = pagesUiField.getControl(0).getFieldValue();
 			String originalMainValue = pagesValue.getMainValueAsString();
 			String originalExtraValue = pagesValue.getExtraValueAsString();
 			assertNotNull("Could not find "+ID_AUTH, authUiField);
@@ -369,7 +369,7 @@ public class RecordEditTests extends TestCase {
 			gui.enterRecord();
 
 			gui.displayRecord(currentRec.getRecordId());
-			pagesValue = pagesUiField.getCtrl(0).getFieldValue();
+			pagesValue = pagesUiField.getControl(0).getFieldValue();
 			String newMainValue = pagesValue.getMainValueAsString();
 			String newExtraValue = pagesValue.getExtraValueAsString();
 			assertEquals("pages field main values differ", originalMainValue, newMainValue);
@@ -399,9 +399,9 @@ public class RecordEditTests extends TestCase {
 			String oldValues = pubUiField.getRecordField().getValuesAsString();
 			Utilities.pause();
 			int numPubValues = pubUiField.getNumValues();
-			pubUiField.getCtrl(numPubValues - 1);
+			pubUiField.getControl(numPubValues - 1);
 			gui.newFieldValue();
-			GuiControl newCtrl = pubUiField.getCtrl(numPubValues);
+			GuiControl newCtrl = pubUiField.getControl(numPubValues);
 			assertNotNull("GUI control for new value is null", newCtrl);
 			Utilities.pause();
 			gui.enterRecord();
@@ -438,7 +438,7 @@ public class RecordEditTests extends TestCase {
 			gui.newFieldValue();
 			assertEquals("wrong number of field values after new value", 2, titleField.getNumValues());
 
-			GuiControl titleNewValue = titleField.getCtrl(1);
+			GuiControl titleNewValue = titleField.getControl(1);
 			assertNotNull("control for new object is null", titleNewValue);
 			String TITLE_NEW_VALUE = "TitleNewValue";
 			titleNewValue.setFieldValue(TITLE_NEW_VALUE);
@@ -472,7 +472,7 @@ public class RecordEditTests extends TestCase {
 			gui.newFieldValue();
 			assertEquals("wrong number of field values after new value", pubField.getNumValues(), 2);
 
-			GuiControl pubCtrl = pubField.getCtrl(1);
+			GuiControl pubCtrl = pubField.getControl(1);
 			assertNotNull("control for new object is null", pubCtrl);
 			String PUB_NEW_VALUE = "PubNewValue";
 			pubCtrl.setFieldValue(PUB_NEW_VALUE);

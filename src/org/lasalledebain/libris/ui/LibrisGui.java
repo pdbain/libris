@@ -394,25 +394,19 @@ public class LibrisGui extends LibrisWindowedUi {
 				RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
 				final UiField selectedField = getSelectedField();
 				if (null != selectedField) {
+					final GuiControl ctrl;
 					if (selectedField.isMultiControl()) {
-						GuiControl ctrl;
-						try {
-							ctrl = ((MultipleValueUiField) selectedField).addControl(true);
-							ctrl.requestFocusInWindow();
-							ctrl.setFieldValue(contents);
-							repaint();
-						} catch (FieldDataException e) {
-							currentDatabase.alert("Error displaying record", e);
-						}
+						ctrl = selectedField.addControl(true);
 					} else {
-						((SingleControlUiField) selectedField).getControl().setFieldValue(contents);
+						ctrl = selectedField.getControl();
 					}
-				} else {
-// TODO
-					}
-				currentRecordWindow.setModified(true);
+					ctrl.requestFocusInWindow();
+					ctrl.setFieldValue(contents);
+					currentRecordWindow.setModified(true);
+					repaint();
+				}
 			} catch (UnsupportedFlavorException | IOException | FieldDataException e) {
-				throw new DatabaseError("Exception getting data from clipborad", e);
+				throw new DatabaseError("Exception getting data from clipboard", e);
 			}
 		}
 	}

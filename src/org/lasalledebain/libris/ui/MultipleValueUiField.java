@@ -148,10 +148,14 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 
 	}
 
-	public GuiControl getCtrl(int i) {
+	public GuiControl getControl(int i) {
 		return controlList.get(i);
 	}
 
+	public GuiControl getControl() {
+		return controlList.get(controlList.size()-1);
+	}
+	
 	@Override
 	public int getNumValues() {
 		int result = 0;
