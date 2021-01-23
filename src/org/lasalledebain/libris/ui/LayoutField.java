@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.Field.FieldType;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -15,20 +14,21 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class LayoutField<RecordType extends Record> implements XMLElement, Iterable<LayoutField<RecordType>>, LibrisXMLConstants {
+// TODO Remove generics
+public class LayoutField implements XMLElement, Iterable<LayoutField>, LibrisXMLConstants {
 	protected String controlTypeName;
 	protected String id;
 	protected String title;
 	protected int fieldNum;
 	int height = -1, width = -1, vpos = -1, hpos = -1, hspan = -1, vspan = -1;
-	private LayoutField<RecordType> prevLink;
-	private LibrisLayout<RecordType> containingLayout;
-	protected GuiControlConstructor<RecordType> ctrlConstructor;
+	private LayoutField prevLink;
+	private LibrisLayout containingLayout;
+	protected GuiControlConstructor ctrlConstructor;
 	private boolean carriageReturn = false;
 	private int myRightEdge;
-	private final GuiControlFactory<RecordType> ctrlFactory;
+	private final GuiControlFactory ctrlFactory;
 
-	public LayoutField(LibrisLayout<RecordType> containingLayout, LayoutField<RecordType> previous, GuiControlFactory<RecordType> theFactory) throws DatabaseException {
+	public LayoutField(LibrisLayout containingLayout, LayoutField previous, GuiControlFactory theFactory) throws DatabaseException {
 		this.containingLayout = containingLayout;
 		prevLink = previous;
 		ctrlFactory = theFactory;
@@ -55,7 +55,7 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 
 	private int checkForOverlap() throws DatabaseException {
 		int myRightEdge = hpos+hspan-1;
-		LayoutField<RecordType> cursor = prevLink;
+		LayoutField cursor = prevLink;
 		while (null != cursor) {
 			int otherBottomEdge = cursor.vpos+cursor.vspan-1;
 			int otherRightEdge = cursor.hpos+cursor.hspan-1;
@@ -69,7 +69,7 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 		return myRightEdge;
 	}
 
-	public GuiControlConstructor<RecordType> getControlContructor() {
+	public GuiControlConstructor getControlContructor() {
 		return ctrlConstructor;
 	}
 
@@ -122,16 +122,16 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 	}
 
 	@Override
-	public Iterator<LayoutField<RecordType>> iterator() {
+	public Iterator<LayoutField> iterator() {
 		return new FieldPositionIterator(this);
 	}
 
-	public class FieldPositionIterator implements Iterator<LayoutField<RecordType>> {
-		LayoutField<RecordType> cursor;
+	public class FieldPositionIterator implements Iterator<LayoutField> {
+		LayoutField cursor;
 		/**
 		 * @param cursor
 		 */
-		public FieldPositionIterator(LayoutField<RecordType> cursor) {
+		public FieldPositionIterator(LayoutField cursor) {
 			this.cursor = cursor;
 		}
 
@@ -141,8 +141,8 @@ public class LayoutField<RecordType extends Record> implements XMLElement, Itera
 		}
 
 		@Override
-		public LayoutField<RecordType> next() {
-			LayoutField<RecordType> result = cursor;
+		public LayoutField next() {
+			LayoutField result = cursor;
 			if (null != cursor) {
 				cursor = cursor.prevLink;
 			}

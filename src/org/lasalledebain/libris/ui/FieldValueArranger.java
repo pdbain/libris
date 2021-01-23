@@ -36,7 +36,7 @@ public class FieldValueArranger<RecordType extends Record> extends JDialog {
 	private Frame parentFrame;
 	boolean fieldUpdated;
  
-	public FieldValueArranger(JFrame parent, final MultipleValueUiField<RecordType> fld) {
+	public FieldValueArranger(JFrame parent, final MultipleValueUiField fld) {
 		super(parent, "Arrange field values", true);
 		fieldUpdated = false;
 		parentFrame = parent;

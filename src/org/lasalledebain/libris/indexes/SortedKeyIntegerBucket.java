@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.lasalledebain.libris.exception.InputException;
 
 
-public class SortedKeyIntegerBucket extends SortedKeyValueBucket {
+public class SortedKeyIntegerBucket extends SortedKeyValueBucket<KeyIntegerTuple> {
 
 	public SortedKeyIntegerBucket(DataInput dataIp) throws IOException {
 		super(dataIp);
@@ -15,7 +15,7 @@ public class SortedKeyIntegerBucket extends SortedKeyValueBucket {
 		super();
 	}
 	@Override
-	protected KeyValueTuple readTuple(DataInput source) throws IOException {
+	protected KeyIntegerTuple readTuple(DataInput source) throws IOException {
 		KeyIntegerTuple tuple = new KeyIntegerTuple(source);
 		return tuple;
 	}

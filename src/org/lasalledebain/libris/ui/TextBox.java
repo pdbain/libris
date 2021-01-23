@@ -3,9 +3,7 @@ package org.lasalledebain.libris.ui;
 import javax.swing.JTextArea;
 import javax.swing.text.JTextComponent;
 
-import org.lasalledebain.libris.Record;
-
-public class TextBox<RecordType extends Record> extends GenericTextControl<RecordType> {
+public class TextBox extends GenericTextControl {
 
 	public TextBox(int height, int width, boolean editable) {
 		super(height, width, editable);

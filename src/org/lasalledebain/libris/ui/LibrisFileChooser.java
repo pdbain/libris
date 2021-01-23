@@ -10,11 +10,11 @@ import javax.swing.JOptionPane;
 
 @SuppressWarnings("serial")
 public class LibrisFileChooser extends JFileChooser {
-	LibrisWindowedUi<?> gui;
+	LibrisWindowedUi gui;
 	Component parent;
 	String title;
 	
-	public LibrisFileChooser(LibrisWindowedUi<?> gui, String title) {
+	public LibrisFileChooser(LibrisWindowedUi gui, String title) {
 		this.gui = gui;
 		if (Objects.nonNull(gui)) {
 			parent = gui.mainFrame;

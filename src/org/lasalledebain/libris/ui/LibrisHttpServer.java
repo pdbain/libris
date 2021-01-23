@@ -8,7 +8,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public class LibrisHttpServer<RecordType extends Record> extends HeadlessUi<RecordType> {
+public class LibrisHttpServer<RecordType extends Record> extends HeadlessUi {
 
 	public LibrisHttpServer(int thePort, String theContext) {
 		portNumber = thePort;

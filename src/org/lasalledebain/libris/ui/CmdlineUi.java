@@ -15,7 +15,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class CmdlineUi<RecordType extends Record> extends AbstractUi<RecordType> {
+public class CmdlineUi<RecordType extends Record> extends AbstractUi {
 
 	protected final BufferedReader cmdlineInput;
 	

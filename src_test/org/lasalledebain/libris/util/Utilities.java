@@ -58,8 +58,6 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;
 import org.lasalledebain.libris.xmlUtils.XmlShapes.SHAPE_LIST;
 
 import junit.framework.TestCase;
-@SuppressWarnings("rawtypes")
-
 public class Utilities<RecordType extends Record> extends TestCase implements LibrisXMLConstants {
 	public static final String KEYWORD_DATABASE1_ARCHIVE = "KeywordDatabase1_archive.tar";
 	public static final String HTML_TEST_DATABASE = "htmlTestDatabase1.libr";
@@ -135,11 +133,11 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		return testDirectory;
 	}
 
-	public Layouts<RecordType> loadLayoutsFromXml(Schema schem, File inputFile)
+	public Layouts loadLayoutsFromXml(Schema schem, File inputFile)
 			throws FileNotFoundException, FactoryConfigurationError,
 			XMLStreamException, LibrisException, DatabaseException {
 		ElementManager mgr = makeElementManagerFromFile(inputFile, "layouts");
-		Layouts<RecordType> myLayouts = new Layouts<RecordType>(schem);
+		Layouts myLayouts = new Layouts(schem);
 		myLayouts.fromXml(mgr);
 		return myLayouts;
 	}
@@ -550,7 +548,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(archiveFile, archiveFile.getParentFile());
 		assertTrue("Archive file is empty", fileList.size() > 0);
 		File databaseFile = fileList.get(0);
-		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
+		HeadlessUi ui = new HeadlessUi(databaseFile, false);
 		Libris.buildIndexes(databaseFile, ui);
 		LibrisDatabase result = ui.openDatabase();
 		assertNotNull("Database not opened", result);
@@ -558,7 +556,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 	}
 
 	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
-		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
+		HeadlessUi ui = new HeadlessUi(databaseFile, false);
 		Libris.buildIndexes(databaseFile, ui);
 	
 		LibrisDatabase result = ui.openDatabase();
@@ -567,7 +565,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 	}
 
 	public static LibrisDatabase buildAndOpenDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
-		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>();
+		HeadlessUi ui = new HeadlessUi();
 		Libris.buildIndexes(config, ui);
 		LibrisDatabase result = ui.openDatabase(config);
 		return result;

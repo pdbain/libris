@@ -16,11 +16,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.lasalledebain.libris.ArtifactDatabase;
-import org.lasalledebain.libris.ArtifactRecord;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.MetadataHolder;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Repository;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.PdfRecordImporter;
@@ -55,13 +53,13 @@ public class TestPDF extends TestCase {
 		repoRoot = new File(workingDirectory, "repo_root");
 		assertTrue("Could not create "+repoRoot.getPath(), repoRoot.mkdir());
 		File databaseFile = Repository.getDatabaseFileFromRoot(repoRoot);
-		HeadlessUi<DatabaseRecord> theUi = new HeadlessUi<DatabaseRecord>(databaseFile, false);
-		Layouts<ArtifactRecord> theLayouts = new Layouts<ArtifactRecord>(ArtifactDatabase.getArtifactsSchema());
-		MetadataHolder<DatabaseRecord> metadata = new MetadataHolder(ArtifactDatabase.getArtifactsSchema(), theLayouts);
+		HeadlessUi theUi = new HeadlessUi(databaseFile, false);
+		Layouts theLayouts = new Layouts(ArtifactDatabase.getArtifactsSchema());
+		MetadataHolder<DatabaseRecord> metadata = new MetadataHolder<DatabaseRecord>(ArtifactDatabase.getArtifactsSchema(), theLayouts);
 		boolean success = Utilities.newDatabase(databaseFile, RepositoryTest.REPOSITORY, false, theUi, metadata);
 		final File repoDbFile = success ? databaseFile : null;
 		assertTrue("could not create database", null != repoDbFile);
-		HeadlessUi<Record> ui = new HeadlessUi<Record>(repoFile, false);
+		HeadlessUi ui = new HeadlessUi(repoFile, false);
 		repo = Repository.open(ui, repoRoot);
 		db = null;
 	}
@@ -106,7 +104,7 @@ public class TestPDF extends TestCase {
 			DatabaseRecord rec = db.newRecord();
 			File testPdf = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_LARGE_PDF, workingDirectory);
 			importer.importDocument(testPdf.toURI(), t -> 1, rec);
-			String keywordsText = rec.getField(keywordField).getValuesAsString();
+			rec.getField(keywordField).getValuesAsString();
 			String abstractText = rec.getField(abstractField).getValuesAsString();
 			final String expectedAbstractContents = "a number of problems arise which have "
 					+ "not been adequately dealt with: the semantics of nested monitor calls; the various ways of "

@@ -23,7 +23,6 @@ import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 
-@SuppressWarnings("rawtypes")
 public class RecordListTests extends TestCase {
 
 	private static final String EXTRA_DATA = "extra data";
@@ -53,6 +52,7 @@ public class RecordListTests extends TestCase {
 			RecordList<DatabaseRecord> list = testDb.getRecords();
 			int recordCount = 0;
 			for (Record r: list) {
+				// TODO finish testDatabaseRecordList
 				String id = getRecordIdString(r);
 			}
 			for (Record r: list) {
@@ -71,7 +71,7 @@ public class RecordListTests extends TestCase {
 		try {
 			testDb = Utilities.buildAndOpenDatabase(Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory));
 			RecordList<DatabaseRecord> list = testDb.getRecords();
-			ModifiedRecordList modList = new ModifiedRecordList();
+			ModifiedRecordList<Record> modList = new ModifiedRecordList<Record>();
 			ArrayList<Record> foundRecords = new ArrayList<Record>();
 
 			for (Record r: list) {

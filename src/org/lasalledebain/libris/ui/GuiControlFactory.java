@@ -4,43 +4,42 @@ import java.util.HashMap;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
-public class GuiControlFactory<RecordType extends Record> {
-	private final HashMap<String, GuiControlConstructor<RecordType>> controls;
+public class GuiControlFactory {
+	private final HashMap<String, GuiControlConstructor> controls;
 	GuiControlFactory() {
 		controls = initializeControlList();
 	}
 
-	HashMap<String, GuiControlConstructor<RecordType>> initializeControlList() {
-		HashMap<String, GuiControlConstructor<RecordType>> map = new HashMap<String, GuiControlConstructor<RecordType>>(12);
+	HashMap<String, GuiControlConstructor> initializeControlList() {
+		HashMap<String, GuiControlConstructor> map = new HashMap<String, GuiControlConstructor>(12);
 
 		try {
 			String cName = GuiConstants.GUI_TEXTBOX;
-			map.put(cName, new TextboxConstructor<RecordType>());
+			map.put(cName, new TextboxConstructor());
 
 			cName = GuiConstants.GUI_TEXTFIELD;
-			map.put(cName, new TextfieldConstructor<RecordType>());
+			map.put(cName, new TextfieldConstructor());
 
 			cName = GuiConstants.GUI_PAIRFIELD;
-			map.put(cName, new RangefieldConstructor<RecordType>());
+			map.put(cName, new RangefieldConstructor());
 
 			cName = GuiConstants.GUI_CHECKBOX;
-			map.put(cName, new CheckboxConstructor<RecordType>());
+			map.put(cName, new CheckboxConstructor());
 
 			cName = GuiConstants.GUI_ENUMFIELD;
-			map.put(cName, new GuiControlConstructor<RecordType>() {
-				public GuiControl<RecordType> makeControl(String title, int height, int width, boolean editable) {	
-					return new EnumField<RecordType>(height, width, editable);
+			map.put(cName, new GuiControlConstructor() {
+				public GuiControl makeControl(String title, int height, int width, boolean editable) {	
+					return new EnumField(height, width, editable);
 				}		
 			});
 
 			cName = GuiConstants.GUI_LOCATIONFIELD;
-			map.put(cName, new GuiControlConstructor<RecordType>() {
-				public GuiControl<RecordType> makeControl(String title, int height, int width, boolean editable) {	
-					return new LocationField<RecordType>(height, width, editable);
+			map.put(cName, new GuiControlConstructor() {
+				public GuiControl makeControl(String title, int height, int width, boolean editable) {	
+					return new LocationField(height, width, editable);
 				}
 			});
 
@@ -50,17 +49,17 @@ public class GuiControlFactory<RecordType extends Record> {
 		return map;
 	}
 	
-	MultipleValueUiField<RecordType> makeMultiControlField(LayoutField<RecordType> fieldPosn, Field recordField, ModificationTracker modTrk) throws DatabaseException {
+	MultipleValueUiField makeMultiControlField(LayoutField fieldPosn, Field recordField, ModificationTracker modTrk) throws DatabaseException {
 		try {
 			int numValues = recordField.getNumberOfValues();
-			final GuiControlConstructor<RecordType> ctrlConst = fieldPosn.getControlContructor();
-			MultipleValueUiField<RecordType> guiFld = new MultipleValueUiField<RecordType>(this, fieldPosn, ctrlConst.labelField(), 
+			final GuiControlConstructor ctrlConst = fieldPosn.getControlContructor();
+			MultipleValueUiField guiFld = new MultipleValueUiField(this, fieldPosn, ctrlConst.labelField(), 
 					recordField, numValues, modTrk);
 			if (0 == numValues) {
 				guiFld.addControl(modTrk.isModifiable());
 			} else {
 				for (FieldValue v: recordField.getFieldValues()) {
-					GuiControl<RecordType> control = guiFld.addControl(modTrk.isModifiable());
+					GuiControl control = guiFld.addControl(modTrk.isModifiable());
 					control.setFieldValue(v);
 				}
 			}
@@ -70,9 +69,9 @@ public class GuiControlFactory<RecordType extends Record> {
 		}
 	}
 
-	GuiControl<RecordType> newControl(LayoutField<RecordType> fieldPosn,
+	GuiControl newControl(LayoutField fieldPosn,
 			Field recordField, ModificationTracker modTrk, boolean editable) throws FieldDataException {
-		GuiControl<RecordType> control = fieldPosn.getControlContructor().makeControl(fieldPosn, modTrk, editable);
+		GuiControl control = fieldPosn.getControlContructor().makeControl(fieldPosn, modTrk, editable);
 		EnumFieldChoices legalValues = recordField.getLegalValues();
 		control.setLegalValues(legalValues);
 		control.setRestricted(recordField.isRestricted());
@@ -80,7 +79,7 @@ public class GuiControlFactory<RecordType extends Record> {
 		return control;
 	}
 
-	public GuiControlConstructor<RecordType> getControlConstructor(
+	public GuiControlConstructor getControlConstructor(
 			String controlType) {
 		return controls.get(controlType);
 	}

@@ -49,7 +49,7 @@ public class Repository extends Libris {
 	}
 
 	public static Repository open(DatabaseUi parent, File repoRoot) throws FactoryConfigurationError, LibrisException {
-		HeadlessUi<ArtifactRecord> myUi = new HeadlessUi<ArtifactRecord>(getDatabaseFileFromRoot(repoRoot), parent.isDatabaseReadOnly());
+		HeadlessUi myUi = new HeadlessUi(getDatabaseFileFromRoot(repoRoot), parent.isDatabaseReadOnly());
 		GenericDatabase<DatabaseRecord> db = myUi.openDatabase();
 		Repository result = new Repository(db, repoRoot);
 		return result;

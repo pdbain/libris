@@ -28,7 +28,7 @@ import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 
-public class FormLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
+public class FormLayoutProcessor extends LayoutProcessor {
 
 	private static final String FORM_FIELD_GRID_CLASS = "formFieldGrid";
 	private static final String RECORD_FIELD_CLASS = "recordField";
@@ -37,8 +37,8 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 			MULTICONTROL_CELL_CLASS = "multiControlCell",
 			FIELD_TEXT_MULTILINE_CLASS="fieldTextMultiLine";
 	private final String myStyleString;
-	private final GuiControlFactory<RecordType> ctrlFactory;
-	public FormLayoutProcessor(LibrisLayout<RecordType> theLayout, GuiControlFactory<RecordType> theFactory) {
+	private final GuiControlFactory ctrlFactory;
+	public FormLayoutProcessor(LibrisLayout theLayout, GuiControlFactory theFactory) {
 		super(theLayout);
 		myStyleString = makeStyleString();
 		ctrlFactory = theFactory;
@@ -64,7 +64,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 						+ "}\n"
 						+ FIELDS_PANEL_STYLE
 				);
-		for (LayoutField<RecordType> fp: myLayout.getFields()) {
+		for (LayoutField fp: myLayout.getFields()) {
 			buff.append("."
 					+ RECORD_FIELD_CLASS+fp.getFieldNum()+" {\n" + 
 					"  grid-column: "+(1+fp.getHpos())+" / span "+fp.getHspan()+";\n" + 
@@ -78,7 +78,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
+	public ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		final boolean modifiable = modTrk.isModifiable();
 		JComponent fieldPanel = null;
@@ -98,14 +98,14 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 				TitledBorder affiliateBorder = BorderFactory.createTitledBorder(UiField.LINE_BORDER, groupName);
 				Box groupBox = Box.createHorizontalBox();
 				groupBox.setBorder(affiliateBorder);
-				GuiControl<RecordType> uiField = new NameList<RecordType>(ui, db, rec, def, modifiable);
+				GuiControl uiField = new NameList(ui, db, rec, def, modifiable);
 				JComponent comp = uiField.getGuiComponent();
 				GroupMember gm = rec.getMember(groupNum);
 				if (null == gm) {
 					gm = new GroupMember(defs, def);
 					rec.setMember(groupNum, gm);
 				}
-				SingleControlUiField<RecordType> guiFld = new SingleControlUiField<RecordType>(gm, modTrk);
+				SingleControlUiField guiFld = new SingleControlUiField(gm, modTrk);
 				guiFld.setControl(uiField);
 				groupBox.add(comp);
 				groupPanel.add(groupBox);
@@ -119,7 +119,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 		GridBagConstraints c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
 		fieldPanel.setLayout(panelLayout);
-		for (LayoutField<RecordType> fp: myLayout.getFields()) {
+		for (LayoutField fp: myLayout.getFields()) {
 			int fieldNum = fp.getFieldNum();
 			Field fld = myLayout.getField(rec, fieldNum);
 			if (null == fld) {
@@ -128,7 +128,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 			c.gridx = fp.getHpos(); c.gridy = fp.getVpos();
 			c.gridwidth = fp.isCarriageReturn()? GridBagConstraints.REMAINDER: fp.getHspan();
 			c.gridheight = fp.getVspan();
-			MultipleValueUiField<RecordType> guiFld = ctrlFactory.makeMultiControlField(fp, fld, modTrk);
+			MultipleValueUiField guiFld = ctrlFactory.makeMultiControlField(fp, fld, modTrk);
 			JComponent comp = guiFld.getGuiComponent();
 			panelLayout.setConstraints(comp, c);
 			fieldPanel.add(comp);
@@ -138,8 +138,8 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
-		RecordType rec = getRecordOrErrorMessage(recList, recId, buff);
+	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+		Record rec = getRecordOrErrorMessage(recList, recId, buff);
 		if (null == rec) return;
 		layoutRecordTitle(buff, rec);
 		startDiv(buff, RECORD_PANEL_CLASS); {
@@ -166,7 +166,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 				endDiv(buff);
 			}
 			startDiv(buff, new String[] {FIELDS_PANEL_CLASS, FORM_FIELD_GRID_CLASS}); {
-				for (LayoutField<RecordType> fp: myLayout.getFields()) {
+				for (LayoutField fp: myLayout.getFields()) {
 					int fieldNum = fp.fieldNum;
 					Field fld = rec.getField(fieldNum);
 					if (null == fld) {
@@ -197,7 +197,7 @@ public class FormLayoutProcessor<RecordType extends Record> extends LayoutProces
 	@Override
 	protected void validate() throws InputException {
 		Schema mySchema = myLayout.getSchema();
-		for (LayoutField<RecordType> lf: myLayout.getFields()) {
+		for (LayoutField lf: myLayout.getFields()) {
 			String fid = lf.getId();
 			FieldType fType = mySchema.getFieldType(fid);
 			if (lf.getControlTypeName().equals(GuiConstants.GUI_ENUMFIELD)

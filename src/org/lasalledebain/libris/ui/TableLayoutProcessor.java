@@ -18,7 +18,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 
-public class TableLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
+public class TableLayoutProcessor extends LayoutProcessor {
 	private static final String RECORD_TABLE_LAYOUT_CLASS = "recordTable",
 			RECORD_FIELD_CELL_CLASS = "recordFieldCell";
 	private static final String RECORD_TABLE_LAYOUT_STYLE = "."+ RECORD_TABLE_LAYOUT_CLASS + " {\n"
@@ -32,7 +32,7 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 			+ "vertical-align: top;\n"
 		+	"}\n";
 
-	public TableLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+	public TableLayoutProcessor(LibrisLayout theLayout) {
 		super(theLayout);
 	}
 
@@ -49,14 +49,14 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
-		RecordType rec = getRecordOrErrorMessage(recList, recId, buff);
+	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+		Record rec = getRecordOrErrorMessage(recList, recId, buff);
 		if (null == rec) return;
 		layoutRecordTitle(buff, rec);
 		buff.append("<table class = "
 				+ RECORD_TABLE_LAYOUT_CLASS
 				+ ">\n"); {
-					for (LayoutField<RecordType> fp: myLayout.getFields()) {
+					for (LayoutField fp: myLayout.getFields()) {
 						int fieldNum = fp.fieldNum;
 						Field fld = rec.getField(fieldNum);
 						if (null == fld) {
@@ -90,24 +90,24 @@ public class TableLayoutProcessor<RecordType extends Record> extends LayoutProce
 	}
 	@Override
 	public
-	ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+	ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {		
-		return layOutFields(new SingleRecordList<RecordType>(rec), ui, recordPanel, modTrk);
+		return layOutFields(new SingleRecordList<Record>(rec), ui, recordPanel, modTrk);
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+	public ArrayList<UiField> layOutFields(RecordList<Record> recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException {
-		TableLayoutTableModel<RecordType> myTableModel = new TableLayoutTableModel<RecordType>(recList, myLayout);
+		TableLayoutTableModel myTableModel = new TableLayoutTableModel(recList, myLayout);
 		JTable recordTable = new JTable(myTableModel);
 		FontMetrics myFontMetrics = recordPanel.getFontMetrics(recordTable.getFont());
 		int columnWidth = myFontMetrics.stringWidth(TableLayoutTableModel.RECORD_ID) + 10;
 		TableColumnModel columns = recordTable.getColumnModel();
 		columns.getColumn(0).setPreferredWidth(columnWidth);
-		ArrayList<LayoutField<RecordType>> bodyFieldList = myLayout.getBodyFieldList();
+		ArrayList<LayoutField> bodyFieldList = myLayout.getBodyFieldList();
 
 		for (int i = 1; i < myTableModel.getColumnCount(); ++i) {
-			LayoutField<RecordType> theFieldPosition = bodyFieldList.get(i-1);
+			LayoutField theFieldPosition = bodyFieldList.get(i-1);
 			columnWidth = theFieldPosition.getWidth();
 			columnWidth = Math.max(columnWidth, myFontMetrics.stringWidth(theFieldPosition.title) + 10);
 			columns.getColumn(i).setPreferredWidth(columnWidth);

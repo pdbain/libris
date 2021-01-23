@@ -22,7 +22,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.util.StringUtils;
 
-public class ListLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
+public class ListLayoutProcessor<RecordType extends Record> extends LayoutProcessor {
 	private static final String RECORD_LIST_TABLE_CLASS = "recordList";
 	private static final String RECORD_LIST_ROW_CLASS = "recordListRow",
 			RECORD_ID_CLASS = "recordId",
@@ -48,12 +48,12 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 			+ "display: inline;\n"
 			+ "\n}\n";
 
-	public ListLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+	public ListLayoutProcessor(LibrisLayout theLayout) {
 		super(theLayout);
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
 		buff.append("<table class = \""
 				+ RECORD_LIST_TABLE_CLASS
 				+ "\">\n"); {
@@ -62,7 +62,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 								+RECORD_LIST_CELL_CLASS
 								+ "\">"
 								+ "Record</th>");
-						for (LayoutField<RecordType> fp: myLayout.getFields()) {
+						for (LayoutField fp: myLayout.getFields()) {
 							buff.append("<th class=\"\n"
 									+ RECORD_LIST_CELL_CLASS
 									+ "\">"
@@ -74,7 +74,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 					} buff.append("</thead>");
 					buff.append("<tbody>"); {
 						int recCount = 0;
-						for (RecordType rec:recList) {
+						for (Record rec:recList) {
 							if (rec.getRecordId() < params.browserFirstId) continue;
 							buff.append("<tr "
 									+ "class=\""+RECORD_LIST_ROW_CLASS+"\""
@@ -90,7 +90,7 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 														buff.append(recName);
 													}
 												} buff.append("</td>\n");
-												for (LayoutField<RecordType> fp: myLayout.getFields()) {
+												for (LayoutField fp: myLayout.getFields()) {
 													int fieldNum = fp.fieldNum;
 													Field fld = rec.getField(fieldNum);
 													buff.append("<td class=\"" 
@@ -113,8 +113,8 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 	}
 
 	@Override
-	protected int layoutBrowserPanel(RecordList<RecordType> recList, int start, int currentRecord,
-			LibrisLayout<RecordType> browserLayout, StringBuffer buff) {
+	protected int layoutBrowserPanel(RecordList<Record> recList, int start, int currentRecord,
+			LibrisLayout browserLayout, StringBuffer buff) {
 		startDiv(buff);
 		addLayoutSelector(buff);
 
@@ -166,10 +166,10 @@ public class ListLayoutProcessor<RecordType extends Record> extends LayoutProces
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordType theRecord, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
+	public ArrayList<UiField> layOutFields(Record theRecord, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		GenericDatabase<DatabaseRecord> db = ui.getDatabase();
-		ListLayoutTableModel<RecordType> myTableModel = new ListLayoutTableModel(theRecord, db, myLayout);
+		ListLayoutTableModel myTableModel = new ListLayoutTableModel(theRecord, db, myLayout);
 		JTable recordTable = new JTable(myTableModel);
 		TableColumnModel columns = recordTable.getColumnModel();
 		FontMetrics myFontMetrics = recordPanel.getFontMetrics(recordTable.getFont());

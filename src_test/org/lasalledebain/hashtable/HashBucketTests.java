@@ -4,14 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.junit.Test;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.hashfile.FixedSizeHashEntry;
 import org.lasalledebain.libris.hashfile.HashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashBucket;
 import org.lasalledebain.libris.hashfile.NumericKeyHashEntry;
+import org.lasalledebain.libris.hashfile.VariableSizeHashEntry;
 import org.lasalledebain.libris.indexes.FileSpaceManager;
 import org.lasalledebain.libris.indexes.MockFixedSizeEntryBucket;
+import org.lasalledebain.libris.indexes.MockFixedSizeEntryBucket2;
 import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
@@ -23,11 +27,11 @@ public class HashBucketTests extends TestCase {
 
 	@Test
 	public void testAddEntry() {
-		HashBucket buck = new MockFixedSizeEntryBucket(null, 0);
+		HashBucket<FixedSizeHashEntry> buck = new MockFixedSizeEntryBucket2(null, 0);
 		ArrayList<NumericKeyHashEntry> entries;
 		try {
-			entries = HashUtils.fixedSizeFillBucket(buck, 42,(byte) 1);
-			HashUtils.checkBucket(buck, entries);
+			entries = HashUtils.fixedSizeFillBucket2(buck, 42,(byte) 1);
+			HashUtils.checkBucket2(buck, entries);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 			fail("Unexpected exception on hashfile");
@@ -38,10 +42,10 @@ public class HashBucketTests extends TestCase {
 	@Test
 	public void testReadAndWrite() {
 		RandomAccessFile hashFile = HashUtils.MakeHashFile(testFile);
-		HashBucket writeBucket = new MockFixedSizeEntryBucket(hashFile,0,10);
+		HashBucket<FixedSizeHashEntry> writeBucket = new MockFixedSizeEntryBucket2(hashFile,0,10);
 		ArrayList<NumericKeyHashEntry> entries = null;
 		try {
-			entries = HashUtils.fixedSizeFillBucket(writeBucket, 10, (byte) 2);
+			entries = HashUtils.fixedSizeFillBucket2(writeBucket, 10, (byte) 2);
 			writeBucket.write();
 		} catch (DatabaseException e) {
 			e.printStackTrace();
@@ -57,7 +61,7 @@ public class HashBucketTests extends TestCase {
 		}
 		
 		try {
-		HashUtils.checkBucket((NumericKeyHashBucket<NumericKeyHashEntry>) readBucket, entries);
+		HashUtils.checkBucket3(readBucket, entries);
 			hashFile.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -72,17 +76,37 @@ public class HashBucketTests extends TestCase {
 		MockOverflowManager overflowManager = new MockOverflowManager(mgr);
 
 		RandomAccessFile backingStore = HashUtils.MakeHashFile(testFile);
-		HashBucket writeBucket = new MockVariableSizeEntryBucket(backingStore, 0, overflowManager);
+		HashBucket<VariableSizeHashEntry> writeBucket = new MockVariableSizeEntryBucket(backingStore, 0, overflowManager);
 		ArrayList<NumericKeyHashEntry> entries = null;
 		try {
-			entries = HashUtils.variableSizeFillBucket(writeBucket, (byte) 2);
+			byte initialData = (byte) 2;
+			int bucketSize = NumericKeyHashBucket.getBucketSize();
+			int entryCount = 0;
+			int entryLength = 10; 
+			MockVariableSizeHashEntry newEntry = null;
+			entries = new ArrayList<NumericKeyHashEntry>();
+			
+			do {
+				if (null != newEntry) {
+					entries.add(newEntry);
+				}
+				int occupancy = writeBucket.getOccupancy();
+				newEntry = new MockVariableSizeHashEntry(entryCount+1, entryLength, initialData);
+				/* all buckets have at least 4 bytes */
+				HashUtils.assertEquals("wrong value for occupancy for key "+entryCount, 
+						entryCount*newEntry.getTotalLength()+2, occupancy);
+				++entryCount;
+				++initialData;
+				boolean expectedOccupancy = entryCount <= ((bucketSize/newEntry.getTotalLength()) + 1);
+				HashUtils.assertTrue("bucket overfilled: "+entryCount, expectedOccupancy);
+			} while (writeBucket.addEntry(newEntry));
 			writeBucket.write();
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 			fail("Unexpected exception on hashfile");
 		}
 		
-		HashBucket<?> readBucket = new MockVariableSizeEntryBucket(backingStore, 0, overflowManager);
+		MockVariableSizeEntryBucket readBucket = new MockVariableSizeEntryBucket(backingStore, 0, overflowManager);
 		try {
 			readBucket.read();
 		} catch (Exception e1) {
@@ -91,7 +115,15 @@ public class HashBucketTests extends TestCase {
 		}
 		
 		try {
-		HashUtils.checkBucket((NumericKeyHashBucket<NumericKeyHashEntry>) readBucket, entries);
+		Iterator<NumericKeyHashEntry> ti = entries.iterator();
+		int entryCount = 0;
+		for (NumericKeyHashEntry e: readBucket) {
+			HashUtils.assertTrue("too many entries in the bucket", ti.hasNext());
+			NumericKeyHashEntry t = ti.next();
+			HashUtils.assertTrue("mismatch in hash entries", t.equals(e));
+			++entryCount;
+		}
+		HashUtils.assertFalse("too few entries in the bucket.  Expected "+entries.size()+" got "+entryCount, ti.hasNext());
 			backingStore.close();
 		} catch (IOException e) {
 			e.printStackTrace();

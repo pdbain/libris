@@ -18,16 +18,16 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 
-public class ParagraphLayoutProcessor <RecordType extends Record> extends LayoutProcessor<RecordType> {
+public class ParagraphLayoutProcessor extends LayoutProcessor {
 
-	public ParagraphLayoutProcessor(LibrisLayout<RecordType> theLayout) {
+	public ParagraphLayoutProcessor(LibrisLayout theLayout) {
 		super(theLayout);
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
-		LayoutField<RecordType>[] fieldInfo = myLayout.getFields();
-		RecordType rec = recList.getRecord(recId);
+	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+		LayoutField[] fieldInfo = myLayout.getFields();
+		Record rec = recList.getRecord(recId);
 		StringBuffer windowText = new StringBuffer();
 		if (null == rec) {
 			windowText.append("Record "+recId+" not found");
@@ -38,7 +38,7 @@ public class ParagraphLayoutProcessor <RecordType extends Record> extends Layout
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel,
+	public ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		JEditorPane content = new JEditorPane();
 		recordPanel.addComponentListener(new ComponentListener() {
@@ -69,14 +69,14 @@ public class ParagraphLayoutProcessor <RecordType extends Record> extends Layout
 		recordPanel.setLayout(new GridBagLayout());
 		content.setContentType("text/html;");
 		content.setEditable(false);
-		LayoutField<RecordType>[] fieldInfo = myLayout.getFields();
+		LayoutField[] fieldInfo = myLayout.getFields();
 		String windowText = createHtmlParagraph(rec, fieldInfo);
 
 		content.setText(windowText);
 		return LibrisLayout.emptyUiList;
 	}
 
-	public String createHtmlParagraph(RecordType rec, LayoutField<RecordType>[] fieldInfo)
+	public String createHtmlParagraph(Record rec, LayoutField[] fieldInfo)
 			throws InputException {
 		StringBuffer windowText = new StringBuffer();
 
@@ -96,10 +96,10 @@ public class ParagraphLayoutProcessor <RecordType extends Record> extends Layout
 		return windowText.toString();
 	}
 
-	public void recordToParagraph(RecordType rec, LayoutField<RecordType>[] fieldInfo, StringBuffer windowText)
+	public void recordToParagraph(Record rec, LayoutField[] fieldInfo, StringBuffer windowText)
 			throws InputException {
 		String separator = "";
-		for (LayoutField<RecordType> fp: fieldInfo) {
+		for (LayoutField fp: fieldInfo) {
 			FieldValue val = rec.getFieldValue(fp.fieldNum);
 			if (!Objects.isNull(val) && !val.isEmpty()) {
 				windowText.append(separator);

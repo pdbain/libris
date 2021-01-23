@@ -3,9 +3,7 @@ package org.lasalledebain.libris.ui;
 import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
-import org.lasalledebain.libris.Record;
-
-public class RecordTextField<RecordType extends Record> extends GenericTextControl<RecordType> {
+public class RecordTextField extends GenericTextControl {
 
 	public RecordTextField(int height, int width, boolean editable) {
 		super(height, width, editable);

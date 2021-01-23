@@ -10,12 +10,12 @@ public abstract class NumericKeyHashFile<EntryType extends NumericKeyHashEntry,
 BucketType extends NumericKeyHashBucket<EntryType>> 
 extends HashFile<EntryType, BucketType> {
 
-	HashMap<Integer, NumericKeyHashBucket<EntryType>> bucketCache;
+	HashMap<Integer, BucketType> bucketCache;
 
 	public NumericKeyHashFile(RandomAccessFile backingStore)
 			throws IOException {
 		super(backingStore);
-		bucketCache = new HashMap<Integer, NumericKeyHashBucket<EntryType>>();
+		bucketCache = new HashMap<Integer, BucketType>();
 	}
 	
 	public EntryType getEntry(int key) throws IOException, DatabaseException {
@@ -25,7 +25,7 @@ extends HashFile<EntryType, BucketType> {
 		if (null != foundEntry) {
 			return foundEntry;
 		} else {
-			NumericKeyHashBucket<EntryType> overflowBucket = getBucket(numBuckets-1);
+			BucketType overflowBucket = getBucket(numBuckets-1);
 			foundEntry = overflowBucket.getEntry(key);
 			if (null != foundEntry) {
 				return foundEntry;
@@ -44,6 +44,5 @@ extends HashFile<EntryType, BucketType> {
 		int homeBucket = hashToBucketNumber(hashedKey);
 		return homeBucket;
 	}
-
 
 }

@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.XMLElement;
 import org.lasalledebain.libris.exception.Assertion;
@@ -21,15 +20,15 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisEmptyAttributes;
 
-public class Layouts<RecordType extends Record> implements XMLElement {
+public class Layouts implements XMLElement {
 	enum LAYOUT_MEDIUM {
 		LM_SWING, LM_TEXT, LM_HTML;
 	};
 	public static final String DEFAULT_LAYOUT_VALUE = "default";
 
 	private Schema schem;
-	HashMap <String,LibrisLayout<RecordType>> layoutUsageMap = new HashMap<>();
-	LinkedHashMap<String, LibrisLayout<RecordType>> myLayouts;
+	HashMap <String,LibrisLayout> layoutUsageMap = new HashMap<>();
+	LinkedHashMap<String, LibrisLayout> myLayouts;
 	ArrayList<String> layoutIds;
 
 	protected static HashMap<String, Dimension> defaultDimensionStrings = initializeDefaultDimensions();
@@ -51,7 +50,7 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		mgr.parseOpenTag();
 		while (mgr.hasNext()) {
 			ElementManager layoutMgr = mgr.nextElement();
-			LibrisLayout<RecordType> theLayout = new LibrisLayout<>(schem, this);
+			LibrisLayout theLayout = new LibrisLayout(schem, this);
 			theLayout.fromXml(layoutMgr);
 			String layoutId = theLayout.getId();
 			for (String u: theLayout.getLayoutUsers()) {
@@ -64,7 +63,7 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		mgr.parseClosingTag();
 	}
 
-	public LibrisLayout<RecordType> getLayout(String id) {
+	public LibrisLayout getLayout(String id) {
 		return myLayouts.get(id);
 	}
 
@@ -72,7 +71,7 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return layoutIds.toArray(new String[layoutIds.size()]);
 	}
 
-	Stream <LibrisLayout<RecordType>> getLayouts() {
+	Stream <LibrisLayout> getLayouts() {
 		return myLayouts.values().stream();
 		
 	}
@@ -81,8 +80,8 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return dims;
 	}
 
-	public LibrisLayout<RecordType> getLayoutByUsage(String user) throws DatabaseException {
-		LibrisLayout<RecordType> l = layoutUsageMap.get(user);
+	public LibrisLayout getLayoutByUsage(String user) throws DatabaseException {
+		LibrisLayout l = layoutUsageMap.get(user);
 		assertNotNullDatabaseException("No layout defined:",  user, l);
 		return l;
 	}
@@ -102,9 +101,9 @@ public class Layouts<RecordType extends Record> implements XMLElement {
 		return LibrisEmptyAttributes.getLibrisEmptyAttributes();
 	}
 
-	public boolean equals(Layouts<RecordType> comparand) {
+	public boolean equals(Layouts comparand) {
 		try {
-			Layouts<RecordType> otherLayouts = comparand;
+			Layouts otherLayouts = comparand;
 			return otherLayouts.myLayouts.equals(myLayouts);
 		} catch (ClassCastException e) {
 			final String msg = "type mismatch in Layouts.equals()";

@@ -10,14 +10,13 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.lasalledebain.libris.EnumFieldChoices;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
-public abstract class GuiControl<RecordType extends Record> {
+public abstract class GuiControl {
 	protected static final String EMPTY_TEXT_VALUE = "";
-	private LayoutField<RecordType> fldInfo;
+	private LayoutField fldInfo;
 	private ModificationTracker modMon;
 	protected final boolean editable;
 	protected int height;
@@ -95,7 +94,7 @@ public abstract class GuiControl<RecordType extends Record> {
 	public void setLegalValues(EnumFieldChoices legalValues) {
 		return;
 	}
-	public void setFieldInfo(LayoutField<RecordType> fieldInfo) {
+	public void setFieldInfo(LayoutField fieldInfo) {
 		this.fldInfo = fieldInfo;
 	}
 

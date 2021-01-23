@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.junit.Test;
-import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.util.Utilities;
@@ -29,7 +28,7 @@ public class LayoutTests extends TestCase {
 		RecordDisplayPanel dispPanel = myGui.getDisplayPanel();
 		for (String layoutId: new String[] {"LO_shortFormDisplay", "LO_formDisplay",
 				"LO_paragraphDisplay", "LO_tableDisplay", "LO_listDisplay", "LO_browserDisplay"}) {
-			LibrisLayout<DatabaseRecord> theLayout = myDb.getLayouts().getLayout(layoutId);
+			LibrisLayout theLayout = myDb.getLayouts().getLayout(layoutId);
 			assertNotNull("Layout "+layoutId+" not found", theLayout);
 			dispPanel.setRecLayout(theLayout);
 			myGui.displaySelectedRecord();

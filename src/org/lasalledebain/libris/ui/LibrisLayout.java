@@ -22,7 +22,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public class LibrisLayout<RecordType extends Record> implements XMLElement {
+public class LibrisLayout implements XMLElement {
 
 	final static ArrayList<UiField> emptyUiList = new ArrayList<>();
 	protected String id;
@@ -31,21 +31,21 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 	protected int width;
 	protected String layoutType;
 	protected Schema mySchema = null;
-	protected ArrayList<LayoutField<RecordType>> bodyFieldList;
-	protected LayoutField<RecordType> positionList = null;
+	protected ArrayList<LayoutField> bodyFieldList;
+	protected LayoutField positionList = null;
 	protected ArrayList<String> layoutUsers;
-	protected final Layouts<RecordType> myLayouts;
-	protected LayoutProcessor<RecordType> layoutProc;
+	protected final Layouts myLayouts;
+	protected LayoutProcessor layoutProc;
 	private int tableRightEdge;
-	private final GuiControlFactory<RecordType> ctrlFactory;
+	private final GuiControlFactory ctrlFactory;
 
-	public LibrisLayout(Schema schem, Layouts<RecordType> theLayouts) {
+	public LibrisLayout(Schema schem, Layouts theLayouts) {
 		mySchema = schem;
-		bodyFieldList = new ArrayList<LayoutField<RecordType>>();
+		bodyFieldList = new ArrayList<LayoutField>();
 		layoutUsers = new ArrayList<String>(1);
 		myLayouts = theLayouts;
 		layoutProc = null;
-		ctrlFactory = new GuiControlFactory<RecordType>();
+		ctrlFactory = new GuiControlFactory();
 	}
 
 	public LibrisLayout(Schema schem) {
@@ -68,7 +68,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		while (mgr.hasNext()) {
 			ElementManager subElementMgr = mgr.nextElement();
 			if (subElementMgr.getElementTag().equals(XML_LAYOUTFIELD_TAG)) {
-				LayoutField<RecordType> l = new LayoutField<RecordType>(this, positionList, ctrlFactory);
+				LayoutField l = new LayoutField(this, positionList, ctrlFactory);
 				l.fromXml(subElementMgr);
 				tableRightEdge = Math.max(l.getRightEdge(), tableRightEdge);
 				l.setFieldNum(mySchema.getFieldNum(l.getId()));
@@ -89,17 +89,17 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		layoutProc.validate();
 	}
 
-	private LayoutProcessor<RecordType> getLayoutProcessor(String theType) {
-		LayoutProcessor<RecordType> result = null;
+	private LayoutProcessor getLayoutProcessor(String theType) {
+		LayoutProcessor result = null;
 		switch (theType) {
 		case XML_LAYOUT_TYPE_XML: 
-			result = new XmlLayoutProcessor<>(this);
+			result = new XmlLayoutProcessor(this);
 			break;
 		case XML_LAYOUT_TYPE_TABLE: 
-			result = new TableLayoutProcessor<>(this);
+			result = new TableLayoutProcessor(this);
 			break;
 		case XML_LAYOUT_TYPE_FORM: {
-			result = new FormLayoutProcessor<RecordType>(this, ctrlFactory);
+			result = new FormLayoutProcessor(this, ctrlFactory);
 			break;
 		}
 
@@ -107,7 +107,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 			result = new ListLayoutProcessor<>(this);
 			break;
 		case XML_LAYOUT_TYPE_PARAGRAPH: 
-			result = new ParagraphLayoutProcessor<>(this);
+			result = new ParagraphLayoutProcessor(this);
 			break;
 		default: result = null;
 		}
@@ -123,7 +123,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 			output.writeStartElement(XML_LAYOUTUSAGE_TAG, attr, true);
 		}
 
-		for (LayoutField<RecordType> f: bodyFieldList) {
+		for (LayoutField f: bodyFieldList) {
 			LibrisAttributes attr = f.getAttributes();
 			output.writeStartElement(XML_LAYOUTFIELD_TAG, attr, true);
 		}
@@ -149,24 +149,24 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		return attrs;
 	}
 
-	LayoutField<RecordType>[] getFields() {
-		LayoutField<RecordType>[] positions = new LayoutField[bodyFieldList.size()];
+	LayoutField[] getFields() {
+		LayoutField[] positions = new LayoutField[bodyFieldList.size()];
 		bodyFieldList.toArray(positions);
 		return positions;
 	}
 
-	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+	public ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {
 		return layoutProc.layOutFields(rec, ui, recordPanel, modTrk);
 	}
 
-	public ArrayList<UiField> layOutFields(RecordList<RecordType> recList, LibrisWindowedUi<RecordType> ui, JComponent recordPanel, ModificationTracker modTrk)
+	public ArrayList<UiField> layOutFields(RecordList<Record> recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {
 		return 	layoutProc.layOutFields(recList, ui, recordPanel, modTrk);
 	};
 	
-	public void layOutPage(RecordList<RecordType> recList, HttpParameters parameterObject, 
-			LibrisLayout<RecordType> browserLayout, DatabaseUi ui) throws InputException, IOException {
+	public void layOutPage(RecordList<Record> recList, HttpParameters parameterObject, 
+			LibrisLayout browserLayout, DatabaseUi ui) throws InputException, IOException {
 		layoutProc.layOutPage(recList, parameterObject, browserLayout, ui);
 	}
 
@@ -198,7 +198,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		return mySchema;
 	}
 	
-	Stream <LibrisLayout<RecordType>> getLayouts() {
+	Stream <LibrisLayout> getLayouts() {
 		return myLayouts.getLayouts();
 	}
 
@@ -213,7 +213,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 
 	public String[] getFieldIds() {
 		Vector<String> fieldIds = new Vector<String>();
-		for (LayoutField<RecordType> p: bodyFieldList) {
+		for (LayoutField p: bodyFieldList) {
 			fieldIds.add(p.getId());
 		}
 		return fieldIds.toArray(new String[fieldIds.size()]);
@@ -282,8 +282,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 	@Override
 	public boolean equals(Object obj) {
 		if (getClass().isAssignableFrom(obj.getClass())) {
-			@SuppressWarnings("unchecked")
-			LibrisLayout<RecordType> comparand = (LibrisLayout<RecordType>) obj;
+			LibrisLayout comparand = (LibrisLayout) obj;
 			return comparand.getAttributes().equals(getAttributes());
 		} else {
 			return false;
@@ -294,7 +293,7 @@ public class LibrisLayout<RecordType extends Record> implements XMLElement {
 		this.layoutType = theType;
 	}
 
-	ArrayList<LayoutField<RecordType>> getBodyFieldList() {
+	ArrayList<LayoutField> getBodyFieldList() {
 		return bodyFieldList;
 	}
 	protected void showRecord(int recId) {

@@ -8,12 +8,12 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
 public class MetadataHolder<RecordType extends Record> extends LibrisMetadata<RecordType> {
 	Schema mySchema;
-	Layouts<RecordType> myLayouts;
+	Layouts myLayouts;
 	public MetadataHolder(LibrisDatabase database) {
 		super(database);
 	}
 
-	public MetadataHolder(Schema theSchema, Layouts<RecordType> theLayouts) {
+	public MetadataHolder(Schema theSchema, Layouts theLayouts) {
 		mySchema = theSchema;
 		myLayouts = theLayouts;
 	}

@@ -23,13 +23,13 @@ import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;;
 
-public class NameList<RecordType extends Record> extends GuiControl<RecordType> {
+public class NameList extends GuiControl {
 
 	private final JList<KeyIntegerTuple> control;
 	private final GroupDef grpDef;
 	private final GenericDatabase<DatabaseRecord> dBase;
 	Vector <KeyIntegerTuple> affiliateInfo;
-	private final LibrisWindowedUi<RecordType> windowedUi;
+	private final LibrisWindowedUi windowedUi;
 	final Record currentRecord;
 	public static final KeyIntegerTuple NULL_ID_TUPLE = makeNullTuple();
 
@@ -41,7 +41,7 @@ public class NameList<RecordType extends Record> extends GuiControl<RecordType> 
 		}
 	}
 
-	public NameList(LibrisWindowedUi<RecordType> ui, GenericDatabase<DatabaseRecord> db, Record rec, GroupDef gd, boolean editable) throws InputException {
+	public NameList(LibrisWindowedUi ui, GenericDatabase<DatabaseRecord> db, Record rec, GroupDef gd, boolean editable) throws InputException {
 		super(0, 0, editable);
 		grpDef = gd;
 		windowedUi = ui;
@@ -164,7 +164,7 @@ public class NameList<RecordType extends Record> extends GuiControl<RecordType> 
 
 	class GroupMouseListener implements MouseListener {
 
-		private GuiControl<RecordType> uiField;
+		private GuiControl uiField;
 		public GroupMouseListener() {
 			uiField = NameList.this;
 		}
@@ -177,7 +177,7 @@ public class NameList<RecordType extends Record> extends GuiControl<RecordType> 
 			case 1: 
 				break;
 			case 2: 
-				new AffiliateEditor<RecordType>(currentRecord, uiField, windowedUi, dBase.getNamedRecordIndex(), affiliateInfo, control, grpDef);
+				new AffiliateEditor(currentRecord, uiField, windowedUi, dBase.getNamedRecordIndex(), affiliateInfo, control, grpDef);
 				break;
 			} 
 		}

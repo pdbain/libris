@@ -48,7 +48,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
+public class LibrisGui extends LibrisWindowedUi {
 	private static final String CONTENT_PANE_HEIGHT = "CONTENT_PANE_HEIGHT";
 	private static final String CONTENT_PANE_WIDTH = "CONTENT_PANE_WIDTH";
 	private static final String CONTENT_PANE_DIVIDER = "CONTENT_PANE_DIVIDER_LOCATION";
@@ -385,16 +385,34 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	}
 
 	@Override
+	// TODO finish this
 	public void pasteToField() {
 		if (systemClipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
 			try {
 				String contents = systemClipboard.getData(DataFlavor.stringFlavor).toString();
-			} catch (UnsupportedFlavorException e) {
-				/* shouldn't happen */
-				System.err.println(e.getMessage());
-			} catch (IOException e) {
-				/* shouldn't happen */
-				System.err.println(e.getMessage());
+
+				RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
+				final UiField selectedField = getSelectedField();
+				if (null != selectedField) {
+					if (selectedField.isMultiControl()) {
+						GuiControl ctrl;
+						try {
+							ctrl = ((MultipleValueUiField) selectedField).addControl(true);
+							ctrl.requestFocusInWindow();
+							ctrl.setFieldValue(contents);
+							repaint();
+						} catch (FieldDataException e) {
+							currentDatabase.alert("Error displaying record", e);
+						}
+					} else {
+						((SingleControlUiField) selectedField).getControl().setFieldValue(contents);
+					}
+				} else {
+// TODO
+					}
+				currentRecordWindow.setModified(true);
+			} catch (UnsupportedFlavorException | IOException | FieldDataException e) {
+				throw new DatabaseError("Exception getting data from clipborad", e);
 			}
 		}
 	}
@@ -452,7 +470,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 		RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
 		final UiField selectedField = getSelectedField();
 		if ((null != selectedField) && selectedField.isMultiControl()) {
-			GuiControl<DatabaseRecord> ctrl;
+			GuiControl ctrl;
 			try {
 				ctrl = ((MultipleValueUiField) selectedField).addControl(true);
 				ctrl.requestFocusInWindow();
@@ -654,7 +672,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 		return newRec;
 	}
 
-	RecordList<DatabaseRecord> getResultRecords() {
+	RecordList<Record> getResultRecords() {
 		return resultsPanel.getResultRecords();
 	}
 	

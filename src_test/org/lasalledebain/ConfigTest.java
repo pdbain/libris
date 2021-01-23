@@ -23,7 +23,6 @@ import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 
-@SuppressWarnings("rawtypes")
 public class ConfigTest extends TestCase {
 
 	private File workingDirectory;

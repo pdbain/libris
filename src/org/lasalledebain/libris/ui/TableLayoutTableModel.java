@@ -13,15 +13,15 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 
 @SuppressWarnings("serial")
-public class TableLayoutTableModel<RecordType extends Record> extends AbstractTableModel {
+public class TableLayoutTableModel extends AbstractTableModel {
 
 	public static final String RECORD_ID = "Record ID";
-	private final RecordList<RecordType> myRecList;
-	private final LibrisLayout<RecordType> myLayout;
+	private final RecordList<Record> myRecList;
+	private final LibrisLayout myLayout;
 	private final String[] myFieldIds;
-	final private ArrayList<RecordType> recList;
-	Iterator<RecordType> recIterator;
-	public TableLayoutTableModel(RecordList<RecordType> theRecList, LibrisLayout<RecordType> theLayout) {
+	final private ArrayList<Record> recList;
+	Iterator<Record> recIterator;
+	public TableLayoutTableModel(RecordList<Record> theRecList, LibrisLayout theLayout) {
 		myRecList = theRecList;
 		myLayout = theLayout;
 		myFieldIds = myLayout.getFieldIds();
@@ -72,7 +72,7 @@ public class TableLayoutTableModel<RecordType extends Record> extends AbstractTa
 		if (i >= recList.size()) {
 			i = 0;
 			while (recIterator.hasNext()) {
-				RecordType rec = recIterator.next();
+				Record rec = recIterator.next();
 				recList.add(rec);
 				if (rec.getRecordId() == recId) {
 					i = recList.size() - 1;

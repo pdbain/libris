@@ -11,7 +11,6 @@ import java.util.prefs.Preferences;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.exception.InputException;
@@ -67,7 +66,7 @@ public class DatabaseExporter {
 	}
 
 
-	public boolean chooseExportFile(LibrisWindowedUi<DatabaseRecord> gui) throws InputException {
+	public boolean chooseExportFile(LibrisWindowedUi gui) throws InputException {
 		String userDir = System.getProperty("user.dir");
 		String lastExportFileName = librisPrefs.get(DATABASE_EXPORT_FILE, userDir);
 		String lastExportFormat = librisPrefs.get(DATABASE_EXPORT_FORMAT, ExportFormat.EXPORT_LIBR.toString());

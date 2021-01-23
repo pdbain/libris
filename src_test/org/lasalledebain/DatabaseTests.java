@@ -83,7 +83,7 @@ public class DatabaseTests extends TestCase {
 
 	public void testOpenReadOnlyNoArtifacts() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
-		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(testDatabaseFileCopy, false);
+		HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy, false);
 		Libris.buildIndexes(testDatabaseFileCopy, ui);
 		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(testDatabaseFileCopy, true));
 		{
@@ -113,7 +113,7 @@ public class DatabaseTests extends TestCase {
 
 	public void testRepoReadOnly() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
-		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(testDatabaseFileCopy, false);
+		HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy, false);
 		Libris.buildIndexes(testDatabaseFileCopy, ui);
 		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(testDatabaseFileCopy, true));
 		{
@@ -159,7 +159,7 @@ public class DatabaseTests extends TestCase {
 		ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(archiveFile, archiveFile.getParentFile());
 		assertTrue("Archive file is empty", fileList.size() > 0);
 		File databaseFile = fileList.get(0);
-		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
+		HeadlessUi ui = new HeadlessUi(databaseFile, false);
 		Libris.buildIndexes(databaseFile, ui);
 		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(databaseFile, true));
 		{

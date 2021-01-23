@@ -53,13 +53,13 @@ public class GuiManualTests extends TestCase {
 	private static final String LAYOUT1 = "layout1";
 	private static final String LAYOUT1A = "layout1a";
 	private Schema mySchema;
-	private LibrisLayout<DatabaseRecord> myGuiLayout;
-	private LibrisWindowedUi<DatabaseRecord> myUi;
+	private LibrisLayout myGuiLayout;
+	private LibrisWindowedUi myUi;
 	Utilities<DatabaseRecord> myUtilities;
 
 	@Override
 	protected void setUp() throws Exception {
-		myUi = new HeadlessUi<DatabaseRecord>(null, false);
+		myUi = new HeadlessUi(null, false);
 		myUtilities = new Utilities<>();
 	}
 
@@ -164,7 +164,7 @@ public class GuiManualTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
 			Schema schem = XmlSchema.loadSchema(schemaFile);
-			Layouts<DatabaseRecord> myLayouts = myUtilities.loadLayoutsFromXml(schem, layoutFile);
+			Layouts myLayouts = myUtilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
 			assertNotNull("could not load "+Utilities.LAYOUT2, myGuiLayout);
@@ -187,7 +187,7 @@ public class GuiManualTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA2_XML_FILE);
 		try {
 			Schema schem = XmlSchema.loadSchema(schemaFile);
-			Layouts<DatabaseRecord> myLayouts = myUtilities.loadLayoutsFromXml(schem, layoutFile);
+			Layouts myLayouts = myUtilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = myLayouts.getLayout(Utilities.LAYOUT2);
@@ -225,7 +225,7 @@ public class GuiManualTests extends TestCase {
 		try {
 			template = RecordTemplate.templateFactory(mySchema);
 			DatabaseRecord rec = template.makeRecord(true);
-			Layouts<DatabaseRecord> myLayouts = loadFromLayout(rec);
+			Layouts myLayouts = loadFromLayout(rec);
 			try {
 				myGuiLayout = myLayouts.getLayout(LAYOUT1);
 			} catch (ClassCastException e) {
@@ -253,7 +253,7 @@ public class GuiManualTests extends TestCase {
 		try {
 			template = RecordTemplate.templateFactory(mySchema);
 			DatabaseRecord rec = template.makeRecord(true);
-			Layouts<DatabaseRecord> myLayouts = loadFromLayout(rec);
+			Layouts myLayouts = loadFromLayout(rec);
 			try {
 				myGuiLayout = myLayouts.getLayout(LAYOUT1);
 			} catch (ClassCastException e) {
@@ -296,11 +296,11 @@ public class GuiManualTests extends TestCase {
 		}
 	}
 
-	private Layouts<DatabaseRecord> loadFromLayout(Record rec) throws LibrisException {
+	private Layouts loadFromLayout(Record rec) throws LibrisException {
 		File testDir = Utilities.getTestDataDirectory();
 		File inputFile = new File(testDir, Utilities.LAYOUT_DECLARATIONS_XML_FILE);
 		try {
-			Layouts<DatabaseRecord> myLayouts = new Layouts<DatabaseRecord>(mySchema);
+			Layouts myLayouts = new Layouts(mySchema);
 			ElementManager mgr = Utilities.makeElementManagerFromFile(inputFile, "layouts");
 			loadSchema();
 			myLayouts.fromXml(mgr);
@@ -343,7 +343,7 @@ public class GuiManualTests extends TestCase {
 		File schemaFile = new File(testDir, Utilities.TEST_SCHEMA_XML_FILE);
 		try {
 			Schema schem = XmlSchema.loadSchema(schemaFile);
-			Layouts<DatabaseRecord> myLayouts = myUtilities.loadLayoutsFromXml(schem, layoutFile);
+			Layouts myLayouts = myUtilities.loadLayoutsFromXml(schem, layoutFile);
 			DatabaseRecord rec = Utilities.loadRecordFromXml(schemaFile, recordFile);
 			try {
 				myGuiLayout = myLayouts.getLayout(LAYOUT1A);

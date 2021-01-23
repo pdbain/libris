@@ -17,14 +17,14 @@ import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 
 @SuppressWarnings("serial")
-public class ListLayoutTableModel<RecordType extends Record> extends AbstractTableModel {
+public class ListLayoutTableModel extends AbstractTableModel {
 
-	private final LibrisLayout<RecordType> myLayout;
-	private RecordType myRecord;
+	private final LibrisLayout myLayout;
+	private Record myRecord;
 	private final static String[] columnNames = new String[] {"Field", "Main value", "Extra value"};
 	private final String[] myFieldIds;
 	private final ArrayList<String[]> rows;
-	public ListLayoutTableModel(RecordType theRecord, GenericDatabase<RecordType> db, LibrisLayout<RecordType> theLayout) throws LibrisException {
+	public ListLayoutTableModel(Record theRecord, GenericDatabase<?> db, LibrisLayout theLayout) throws LibrisException {
 		myRecord = theRecord;
 		myLayout = theLayout;
 		rows = new ArrayList<>();

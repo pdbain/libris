@@ -23,13 +23,13 @@ import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 
 @SuppressWarnings("serial")
-public class AffiliateEditor<RecordType extends Record> {
+public class AffiliateEditor {
 	Frame ownerFrame;
 	JDialog dLog;
 	final Vector<KeyIntegerTuple> affInfo;
 	final JList<KeyIntegerTuple> affList;
-	private final GuiControl<RecordType> guiCtrl;
-	public AffiliateEditor(Record currentRecord, final GuiControl<RecordType> ctrl, LibrisWindowedUi<RecordType> ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
+	private final GuiControl guiCtrl;
+	public AffiliateEditor(Record currentRecord, final GuiControl ctrl, LibrisWindowedUi ui, SortedKeyValueFileManager<KeyIntegerTuple> namedRecIndex, 
 			Vector<KeyIntegerTuple> affiliateInfo, JList<KeyIntegerTuple> affiliateList, GroupDef grpDef) {
 		guiCtrl = ctrl;
 		affInfo = affiliateInfo;

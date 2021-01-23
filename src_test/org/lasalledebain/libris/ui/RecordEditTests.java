@@ -399,7 +399,7 @@ public class RecordEditTests extends TestCase {
 			String oldValues = pubUiField.getRecordField().getValuesAsString();
 			Utilities.pause();
 			int numPubValues = pubUiField.getNumValues();
-			GuiControl ctrl = pubUiField.getCtrl(numPubValues - 1);
+			pubUiField.getCtrl(numPubValues - 1);
 			gui.newFieldValue();
 			GuiControl newCtrl = pubUiField.getCtrl(numPubValues);
 			assertNotNull("GUI control for new value is null", newCtrl);
