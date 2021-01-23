@@ -8,10 +8,14 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
 
 public class SingleControlUiField extends UiField {
-
-	GuiControl control;
 	public SingleControlUiField(Field fld, ModificationTracker modTrk) {
 		super(fld, modTrk);
+	}
+
+
+	GuiControl control;
+	public GuiControl getControl() {
+		return control;
 	}
 
 	public void setControl(GuiControl control) {
@@ -32,6 +36,12 @@ public class SingleControlUiField extends UiField {
 	@Override
 	public void setFieldValues(FieldValue[] valueArray)
 			throws FieldDataException {
+	}
+
+	@Override
+	public GuiControl addControl(boolean editable) throws FieldDataException {
+		
+		return null;
 	}
 
 	@Override

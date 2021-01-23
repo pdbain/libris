@@ -42,6 +42,7 @@ public class MultipleValueUiField extends UiField  implements Iterable<FieldValu
 		controlsContainer.add(control.getGuiComponent());
 	}
 
+	@Override
 	public GuiControl addControl(boolean editable) throws FieldDataException {
 		GuiControl ctrl = ctrlFactory.newControl(fldInfo,
 				recordField,  modificationTrack,  editable);
