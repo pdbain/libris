@@ -52,6 +52,7 @@ public class RecordListTests extends TestCase {
 			RecordList<DatabaseRecord> list = testDb.getRecords();
 			int recordCount = 0;
 			for (Record r: list) {
+				// TODO finish testDatabaseRecordList
 				String id = getRecordIdString(r);
 			}
 			for (Record r: list) {

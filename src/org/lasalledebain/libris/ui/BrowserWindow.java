@@ -39,12 +39,12 @@ public class BrowserWindow extends JPanel {
 	private static final int VISIBLE_LIMIT = 64;
 
 	private LibrisDatabase database;
-	private JList<RecordInfo<DatabaseRecord>> chooser;
+	private JList<RecordInfo<Record>> chooser;
 	private final LibrisGui gui;
 	private JPanel filterView;
 	private JButton moreButton;
 	private JButton refreshButton;
-	private RandomAccessBrowserList<DatabaseRecord> resultRecords;
+	private RandomAccessBrowserList<Record> resultRecords;
 	private Iterator<DatabaseRecord> recordsIterator;
 	private ImageIcon searchIcon;
 
@@ -134,7 +134,7 @@ public class BrowserWindow extends JPanel {
 	}
 
 	public int getSelectedRecordId() {
-		RecordInfo<DatabaseRecord> chosenRecord = chooser.getSelectedValue();
+		RecordInfo<Record> chosenRecord = chooser.getSelectedValue();
 		if (null != chosenRecord) {		
 			return chosenRecord.getRecordId();
 		} else {
@@ -189,7 +189,7 @@ public class BrowserWindow extends JPanel {
 	}
 
 	public void setResultList() {
-		RandomAccessBrowserList<DatabaseRecord> list = new RandomAccessBrowserList<>(fieldIds);
+		RandomAccessBrowserList<Record> list = new RandomAccessBrowserList<>(fieldIds);
 		int recordCount = 0;
 		while (recordsIterator.hasNext() && (LIST_LIMIT > recordCount)) {
 			DatabaseRecord r = recordsIterator.next();
@@ -212,7 +212,7 @@ public class BrowserWindow extends JPanel {
 	}
 
 	public void displaySelectedRecord() {
-		RecordInfo<DatabaseRecord> chosenRecord = (RecordInfo<DatabaseRecord>) chooser.getSelectedValue();
+		RecordInfo<Record> chosenRecord = chooser.getSelectedValue();
 		int recId = chosenRecord.getRecordId();
 		try {
 			gui.displayRecord(recId);
@@ -241,7 +241,7 @@ public class BrowserWindow extends JPanel {
 		chooser.clearSelection();	
 	}
 
-	public RecordList<DatabaseRecord> getResultRecords() {
+	public RecordList<Record> getResultRecords() {
 		return resultRecords;
 	}
 

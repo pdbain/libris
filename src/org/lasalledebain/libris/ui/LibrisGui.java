@@ -385,6 +385,7 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
+	// TODO finish this
 	public void pasteToField() {
 		if (systemClipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
 			try {
@@ -654,7 +655,7 @@ public class LibrisGui extends LibrisWindowedUi {
 		return newRec;
 	}
 
-	RecordList<DatabaseRecord> getResultRecords() {
+	RecordList<Record> getResultRecords() {
 		return resultsPanel.getResultRecords();
 	}
 	

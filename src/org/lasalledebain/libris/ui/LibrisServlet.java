@@ -74,7 +74,7 @@ public class LibrisServlet<RecordType extends Record> extends HttpServlet implem
 			resp.setStatus(HttpStatus.OK_200);
 			LibrisLayout summaryLayout = database.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 			Assertion.assertNotNull(myUi, "No layout found for "+LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY, summaryLayout);
-			theLayout.layOutPage(database.getRecords(), new HttpParameters(recId, startId, resp), summaryLayout, myUi);
+			theLayout.layOutPage(database.getRecords().ofRecords(), new HttpParameters(recId, startId, resp), summaryLayout, myUi);
 		} catch (Throwable t) {
 			writer.append("Error: "+t.toString());
 			LibrisDatabase.log(Level.SEVERE, "Error formatting web page: ", t);

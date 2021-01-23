@@ -160,12 +160,12 @@ public class LibrisLayout implements XMLElement {
 		return layoutProc.layOutFields(rec, ui, recordPanel, modTrk);
 	}
 
-	public ArrayList<UiField> layOutFields(RecordList recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
+	public ArrayList<UiField> layOutFields(RecordList<Record> recList, LibrisWindowedUi ui, JComponent recordPanel, ModificationTracker modTrk)
 			throws DatabaseException, LibrisException {
 		return 	layoutProc.layOutFields(recList, ui, recordPanel, modTrk);
 	};
 	
-	public void layOutPage(RecordList recList, HttpParameters parameterObject, 
+	public void layOutPage(RecordList<Record> recList, HttpParameters parameterObject, 
 			LibrisLayout browserLayout, DatabaseUi ui) throws InputException, IOException {
 		layoutProc.layOutPage(recList, parameterObject, browserLayout, ui);
 	}

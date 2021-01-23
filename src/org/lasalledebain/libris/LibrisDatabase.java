@@ -775,7 +775,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			}
 		}
 
-		public RecordList<DatabaseRecord> getRecords() {
+		public DatabaseRecordList getRecords() {
 			return new DatabaseRecordList(this);	
 		}
 

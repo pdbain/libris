@@ -14,8 +14,7 @@ import java.util.logging.Level;
 import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
-import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
@@ -48,12 +47,12 @@ public class HtmlTests extends TestCase implements LibrisHTMLConstants {
 			"k13 k14 k15"
 			};
 	@Test
-	public void testBasicLayout() throws InputException, IOException, DatabaseException {
+	public void testBasicLayout() throws IOException, LibrisException {
 		TestResponse resp = new TestResponse();
 		Layouts myLayouts = db.getLayouts();
 		LibrisLayout myLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH);
 		LibrisLayout browserLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
-		myLayout.layOutPage(db.getRecords(), new HttpParameters(2, 0, resp), browserLayout, db.getUi());
+	 myLayout.layOutPage(db.getRecords().ofRecords(), new HttpParameters(2, 0, resp), browserLayout, db.getUi());
 		String result = resp.getResponseText();
 		checkExpectedStrings(result, expectedBasicWords);
 	}
