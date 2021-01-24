@@ -69,8 +69,6 @@ public class LibrisGui extends LibrisWindowedUi {
 		initializeGui();
 	}
 
-	// TODO 1 menu option to auto-generate keywords
-	// TODO bulk import artifacts
 	protected void initializeGui() throws DatabaseException {
 		final Desktop myDesktop = Desktop.getDesktop();
 		if (myDesktop.isSupported(Action.APP_QUIT_HANDLER)) {
@@ -385,7 +383,6 @@ public class LibrisGui extends LibrisWindowedUi {
 	}
 
 	@Override
-	// TODO finish this
 	public void pasteToField() {
 		if (systemClipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
 			try {
@@ -394,11 +391,13 @@ public class LibrisGui extends LibrisWindowedUi {
 				RecordWindow<DatabaseRecord> currentRecordWindow = getCurrentRecordWindow();
 				final UiField selectedField = getSelectedField();
 				if (null != selectedField) {
-					final GuiControl ctrl;
-					if (selectedField.isMultiControl()) {
-						ctrl = selectedField.addControl(true);
-					} else {
-						ctrl = selectedField.getControl();
+					GuiControl ctrl = selectedField.getControl();
+					if (null == ctrl) {
+						if (selectedField.isMultiControl()) {
+							ctrl = selectedField.addControl(true);
+						} else {
+							ctrl = selectedField.getControl();
+						}
 					}
 					ctrl.requestFocusInWindow();
 					ctrl.setFieldValue(contents);

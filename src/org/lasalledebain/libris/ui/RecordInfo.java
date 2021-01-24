@@ -6,7 +6,6 @@ package org.lasalledebain.libris.ui;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 
-// TODO type parameters
 class RecordInfo<RecordType extends Record> {
 	private final RecordType rec;
 	private final int recId;

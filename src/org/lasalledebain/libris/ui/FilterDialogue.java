@@ -35,10 +35,6 @@ import org.lasalledebain.libris.search.RecordNameFilter;
 import org.lasalledebain.libris.ui.AffiliateEditor.RecordSelectorByName;
 
 class FilterDialogue {
-	/* TODO filter dialogue
-	 * 1. Regenerate dialogue from current filter
-	 * 2. Search in record name
-	 */
 	JRadioButton prefixButton;
 	private ButtonGroup matchGroup;
 	private JRadioButton containsButton;
