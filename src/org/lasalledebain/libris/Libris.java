@@ -260,33 +260,6 @@ public class Libris {
 		return db;
 	}
 
-	public static boolean buildIndexes(File databaseFile, DatabaseUi ui) throws LibrisException {
-		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(databaseFile);
-		return buildIndexes(config, ui);
-	}
-
-	public static boolean buildIndexes(LibrisDatabaseConfiguration config, DatabaseUi databaseUi)
-			throws LibrisException {
-		if (config.isReadOnly()) {
-			databaseUi.alert("Cannot build indexes if read-only set");
-			return false;
-		}
-		try (LibrisDatabase db = new LibrisDatabase(config, databaseUi)) {
-			if (!db.isDatabaseReserved()) {
-				boolean buildResult = db.buildDatabase();
-				if (!buildResult) {
-					return false;
-				}
-				return db.closeDatabase(true);
-			} else {
-				return false;
-			}
-		} catch (Error e) {
-			databaseUi.alert("Error rebuilding database", e);
-			return false;
-		}
-	}
-
 	static {
 		URL props = PdfRecordImporter.class.getClassLoader().getResource("commons-logging.properties");
 		if (Objects.nonNull(props)) {

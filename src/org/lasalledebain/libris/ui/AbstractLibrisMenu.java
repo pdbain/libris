@@ -48,7 +48,7 @@ public abstract class AbstractLibrisMenu {
 
 	abstract boolean openDatabaseDialogue();
 
-	abstract boolean buildDatabaseDialogue();
+	abstract void buildDatabaseDialogue();
 
 	public class BuildOpenDatabaseListener implements ActionListener {
 		private final boolean buildDatabaseSelected;

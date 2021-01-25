@@ -1,5 +1,8 @@
 package org.lasalledebain.libris.ui;
 
+import static java.util.Objects.nonNull;
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +22,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lasalledebain.libris.DatabaseArchive;
@@ -31,10 +35,6 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
-import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
-
-import static java.util.Objects.nonNull;
-import static org.junit.Assert.assertTrue;
 
 public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 
@@ -487,8 +487,7 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 	}
 
 	@Override
-	boolean buildDatabaseDialogue() {
-		boolean result = false;
+	void buildDatabaseDialogue() {
 		JFileChooser chooser;
 		File archiveLocation = null;
 		String userDir = System.getProperty("user.dir");
@@ -508,30 +507,40 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		int option = chooser.showOpenDialog(guiMain.getMainFrame());
 		if (option == JFileChooser.APPROVE_OPTION) {
 			File selectedFile =  chooser.getSelectedFile();
+			final boolean buildFromArchive = buildFromArchiveCheckbox.isSelected();
 			if (selectedFile != null) {
-				String errorMessage = "Error reading TAR archive "+selectedFile.getPath();
-				File databaseFile;
-				try {
-					if (buildFromArchiveCheckbox.isSelected()) {
-						ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(selectedFile, selectedFile.getParentFile());
-						errorMessage = ERROR_BUILDING_INDEXES_MESSAGE;
-						assertTrue("Archive file is empty", fileList.size() > 0);
-						databaseFile = fileList.get(0);
-					} else {
-						databaseFile = selectedFile;
+				SwingWorker<Boolean, Object> task = new SwingWorker<>() {
+
+					@Override
+					protected Boolean doInBackground() throws Exception {
+						String errorMessage = "";
+						File databaseFile;
+						try {
+							if (buildFromArchive) {
+								errorMessage = "Error reading TAR archive "+selectedFile.getPath();
+								ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(selectedFile, selectedFile.getParentFile());
+								errorMessage = ERROR_BUILDING_INDEXES_MESSAGE;
+								assertTrue("Archive file is empty", fileList.size() > 0);
+								databaseFile = fileList.get(0);
+							} else {
+								errorMessage = "Error reading database file "+selectedFile.getPath();
+								databaseFile = selectedFile;
+							}
+							guiMain.setDatabaseFile(databaseFile);
+							guiMain.buildDatabase(databaseFile);
+							if ((Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database built successfully\nOpen now?") == Dialogue.YES_OPTION))
+								return openDatabaseImpl(selectedFile, false);
+							else return true;
+						} catch (Exception e) {
+							guiMain.alert(errorMessage, e);
+							return false;
+						}
 					}
-					guiMain.setDatabaseFile(databaseFile);
-					guiMain.buildDatabase(databaseFile);
-				} catch (Exception e) {
-					guiMain.alert(errorMessage, e);
-					return false;
-				}
+
+				};
+				task.execute();
 			}
-			boolean doOpenDatabase = (Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database built successfully\nOpen now?") == Dialogue.YES_OPTION);
-			if (doOpenDatabase)
-				result = openDatabaseImpl(selectedFile, false);
 		}
-		return result;
 	}
 
 	private boolean openDatabaseImpl(File dbFile, boolean readOnlySelected) {

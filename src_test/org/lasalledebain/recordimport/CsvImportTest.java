@@ -112,7 +112,7 @@ public class CsvImportTest extends TestCase {
 		final File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 		testDatabase = new DiagnosticDatabase(testDatabaseFile);
 		HeadlessUi ui = new HeadlessUi(false);
-		Libris.buildIndexes(testDatabaseFile, ui);
+		ui.buildDatabase(testDatabaseFile);
 		testDatabase.openDatabase();
 		valueTranslations = new HashMap<String, String>();
 		valueTranslations.put("ACM", "NS_acm");
