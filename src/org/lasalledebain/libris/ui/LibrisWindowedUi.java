@@ -71,7 +71,7 @@ public abstract class LibrisWindowedUi extends AbstractUi {
 		showMessageDialog(parentComponent, msg);
 	}
 	
-	public static String formatAlertString(String msg, Exception e) {
+	public static String formatAlertString(String msg, Throwable e) {
 		StringBuilder buff = new StringBuilder(msg);
 		LibrisDatabase.log(Level.WARNING, e.getMessage(), e);
 		String emessage = "";
@@ -146,7 +146,7 @@ public abstract class LibrisWindowedUi extends AbstractUi {
 	}
 
 	@Override
-	public void alert(String msg, Exception e) {
+	public void alert(String msg, Throwable e) {
 		String errorString = formatAlertString(msg, e);
 		alert(errorString);
 	}
@@ -189,7 +189,6 @@ public abstract class LibrisWindowedUi extends AbstractUi {
 		}
 	}
 
-
 	@Override
 	public void setCurrentProgress(int currentPercentProgress) {
 		if (nonNull(progressWorker)) {
@@ -224,5 +223,4 @@ public abstract class LibrisWindowedUi extends AbstractUi {
 		});
 		progressWorker.execute();
 	}
-	
 }

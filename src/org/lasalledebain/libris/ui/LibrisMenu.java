@@ -31,6 +31,8 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.index.GroupDef;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
+
 import static java.util.Objects.nonNull;
 import static org.junit.Assert.assertTrue;
 
@@ -518,7 +520,8 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 					} else {
 						databaseFile = selectedFile;
 					}
-					Libris.buildIndexes(databaseFile, guiMain);
+					guiMain.setDatabaseFile(databaseFile);
+					guiMain.buildDatabase(databaseFile);
 				} catch (Exception e) {
 					guiMain.alert(errorMessage, e);
 					return false;

@@ -8,7 +8,6 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
-import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 
@@ -125,12 +124,6 @@ public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> 
 	@Override
 	public void arrangeValues() {
 		alert("Operation not available");
-	}
-
-	@Override
-	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
-		alert("Operation not available");
-		return false;
 	}
 
 	@Override

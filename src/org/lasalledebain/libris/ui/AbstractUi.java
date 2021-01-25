@@ -2,7 +2,6 @@ package org.lasalledebain.libris.ui;
 
 import static java.util.Objects.nonNull;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Objects;
@@ -168,7 +167,7 @@ public abstract class AbstractUi implements DatabaseUi, LibrisConstants {
 	public abstract String SelectSchemaFile(String schemaName) throws DatabaseException;
 
 	@Override
-	public abstract void alert(String msg, Exception e);
+	public abstract void alert(String msg, Throwable e);
 
 	@Override
 	public abstract void alert(String msg);
@@ -179,19 +178,34 @@ public abstract class AbstractUi implements DatabaseUi, LibrisConstants {
 		System.exit(1);
 	}
 
-	public boolean rebuildDatabase() throws LibrisException {
-		assertTrue("Database not opened", isDatabaseOpen());
-		assertFalse("Database has unsaved changes", isDatabaseModified());
-		currentDatabase.exportDatabaseXml();
-		closeDatabase(false);
-		return Libris.buildIndexes(databaseFile, this);
+	public boolean buildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
+		assertFalse("Cannot build database while database is open", isDatabaseOpen());
+		if (config.isReadOnly()) {
+			this.alert("Cannot build indexes if read-only set");
+			return false;
+		}
+		try (LibrisDatabase db = new LibrisDatabase(config, this)) {
+			if (!db.isDatabaseReserved()) {
+				boolean buildResult = db.buildDatabase();
+				if (!buildResult) {
+					return false;
+				}
+				return db.closeDatabase(true);
+			} else {
+				return false;
+			}
+		} catch (Error e) {
+			this.alert("Error rebuilding database", e);
+			return false;
+		}
 	}
 
-	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
-		closeDatabase(false);
-		return Libris.buildIndexes(config, this);
+	@Override
+	public  boolean buildDatabase(File databaseFile) throws LibrisException {
+		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(databaseFile);
+		return buildDatabase(config);
 	}
-
+	
 	@Override
 	public abstract void displayRecord(int recordId) throws LibrisException;
 	

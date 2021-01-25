@@ -169,7 +169,7 @@ public class Libris {
 					Assertion.assertEquals(ui, "cannot specify UI type for batch operations", IfType.UI_DEFAULT, myUiType);
 					Assertion.assertNotNullError("Database file not set", dbFile);
 					ui = new HeadlessUi(false);
-					status = ui.rebuildDatabase(config);
+					status = ui.buildDatabase(config);
 				} else {
 					switch (myUiType) {
 					case UI_GUI:
@@ -281,6 +281,9 @@ public class Libris {
 			} else {
 				return false;
 			}
+		} catch (Error e) {
+			databaseUi.alert("Error rebuilding database", e);
+			return false;
 		}
 	}
 
@@ -292,7 +295,7 @@ public class Libris {
 		}
 	}
 
-	public static String formatConciseStackTrace(Exception e, StringBuilder buff) {
+	public static String formatConciseStackTrace(Throwable e, StringBuilder buff) {
 		String emessage;
 		emessage = e.getMessage();
 		if (null != emessage) {

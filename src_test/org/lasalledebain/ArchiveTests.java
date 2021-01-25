@@ -123,8 +123,7 @@ public class ArchiveTests extends TestCase {
 				db.addArtifact(r, f);
 			}
 			db.save();
-			db.save();
-			assertTrue("rebuild failed", ui.rebuildDatabase());
+			assertTrue("rebuild failed", rebuildDatabase(db));
 		}
 		File databaseExport = new File(workingDirectory, "database_archive.tar");
 		try	(LibrisDatabase db = ui.openDatabase()) {
@@ -174,7 +173,7 @@ public class ArchiveTests extends TestCase {
 				db.addArtifact(r,outFile.toFile());
 			}
 			db.save();
-			assertTrue("rebuild failed", ui.rebuildDatabase());
+			assertTrue("rebuild failed", rebuildDatabase(db));
 		}
 		File databaseExport = new File(workingDirectory, "database_archive.tar");
 		try	(LibrisDatabase db = ui.openDatabase()) {
@@ -241,6 +240,14 @@ public class ArchiveTests extends TestCase {
 		final File docDir = new File(workingDirectory, "docs");
 		ZipUtils.unzipZipFile(exampleDocs, docDir);
 		return docDir;
+	}
+
+	public boolean rebuildDatabase(LibrisDatabase currentDatabase) throws LibrisException {
+		assertTrue("Database not opened", currentDatabase.isDatabaseOpen());
+		assertFalse("Database has unsaved changes", currentDatabase.isModified());
+		File exportFile = currentDatabase.exportDatabaseXml();
+		currentDatabase.closeDatabase(false);
+		return currentDatabase.getUi().buildDatabase(exportFile);
 	}
 
 }

@@ -30,7 +30,7 @@ public class CmdlineUi<RecordType extends Record> extends AbstractUi {
 	}
 
 	@Override
-	public void alert(String msg, Exception e) {
+	public void alert(String msg, Throwable e) {
 		log(Level.SEVERE, msg, e);
 		String errorString = msg+": "+e.getMessage();
 		alert(errorString);

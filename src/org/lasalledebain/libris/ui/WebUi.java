@@ -35,7 +35,7 @@ public class WebUi extends AbstractUi {
 	}
 
 	@Override
-	public void alert(String msg, Exception e) {
+	public void alert(String msg, Throwable e) {
 		// TODO Auto-generated method stub
 		
 	}

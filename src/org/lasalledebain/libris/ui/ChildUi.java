@@ -131,7 +131,7 @@ public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 	}
 
 	@Override
-	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
+	public boolean buildDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
 		alert("Operation not available");
 		return false;
 	}

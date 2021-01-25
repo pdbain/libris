@@ -27,7 +27,6 @@ import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.Record;
@@ -549,7 +548,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		assertTrue("Archive file is empty", fileList.size() > 0);
 		File databaseFile = fileList.get(0);
 		HeadlessUi ui = new HeadlessUi(databaseFile, false);
-		Libris.buildIndexes(databaseFile, ui);
+		ui.buildDatabase(databaseFile);
 		LibrisDatabase result = ui.openDatabase();
 		assertNotNull("Database not opened", result);
 		return result;
@@ -557,7 +556,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 
 	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
 		HeadlessUi ui = new HeadlessUi(databaseFile, false);
-		Libris.buildIndexes(databaseFile, ui);
+		ui.buildDatabase(databaseFile);
 	
 		LibrisDatabase result = ui.openDatabase();
 		assertNotNull("Database not opened", result);
@@ -566,7 +565,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 
 	public static LibrisDatabase buildAndOpenDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
 		HeadlessUi ui = new HeadlessUi();
-		Libris.buildIndexes(config, ui);
+		ui.buildDatabase(config);
 		LibrisDatabase result = ui.openDatabase(config);
 		return result;
 	}
@@ -595,7 +594,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		databaseWriter.flush();
 		databaseStream.close();
 	
-		return Libris.buildIndexes(databaseFile, ui);
+		return ui.buildDatabase(databaseFile);
 	}
 
 }

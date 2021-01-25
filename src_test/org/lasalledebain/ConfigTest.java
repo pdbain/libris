@@ -45,7 +45,7 @@ public class ConfigTest extends TestCase {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		AbstractUi ui = new HeadlessUi();
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();
 		assertNotNull("Record not created in read-write mode", rec);
@@ -81,7 +81,7 @@ public class ConfigTest extends TestCase {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setAuxiliaryDirectory(auxDir);
 		AbstractUi ui = new HeadlessUi();
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();
 		rec = currentDb.getRecord(3);
@@ -106,7 +106,7 @@ public class ConfigTest extends TestCase {
 		config.setAuxiliaryDirectory(auxDir);
 		config.setRepositoryDirectory(artDir);
 		AbstractUi ui = new HeadlessUi();
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();
 		rec = currentDb.getRecord(3);

@@ -1,10 +1,10 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import junit.framework.TestCase;
 
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
@@ -12,9 +12,10 @@ import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.util.Utilities;
 
-import static org.lasalledebain.LibrisTestSuite.ignoreUnimplemented;;
+import junit.framework.TestCase;;
 
 public class ImportTests extends TestCase {
 	private File testDatabaseFileCopy;
@@ -39,6 +40,7 @@ public class ImportTests extends TestCase {
 			fail("unexpected exception "+e);
 		}
 	}
+	
 	public void testImportBasic() throws FileNotFoundException, IOException {
 		File importData = Utilities.copyTestDatabaseFile(Utilities.TEST_DELIM_TEXT_FILE_WITH_FIELD_IDS, workingDirectory);
 		try {
@@ -57,6 +59,14 @@ public class ImportTests extends TestCase {
 		} catch (LibrisException e) {
 			e.printStackTrace();
 			fail("Unexpected exception");
+		}
+	}
+	
+	public void testBuildFromDatabaseFile() throws LibrisException, Exception {
+		File databaseFile = Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_DATABASE1_FILE, workingDirectory);
+		try (TestGUI ui = new TestGUI(databaseFile)) {
+			LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(databaseFile);
+			ui.buildDatabase(config);
 		}
 	}
 	public void testMalformedTextFile() {

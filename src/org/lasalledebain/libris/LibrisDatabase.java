@@ -43,7 +43,6 @@ import org.lasalledebain.libris.records.Records;
 import org.lasalledebain.libris.records.XmlRecordsReader;
 import org.lasalledebain.libris.ui.ChildUi;
 import org.lasalledebain.libris.ui.DatabaseUi;
-import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
 import org.lasalledebain.libris.ui.Messages;
 import org.lasalledebain.libris.util.StringUtils;
@@ -245,7 +244,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			}
 		}
 
-		boolean buildDatabase() throws LibrisException {
+		public boolean buildDatabase() throws LibrisException {
 			boolean result = true;
 			initialize();
 			if (!reserveDatabase()) {
@@ -277,7 +276,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					if (XmlRecordsReader.XML_ARTIFACTS_TAG.equals(nextElement)) {
 						ElementManager artifactsMgr = librisMgr.nextElement();
 						File artifactDirectory = myConfiguration.getRepositoryDirectory();
-						DatabaseUi theUi = new HeadlessUi();
+						DatabaseUi theUi = new ChildUi<ArtifactRecord>(getUi(), false);
 						initializeDocumentRepository(theUi, artifactDirectory);
 						documentRepository.fromXml(artifactsMgr);
 						documentRepository.buildIndexes(myConfiguration);
@@ -401,8 +400,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			toXml(outWriter); 
 		}
 
-		public void exportDatabaseXml() throws LibrisException {
-			exportDatabaseXml(getDatabaseFile());
+		public File exportDatabaseXml() throws LibrisException {
+			final File dbFile = getDatabaseFile();
+			exportDatabaseXml(dbFile);
+			return dbFile;
 		}
 
 		public void exportDatabaseXml(File destination) throws LibrisException {
@@ -576,6 +577,9 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			File auxDir = config.getAuxiliaryDirectory();
 			if (isNull(auxDir)) {
 				File theDatabaseFile = config.getDatabaseFile();
+				if (isNull(theDatabaseFile)) {
+					throw new DatabaseException("Database file not specified");
+				}
 				auxDir = getDatabaseAuxDirectory(theDatabaseFile, DATABASE_AUX_DIRECTORY_NAME);
 			}
 			return auxDir;

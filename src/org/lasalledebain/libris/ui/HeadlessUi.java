@@ -41,7 +41,7 @@ public class HeadlessUi extends LibrisWindowedUi {
 	}
 
 	@Override
-	public void alert(String msg, Exception e) {
+	public void alert(String msg, Throwable e) {
 		log(Level.SEVERE, msg, e);
 	}
 

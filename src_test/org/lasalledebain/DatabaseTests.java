@@ -23,7 +23,6 @@ import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.GenericDatabase;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.Record;
@@ -84,7 +83,7 @@ public class DatabaseTests extends TestCase {
 	public void testOpenReadOnlyNoArtifacts() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 		HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy, false);
-		Libris.buildIndexes(testDatabaseFileCopy, ui);
+		ui.buildDatabase(testDatabaseFileCopy);
 		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(testDatabaseFileCopy, true));
 		{
 			boolean exceptionThrown = false;
@@ -114,7 +113,7 @@ public class DatabaseTests extends TestCase {
 	public void testRepoReadOnly() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 		HeadlessUi ui = new HeadlessUi(testDatabaseFileCopy, false);
-		Libris.buildIndexes(testDatabaseFileCopy, ui);
+		ui.buildDatabase(testDatabaseFileCopy);
 		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(testDatabaseFileCopy, true));
 		{
 			boolean exceptionThrown = false;
@@ -160,7 +159,7 @@ public class DatabaseTests extends TestCase {
 		assertTrue("Archive file is empty", fileList.size() > 0);
 		File databaseFile = fileList.get(0);
 		HeadlessUi ui = new HeadlessUi(databaseFile, false);
-		Libris.buildIndexes(databaseFile, ui);
+		ui.buildDatabase(databaseFile);
 		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(databaseFile, true));
 		{
 			boolean exceptionThrown = false;

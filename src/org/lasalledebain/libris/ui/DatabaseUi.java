@@ -24,8 +24,6 @@ public interface DatabaseUi extends ProgressTracker{
 	public boolean checkAndCloseDatabase(boolean force) throws DatabaseException;
 	public boolean quit(boolean force) throws DatabaseException;
 
-	public boolean rebuildDatabase() throws LibrisException;
-	public boolean rebuildDatabase(LibrisDatabaseConfiguration config) throws LibrisException;
 	public boolean isDatabaseSelected();
 	public boolean isDatabaseOpen();
 	public boolean isDatabaseModified();
@@ -63,7 +61,7 @@ public interface DatabaseUi extends ProgressTracker{
 	public abstract void arrangeValues();
 
 	public void repaint();
-	public abstract void alert(String msg, Exception e);
+	public abstract void alert(String msg, Throwable e);
 	public abstract void alert(String msg);
 	/**
 	 * Print a message and get a yes/no/cancel response.
@@ -86,4 +84,6 @@ public interface DatabaseUi extends ProgressTracker{
 	public default void setCurrentProgress(int currentProgress) {
 		return;
 	}
+	public boolean buildDatabase(LibrisDatabaseConfiguration config) throws LibrisException;;
+	public boolean buildDatabase(File databaseFile) throws LibrisException;
 }

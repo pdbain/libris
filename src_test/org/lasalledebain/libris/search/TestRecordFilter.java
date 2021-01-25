@@ -133,7 +133,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators, fieldNums);
 		database.exportDatabaseXml(new FileOutputStream(testDatabaseFileCopy), true, true, true);
 		ui.closeDatabase(false);
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		database = ui.openDatabase();
 		for (String term : keyWordsAndRecords.keySet()) {
 			FilteredRecordList<DatabaseRecord> filteredList = database
@@ -159,7 +159,7 @@ public class TestRecordFilter extends TestCase {
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(testDatabaseFileCopy), true, true, true);
 		ui.closeDatabase(false);
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		database = ui.openDatabase();
 		for (String term : keyWordsAndRecords.keySet()) {
 			FilteredRecordList<DatabaseRecord> filteredList = database
@@ -194,7 +194,7 @@ public class TestRecordFilter extends TestCase {
 		makeDatabase(database, numRecs, generators, keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(testDatabaseFileCopy), true, true, true);
 		ui.closeDatabase(false);
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		database = ui.openDatabase();
 
 		FilteredRecordList<DatabaseRecord> filteredList = database.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT,
@@ -227,7 +227,7 @@ public class TestRecordFilter extends TestCase {
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
 		DatabaseUi ui = database.getUi();
 		ui.closeDatabase(false);
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		database = ui.openDatabase();
 
 		doCompoundQuery(database, keywordFieldNums, keyWordsAndRecords, new String[] { "termtwo", "termthree" });
@@ -258,7 +258,7 @@ public class TestRecordFilter extends TestCase {
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
 		DatabaseUi ui = database.getUi();
 		ui.closeDatabase(false);
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		database = ui.openDatabase();
 
 		doSubstringQuery(database, keywordFieldNums, keyWordsAndRecords, new String[] { "termtwo", "termthree" },
@@ -292,7 +292,7 @@ public class TestRecordFilter extends TestCase {
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
 		DatabaseUi ui = database.getUi();
 		ui.closeDatabase(false);
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		database = ui.openDatabase();
 		String searchTerm = "UPPERCASEWORD";
 
@@ -329,7 +329,7 @@ public class TestRecordFilter extends TestCase {
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
 		DatabaseUi ui = database.getUi();
 		ui.closeDatabase(false);
-		ui.rebuildDatabase(config);
+		ui.buildDatabase(config);
 		database = ui.openDatabase();
 		DatabaseRecord rec = database.newRecord();
 		final String newKeyWords[] = { "FirstKeyword", "SecondKeyword", "ThirdKeyword" };
@@ -385,8 +385,8 @@ public class TestRecordFilter extends TestCase {
 		}
 		DatabaseUi ui = database.getUi();
 		assertTrue("Database not closed", ui.closeDatabase(false));
-		info("rebuildDatabase");
-		ui.rebuildDatabase(config);
+		info("buildDatabase");
+		ui.buildDatabase(config);
 		database = ui.openDatabase();
 
 		info("checkReturnedRecords");
@@ -430,8 +430,8 @@ public class TestRecordFilter extends TestCase {
 		}
 		DatabaseUi ui = database.getUi();
 		assertTrue("Database not closed", ui.closeDatabase(false));
-		info("rebuildDatabase");
-		ui.rebuildDatabase(config);
+		info("buildDatabase");
+		ui.buildDatabase(config);
 		database = ui.openDatabase();
 
 		info("checkReturnedRecords");

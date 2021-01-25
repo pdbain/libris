@@ -53,7 +53,7 @@ public class DatabaseMenu extends JMenu {
 
 		exportItem = addMenuItem("Export...", e -> {
 			try {
-				guiMain.exportData(database);
+				guiMain.exportDatabase(database);
 			} catch (LibrisException exc) {
 				guiMain.alert("Problem exporting data", exc);
 			}
