@@ -57,7 +57,7 @@ public class Libris {
 		boolean doRebuild = false;
 		boolean doExport = false;
 		boolean includeArtifacts = false;
-		boolean archive = true;
+		boolean archive = false;
 		String auxDirPath = null;
 		String repoDirPath = null;
 		String databaseFilePath = null;
@@ -159,10 +159,10 @@ public class Libris {
 			}
 			if (status) {
 				{
-					Assertion.assertTrue(ui, "cannot specify both "+OPTION_EXPORT+" and "+OPTION_REBUILD, doExport && doRebuild);
-					Assertion.assertTrue(ui, "cannot specify both "+OPTION_INCLUDE_ARTIFACTS+" without "+OPTION_EXPORT, !doExport && includeArtifacts);
-					Assertion.assertTrue(ui, "cannot specify both "+OPTION_ARCHIVE+" without "+OPTION_EXPORT+" or "+OPTION_REBUILD, 
-							!(doRebuild || doExport) && archive);
+					Assertion.assertTrue(ui, "cannot specify both "+OPTION_EXPORT+" and "+OPTION_REBUILD, !(doExport && doRebuild));
+					Assertion.assertTrue(ui, "cannot specify both "+OPTION_INCLUDE_ARTIFACTS+" without "+OPTION_EXPORT, !doExport || includeArtifacts);
+					Assertion.assertTrue(ui, "cannot specify "+OPTION_ARCHIVE+" without "+OPTION_EXPORT+" or "+OPTION_REBUILD, 
+							!(archive  && !(doRebuild || doExport)));
 				}
 				if (doRebuild) {
 					Assertion.assertEquals(ui, "cannot specify UI type for batch operations", IfType.UI_DEFAULT, myUiType);
