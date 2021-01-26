@@ -12,13 +12,12 @@ import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.records.PdfRecordImporter;
+import org.lasalledebain.libris.ui.AbstractUi;
 import org.lasalledebain.libris.ui.CmdlineUi;
 import org.lasalledebain.libris.ui.ConsoleUi;
-import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.LibrisGui;
 import org.lasalledebain.libris.ui.LibrisHttpServer;
-import org.lasalledebain.libris.ui.AbstractUi;
 
 public class Libris {
 	private static final String OPTION_HELP = "-h";

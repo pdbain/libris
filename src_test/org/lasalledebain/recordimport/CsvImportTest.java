@@ -9,7 +9,6 @@ import java.util.HashMap;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FileAccessManager;
-import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.LibrisException;

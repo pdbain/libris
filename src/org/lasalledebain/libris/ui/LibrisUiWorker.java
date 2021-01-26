@@ -2,18 +2,9 @@ package org.lasalledebain.libris.ui;
 
 import javax.swing.SwingWorker;
 
-class LibrisUiWorker extends SwingWorker<Object, Object> {
-	private final Runnable workToDo;
-
-	LibrisUiWorker(Runnable theWorkToDo) {
-		workToDo = theWorkToDo;
-	}
-
+abstract class LibrisUiWorker extends SwingWorker<Object, Object> {
 	@Override
-	protected Object doInBackground() throws Exception {
-		workToDo.run();
-		return null;
-	}
+	abstract protected Object doInBackground() throws Exception;
 	
 	public void setWorkerProgress(int progress) {
 		setProgress(progress);

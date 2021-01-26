@@ -84,6 +84,10 @@ public interface DatabaseUi extends ProgressTracker{
 	public default void setCurrentProgress(int currentProgress) {
 		return;
 	}
+	default void setProgressNote(String theNote) {
+		return;
+	}
+	
 	public boolean buildDatabase(LibrisDatabaseConfiguration config) throws LibrisException;;
 	public boolean buildDatabase(File databaseFile) throws LibrisException;
 }

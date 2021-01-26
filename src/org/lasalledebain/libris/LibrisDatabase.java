@@ -250,6 +250,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			if (!reserveDatabase()) {
 				result = false;
 			} else {
+				ui.setProgressNote("Loading database metadata");
 				loadDatabaseInfo(myConfiguration.isLoadMetadata());
 				mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
 				final File databaseFile = getDatabaseFile();
@@ -270,7 +271,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 						nextElement = librisMgr.getNextId();	
 					}
 					ElementManager recordsMgr = librisMgr.nextElement();
+					ui.setProgressNote("Loading database records");
 					recs.fromXml(recordsMgr);
+					ui.addProgress(1);
+					ui.setProgressNote("Building database indexes");
 					buildIndexes(myConfiguration);
 					nextElement = librisMgr.getNextId();
 					if (XmlRecordsReader.XML_ARTIFACTS_TAG.equals(nextElement)) {
@@ -278,7 +282,11 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 						File artifactDirectory = myConfiguration.getRepositoryDirectory();
 						DatabaseUi theUi = new ChildUi<ArtifactRecord>(getUi(), false);
 						initializeDocumentRepository(theUi, artifactDirectory);
+						ui.addProgress(1);
+						ui.setProgressNote("Loading artifact database");
 						documentRepository.fromXml(artifactsMgr);
+						ui.addProgress(1);
+						ui.setProgressNote("Building artifact indexes");
 						documentRepository.buildIndexes(myConfiguration);
 					}
 					saveMetadata();

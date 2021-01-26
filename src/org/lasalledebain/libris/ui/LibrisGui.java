@@ -431,18 +431,18 @@ public class LibrisGui extends LibrisWindowedUi {
 		DatabaseExporter exporter = new DatabaseExporter(db);
 		if (exporter.chooseExportFile(this)) {
 			setExpectedWork(exporter.getTotalWorkItems());
-			LibrisUiWorker theWorker = new LibrisUiWorker(new Runnable() {
+			var theWorker = new LibrisUiWorker() {
 
 				@Override
-				public void run() {
+				protected Object doInBackground() throws Exception {
 					try {
 						exporter.doExport();
 					} catch (LibrisException e) {
 						alert("Error exporting database", e);
 					}
-					setCurrentProgress(100);
+					return null;
 				}
-			});
+			};
 			runProgressMonitoredTask(theWorker, "Exporting database...");
 		}
 	}

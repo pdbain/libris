@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.ui;
 
 import static java.util.Objects.nonNull;
-import static org.junit.Assert.assertTrue;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -22,7 +21,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.lasalledebain.libris.DatabaseArchive;
@@ -31,6 +29,7 @@ import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -509,7 +508,7 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 			File selectedFile =  chooser.getSelectedFile();
 			final boolean buildFromArchive = buildFromArchiveCheckbox.isSelected();
 			if (selectedFile != null) {
-				SwingWorker<Boolean, Object> task = new SwingWorker<>() {
+				var theWorker = new LibrisUiWorker() {
 
 					@Override
 					protected Boolean doInBackground() throws Exception {
@@ -517,28 +516,35 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 						File databaseFile;
 						try {
 							if (buildFromArchive) {
+								guiMain.setExpectedWork(5);
+								guiMain.setCurrentProgress(0);
 								errorMessage = "Error reading TAR archive "+selectedFile.getPath();
+								guiMain.setProgressNote("Unpacking archive");
 								ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(selectedFile, selectedFile.getParentFile());
+								if (!Assertion.assertTrue(guiMain, "Archive file is empty", fileList.size() > 0)) return false;
+								guiMain.addProgress(1);
 								errorMessage = ERROR_BUILDING_INDEXES_MESSAGE;
-								assertTrue("Archive file is empty", fileList.size() > 0);
 								databaseFile = fileList.get(0);
 							} else {
+								guiMain.setExpectedWork(5);
 								errorMessage = "Error reading database file "+selectedFile.getPath();
 								databaseFile = selectedFile;
 							}
 							guiMain.setDatabaseFile(databaseFile);
 							guiMain.buildDatabase(databaseFile);
 							if ((Dialogue.yesNoDialog(guiMain.getMainFrame(), "Database built successfully\nOpen now?") == Dialogue.YES_OPTION))
-								return openDatabaseImpl(selectedFile, false);
+								return openDatabaseImpl(databaseFile, false);
 							else return true;
 						} catch (Exception e) {
 							guiMain.alert(errorMessage, e);
 							return false;
+						} finally {
+							guiMain.setCurrentProgress(100); 
 						}
 					}
 
 				};
-				task.execute();
+				guiMain.runProgressMonitoredTask(theWorker, "Building database...");
 			}
 		}
 	}

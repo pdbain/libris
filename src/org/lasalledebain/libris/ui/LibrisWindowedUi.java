@@ -5,7 +5,6 @@ import static javax.swing.JOptionPane.showMessageDialog;
 
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -39,6 +38,7 @@ public abstract class LibrisWindowedUi extends AbstractUi {
 	protected boolean databaseSelected = false;
 	protected String title = NO_DATABASE_OPEN;
 	protected LibrisUiWorker progressWorker;
+	private ProgressMonitor progMon;
 
 	public abstract boolean closeWindow(boolean allWindows);
 
@@ -204,9 +204,16 @@ public abstract class LibrisWindowedUi extends AbstractUi {
 		}
 	}
 
+	@Override
+	public void setProgressNote(String theNote) {
+		if (nonNull(progMon)) {
+			progMon.setNote(theNote);
+		}
+	}
+	
 	protected void runProgressMonitoredTask(LibrisUiWorker theWorker, String message) {
 		progressWorker = theWorker;
-		ProgressMonitor progMon = new ProgressMonitor(this.mainFrame, message, null, 0, 100);
+		progMon = new ProgressMonitor(this.mainFrame, message, null, 0, 100);
 		progressWorker.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -214,8 +221,8 @@ public abstract class LibrisWindowedUi extends AbstractUi {
 					int progress = (Integer) evt.getNewValue();
 					progMon.setProgress(progress);
 					if (progMon.isCanceled() || progressWorker.isDone()) {
-						Toolkit.getDefaultToolkit().beep();
 						progressWorker = null;
+						progMon = null;
 					}
 				}
 	
