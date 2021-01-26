@@ -2,6 +2,8 @@ package org.lasalledebain.libris.indexes;
 
 
 import static org.lasalledebain.libris.util.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.trace;
+import static org.lasalledebain.libris.util.Utilities.info;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -129,13 +131,13 @@ public class FileSpaceManagerTests extends TestCase {
 			while (iter.hasNext()) {
 				RecordHeader h = iter.next();
 				short headerId = h.getInput().readShort();
-				testLogger.log(Level.INFO, "Keep "+headerId);
+				trace("Keep "+headerId);
 				if (iter.hasNext()) {
 					h = iter.next();
 				}
 				headerId = h.getInput().readShort();
 				Integer id =  Integer.valueOf(headerId);
-				testLogger.log(Level.INFO, "Remove "+headerId);
+				trace("Remove "+headerId);
 				removedEntries.add(id);
 				iter.remove();
 			}
@@ -203,12 +205,14 @@ public class FileSpaceManagerTests extends TestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		info("Starting "+getName());
 		workDir = Utilities.makeTempTestDirectory();
 		testFile = Utilities.makeTestFileObject(workDir, "tempRecordsFile");
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		info("Ending "+getName());
 		Utilities.deleteWorkingDirectory();
 	}
 }

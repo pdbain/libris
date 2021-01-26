@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.search;
 
 import static org.lasalledebain.libris.util.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.trace;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -361,7 +362,7 @@ public class TestRecordFilter extends TestCase {
 	}
 	
 	public void testIndexStress() throws FileNotFoundException, IOException, LibrisException {
-		info("copyAndBuildDatabase");
+		trace("copyAndBuildDatabase");
 		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
 
 		Random rand = new BiasedRandom(3141592);
@@ -372,24 +373,24 @@ public class TestRecordFilter extends TestCase {
 		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
 		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, keywordRatio);
 		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, keywordRatio);
-		info("makeDatabase");
+		trace("makeDatabase");
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
-		info("exportDatabaseXml");
+		trace("exportDatabaseXml");
 		database.exportDatabaseXml(new BufferedOutputStream(new FileOutputStream(config.getDatabaseFile())), true, true,
 				true);
-		info("check database");
+		trace("check database");
 		for (int i=1 ; i<4; ++i) {
 			Record r = database.getRecord(i);
 			assertNotNull("Record "+i+" null", r);
 		}
 		DatabaseUi ui = database.getUi();
 		assertTrue("Database not closed", ui.closeDatabase(false));
-		info("buildDatabase");
+		trace("buildDatabase");
 		ui.buildDatabase(config);
 		database = ui.openDatabase();
 
-		info("checkReturnedRecords");
+		trace("checkReturnedRecords");
 		for (String term : keyWordsAndRecords.keySet()) {
 			FilteredRecordList<DatabaseRecord> filteredList = database
 					.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, keywordFieldNums, term);
@@ -401,12 +402,10 @@ public class TestRecordFilter extends TestCase {
 				throw afe;
 			}
 		}
-		info("Finished");
-
 	}
 
 	public void testIndexUniformDistribution() throws FileNotFoundException, IOException, LibrisException {
-		info("copyAndBuildDatabase");
+		trace("copyAndBuildDatabase");
 		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
 
 		Random rand = new Random(3141592);
@@ -417,24 +416,24 @@ public class TestRecordFilter extends TestCase {
 		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
 		generators[1] = new RandomFieldGenerator(2, 10, 4, 16, rand, keywordRatio);
 		generators[2] = new RandomFieldGenerator(2, 10, 20, 40, rand, keywordRatio);
-		info("makeDatabase");
+		trace("makeDatabase");
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
-		info("exportDatabaseXml");
+		trace("exportDatabaseXml");
 		database.exportDatabaseXml(new BufferedOutputStream(new FileOutputStream(config.getDatabaseFile())), true, true,
 				true);
-		info("check database");
+		trace("check database");
 		for (int i=1 ; i<4; ++i) {
 			Record r = database.getRecord(i);
 			assertNotNull("Record "+i+" null", r);
 		}
 		DatabaseUi ui = database.getUi();
 		assertTrue("Database not closed", ui.closeDatabase(false));
-		info("buildDatabase");
+		trace("buildDatabase");
 		ui.buildDatabase(config);
 		database = ui.openDatabase();
 
-		info("checkReturnedRecords");
+		trace("checkReturnedRecords");
 		for (String term : keyWordsAndRecords.keySet()) {
 			FilteredRecordList<DatabaseRecord> filteredList = database
 					.makeKeywordFilteredRecordList(MATCH_TYPE.MATCH_EXACT, true, keywordFieldNums, term);
@@ -446,7 +445,6 @@ public class TestRecordFilter extends TestCase {
 				throw afe;
 			}
 		}
-		info("Finished");
 
 	}
 
@@ -540,11 +538,13 @@ public class TestRecordFilter extends TestCase {
 
 	@Before
 	public void setUp() throws Exception {
+		info("Starting "+getName());
 		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 
 	@After
 	public void tearDown() throws Exception {
+		info("Ending "+getName());
 		if (Objects.nonNull(db)) {
 			assertTrue("Could not close database", db.closeDatabase(false));
 		}

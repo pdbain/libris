@@ -114,7 +114,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 	}
 
 	public static File getTestDataDirectory() {
-		info(System.getProperty("user.dir"));
+		trace(System.getProperty("user.dir"));
 		File testDir = new File(System.getProperty("user.dir"), "test_data");
 		return testDir;
 	}
@@ -370,7 +370,9 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 	static {
 		testLogger = Logger.getLogger("org.lasalledebain.test");
 		testLogger.setLevel(Boolean.getBoolean("org.lasalledebain.test.verbose")? Level.ALL: Level.INFO);
-	}
+		System.setProperty("java.util.logging.SimpleFormatter.format",
+	              "[%1$tF %1$tT] [%4$-7s] %5$s %n");
+		}
 
 	public static void trace(String msg) {
 		testLogger.fine(msg);
@@ -539,7 +541,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 	public static int pauseDuration = Integer.getInteger("libris.test.pause", -1);
 
 	public static void pause(String msg) {
-		info("Pause: "+msg);
+		trace("Pause: "+msg);
 		pause();
 	}
 

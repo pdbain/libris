@@ -1,13 +1,13 @@
 package org.lasalledebain.group;
 
-import static org.lasalledebain.libris.util.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.trace;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
 import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
@@ -103,7 +103,7 @@ public class GroupDefsTests extends TestCase {
 		try {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE, workingDirectory);
 			GenericDatabase<DatabaseRecord> db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
-			testLogger.log(Level.INFO, "database rebuilt");
+			trace("database rebuilt");
 			ArrayList<DatabaseRecord> recList = new ArrayList<DatabaseRecord>();
 			{
 				DatabaseRecord curr = db.newRecord();
@@ -167,7 +167,7 @@ public class GroupDefsTests extends TestCase {
 			}
 			String[] fieldIds = db.getSchema().getFieldIds();
 			for (Record r: recList) {
-				testLogger.log(Level.INFO, "Record "+r.getRecordId());
+				trace("Record "+r.getRecordId());
 				int parentId = r.getParent(GRP_ONE);
 				Record parent = null;
 				if (!RecordId.isNull(parentId)) {
@@ -176,7 +176,7 @@ public class GroupDefsTests extends TestCase {
 				for (String fid: fieldIds) {
 					FieldValue val = r.getFieldValue(fid);
 					if (null != val) {
-						testLogger.log(Level.INFO, fid+": "+val.getValueAsString());
+						trace(fid+": "+val.getValueAsString());
 					}
 					if ((r.getField(fid) == null) && (null != parent)) {
 						Field parentValue = parent.getField(fid);
@@ -195,7 +195,7 @@ public class GroupDefsTests extends TestCase {
 	public void testSetParent() throws FileNotFoundException, IOException, LibrisException {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB_WITH_GROUPS_XML_FILE, workingDirectory);
 			GenericDatabase<DatabaseRecord> db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
-			testLogger.log(Level.INFO, "database rebuilt");
+			trace("database rebuilt");
 			ArrayList<DatabaseRecord> recList = new ArrayList<DatabaseRecord>();
 			{
 				DatabaseRecord curr = db.newRecord();
@@ -219,12 +219,12 @@ public class GroupDefsTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		workingDirectory = Utilities.makeTempTestDirectory();
-		testLogger.log(Level.INFO, "Starting "+getName());
+		info("Starting "+getName());
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
-		testLogger.log(Level.INFO, "Ending "+getName());
+		info("Ending "+getName());
 
 	}
 

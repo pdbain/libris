@@ -4,6 +4,8 @@ import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_AND_R
 import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_XML;
 import static org.lasalledebain.libris.util.Utilities.checkRecords;
 import static org.lasalledebain.libris.util.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.trace;
+import static org.lasalledebain.libris.util.Utilities.info;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -285,7 +287,7 @@ public class DatabaseTests extends TestCase {
 				DatabaseRecord rec = rootDb.getRecord(i);
 				Field f = rec.getField(ID_AUTH);
 				f.changeValue("new value "+i);
-				testLogger.log(Level.INFO,rec.toString());
+				trace(rec.toString());
 				rootDb.putRecord(rec);
 			}
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
@@ -310,7 +312,7 @@ public class DatabaseTests extends TestCase {
 				DatabaseRecord rec = rootDb.getRecord(i);
 				rec.setName("Name_"+i);
 				rec.addFieldValue(ID_AUTH, "new value "+i);
-				testLogger.log(Level.FINE,rec.toString());
+				trace(rec.toString());
 				rootDb.putRecord(rec);
 			}
 			for (int i = 1; i <= NUM_RECORDS; ++i) {
@@ -405,7 +407,7 @@ public class DatabaseTests extends TestCase {
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			copyDbXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
-			testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
+			trace(getName()+": copy database to"+copyDbXml);
 			rootDb.exportDatabaseXml(copyStream, true, true, false);
 			copyStream.close();
 
@@ -425,7 +427,7 @@ public class DatabaseTests extends TestCase {
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			copyDbXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
-			testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
+			trace(getName()+": copy database to"+copyDbXml);
 			rootDb.exportDatabaseXml(copyStream);
 			copyStream.close();
 
@@ -443,7 +445,7 @@ public class DatabaseTests extends TestCase {
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			copyDbXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
-			testLogger.log(Level.INFO,getName()+": copy database to"+copyDbXml);
+			trace(getName()+": copy database to"+copyDbXml);
 			db.exportDatabaseXml(copyStream, true, true, false);
 			copyStream.close();
 
@@ -466,7 +468,7 @@ public class DatabaseTests extends TestCase {
 		try {
 			File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile, workingDirectory);
 			rootDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
-			testLogger.log(Level.INFO, "database rebuilt");
+			trace( "database rebuilt");
 			int lastId = rootDb.getLastRecordId();
 			for (int i = lastId+1; i <= numRecs; ++i) {
 				DatabaseRecord rec = rootDb.newRecord();
@@ -486,11 +488,11 @@ public class DatabaseTests extends TestCase {
 		{
 			rootDb = buildTestDatabase(getTestDatabase());
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
-			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
+			trace(getName()+": copy database to "+copyDbXml);
 			copyDbXml.deleteOnExit();
 			dbInstance.deleteOnExit();
 			FileOutputStream instanceStream = new FileOutputStream(dbInstance);
-			testLogger.log(Level.INFO,getName()+": copy database to "+dbInstance);
+			trace(getName()+": copy database to "+dbInstance);
 			rootDb.exportDatabaseXml(instanceStream, true, true, true);
 			instanceStream.close();
 		}
@@ -548,11 +550,11 @@ public class DatabaseTests extends TestCase {
 			}
 			newRecordNumber = rootDb.getLastRecordId() + 1;
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
-			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
+			trace(getName()+": copy database to "+copyDbXml);
 			copyDbXml.deleteOnExit();
 			dbInstance.deleteOnExit();
 			FileOutputStream instanceStream = new FileOutputStream(dbIncrement);
-			testLogger.log(Level.INFO,getName()+": copy database to "+dbIncrement);
+			trace(getName()+": copy database to "+dbIncrement);
 			rootDb.exportFork(instanceStream);
 			instanceStream.close();
 			int lastId = rootDb.getLastRecordId();
@@ -602,17 +604,17 @@ public class DatabaseTests extends TestCase {
 			newRecordNumber = rootDb.getLastRecordId() + 1;
 			for (int forkNum = 0; forkNum < 3; ++forkNum) {
 				File forkFile = new File (workingDirectory, "database_copy_"+forkNum+".xml");
-				testLogger.log(Level.INFO,getName()+": copy database to "+forkFile);
+				trace(getName()+": copy database to "+forkFile);
 				forkFiles.add(forkFile);
 				forkFile.deleteOnExit();
 				FileOutputStream forkStream = new FileOutputStream(forkFile);
-				testLogger.log(Level.INFO,getName()+": copy database to "+forkFile);
+				trace(getName()+": copy database to "+forkFile);
 				rootDb.exportFork(forkStream);
 				forkStream.close();
 				DatabaseRecord newRootRec = rootDb.newRecord();
 				String fieldData = "DatabaseRecord"+newRecordNumber;
 				newRootRec.addFieldValue("ID_title", fieldData);
-				testLogger.log(Level.INFO,"add new record with "+fieldData+" to root database");
+				trace("add new record with "+fieldData+" to root database");
 				rootDb.putRecord(newRootRec);
 				newRecordNumber++;
 				rootDb.save();
@@ -628,7 +630,7 @@ public class DatabaseTests extends TestCase {
 					newForkRec.addFieldValue("ID_title", fieldData);
 					int newId = forkDb.putRecord(newForkRec);
 					recCopy = newForkRec.duplicate();
-					testLogger.log(Level.INFO,"add new record " + newId + " with "+fieldData+" to fork "+incrementNumber);
+					trace("add new record " + newId + " with "+fieldData+" to fork "+incrementNumber);
 				}
 				forkDb.save();
 				recCopy.setRecordId(newRecordNumber);
@@ -662,11 +664,11 @@ public class DatabaseTests extends TestCase {
 			rootDb = buildTestDatabase(Utilities.copyTestDatabaseFile(DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory));
 			newRecordNumber = rootDb.getLastRecordId() + 1;
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
-			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
+			trace(getName()+": copy database to "+copyDbXml);
 			copyDbXml.deleteOnExit();
 			dbInstance.deleteOnExit();
 			FileOutputStream instanceStream = new FileOutputStream(dbInstance);
-			testLogger.log(Level.INFO,getName()+": copy database to "+dbInstance);
+			trace(getName()+": copy database to "+dbInstance);
 			rootDb.exportFork(instanceStream);
 			int baseId = rootDb.getLastRecordId();
 			int baseAffiliate = baseId - 1;
@@ -735,11 +737,11 @@ public class DatabaseTests extends TestCase {
 			ArrayList<Record> incrementExpectedRecords = new ArrayList<>();
 			newRecordNumber = myOriginalDb.getLastRecordId() + 1;
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
-			testLogger.log(Level.INFO,getName()+": copy database to "+copyDbXml);
+			trace(getName()+": copy database to "+copyDbXml);
 			copyDbXml.deleteOnExit();
 			dbInstance.deleteOnExit();
 			FileOutputStream instanceStream = new FileOutputStream(dbInstance);
-			testLogger.log(Level.INFO,getName()+": copy database to "+dbInstance);
+			trace(getName()+": copy database to "+dbInstance);
 			myOriginalDb.exportFork(instanceStream);
 			int baseId = myOriginalDb.getLastRecordId();
 			instanceStream.close();
@@ -789,7 +791,7 @@ public class DatabaseTests extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		testLogger.log(Level.INFO,"running "+getName());
+		info("starting "+getName());
 		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 
@@ -806,6 +808,7 @@ public class DatabaseTests extends TestCase {
 			forkDb = null;
 		}
 		Utilities.deleteWorkingDirectory();
+		info("ending "+getName());
 	}
 
 	private void checkDbRecords(LibrisDatabase testDb, ArrayList<Record> expectedRecords) {

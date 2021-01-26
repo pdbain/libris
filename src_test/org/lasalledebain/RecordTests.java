@@ -161,7 +161,7 @@ public class RecordTests extends TestCase {
 				sb.append("("+fType+")");
 				assertEquals("schema: wrong types loaded", expectedFieldTypes[i], fType);
 			}
-			info(sb.toString());
+			trace(sb.toString());
 			
 			sb = new StringBuilder();
 			sb.append("\nrecord field ids: ");
@@ -176,7 +176,7 @@ public class RecordTests extends TestCase {
 				FieldType sType = schem.getFieldType(fid);
 				assertEquals("record: wrong types loaded", sType, fType);
 			}
-			info(sb.toString());
+			trace(sb.toString());
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -3,12 +3,12 @@ package org.lasalledebain.group;
 
 import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML;
 import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_XML;
-import static org.lasalledebain.libris.util.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.trace;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.logging.Level;
 
 import org.junit.After;
 import org.lasalledebain.libris.DatabaseRecord;
@@ -121,7 +121,7 @@ public class InheritanceTest extends TestCase {
 				assertEquals("wrong ID for new record",  i, recNum);
 				addExpectedAffiliate(expectedChildren, maxParent, recNum);
 			}
-			testLogger.log(Level.INFO, "Check children before save");
+			trace("Check children before save");
 			checkChildren(numRecs, expectedChildren);
 			db.save();
 		} catch (LibrisException e) {
@@ -130,7 +130,7 @@ public class InheritanceTest extends TestCase {
 		}
 		Utilities.checkRecords(db, lastId);
 		try {
-			testLogger.log(Level.INFO, "Check children after save");
+			trace("Check children after save");
 			checkChildren(numRecs, expectedChildren);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -159,7 +159,7 @@ public class InheritanceTest extends TestCase {
 				addExpectedAffiliate(expectedChildren, maxAff, recNum);
 				addExpectedAffiliate(expectedChildren, maxAff/2, recNum);
 			}
-			testLogger.log(Level.INFO, "Check children before save");
+			trace("Check children before save");
 			checkAffiliates(numRecs, expectedChildren);
 			db.save();
 		} catch (LibrisException e) {
@@ -168,7 +168,7 @@ public class InheritanceTest extends TestCase {
 		}
 		Utilities.checkRecords(db, lastId);
 		try {
-			testLogger.log(Level.INFO, "Check children after save");
+			trace("Check children after save");
 			checkAffiliates(numRecs, expectedChildren);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -337,7 +337,7 @@ public class InheritanceTest extends TestCase {
 		try {
 			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile, workingDirectory);
 			db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
-			testLogger.log(Level.INFO, "database rebuilt");
+			trace("database rebuilt");
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("unexpected exception "+e.getMessage());
@@ -451,7 +451,7 @@ public class InheritanceTest extends TestCase {
 				assertEquals("wrong ID for new record",  i, recNum);
 				addExpectedAffiliate(expectedDescendents, maxParent, recNum);
 			}
-			testLogger.log(Level.INFO, "Check children before save");
+			trace("Check children before save");
 			checkDescendents(numRecs, expectedDescendents);
 			db.save();
 		} catch (LibrisException e) {
@@ -460,7 +460,7 @@ public class InheritanceTest extends TestCase {
 		}
 		Utilities.checkRecords(db, lastId);
 		try {
-			testLogger.log(Level.INFO, "Check children after save");
+			trace("Check children after save");
 			checkDescendents(numRecs, expectedDescendents);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -516,13 +516,13 @@ public class InheritanceTest extends TestCase {
 
 	@After
 	public void tearDown() throws Exception {
-		testLogger.log(Level.INFO, "Ending "+getName());
+		info("Ending "+getName());
 		Utilities.deleteTestDatabaseFiles(DATABASE_WITH_GROUPS_XML);
 	}
 
 	@Override
 	protected void setUp() throws Exception {
-		testLogger.log(Level.INFO, "Starting "+getName());
+		info("Starting "+getName());
 		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 

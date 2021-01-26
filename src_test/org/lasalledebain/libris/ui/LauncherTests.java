@@ -1,6 +1,6 @@
 package org.lasalledebain.libris.ui;
 
-import static org.lasalledebain.libris.util.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.info;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Level;
 
 import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
@@ -100,13 +99,13 @@ public class LauncherTests extends TestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
-		testLogger.log(Level.INFO,this.getClass().getName()+" running "+getName());
+		info(this.getClass().getName()+" running "+getName());
 		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 
 	@Override
 	protected void tearDown() throws Exception {
-		testLogger.log(Level.INFO, "Ending "+getName());
+		info("Ending "+getName());
 		Utilities.deleteWorkingDirectory();
 	}
 }

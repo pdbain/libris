@@ -3,6 +3,7 @@ package org.lasalledebain.libris.ui;
 import static org.lasalledebain.libris.util.Utilities.TEST_DB4_XML_FILE;
 import static org.lasalledebain.libris.util.Utilities.TEST_DB_WITH_DEFAULTS_XML_FILE;
 import static org.lasalledebain.libris.util.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.trace;
 import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
@@ -47,7 +48,7 @@ public class RecordEditTests extends TestCase {
 			int rid = resultsWindow.getSelectedRecordId();
 			gui.displaySelectedRecord();
 			Utilities.pause("opened record");
-			info("selected "+rid);
+			trace("selected "+rid);
 			gui.setRecordWindowEditable(true);
 			Utilities.pause("re-open record");
 			gui.displaySelectedRecord();

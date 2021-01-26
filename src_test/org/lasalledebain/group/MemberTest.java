@@ -1,12 +1,12 @@
 package org.lasalledebain.group;
 
-import static org.lasalledebain.libris.util.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.trace;
 
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.logging.Level;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -37,17 +37,17 @@ public class MemberTest extends TestCase implements LibrisXMLConstants {
 	private GroupDefs defs;
 	@Override
 	protected void setUp() throws Exception {
-		testLogger.log(Level.INFO,"\n=====================================================\nrunning "+getName());
+		info("starting "+getName());
 		defs = new GroupDefs();
 		defs.addGroup(new GroupDef(new MockSchema(), TEST_GROUP1, TEST_TITLE, 0));
 	}
 	public void testFromToXml() {
 		try {
 			final String elementString = simpleMember;
-			testLogger.log(Level.INFO,"parsing "+elementString);
+			trace("parsing "+elementString);
 			GroupMember gmm = parseAndCheckGroupMember(elementString);
 			String newElementString = memberToXml(gmm);
-			testLogger.log(Level.INFO,"re-parsing "+newElementString);
+			trace("re-parsing "+newElementString);
 			parseAndCheckGroupMember(newElementString);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -77,7 +77,7 @@ public class MemberTest extends TestCase implements LibrisXMLConstants {
 		return gmm;
 	}
 	public void testAffiliations() {
-		testLogger.log(Level.INFO,"parsing "+affiliate);
+		trace("parsing "+affiliate);
 		ElementManager mgr = Utilities.makeElementManagerFromReader(new StringReader(affiliate), null,
 				XML_MEMBER_TAG);
 		GroupMember gmm = new GroupMember(defs, null);

@@ -1,7 +1,7 @@
 package org.lasalledebain;
 
 import static org.lasalledebain.libris.util.Utilities.KEYWORD_DATABASE1_XML;
-import static org.lasalledebain.libris.util.Utilities.testLogger;
+import static org.lasalledebain.libris.util.Utilities.info;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,7 +10,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import org.junit.Test;
@@ -32,7 +31,7 @@ public class ArchiveTests extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		Utilities.deleteWorkingDirectory();
-		testLogger.log(Level.INFO,getClass().getName()+" running "+getName());
+		info(getClass().getName()+" running "+getName());
 		workingDirectory = Utilities.makeTempTestDirectory();
 	}
 
