@@ -35,9 +35,6 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		name = null;
 		affiliations = null;
 		recordFields = new Field[template.getNumFields()];
-		for (int i = 0; i < recordFields.length; ++i) {
-			recordFields[i] = null;
-		}
 		artifactId = RecordId.NULL_RECORD_ID;
 	}
 	
@@ -227,6 +224,12 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	
 	public FieldType getFieldType(String fieldId) {
 		return template.getFieldType(fieldId);
+	}
+	
+	@Override
+	public EnumFieldChoices getFieldLegalValues(String fieldId) throws FieldDataException {
+		int index = template.getFieldIndex(fieldId);
+		return template.getFieldLegalValues(index);
 	}
 	
 	private class FieldIterator implements Iterator<Field>, Iterable<Field> {

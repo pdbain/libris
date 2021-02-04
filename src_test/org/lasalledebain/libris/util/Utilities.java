@@ -132,6 +132,8 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		return testDirectory;
 	}
 
+	public static final String RECIPE_DATABASE1_LIBR = "RecipeDatabase1.libr";
+
 	public Layouts loadLayoutsFromXml(Schema schem, File inputFile)
 			throws FileNotFoundException, FactoryConfigurationError,
 			XMLStreamException, LibrisException, DatabaseException {
@@ -558,7 +560,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 
 	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
 		HeadlessUi ui = new HeadlessUi(databaseFile, false);
-		ui.buildDatabase(databaseFile);
+		assertTrue("Database not built", ui.buildDatabase(databaseFile));
 	
 		LibrisDatabase result = ui.openDatabase();
 		assertNotNull("Database not opened", result);

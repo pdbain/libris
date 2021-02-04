@@ -159,6 +159,10 @@ public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 	public String getDefaultValue(int i) {
 		return fieldMasters[i].getDefaultData();
 	}
+@Deprecated
+	public EnumFieldChoices getFieldLegalValues(int i) {
+		 return fieldMasters[i].getEnumChoices();
+	}
 
 	public Field getDefaultField(int fieldId) {
 		return defaultFields[fieldId];

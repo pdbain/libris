@@ -317,5 +317,9 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 		}
 	}
 	// TODO abbreviate title
+@Deprecated
+	public EnumFieldChoices getFieldLegalValues(String fieldId) throws FieldDataException {
+		return null;
+	}
 	
 }

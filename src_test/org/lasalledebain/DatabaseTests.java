@@ -3,9 +3,8 @@ package org.lasalledebain;
 import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML;
 import static org.lasalledebain.libris.util.Utilities.DATABASE_WITH_GROUPS_XML;
 import static org.lasalledebain.libris.util.Utilities.checkRecords;
-import static org.lasalledebain.libris.util.Utilities.testLogger;
-import static org.lasalledebain.libris.util.Utilities.trace;
 import static org.lasalledebain.libris.util.Utilities.info;
+import static org.lasalledebain.libris.util.Utilities.trace;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,8 +14,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import org.junit.Test;
 import org.lasalledebain.libris.ArtifactParameters;
@@ -33,6 +32,7 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordTemplate;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
@@ -43,7 +43,6 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 
 import junit.framework.TestCase;
 
-@SuppressWarnings("rawtypes")
 public class DatabaseTests extends TestCase {
 
 	private static final String ID_AUTH = "ID_auth";
@@ -53,6 +52,10 @@ public class DatabaseTests extends TestCase {
 	private LibrisDatabase forkDb;
 	private File workingDirectory;
 	// TODO override auxiliary directory
+	private String string;
+	private String string2;
+	private String string3;
+	private String string4;
 
 	public void testBuildWithRepo() throws FileNotFoundException, IOException, LibrisException {
 		File exportedFile;
@@ -352,7 +355,7 @@ public class DatabaseTests extends TestCase {
 			File testDatabaseFileCopy = getTestDatabase();			
 			rootDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 			DatabaseUi ui = rootDb.getUi();
-			LibrisMetadata meta = rootDb.getMetadata();
+			LibrisMetadata<DatabaseRecord> meta = rootDb.getMetadata();
 			int numRecs = meta.getSavedRecords();
 			assertEquals("Wrong number of records initial build", 4, numRecs);
 			ui.closeDatabase(false);
@@ -372,6 +375,75 @@ public class DatabaseTests extends TestCase {
 			fail("unexpected exception");
 		}
 
+	}
+
+	public void testRecipe1() throws FileNotFoundException, IOException, DatabaseException, LibrisException {
+		final int NUM_RECS = 4;
+			var testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.RECIPE_DATABASE1_LIBR, workingDirectory);
+			File exportedDatabase = new File(workingDirectory, "rebuild");
+			final String fieldIds[] = {
+					"ID_recipe",
+					"ID_ingredients",
+					"ID_instructions",
+					"ID_genre",
+					"ID_publication",
+					"ID_auth",
+					"ID_publisher",
+					"ID_year",
+					"ID_page",
+					"ID_keywords"};
+		try (LibrisDatabase myDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy)) {
+			Random rand = new Random(getName().hashCode());
+			for (int i = 1; i <= NUM_RECS; ++i) {
+				DatabaseRecord rec = myDb.newRecord();
+				for (var id: fieldIds) {
+					String fieldValue = generateFieldValue(rand, rec, id, false);
+					rec.addFieldValue(id, fieldValue);
+				}
+				myDb.putRecord(rec);
+			}
+			myDb.save();
+			myDb.exportDatabaseXml(exportedDatabase);
+			assertTrue("Could not close database", myDb.closeDatabase(false));
+		}
+
+		try (LibrisDatabase myDb = Utilities.buildAndOpenDatabase(exportedDatabase)) {
+			Random rand = new Random(getName().hashCode());
+			for (int i = 1; i <= NUM_RECS; ++i) {
+				DatabaseRecord rec = myDb.getRecord(i);
+				for (var id: fieldIds) {
+					final var expectedValue = generateFieldValue(rand, rec, id, true);
+					var actualValue = rec.getFieldValue(id).getValueAsString();
+					assertEquals("Incorrect value for field "+id,  expectedValue, actualValue);
+				}
+			}
+			assertTrue("Could not close database", myDb.closeDatabase(false));
+		}
+	}
+
+	// TODO use field subtypes
+	private String generateFieldValue(Random rand, DatabaseRecord rec, String id, boolean value) throws FieldDataException {
+		var fType = rec.getFieldType(id);
+		String fieldValue = "";
+		switch (fType) {
+		case T_FIELD_BOOLEAN: fieldValue = (rand.nextInt(2) == 0)? "false": "true"; break;
+		case T_FIELD_INTEGER: fieldValue = Integer.toString(rand.nextInt()); break;
+		case T_FIELD_STRING:
+		case T_FIELD_TEXT: fieldValue = makeFieldTextData(rand, id); break;
+		case T_FIELD_ENUM: {
+			var legalValues = rec.getFieldLegalValues(id);
+			assertNotNull("missing legal  values", legalValues);
+			var choiceList = value? legalValues.getChoiceValues(): legalValues.getChoices();
+			fieldValue = choiceList[rand.nextInt(choiceList.length)];
+		}
+		break;
+		default: fail("Unhandled field type");
+		}
+		return fieldValue;
+	}
+
+	protected String makeFieldTextData(Random rand, String id) {
+		return id+'_'+Utilities.makeRandomWord(rand, 3, 10);
 	}
 
 	public void testEnumOutOfRange() {

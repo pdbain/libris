@@ -205,7 +205,9 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 				return true;
 			}
 		} catch (XMLStreamException e) {
-			throw new DatabaseError("Error parsing XML", new DatabaseException(this, e));
+			var msg = e.getMessage();
+			msg = (null == msg)? "": "\nmessage="+msg;
+			throw new DatabaseError("Error parsing XML for "+tagQname+" at line "+xmlReader.getSourceLine()+msg, e);
 		}
 	}
 

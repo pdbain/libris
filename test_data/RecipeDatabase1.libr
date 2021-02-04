@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<libris date="2011-06-03 00:00:00 UTC" schemaname="Recipes"
+	databasename="RecipeDatabase1" schemaversion="0.0">
+	<metadata>
+		<schema>
+			<groupdefs>
+				<groupdef id="GRP_pubinfo" structure="flat" title="Publication information" />
+			</groupdefs>
+			<fielddefs>
+				<enumset id="ENUM_genre">
+					<enumchoice id="GNR_asian" value="Asian" />
+					<enumchoice id="GNR_italian" value="Italian" />
+					<enumchoice id="GNR_veg" value="Vegetarian" />
+				</enumset>
+				<enumset id="ENUM_mealtype">
+					<enumchoice id="MT_breakfast" value="Breakfast" />
+					<enumchoice id="MT_main" value="Main" />
+					<enumchoice id="MT_vegetable" value="Vegetable" />
+				</enumset>
+				<fielddef id="ID_recipe" title="Recipe" datatype="string" />
+				<fielddef id="ID_ingredients" title="Ingredients" datatype="string" />
+				<fielddef id="ID_instructions" title="Instructions" datatype="string" />
+				<fielddef id="ID_genre" datatype="enum" enumset="ENUM_genre" valueseparator=":" />
+				<fielddef id="ID_publication" title="Publication" datatype="string" inherit="GRP_pubinfo"/>
+				<fielddef id="ID_auth" title="author" inherit="GRP_pubinfo" />
+				<fielddef id="ID_publisher" datatype="string" inherit="GRP_pubinfo"/>
+				<fielddef id="ID_year" datatype="string" inherit="GRP_pubinfo"/>
+				<fielddef id="ID_page" datatype="string" title="page" />
+				<fielddef id="ID_keywords" datatype="string" />
+			</fielddefs>
+			<indexdefs>
+			</indexdefs>
+		</schema>
+		<layouts>
+			<layout id="LO_shortFormDisplay" title="Condensed form layout"
+				type="form" height="400" width="700">
+				<layoutfield id="ID_recipe" control="textfield" />
+			</layout>
+			<layout id="LO_formDisplay" title="Form layout" type="form"
+				height="400" width="700">
+				<layoutusage usedby="newrecord" />
+				<layoutfield id="ID_recipe" control="textfield" />
+				<layoutfield id="ID_genre" control="textfield" return="true" />
+				<layoutfield id="ID_ingredients" control="textfield" return="true" />
+				<layoutfield id="ID_instructions" control="textbox" return="true" />
+				<layoutfield id="ID_publication" control="textfield" />
+				<layoutfield id="ID_auth" control="textfield" />
+				<layoutfield id="ID_page" control="textfield" />
+				<layoutfield id="ID_publisher" control="textfield" />
+				<layoutfield id="ID_year" control="textfield" />
+				<layoutfield id="ID_keywords" control="textbox" return="true" />
+			</layout>
+		</layouts>
+	</metadata>
+	<records>
+	</records>
+</libris>

@@ -3,6 +3,7 @@ package org.lasalledebain.libris.field;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 
 public class EnumField extends GenericField implements Field {
@@ -14,6 +15,11 @@ public class EnumField extends GenericField implements Field {
 	public EnumFieldChoices getLegalValues() {
 		EnumFieldChoices choices = template.getEnumChoices();
 		return choices;
+	}
+
+	@Override
+	public boolean isEnum() {
+		return true;
 	}
 
 	@Override
@@ -50,6 +56,17 @@ public class EnumField extends GenericField implements Field {
 		} else {
 			throw new FieldDataException("either value or extravalue field must be empty.\nfound "+"\""+value+"\",\""+value+"\"");
 		}
+	}
+	
+	public static EnumField of(Field f) {
+		if (f instanceof EnumField) return (EnumField) f;
+		else throw new DatabaseError("Field of type "+f.getClass().getName()+" is not compatible with EnumField");
+	}
+
+	@Override
+	public FieldValue getFirstFieldValue() {
+		// TODO Auto-generated method stub
+		return super.getFirstFieldValue();
 	}
 }
 

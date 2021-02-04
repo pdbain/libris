@@ -149,7 +149,9 @@ public class FieldTemplate implements XMLElement {
 			try {
 				f.addValue(fieldData);
 			} catch (FieldDataException e) {
-				throw new InputException("Field "+getFieldId(), e);
+				var msg = e.getMessage();
+				msg = (null == msg)? "": "; "+msg;
+				throw new InputException("Field "+getFieldId()+msg, e);
 			}
 		}
 		return f;

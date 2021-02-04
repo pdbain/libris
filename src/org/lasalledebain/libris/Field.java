@@ -22,6 +22,12 @@ public interface Field extends XMLElement {
 	public String getFieldId();
 	public FieldType getType();
 	public boolean isText();
+	public default boolean isEnum() {
+		return false;		
+	}
+	public boolean isRestricted();
+	public boolean isSingleValue();
+	public boolean isEmpty();
 	public int getNumberOfValues();
 	public Iterable<FieldValue> getFieldValues();
 	public String getValuesAsString();
@@ -31,9 +37,6 @@ public interface Field extends XMLElement {
 	public void changeValue(FieldValue fieldValue) throws FieldDataException;
 	public boolean equals(Field comparand);
 	public EnumFieldChoices getLegalValues();
-	public boolean isRestricted();
-	public boolean isSingleValue();
-	public boolean isEmpty();
 	public void setValues(FieldValue[] valueArray) throws FieldDataException;
 	public void setValues(Iterable<FieldValue> values) throws FieldDataException;
 	public Field duplicate() throws FieldDataException;
