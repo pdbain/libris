@@ -15,7 +15,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.index.GroupDef;;
 
-public class AffiliatesField extends GenericField implements Field, Iterable<FieldValue>{
+public class AffiliatesField extends GenericField implements Iterable<FieldValue>{
 	private int affiliates[];
 	private GroupDef grp;
 	private RecordIdNameMapper mapper;

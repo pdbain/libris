@@ -1,8 +1,10 @@
 package org.lasalledebain.libris;
 
 import java.net.URL;
+import java.util.Optional;
 
 import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.field.EnumField;
 import org.lasalledebain.libris.field.FieldValue;
 
 public interface Field extends XMLElement {
@@ -25,6 +27,7 @@ public interface Field extends XMLElement {
 	public default boolean isEnum() {
 		return false;		
 	}
+	public Optional<EnumField> asEnumField();
 	public boolean isRestricted();
 	public boolean isSingleValue();
 	public boolean isEmpty();

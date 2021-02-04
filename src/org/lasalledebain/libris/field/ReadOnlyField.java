@@ -16,7 +16,7 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
-class ReadOnlyField implements Field {
+class ReadOnlyField extends GenericField {
 	@Override
 	public String getElementTag() {
 		throw new DatabaseError("Cannot call toXml on "+getClass().getName());

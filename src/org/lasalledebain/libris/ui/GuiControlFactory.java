@@ -32,7 +32,7 @@ public class GuiControlFactory {
 			cName = GuiConstants.GUI_ENUMFIELD;
 			map.put(cName, new GuiControlConstructor() {
 				public GuiControl makeControl(String title, int height, int width, boolean editable) {	
-					return new EnumField(height, width, editable);
+					return new EnumFieldControl(height, width, editable);
 				}		
 			});
 

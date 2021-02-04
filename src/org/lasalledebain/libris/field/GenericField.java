@@ -2,6 +2,7 @@ package org.lasalledebain.libris.field;
 
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Optional;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -120,9 +121,18 @@ public abstract class GenericField implements Field {
 		this.template = template;
 	}
 
+	protected GenericField() {
+		super();
+	}
+
 	public boolean isTrue() throws FieldDataException {
 		throw new FieldDataException(getFieldId()+" is not a boolean field");
+	}
+	
 
+	@Override
+	public Optional<EnumField> asEnumField() {
+		return EnumField.class.isInstance(this)? Optional.of(EnumField.class.cast(this)): Optional.empty();
 	}
 
 	@Override

@@ -33,7 +33,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.ui.DatabaseRecordWindow;
-import org.lasalledebain.libris.ui.EnumField;
+import org.lasalledebain.libris.ui.EnumFieldControl;
 import org.lasalledebain.libris.ui.GuiControl;
 import org.lasalledebain.libris.ui.HeadlessUi;
 import org.lasalledebain.libris.ui.Layouts;
@@ -136,7 +136,7 @@ public class GuiManualTests extends TestCase {
 		JPanel recordPanel = new JPanel(panelLayout);
 
 		c.gridx = 0; c.gridy = 0;
-		GuiControl f1 = new EnumField(10, 25, true);
+		GuiControl f1 = new EnumFieldControl(10, 25, true);
 		String[] enumValues = new String[] {"one", "two", "three"};
 		EnumFieldChoices choices = new EnumFieldChoices();
 		try {

@@ -16,7 +16,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldEnumValue;
 import org.lasalledebain.libris.field.FieldValue;
 
-public class EnumField extends GuiControl {
+public class EnumFieldControl extends GuiControl {
 
 	protected final JPanel control;
 	private EnumFieldChoices legalValues;
@@ -26,7 +26,7 @@ public class EnumField extends GuiControl {
 	private JPanel filler;
 	private boolean empty;
 	
-	public EnumField(int height, int width, boolean editable) {
+	public EnumFieldControl(int height, int width, boolean editable) {
 		super(height, width, editable);
 		control = displayControls();
 		setEmpty(true);
