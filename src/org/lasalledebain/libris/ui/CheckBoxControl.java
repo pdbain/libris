@@ -6,7 +6,6 @@ import java.awt.event.ItemListener;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 
-import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldBooleanValue;
 import org.lasalledebain.libris.field.FieldValue;
@@ -50,7 +49,7 @@ public class CheckBoxControl extends GuiControl {
 	@Override ()
 	public FieldValue getFieldValue() throws FieldDataException {
 		boolean buttonState = control.isSelected();
-		return new FieldBooleanValue(buttonState? LibrisConstants.BOOLEAN_TRUE_STRING: LibrisConstants.BOOLEAN_FALSE_STRING);
+		return FieldBooleanValue.of(buttonState);
 	}
 
 	@Override

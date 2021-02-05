@@ -10,7 +10,7 @@ public class BooleanField extends GenericField implements Field {
 	}
 	@Override
 	public void addValue(String data) throws FieldDataException {
-		addFieldValue(new FieldBooleanValue(data));
+		addFieldValue(FieldBooleanValue.of(data));
 	}
 	
 	@Override
@@ -28,7 +28,7 @@ public class BooleanField extends GenericField implements Field {
 	}
 	@Override
 	public void addIntegerValue(int value) throws FieldDataException {
-		addFieldValue(new FieldBooleanValue(value));
+		addFieldValue(FieldBooleanValue.of(value));
 	}
 
 	public Field duplicate() throws FieldDataException {
