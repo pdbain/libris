@@ -40,6 +40,8 @@ public abstract class GenericField implements Field {
 	public boolean isText() {
 		return false;
 	}
+	
+	protected abstract boolean isValueCompatible(FieldValue fv);
 
 	@Override
 	public boolean isEmpty() {
@@ -145,6 +147,17 @@ public abstract class GenericField implements Field {
 	public String getFieldId() {
 		return template.getFieldId();
 	}
+
+	@Override
+	public void addValue(FieldValue fieldData) throws FieldDataException {
+		if (isValueCompatible(fieldData))
+			addFieldValue(fieldData);
+		else
+			addValue(fieldData.getMainValueAsString());
+	}
+
+	public abstract void addValueGeneral (FieldValue fieldData) throws FieldDataException;
+	
 	public abstract void addValue(String data) throws FieldDataException;
 
 	@Override
@@ -255,7 +268,7 @@ public abstract class GenericField implements Field {
 	}
 	@Override
 	public void fromXml(ElementManager mgr) throws LibrisException {
-		throw new DatabaseError("Use staic method "+getClass().getName()+".fromXml()");
+		throw new DatabaseError("Use static method "+getClass().getName()+".fromXml()");
 	}
 
 	public static Field fromXml(ElementManager fieldManager, Record rec) throws XmlException, DatabaseException, InputException {

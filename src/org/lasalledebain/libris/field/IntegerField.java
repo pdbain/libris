@@ -20,6 +20,12 @@ public class IntegerField extends GenericField implements Field {
 	}
 
 	@Override
+	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
+		addValue(fieldData.getMainValueAsKey());
+		
+	}
+
+	@Override
 	public void addIntegerValue(int data) throws FieldDataException {
 		addFieldValue(new FieldIntValue(data));
 	}
@@ -29,6 +35,11 @@ public class IntegerField extends GenericField implements Field {
 		IntegerField f = new IntegerField(template);
 		copyValues(f);
 		return f;
+	}
+
+	@Override
+	protected boolean isValueCompatible(FieldValue fv) {
+		return fv instanceof FieldIntValue;
 	}
 
 }

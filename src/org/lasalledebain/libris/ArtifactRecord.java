@@ -373,5 +373,10 @@ public class ArtifactRecord extends Record {
 		assertTrueError("Invalid group number "+groupNum+" for artifact database", 0 == groupNum);
 	}
 
+	@Override
+	protected Field addFieldValue(int fieldNum, FieldValue fieldData) throws FieldDataException {
+		throw new FieldDataException("addFieldValue not supported");
+	}
+
 
 }

@@ -34,6 +34,9 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.LibrisException;
+import org.lasalledebain.libris.field.FieldBooleanValue;
+import org.lasalledebain.libris.field.FieldIntValue;
+import org.lasalledebain.libris.field.FieldSingleStringValue;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.ui.DatabaseUi;
@@ -397,7 +400,7 @@ public class DatabaseTests extends TestCase {
 			for (int i = 1; i <= NUM_RECS; ++i) {
 				DatabaseRecord rec = myDb.newRecord();
 				for (var id: fieldIds) {
-					String fieldValue = generateFieldValue(rand, rec, id, false);
+					 FieldValue fieldValue = generateFieldValue(rand, rec, id);
 					rec.addFieldValue(id, fieldValue);
 				}
 				myDb.putRecord(rec);
@@ -412,8 +415,8 @@ public class DatabaseTests extends TestCase {
 			for (int i = 1; i <= NUM_RECS; ++i) {
 				DatabaseRecord rec = myDb.getRecord(i);
 				for (var id: fieldIds) {
-					final var expectedValue = generateFieldValue(rand, rec, id, true);
-					var actualValue = rec.getFieldValue(id).getValueAsString();
+					final FieldValue expectedValue = generateFieldValue(rand, rec, id);
+					var actualValue = rec.getFieldValue(id);
 					assertEquals("Incorrect value for field "+id,  expectedValue, actualValue);
 				}
 			}
@@ -421,25 +424,24 @@ public class DatabaseTests extends TestCase {
 		}
 	}
 
-	// TODO use field subtypes
-	private String generateFieldValue(Random rand, DatabaseRecord rec, String id, boolean value) throws FieldDataException {
+	private FieldValue generateFieldValue(Random rand, DatabaseRecord rec, String id) throws FieldDataException {
 		var fType = rec.getFieldType(id);
-		String fieldValue = "";
+		FieldValue fieldValueObject = null;
 		switch (fType) {
-		case T_FIELD_BOOLEAN: fieldValue = (rand.nextInt(2) == 0)? "false": "true"; break;
-		case T_FIELD_INTEGER: fieldValue = Integer.toString(rand.nextInt()); break;
+		case T_FIELD_BOOLEAN: fieldValueObject = new FieldBooleanValue((rand.nextInt(2) == 0)? false: true); break;
+		case T_FIELD_INTEGER: fieldValueObject = new FieldIntValue(rand.nextInt()); break;
 		case T_FIELD_STRING:
-		case T_FIELD_TEXT: fieldValue = makeFieldTextData(rand, id); break;
+		case T_FIELD_TEXT: fieldValueObject = new FieldSingleStringValue(makeFieldTextData(rand, id)); break;
 		case T_FIELD_ENUM: {
 			var legalValues = rec.getFieldLegalValues(id);
 			assertNotNull("missing legal  values", legalValues);
-			var choiceList = value? legalValues.getChoiceValues(): legalValues.getChoices();
-			fieldValue = choiceList[rand.nextInt(choiceList.length)];
+			int maxChoice = legalValues.size();
+			fieldValueObject = legalValues.get(rand.nextInt(maxChoice));
 		}
 		break;
 		default: fail("Unhandled field type");
 		}
-		return fieldValue;
+		return fieldValueObject;
 	}
 
 	protected String makeFieldTextData(Random rand, String id) {

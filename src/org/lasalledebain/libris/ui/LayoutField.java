@@ -14,7 +14,6 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-// TODO Remove generics
 public class LayoutField implements XMLElement, Iterable<LayoutField>, LibrisXMLConstants {
 	protected String controlTypeName;
 	protected String id;

@@ -161,6 +161,11 @@ public class GroupMember extends GenericField implements XMLElement {
 	}
 
 	@Override
+	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
+		addIntegerValue(fieldData.getValueAsInt()); 
+	}
+
+	@Override
 	public void addIntegerValue(int value) throws FieldDataException {
 		int tempArray[] = new int[affiliates.length + 1];
 		System.arraycopy(affiliates, 0, tempArray, 0, affiliates.length);
@@ -227,5 +232,10 @@ public class GroupMember extends GenericField implements XMLElement {
 			tempAffiliations.add(fv.getValueAsInt());
 		}
 		affiliates = listToArray(tempAffiliations);
+	}
+
+	@Override
+	protected boolean isValueCompatible(FieldValue fv) {
+		return false;
 	}
 }

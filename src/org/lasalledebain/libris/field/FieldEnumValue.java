@@ -44,6 +44,11 @@ public class FieldEnumValue extends FieldValue implements LibrisConstants {
 	}
 
 	@Override
+	public String toString() {
+		return getValueAsString();
+	}
+
+	@Override
 	public String getMainValueAsString() throws FieldDataException {
 		if ((null == enumChoices) || (ENUM_VALUE_OUT_OF_RANGE == choice)) {
 			return extraValue;

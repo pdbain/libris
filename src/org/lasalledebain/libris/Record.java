@@ -4,6 +4,8 @@ import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseError;
@@ -109,6 +111,12 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 		return addFieldValue(getFieldNum(fieldName), fieldData);
 	}
 	
+	public Field addFieldValue(String fieldName, FieldValue fieldData) throws InputException {
+		return addFieldValue(getFieldNum(fieldName), fieldData);
+	}
+	
+	protected abstract Field addFieldValue(int fieldNum, FieldValue fieldData) throws FieldDataException;
+
 	public abstract Field addFieldValue(int fieldNum, String fieldData) throws InputException;
 	public abstract Field setFieldValue(int fieldNum, String fieldData) throws DatabaseException, InputException;
 	public abstract Field addFieldValue(int fieldNum, int mainValue, String extraValue) throws InputException;
@@ -317,9 +325,15 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 		}
 	}
 	// TODO abbreviate title
-@Deprecated
-	public EnumFieldChoices getFieldLegalValues(String fieldId) throws FieldDataException {
-		return null;
+
+	/**
+	 * Return a list of legal values for a field.  List is empty if the values are not enumerable.
+	 * @param fieldId Field string identifier
+	 * @return
+	 * @throws FieldDataException
+	 */
+	public List<FieldValue> getFieldLegalValues(String fieldId) throws FieldDataException {
+		return Collections.emptyList();
 	}
-	
+
 }

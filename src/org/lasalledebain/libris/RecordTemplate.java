@@ -1,10 +1,12 @@
 package org.lasalledebain.libris;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDefs;
 
 
@@ -108,9 +110,12 @@ public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 		return rec;
 	}
 
-	public Field newField(int i) throws InputException {
-		Field f = fieldMasters[i].newField();
-		return f;
+	public Field newField(int fieldNum) throws InputException {
+		return fieldMasters[fieldNum].newField();
+	}
+
+	public Field newField(int fieldNum, FieldValue fieldData) throws FieldDataException {
+		return fieldMasters[fieldNum].newField(fieldData);
 	}
 
 	public Field newField(int i, String fieldData) throws InputException {
@@ -159,9 +164,9 @@ public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 	public String getDefaultValue(int i) {
 		return fieldMasters[i].getDefaultData();
 	}
-@Deprecated
-	public EnumFieldChoices getFieldLegalValues(int i) {
-		 return fieldMasters[i].getEnumChoices();
+
+	public List<FieldValue> getFieldLegalValues(int i) {
+		 return fieldMasters[i].getLegalValues();
 	}
 
 	public Field getDefaultField(int fieldId) {

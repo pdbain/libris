@@ -1,11 +1,15 @@
 package org.lasalledebain.libris.field;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.FieldDataException;
 
 public class FieldBooleanValue extends FieldValue {
 
 	private final boolean value;
+	private final static List<FieldValue> legalValues = new ArrayList<>(2);
 	
 	public FieldBooleanValue(String data) throws FieldDataException {
 		value = Boolean.parseBoolean(data);
@@ -53,6 +57,14 @@ public class FieldBooleanValue extends FieldValue {
 	public FieldValue duplicate() {
 		FieldBooleanValue v = new FieldBooleanValue(value);
 		return v;
+	}
+
+	public static List<FieldValue> getLegalValues() {
+		if (legalValues.size() == 0) {
+			legalValues.add(new FieldBooleanValue(false));
+			legalValues.add(new FieldBooleanValue(true));
+		}
+		return legalValues;
 	}
 
 }

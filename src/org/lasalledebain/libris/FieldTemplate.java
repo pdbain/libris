@@ -1,6 +1,8 @@
 package org.lasalledebain.libris;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -9,6 +11,8 @@ import org.lasalledebain.libris.exception.XmlException;
 import org.lasalledebain.libris.field.AffiliatesField;
 import org.lasalledebain.libris.field.BooleanField;
 import org.lasalledebain.libris.field.EnumField;
+import org.lasalledebain.libris.field.FieldBooleanValue;
+import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.field.IntegerField;
 import org.lasalledebain.libris.field.PairField;
@@ -154,6 +158,12 @@ public class FieldTemplate implements XMLElement {
 				throw new InputException("Field "+getFieldId()+msg, e);
 			}
 		}
+		return f;
+	}
+
+	public Field newField(FieldValue fieldData) throws FieldDataException {
+		Field f = newField();
+		f.addValue(fieldData);
 		return f;
 	}
 
@@ -322,6 +332,16 @@ public class FieldTemplate implements XMLElement {
 	@Override
 	public String getElementTag() {
 		return getXmlTag();
+	}
+
+	public List<FieldValue> getLegalValues() {
+		List<FieldValue> result;
+		switch (ftype) {
+		case T_FIELD_BOOLEAN: result = FieldBooleanValue.getLegalValues(); break;
+		case T_FIELD_ENUM: result = legalValues.getLegalValues(); break;
+		default: return Collections.emptyList();
+		}
+		return result;
 	}
 }
 

@@ -3,6 +3,7 @@ package org.lasalledebain.libris.field;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.util.StringUtils;
 
 public class PairField extends GenericField implements Field {
 	public PairField(FieldTemplate template) {
@@ -15,15 +16,15 @@ public class PairField extends GenericField implements Field {
 	}
 
 	@Override
+	// TODO check type and create new object if necessary
+	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
+		addValuePair(fieldData.getMainValueAsString(), fieldData.getExtraValueAsString());		
+	}
+
+	@Override
 	public void addValuePair(String mainValue, String extraValue)
 	throws FieldDataException {
-		FieldValue v;
-		if ((null != extraValue) && (extraValue.length() > 0)) {
-			v = new FieldStringPairValue(mainValue, extraValue);
-		} else {
-			v = new FieldSingleStringValue(mainValue);
-
-		}
+		FieldValue v = (StringUtils.isStringEmpty(extraValue))? new FieldSingleStringValue(mainValue): new FieldStringPairValue(mainValue, extraValue);
 		addFieldValue(v);
 	}
 
@@ -37,6 +38,11 @@ public class PairField extends GenericField implements Field {
 		PairField f = new PairField(template);
 		copyValues(f);
 		return f;
+	}
+
+	@Override
+	protected boolean isValueCompatible(FieldValue fv) {
+		return (fv instanceof FieldSingleStringValue) || (fv instanceof FieldStringPairValue);
 	}
 
 }	

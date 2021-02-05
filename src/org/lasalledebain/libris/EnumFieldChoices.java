@@ -8,6 +8,8 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.XmlException;
+import org.lasalledebain.libris.field.FieldEnumValue;
+import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
@@ -17,22 +19,46 @@ public class EnumFieldChoices implements XMLElement {
 	ArrayList<String> enumChoices = new ArrayList<String>();
 	ArrayList<String> choicevalues = new ArrayList<String>();
 	HashMap<String, Integer> choiceIds = new HashMap<String, Integer>();
+	final ArrayList<FieldValue> legalValues;
+	public ArrayList<FieldValue> getLegalValues() {
+		return legalValues;
+	}
+
 	public static final int  INVALID_CHOICE = -1;
 	int numChoices = 0;
+	public EnumFieldChoices(String id) {
+		this();
+		this.setId = id;
+	}
+
+	public EnumFieldChoices() {
+		legalValues = new ArrayList<>();
+	}
+
+	public EnumFieldChoices(String name, String[] choices) throws DatabaseException {
+		this(name);
+		addChoices(choices);
+	}
+
 	public int maxChoice() {
 		return numChoices-1;
 	}
 
 	private String setId;
-	public void addChoice(String choiceId, String choicevalue) throws DatabaseException {
+	public void addChoice(String valueId, String valueString) throws DatabaseException {
 		
-		final String internId = choiceId.intern();
+		final String internId = valueId.intern();
 		enumChoices.add(numChoices, internId);
-		choicevalues.add(numChoices, choicevalue.intern());
+		choicevalues.add(numChoices, valueString.intern());
 		choiceIds.put(internId, numChoices);
 		++numChoices;
+		try {
+			legalValues.add(new FieldEnumValue(this, numChoices-1));
+		} catch (FieldDataException e) {
+			throw new DatabaseException("Cannot add "+valueId+':'+valueString, e);
+		}
 		if (numChoices > Short.MAX_VALUE) {
-			throw new DatabaseException("Cannot add "+choiceId+". Only "+Short.MAX_VALUE+" choices allowed");
+			throw new DatabaseException("Cannot add "+valueId+". Only "+Short.MAX_VALUE+" choices allowed");
 		}
 	}
 	
@@ -86,20 +112,6 @@ public class EnumFieldChoices implements XMLElement {
 			throw new FieldDataException("enum choice "+id+" not defined");
 		}
 		return i.intValue();
-	}
-
-	public EnumFieldChoices(String id) {
-		super();
-		this.setId = id;
-	}
-
-	public EnumFieldChoices() {
-		super();
-	}
-
-	public EnumFieldChoices(String name, String[] choices) throws DatabaseException {
-		this(name);
-		addChoices(choices);
 	}
 
 	public String getId() {
@@ -171,5 +183,9 @@ public class EnumFieldChoices implements XMLElement {
 
 	public static String getXmlTag() {
 		return "enumset";
+	}
+
+	public FieldEnumValue getChoice(int choiceId) throws FieldDataException {
+		return new FieldEnumValue(this, choiceId);
 	}
 }

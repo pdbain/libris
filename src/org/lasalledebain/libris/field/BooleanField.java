@@ -12,6 +12,12 @@ public class BooleanField extends GenericField implements Field {
 	public void addValue(String data) throws FieldDataException {
 		addFieldValue(new FieldBooleanValue(data));
 	}
+	
+	@Override
+	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
+		addValue(fieldData.toString());
+	}
+	
 	@Override
 	public boolean isTrue() {
 		return getFirstFieldValue().isTrue();
@@ -29,5 +35,9 @@ public class BooleanField extends GenericField implements Field {
 		BooleanField otherField = new BooleanField(template);
 		copyValues(otherField);
 		return otherField;
+	}
+	@Override
+	protected boolean isValueCompatible(FieldValue fv) {
+		return fv instanceof FieldBooleanValue;
 	}
 }

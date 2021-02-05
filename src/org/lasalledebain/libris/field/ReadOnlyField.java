@@ -175,4 +175,19 @@ class ReadOnlyField extends GenericField {
 		return;
 	}
 
+	@Override
+	public void addValue(FieldValue fieldData) throws FieldDataException {
+		throw new FieldDataException("field is read-only");
+	}
+
+	@Override
+	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
+		throw new FieldDataException("field is read-only");
+	}
+
+	@Override
+	protected boolean isValueCompatible(FieldValue fv) {
+		return false;
+	}
+
 }

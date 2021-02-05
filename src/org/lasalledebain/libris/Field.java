@@ -15,6 +15,7 @@ public interface Field extends XMLElement {
 		T_FIELD_BOOLEAN, T_FIELD_INTEGER, T_FIELD_INDEXENTRY, T_FIELD_ENUM, T_FIELD_PAIR, // value pair
 		T_FIELD_AFFILIATES, T_FIELD_LOCATION;
 	}
+	public void addValue(FieldValue fieldData) throws FieldDataException;
 	public void addValue(String data) throws FieldDataException;
 	public void addIntegerValue(int value) throws FieldDataException;
 	public void addValuePair(String value, String extraValue) throws FieldDataException;

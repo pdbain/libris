@@ -1,9 +1,11 @@
 package org.lasalledebain.libris;
 
+import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Objects;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.Field.FieldType;
@@ -21,8 +23,6 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
-
-import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 
 	GroupMember affiliations[];
@@ -81,17 +81,28 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 			throw new DatabaseException("Cannot set field "+fieldNum);
 		}
 	}
+	
 	@Override
-	public Field addFieldValue(int position, String fieldData) throws InputException {
-		if (Objects.isNull(fieldData) || fieldData.isEmpty()){
+	protected Field addFieldValue(int fieldNum, FieldValue fieldData) throws FieldDataException {
+		if (null == recordFields[fieldNum]) {
+			recordFields[fieldNum] = template.newField(fieldNum, fieldData);
+		} else {
+			recordFields[fieldNum].addValue(fieldData);
+		}
+		return recordFields[fieldNum];
+	}
+
+	@Override
+	public Field addFieldValue(int fieldNum, String fieldData) throws InputException {
+		if (StringUtils.isStringEmpty(fieldData)){
 			return null;
 		}
-		if (null == recordFields[position]) {
-			recordFields[position] = template.newField(position, fieldData);
+		if (null == recordFields[fieldNum]) {
+			recordFields[fieldNum] = template.newField(fieldNum, fieldData);
 		} else {
-			recordFields[position].addValue(fieldData);
+			recordFields[fieldNum].addValue(fieldData);
 		}
-		return recordFields[position];
+		return recordFields[fieldNum];
 	}
 	/**
 	 * @param fieldNum Position of the field in the field list
@@ -227,7 +238,7 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	}
 	
 	@Override
-	public EnumFieldChoices getFieldLegalValues(String fieldId) throws FieldDataException {
+	public List<FieldValue> getFieldLegalValues(String fieldId) throws FieldDataException {
 		int index = template.getFieldIndex(fieldId);
 		return template.getFieldLegalValues(index);
 	}

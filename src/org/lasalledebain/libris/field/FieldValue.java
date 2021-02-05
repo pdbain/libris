@@ -103,6 +103,17 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 	public int getValueAsInt() {
 		return 0;
 	}
+	
+	@Override
+	public boolean equals(Object comparand) {
+		if (comparand == this) return true;
+		else if (comparand instanceof FieldValue) {
+			final FieldValue comparandValue = FieldValue.class.cast(comparand);
+			return equals(comparandValue);
+		}
+		else return false;
+	}
+
 	public boolean equals(FieldValue comparand) {
 		if (getNumberOfValues() != comparand.getNumberOfValues()) {
 			return false;

@@ -53,6 +53,11 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 	}
 
 	@Override
+	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
+		addIntegerValue(fieldData.getValueAsInt());
+	}
+
+	@Override
 	public void addValuePair(String value, String extraValue)
 			throws FieldDataException {
 		throw new FieldDataException("addValuePair not permitted on this field");
@@ -253,6 +258,12 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 			}
 			
 		};
+	}
+
+	@Override
+	protected boolean isValueCompatible(FieldValue fv) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }
