@@ -31,14 +31,13 @@ public class EnumField extends GenericField implements Field {
 	}
 
 	@Override
-	public void addIntegerValue(int data) throws FieldDataException {
-		addFieldValue(new FieldEnumValue(template.getEnumChoices(), data));
+	public void addIntegerValue(int choiceNum) throws FieldDataException {
+		addFieldValue(template.getEnumChoices().of(choiceNum));
 	}
 
 	@Override
-	public void addValue(String data) throws FieldDataException {
-		String iData = data.intern();
-		addFieldValue(new FieldEnumValue(template.getEnumChoices(), iData));
+	public void addValue(String choiceName) throws FieldDataException {
+		addFieldValue(template.getEnumChoices().of(choiceName));
 	}
 
 	@Override

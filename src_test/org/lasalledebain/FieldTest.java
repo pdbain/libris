@@ -3,12 +3,13 @@ package org.lasalledebain;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.DatabaseError;
+import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.field.FieldValue;
-import org.lasalledebain.libris.util.MockEnumFieldChoices;
 import org.lasalledebain.libris.util.MockSchema;
 import org.lasalledebain.libris.util.Utilities;
 
@@ -226,11 +227,11 @@ public class FieldTest extends TestCase {
 		}
 	}
 	
-	public void testEnumField() {
+	public void testEnumField() throws FieldDataException, DatabaseException {
 		FieldTemplate ft = Utilities.createTemplate("f1", Field.FieldType.T_FIELD_ENUM);
 		String[][] valueNames = {{"toe"}, {"foo", "bar"}, {"bob", "carol", "ted", "alice"}};
 		for (int valueSet = 0; valueSet < valueNames.length; ++valueSet) {
-			ft.setEnumChoices(new MockEnumFieldChoices(valueNames[valueSet]));
+			ft.setEnumChoices(new EnumFieldChoices("MockEnumFieldChoices", valueNames[valueSet]));
 			setAndCheckEnumData(ft, valueNames[valueSet]);
 		}
 	}
@@ -265,26 +266,21 @@ public class FieldTest extends TestCase {
 		}
 	}
 	
-	private void setAndCheckEnumData(FieldTemplate ft, String[] valueNames) {
-		try {
-			Field f = ft.newField();
-			for (int i = 0; i < valueNames.length; ++i) {
-				f.addValue(valueNames[i]);
-				FieldValue v = f.getFirstFieldValue();
-				assertEquals("enum index", i, v.getValueAsInt());
-				assertEquals("enum name", valueNames[i], v.getValueAsString());
-				f.removeValue();
-			}
-			boolean excThrown = false;
-			try {
-				f.addValue("foobar");
-			} catch (FieldDataException e) {
-				excThrown = true;
-			}
-			assertTrue("no exception on bad data", excThrown);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
+	private void setAndCheckEnumData(FieldTemplate ft, String[] valueNames) throws FieldDataException {
+		Field f = ft.newField();
+		for (int i = 0; i < valueNames.length; ++i) {
+			f.addValue(valueNames[i]);
+			FieldValue v = f.getFirstFieldValue();
+			assertEquals("enum index", i, v.getValueAsInt());
+			assertEquals("enum name", valueNames[i], v.getValueAsString());
+			f.removeValue();
 		}
+		boolean excThrown = false;
+		try {
+			f.addValue("foobar");
+		} catch (FieldDataException e) {
+			excThrown = true;
+		}
+		assertTrue("no exception on bad data", excThrown);
 	}
 }

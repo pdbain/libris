@@ -1,7 +1,9 @@
 package org.lasalledebain.libris;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -19,9 +21,9 @@ public class EnumFieldChoices implements XMLElement {
 	ArrayList<String> enumChoices = new ArrayList<String>();
 	ArrayList<String> choicevalues = new ArrayList<String>();
 	HashMap<String, Integer> choiceIds = new HashMap<String, Integer>();
-	final ArrayList<FieldValue> legalValues;
-	public ArrayList<FieldValue> getLegalValues() {
-		return legalValues;
+	final ArrayList<FieldEnumValue> legalValues;
+	public List<FieldValue> getLegalValues() {
+		return Collections.unmodifiableList(legalValues);
 	}
 
 	public static final int  INVALID_CHOICE = -1;
@@ -116,6 +118,14 @@ public class EnumFieldChoices implements XMLElement {
 
 	public String getId() {
 		return setId;
+	}
+	
+	public FieldEnumValue of(int choiceId) {
+		return legalValues.get(choiceId);
+	}
+	
+	public FieldEnumValue of(String id) throws FieldDataException {
+		return legalValues.get(indexFromId(id));
 	}
 	
 	public static EnumFieldChoices fieldChoicesFactory(ElementManager enumSetManager) throws InputException, DatabaseException {
