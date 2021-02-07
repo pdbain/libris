@@ -27,8 +27,9 @@ public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 	}
 
 	@Override
-	public void displayRecord(int recordId) throws LibrisException {
+	public RecordType displayRecord(int recordId) throws LibrisException {
 		alert("displayRecord: Operation not available");
+		return null;
 	}
 
 	@Override

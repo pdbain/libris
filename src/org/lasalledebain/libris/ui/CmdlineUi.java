@@ -25,8 +25,9 @@ public class CmdlineUi<RecordType extends Record> extends AbstractUi {
 	}
 
 	@Override
-	public void displayRecord(int recordId) throws LibrisException {
+	public RecordType displayRecord(int recordId) throws LibrisException {
 		alert("displayRecord not implemented");
+		return null;
 	}
 
 	@Override

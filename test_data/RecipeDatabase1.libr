@@ -33,22 +33,27 @@
 		</schema>
 		<layouts>
 			<layout id="LO_shortFormDisplay" title="Condensed form layout"
-				type="form" height="400" width="700">
+				type="form" height="400" width="2000">
 				<layoutfield id="ID_recipe" control="textfield" />
 			</layout>
 			<layout id="LO_formDisplay" title="Form layout" type="form"
 				height="400" width="700">
 				<layoutusage usedby="newrecord" />
-				<layoutfield id="ID_recipe" control="textfield" />
-				<layoutfield id="ID_genre" control="textfield" return="true" />
-				<layoutfield id="ID_ingredients" control="textfield" return="true" />
+				<layoutfield id="ID_recipe" control="textfield" hspan="3" width="400"/>
+				<layoutfield id="ID_genre" control="textfield" hspan="1" return="true" />
+				<layoutfield id="ID_ingredients" control="textfield" hspan="4" return="true" />
 				<layoutfield id="ID_instructions" control="textbox" return="true" />
 				<layoutfield id="ID_publication" control="textfield" />
-				<layoutfield id="ID_auth" control="textfield" />
-				<layoutfield id="ID_page" control="textfield" />
+				<layoutfield id="ID_auth" control="textfield"/>
+				<layoutfield id="ID_page" control="textfield" return="true"/>
 				<layoutfield id="ID_publisher" control="textfield" />
-				<layoutfield id="ID_year" control="textfield" />
-				<layoutfield id="ID_keywords" control="textbox" return="true" />
+				<layoutfield id="ID_year" control="textfield"  return="true"/>
+				<layoutfield id="ID_keywords" control="textbox" />
+			</layout>
+			<layout height="1400" id="LO_browserDisplay" title="Summary" type="list" width="700">
+				<layoutusage usedby="summarydisplay"/>
+				<layoutfield control="textfield" hspan="1" id="ID_recipe" vspan="1"/>
+				<layoutfield control="textfield" hspan="1" id="ID_genre" vspan="1"/>
 			</layout>
 		</layouts>
 	</metadata>

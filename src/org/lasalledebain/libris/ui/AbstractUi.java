@@ -12,6 +12,7 @@ import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -207,7 +208,8 @@ public abstract class AbstractUi implements DatabaseUi, LibrisConstants {
 	}
 	
 	@Override
-	public abstract void displayRecord(int recordId) throws LibrisException;
+	// TODO displayRecord return record
+	public abstract Record displayRecord(int recordId) throws LibrisException;
 	
 	@Override
 	public void pasteToField() {

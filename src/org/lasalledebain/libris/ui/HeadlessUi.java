@@ -67,8 +67,9 @@ public class HeadlessUi extends LibrisWindowedUi {
 	}
 
 	@Override
-	public void displayRecord(int recordId) throws LibrisException {
+	public Record displayRecord(int recordId) throws LibrisException {
 		log(Level.FINE, RecordId.toString(recordId));
+		return null;
 	}
 
 	@Override

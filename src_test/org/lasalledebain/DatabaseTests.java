@@ -24,6 +24,7 @@ import org.lasalledebain.libris.DatabaseInstance;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.GenericDatabase;
+import org.lasalledebain.libris.Libris;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.LibrisMetadata;
 import org.lasalledebain.libris.Record;
@@ -39,8 +40,10 @@ import org.lasalledebain.libris.field.FieldIntValue;
 import org.lasalledebain.libris.field.FieldSingleStringValue;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
+import org.lasalledebain.libris.ui.AbstractUi;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.ui.HeadlessUi;
+import org.lasalledebain.libris.util.LibrisTestLauncher;
 import org.lasalledebain.libris.util.Utilities;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 
@@ -59,6 +62,17 @@ public class DatabaseTests extends TestCase {
 	private String string2;
 	private String string3;
 	private String string4;
+	private static final String recipeFieldIds[] = {
+			"ID_recipe",
+			"ID_ingredients",
+			"ID_instructions",
+			"ID_genre",
+			"ID_publication",
+			"ID_auth",
+			"ID_publisher",
+			"ID_year",
+			"ID_page",
+			"ID_keywords"};
 
 	public void testBuildWithRepo() throws FileNotFoundException, IOException, LibrisException {
 		File exportedFile;
@@ -384,22 +398,11 @@ public class DatabaseTests extends TestCase {
 		final int NUM_RECS = 4;
 			var testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.RECIPE_DATABASE1_LIBR, workingDirectory);
 			File exportedDatabase = new File(workingDirectory, "rebuild");
-			final String fieldIds[] = {
-					"ID_recipe",
-					"ID_ingredients",
-					"ID_instructions",
-					"ID_genre",
-					"ID_publication",
-					"ID_auth",
-					"ID_publisher",
-					"ID_year",
-					"ID_page",
-					"ID_keywords"};
-		try (LibrisDatabase myDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy)) {
+			try (LibrisDatabase myDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy)) {
 			Random rand = new Random(getName().hashCode());
 			for (int i = 1; i <= NUM_RECS; ++i) {
 				DatabaseRecord rec = myDb.newRecord();
-				for (var id: fieldIds) {
+				for (var id: recipeFieldIds) {
 					 FieldValue fieldValue = generateFieldValue(rand, rec, id);
 					rec.addFieldValue(id, fieldValue);
 				}
@@ -414,7 +417,7 @@ public class DatabaseTests extends TestCase {
 			Random rand = new Random(getName().hashCode());
 			for (int i = 1; i <= NUM_RECS; ++i) {
 				DatabaseRecord rec = myDb.getRecord(i);
-				for (var id: fieldIds) {
+				for (var id: recipeFieldIds) {
 					final FieldValue expectedValue = generateFieldValue(rand, rec, id);
 					var actualValue = rec.getFieldValue(id);
 					assertEquals("Incorrect value for field "+id,  expectedValue, actualValue);
@@ -422,6 +425,31 @@ public class DatabaseTests extends TestCase {
 			}
 			assertTrue("Could not close database", myDb.closeDatabase(false));
 		}
+	}
+
+	public void testRecipeGui() throws FileNotFoundException, IOException, DatabaseException, LibrisException {
+		final int NUM_RECS = 4;
+			var testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.RECIPE_DATABASE1_LIBR, workingDirectory);
+			try (LibrisDatabase myDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy)) {
+			Random rand = new Random(getName().hashCode());
+			for (int i = 1; i <= NUM_RECS; ++i) {
+				DatabaseRecord rec = myDb.newRecord();
+				for (var id: recipeFieldIds) {
+					 FieldValue fieldValue = generateFieldValue(rand, rec, id);
+					rec.addFieldValue(id, fieldValue);
+				}
+				myDb.putRecord(rec);
+			}
+			myDb.save();
+			myDb.exportDatabaseXml();
+			assertTrue("Could not close database", myDb.closeDatabase(false));
+		}
+			String cmdline[] = new String[] {Libris.OPTION_GUI, testDatabaseFileCopy.getPath()};
+			AbstractUi ui = LibrisTestLauncher.testMain(cmdline);
+			ui.displayRecord(10);
+			ui.getSelectedField();
+			assertTrue("Could not close database", ui.closeDatabase(false));
+			assertTrue("Could not close database", ui.quit(false));
 	}
 
 	private FieldValue generateFieldValue(Random rand, DatabaseRecord rec, String id) throws FieldDataException {

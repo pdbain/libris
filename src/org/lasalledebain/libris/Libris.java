@@ -20,8 +20,8 @@ import org.lasalledebain.libris.ui.LibrisGui;
 import org.lasalledebain.libris.ui.LibrisHttpServer;
 
 public class Libris {
-	private static final String OPTION_HELP = "-h";
-	private static final String OPTION_AUXDIR = "-u";
+	public static final String OPTION_HELP = "-h";
+	public static final String OPTION_AUXDIR = "-u";
 	public static final String OPTION_GUI = "-g";
 	public static final String OPTION_REPODIR = "-a";
 	public static final String OPTION_REBUILD = "-b";

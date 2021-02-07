@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.ui;
 
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
@@ -47,7 +48,8 @@ public class WebUi extends AbstractUi {
 	}
 
 	@Override
-	public void displayRecord(int recordId) throws LibrisException {
+	public Record displayRecord(int recordId) throws LibrisException {
+		return null;
 		// TODO Auto-generated method stub
 		
 	}

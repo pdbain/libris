@@ -5,6 +5,7 @@ import java.io.File;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -38,7 +39,7 @@ public interface DatabaseUi extends ProgressTracker{
 
 	void recordsAccessible(boolean accessible);
 
-	public abstract void displayRecord(int recordId) throws LibrisException;
+	public abstract Record displayRecord(int recordId) throws LibrisException;
 
 	/**
 	 * Create a new, empty, value for a field

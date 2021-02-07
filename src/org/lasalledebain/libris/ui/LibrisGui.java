@@ -286,9 +286,11 @@ public class LibrisGui extends LibrisWindowedUi {
 		updateUITitle();
 	}
 
-	public void displayRecord(int recId) throws LibrisException {
+	public DatabaseRecord displayRecord(int recId) throws LibrisException {
 		displayPanel.displayRecord(recId);
 		enablePrevNext();
+		final DatabaseRecordWindow currentRecordWindow = displayPanel.getCurrentRecordWindow();
+		return nonNull(currentRecordWindow)? currentRecordWindow.getRecord(): null;
 	}
 
 	FilterDialogue createSearchDialogue() {
