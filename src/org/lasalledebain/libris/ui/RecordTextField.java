@@ -15,7 +15,7 @@ public class RecordTextField extends GenericTextControl {
 
 	@Override
 	protected JTextComponent displayControls() {
-		JTextField tempControl = new JTextField(mainValue);
+		JTextField tempControl = new JTextField(mainValue, width);
 		tempControl.getDocument().addDocumentListener(getModificationListener());
 		tempControl.setCaretPosition(0);
 		return tempControl;

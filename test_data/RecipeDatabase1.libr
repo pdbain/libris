@@ -20,13 +20,13 @@
 				<fielddef id="ID_recipe" title="Recipe" datatype="string" />
 				<fielddef id="ID_ingredients" title="Ingredients" datatype="string" />
 				<fielddef id="ID_instructions" title="Instructions" datatype="string" />
-				<fielddef id="ID_genre" datatype="enum" enumset="ENUM_genre" valueseparator=":" />
+				<fielddef id="ID_genre" datatype="enum" title="Genre" enumset="ENUM_genre" valueseparator=":" />
 				<fielddef id="ID_publication" title="Publication" datatype="string" inherit="GRP_pubinfo"/>
-				<fielddef id="ID_auth" title="author" inherit="GRP_pubinfo" />
-				<fielddef id="ID_publisher" datatype="string" inherit="GRP_pubinfo"/>
-				<fielddef id="ID_year" datatype="string" inherit="GRP_pubinfo"/>
-				<fielddef id="ID_page" datatype="string" title="page" />
-				<fielddef id="ID_keywords" datatype="string" />
+				<fielddef id="ID_auth" title="Author" inherit="GRP_pubinfo" />
+				<fielddef id="ID_publisher" datatype="string" title="Publisher" inherit="GRP_pubinfo"/>
+				<fielddef id="ID_year" datatype="string" title="Year" inherit="GRP_pubinfo"/>
+				<fielddef id="ID_page" datatype="string" title="Page" />
+				<fielddef id="ID_keywords" title="Keywords" datatype="string" />
 			</fielddefs>
 			<indexdefs>
 			</indexdefs>
@@ -39,15 +39,15 @@
 			<layout id="LO_formDisplay" title="Form layout" type="form"
 				height="400" width="700">
 				<layoutusage usedby="newrecord" />
-				<layoutfield id="ID_recipe" control="textfield" hspan="3" width="400"/>
-				<layoutfield id="ID_genre" control="textfield" hspan="1" return="true" />
-				<layoutfield id="ID_ingredients" control="textfield" hspan="4" return="true" />
+				<layoutfield id="ID_recipe" hspan="3" control="textfield"/>
+				<layoutfield id="ID_genre" control="enumfield" return="true" />
+				<layoutfield id="ID_ingredients" control="textbox" return="true" />
 				<layoutfield id="ID_instructions" control="textbox" return="true" />
 				<layoutfield id="ID_publication" control="textfield" />
-				<layoutfield id="ID_auth" control="textfield"/>
-				<layoutfield id="ID_page" control="textfield" return="true"/>
-				<layoutfield id="ID_publisher" control="textfield" />
-				<layoutfield id="ID_year" control="textfield"  return="true"/>
+				<layoutfield id="ID_auth" control="textfield" />
+				<layoutfield id="ID_publisher" control="textfield" return="true"/>
+				<layoutfield id="ID_page" control="textfield"/>
+				<layoutfield id="ID_year" control="textfield" return="true"/>
 				<layoutfield id="ID_keywords" control="textbox" />
 			</layout>
 			<layout height="1400" id="LO_browserDisplay" title="Summary" type="list" width="700">

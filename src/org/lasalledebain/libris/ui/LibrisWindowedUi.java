@@ -73,12 +73,15 @@ public abstract class LibrisWindowedUi extends AbstractUi {
 	
 	public static String formatAlertString(String msg, Throwable e) {
 		StringBuilder buff = new StringBuilder(msg);
-		LibrisDatabase.log(Level.WARNING, e.getMessage(), e);
+		Throwable cause = e;
+		LibrisDatabase.log(Level.WARNING, cause.getMessage(), cause);
 		String emessage = "";
-		buff.append(": ");
-		buff.append(e.getClass().getSimpleName());
-		buff.append("\n");
-		
+		do {
+			buff.append(": ");
+			buff.append(cause.getClass().getSimpleName());
+			buff.append("\n");
+		} while (null != (cause = cause.getCause()));
+
 		if (null != e) {
 			emessage = Libris.formatConciseStackTrace(e, buff);
 		}
@@ -91,7 +94,7 @@ public abstract class LibrisWindowedUi extends AbstractUi {
 		} catch (UnsupportedEncodingException e1) {
 			e1.printStackTrace();
 		}
-		LibrisDatabase.log(Level.FINE, emessage, e);
+		LibrisDatabase.log(Level.FINE, emessage, cause);
 		return errorString;
 	}
 

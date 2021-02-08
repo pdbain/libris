@@ -21,10 +21,10 @@ public abstract class GuiControl {
 	protected final boolean editable;
 	protected int height;
 	protected int width;
-	public GuiControl(int height, int width, boolean editable) {
+	public GuiControl(int theHeight, int theWidth, boolean editable) {
 		this.editable = editable;
-		this.height = height;
-		this.width = width;
+		height = theHeight;
+		width = theWidth;
 		modListener = new DocumentListener() {
 			@Override
 			public void removeUpdate(DocumentEvent e) {

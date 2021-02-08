@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.libris.util.StringUtils.isStringEmpty;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Vector;
@@ -208,7 +210,7 @@ public class LibrisLayout implements XMLElement {
 	}
 
 	public String getTitle() {
-		return title;
+		return isStringEmpty(title)? "<unknown>": title;
 	}
 
 	public String[] getFieldIds() {
@@ -259,11 +261,11 @@ public class LibrisLayout implements XMLElement {
 	}
 
 	protected void setHeight(String h) {
-		this.height = Integer.parseInt(h);
+		height = Integer.parseInt(h);
 	}
 
 	protected void setWidth(String w) {
-		this.width = Integer.parseInt(w);
+		width = Integer.parseInt(w);
 	}
 
 	public FieldType getFieldType(String id) {
