@@ -441,17 +441,17 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 	
 	@Override
 	public DatabaseRecord duplicate() throws DatabaseException, FieldDataException  {
-		DatabaseRecord otherRec = new DatabaseRecord(template);
-		otherRec.setEditable(true);
+		DatabaseRecord recordCopy = new DatabaseRecord(template);
+		recordCopy.setEditable(true);
 		for (int i = 0; i < recordFields.length; ++i) {
 			Field fld = recordFields[i];
 			if (null == fld) {
 				continue;
 			}
-			Field otherField = fld.duplicate();
-			otherRec.setField(i, otherField);
+			Field fieldCopy = fld.duplicate();
+			recordCopy.setField(i, fieldCopy);
 		}
-		return otherRec;
+		return recordCopy;
 	}
 
 	/* Group management */

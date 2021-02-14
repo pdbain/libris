@@ -29,7 +29,7 @@ class ReadOnlyField extends GenericField {
 
 	@Override
 	public void addURLValue(URL value) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	public ReadOnlyField(Field actualField) {
@@ -44,35 +44,51 @@ class ReadOnlyField extends GenericField {
 	Field actualField;
 	@Override
 	public void addIntegerValue(int value) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
 	public void addValue(String data) throws FieldDataException {
+		throwReadOnlyException();
+	}
+
+	@Override
+	protected FieldValue valueOf(String valueString) throws FieldDataException {
+		throwReadOnlyException();
+		return null;
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String valueString) throws FieldDataException {
+		throwReadOnlyException();
+		return null;
+	}
+
+	protected void throwReadOnlyException() throws FieldDataException {
 		throw new FieldDataException("field is read-only");
 	}
 
 	@Override
 	public void addValuePair(String value, String extraValue)
 			throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
 	public void addValuePair(Integer value, String extraValue)
 			throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
 	public void changeValue(String string) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
 	public void changeValue(FieldValue fieldValue)
 			throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
@@ -177,12 +193,12 @@ class ReadOnlyField extends GenericField {
 
 	@Override
 	public void addValue(FieldValue fieldData) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
 	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override

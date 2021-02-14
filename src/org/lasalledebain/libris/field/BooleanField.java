@@ -10,7 +10,10 @@ public class BooleanField extends GenericField implements Field {
 	}
 	@Override
 	public void addValue(String data) throws FieldDataException {
-		addFieldValue(FieldBooleanValue.of(data));
+		addFieldValue(valueOf(data));
+	}
+	protected FieldBooleanValue valueOf(String data) throws FieldDataException {
+		return FieldBooleanValue.of(data);
 	}
 	
 	@Override
@@ -32,12 +35,16 @@ public class BooleanField extends GenericField implements Field {
 	}
 
 	public Field duplicate() throws FieldDataException {
-		BooleanField otherField = new BooleanField(template);
-		copyValues(otherField);
-		return otherField;
+		BooleanField fieldCopy = new BooleanField(template);
+		copyValues(fieldCopy);
+		return fieldCopy;
 	}
 	@Override
 	protected boolean isValueCompatible(FieldValue fv) {
 		return fv instanceof FieldBooleanValue;
+	}
+	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		throw new FieldDataException("addIntegerValue not defined for BooleanField");
 	}
 }

@@ -13,10 +13,19 @@ public class IntegerField extends GenericField implements Field {
 	public void addValue(String data) throws FieldDataException {
 
 		try {
-			addFieldValue(new FieldIntValue(data));
+			addFieldValue(valueOf(data));
 		} catch (NumberFormatException e) {
 			throw new FieldDataException("invalid data: "+data+" for integer field "+getFieldId());
 		}
+	}
+
+	protected FieldIntValue valueOf(String data) {
+		return new FieldIntValue(data);
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		throw new FieldDataException("valueOf(int, String) not defined for IntegerField");
 	}
 
 	@Override

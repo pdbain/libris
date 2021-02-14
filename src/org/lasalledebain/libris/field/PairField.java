@@ -11,8 +11,16 @@ public class PairField extends GenericField implements Field {
 	}
 
 	public void addValue(String value) throws FieldDataException {		
-		FieldValue v = new FieldSingleStringValue(value);
-		addFieldValue(v);
+		addFieldValue(valueOf(value));
+	}
+
+	protected FieldSingleStringValue valueOf(String value) {
+		return new FieldSingleStringValue(value);
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		throw new FieldDataException("valueOf(int, String) not defined for pairField");
 	}
 
 	@Override
@@ -24,13 +32,13 @@ public class PairField extends GenericField implements Field {
 	@Override
 	public void addValuePair(String mainValue, String extraValue)
 	throws FieldDataException {
-		FieldValue v = (StringUtils.isStringEmpty(extraValue))? new FieldSingleStringValue(mainValue): new FieldStringPairValue(mainValue, extraValue);
+		FieldValue v = (StringUtils.isStringEmpty(extraValue))? valueOf(mainValue): new FieldStringPairValue(mainValue, extraValue);
 		addFieldValue(v);
 	}
 
 	@Override
 	public void addIntegerValue(int value) throws FieldDataException {
-		throw new FieldDataException("addIntegerValue not defined for pairField");
+		throw new FieldDataException("addIntegerValue not defined for PairField");
 	}
 
 	@Override

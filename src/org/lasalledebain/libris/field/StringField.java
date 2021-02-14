@@ -15,14 +15,23 @@ public class StringField extends GenericField implements Field {
 		super(template);
 	}
 
+	protected FieldSingleStringValue valueOf(String data) {
+		return new FieldSingleStringValue(data);
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		return new FieldStringPairValue(Integer.toString(value), extraValue);
+	}
+
 	@Override
 	public void addValue(String data) throws FieldDataException {
-		addFieldValue(new FieldSingleStringValue(data));
+		addFieldValue(valueOf(data));
 	}
 
 	@Override
 	public void addIntegerValue(int data) throws FieldDataException {
-		addFieldValue(new FieldSingleStringValue(Integer.toString(data)));
+		addFieldValue(valueOf(Integer.toString(data)));
 	}
 
 	@Override

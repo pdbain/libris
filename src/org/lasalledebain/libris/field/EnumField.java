@@ -3,6 +3,7 @@ package org.lasalledebain.libris.field;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
+import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.util.StringUtils;
@@ -37,7 +38,11 @@ public class EnumField extends GenericField implements Field {
 
 	@Override
 	public void addValue(String choiceName) throws FieldDataException {
-		addFieldValue(template.getEnumChoices().of(choiceName));
+		addFieldValue(valueOf(choiceName));
+	}
+
+	protected FieldEnumValue valueOf(String choiceName) throws FieldDataException {
+		return template.getEnumChoices().of(choiceName);
 	}
 
 	@Override
@@ -48,14 +53,18 @@ public class EnumField extends GenericField implements Field {
 	@Override
 	public void addValuePair(Integer value, String extraValue)
 			throws FieldDataException {
-		addFieldValue(new FieldEnumValue(template.getEnumChoices(), value, extraValue));
+		addFieldValue(valueOf(value, extraValue));
+	}
+
+	protected FieldEnumValue valueOf(int value, String extraValue) {
+		return new FieldEnumValue(template.getEnumChoices(), value, extraValue);
 	}
 
 	@Override
 	public void addValuePair(String value, String extraValue)
 			throws FieldDataException {
 		if (StringUtils.isStringEmpty(value)) {
-			addFieldValue(new FieldEnumValue(template.getEnumChoices(), -1, extraValue));
+			addFieldValue(new FieldEnumValue(template.getEnumChoices(), LibrisConstants.ENUM_VALUE_OUT_OF_RANGE, extraValue));
 		} else if (StringUtils.isStringEmpty(extraValue)) {
 			addFieldValue(new FieldEnumValue(template.getEnumChoices(), value));
 		} else {

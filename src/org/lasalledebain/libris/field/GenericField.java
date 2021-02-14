@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.field;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -16,7 +17,6 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
-import org.lasalledebain.libris.ui.EmptyField;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementShape;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
@@ -24,6 +24,25 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public abstract class GenericField implements Field {
+
+	protected FieldTemplate template;
+	/**
+	 * Allows a field to have multiple values;
+	 */
+	private FieldValue values = null;
+	private final ArrayList<FieldValue> valueList;
+	private static HashMap<String, FieldType> fieldTypeMap = GenericField.initializeTypeMap();
+	protected static final FieldNullValue nullValue = new FieldNullValue();
+	
+	public GenericField(FieldTemplate template) {
+		this();
+		this.template = template;
+	}
+
+	protected GenericField() {
+		super();
+		valueList = new ArrayList<FieldValue>(0);
+	}
 
 	@Override
 	public void addURLValue(URL value) throws FieldDataException {
@@ -45,14 +64,7 @@ public abstract class GenericField implements Field {
 
 	@Override
 	public boolean isEmpty() {
-		if (null != values) {
-			for (FieldValue v: values) {
-				if (!v.isEmpty()) {
-					return false;
-				}
-			}
-		}
-		return true;
+		return valueList.isEmpty();
 	}
 
 	@Override
@@ -65,20 +77,12 @@ public abstract class GenericField implements Field {
 		return template.isRestricted();
 	}
 
-	protected FieldTemplate template;
-	/**
-	 * Allows a field to have multiple values;
-	 */
-	private FieldValue values = null;
-	private static HashMap<String, FieldType> fieldTypeMap = GenericField.initializeTypeMap();
 	@Override
 	public String getValuesAsString() {
-		FieldValue fieldValues = values;
-		String result = valuesToString(fieldValues);
-		return result;
+		return valuesToString(valueList);
 	}
 
-	public static String valuesToString(FieldValue fieldValues) {
+	public static String valuesToString(Iterable<FieldValue> fieldValues) {
 		String result = "";
 		if (null != fieldValues) {
 			StringBuffer buff = new StringBuffer();
@@ -94,8 +98,14 @@ public abstract class GenericField implements Field {
 		}
 		return result;
 	}
+	
+	@Override
 	public FieldValue removeValue() {
-		FieldValue deletedValue = values;
+		FieldValue deletedValue = null;
+		if (!valueList.isEmpty()) {
+			deletedValue = valueList.get(0);
+			valueList.remove(0);
+		}
 		if (null != values) {
 			values = values.nextValue;
 		}
@@ -103,6 +113,7 @@ public abstract class GenericField implements Field {
 	}
 
 	public void deleteAllvalues() {
+		valueList.clear();
 		while (null != removeValue());
 	}
 
@@ -116,15 +127,6 @@ public abstract class GenericField implements Field {
 	@Override
 	public void setValues(FieldValue[] valueArray) throws FieldDataException {
 		setValues(valueArray);
-	}
-
-	public GenericField(FieldTemplate template) {
-		super();
-		this.template = template;
-	}
-
-	protected GenericField() {
-		super();
 	}
 
 	public boolean isTrue() throws FieldDataException {
@@ -166,6 +168,12 @@ public abstract class GenericField implements Field {
 		throw new FieldDataException("Multiple values not supported in "+getFieldId());
 	}
 	protected void addFieldValue(FieldValue v) throws FieldDataException {
+		if (isSingleValue() && !valueList.isEmpty())  {
+			throw new FieldDataException("cannot add "+v+" to "+getFieldId()+": that field does not allow multiple values");
+		}
+		
+		// TODO DEPRECATED
+		valueList.add(v);
 		if (null != v) {
 			v.nextValue = null;
 		}
@@ -180,35 +188,38 @@ public abstract class GenericField implements Field {
 			}
 			current.nextValue = v;
 		}
+		
 	}
 	@Override
 	public void changeValue(FieldValue newValue) throws FieldDataException {
-		removeValue();
-		addFieldValue(newValue);
+		if (valueList.isEmpty()) addFieldValue(newValue);
+		else valueList.set(0, newValue);
+		// TODO DEPRECATED
+		if (null != values) {
+			values = values.nextValue;
+		}
+		newValue.nextValue = values;
+		values = newValue;
 	}
 	@Override
 	/**
 	 * changes removes the first value and replaces it with new data
 	 */
-	public void changeValue(String newValue) throws FieldDataException {
-		removeValue();
-		addValue(newValue);
+	public void changeValue(String valueString) throws FieldDataException {
+		changeValue(valueOf(valueString));
+	}
+
+	@Override
+	public void changeValue(int value, String extraValue) throws FieldDataException {
+		changeValue(valueOf(value, extraValue));
 	}
 
 	public Iterable<FieldValue> getFieldValues() {
-		if (null == values) {
-			return new EmptyField();
-		} else {
-			return values;
-		}
+		return valueList;
 	}
 
 	public FieldValue getFirstFieldValue() {
-		if (null == values) {
-			return new FieldNullValue();
-		} else {
-			return values;
-		}
+		return (valueList.isEmpty())? nullValue: valueList.get(0);
 	}
 
 	public EnumFieldChoices getLegalValues() {
@@ -216,11 +227,7 @@ public abstract class GenericField implements Field {
 	}
 
 	public int getNumberOfValues() {
-		if ((null == values) || (values.isEmpty())) {
-			return 0;
-		} else {
-			return values.getNumberOfValues();
-		}
+		return valueList.size();
 	}
 	@Override
 	public boolean isSingleValue() {
@@ -253,8 +260,8 @@ public abstract class GenericField implements Field {
 			}
 		} else if (!template.equals(other.template))
 			return false;
-		if (values == null) {
-			if (other.values != null) {
+		if (isEmpty()) {
+			if (!other.isEmpty()) {
 				return false;
 			}
 		} else if (!values.equals(other.values)) {
@@ -306,11 +313,11 @@ public abstract class GenericField implements Field {
 	public void toXml(ElementWriter output) throws LibrisException {
 		boolean storeValueInAttributes = ElementShape.storeValueInAttributes(getMyFieldType());
 
-		if (null == values) {
+		if (isEmpty()) {
 			return;
 		}
 		String fieldId = getFieldId();
-		for (FieldValue v: values) {
+		for (FieldValue v: valueList) {
 			if (!v.isEmpty()) {
 				try {
 					if (storeValueInAttributes) {
@@ -332,14 +339,14 @@ public abstract class GenericField implements Field {
 	}
 	@Override
 	public LibrisAttributes getAttributes() throws XmlException {
-		if (!ElementShape.storeValueInAttributes(getMyFieldType()) || (null == values)) {
+		if (!ElementShape.storeValueInAttributes(getMyFieldType()) || isEmpty()) {
 			return new LibrisAttributes();
 		}
 
 		String fieldId = getFieldId();
 		LibrisAttributes firstAttr = null;
 		LibrisAttributes lastAttr = null;
-		for (FieldValue v: values) {
+		for (FieldValue v: valueList) {
 			LibrisAttributes attributes;
 			try {
 				attributes = v.getValueAsAttributes();
@@ -369,13 +376,15 @@ public abstract class GenericField implements Field {
 	private FieldType getMyFieldType() {
 		return template.getFtype();
 	}
+	
+	protected abstract FieldValue valueOf(String valueString) throws FieldDataException;
 
-	public void copyValues(GenericField otherField) throws FieldDataException {
-		if (null != values) {
-			for (FieldValue v: values) {
-				FieldValue otherValue = v.duplicate();
-				otherField.addFieldValue(otherValue);
-			}
+	protected abstract FieldValue valueOf(int value, String extraValue) throws FieldDataException;
+
+	public void copyValues(GenericField fieldCopy) throws FieldDataException {
+		fieldCopy.valueList.clear();
+		for (FieldValue v: getFieldValues()) {
+			fieldCopy.addFieldValue(v.duplicate());
 		}
 	}
 	@Override

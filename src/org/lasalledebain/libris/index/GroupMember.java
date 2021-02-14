@@ -238,4 +238,14 @@ public class GroupMember extends GenericField implements XMLElement {
 	protected boolean isValueCompatible(FieldValue fv) {
 		return false;
 	}
+
+	@Override
+	protected FieldValue valueOf(String valueString) throws FieldDataException {
+		throw new FieldDataException("valueOf(String) not defined for GroupMember");
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		throw new FieldDataException("valueOf(int, String) not defined for GroupMember");
+	}
 }

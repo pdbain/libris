@@ -39,6 +39,7 @@ public interface Field extends XMLElement {
 	public FieldValue removeValue() throws FieldDataException;
 	public void changeValue(String string) throws FieldDataException;
 	public void changeValue(FieldValue fieldValue) throws FieldDataException;
+	public void changeValue(int value, String extraValue) throws FieldDataException;
 	public boolean equals(Field comparand);
 	public EnumFieldChoices getLegalValues();
 	public void setValues(FieldValue[] valueArray) throws FieldDataException;

@@ -71,6 +71,11 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 	}
 
 	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		throw new FieldDataException("valueOf(int, String) not permitted on this field");
+	}
+
+	@Override
 	public void changeValue(String recName) throws FieldDataException {
 		try {
 			int recId = mapper.getId(recName);
@@ -190,8 +195,7 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 
 	@Override
 	public FieldValue removeValue() {
-		if (isEmpty()) {
-		} else {
+		if (!isEmpty()) {
 			if (affiliates.length == 1) {
 				affiliates = null;
 			} else {
@@ -202,6 +206,11 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 
 			}
 		}
+		return null;
+	}
+
+	@Override
+	protected FieldValue valueOf(String valueString) throws FieldDataException {
 		return null;
 	}
 
