@@ -96,7 +96,7 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 		atEndOfElement = checkEndElement(nextEvt);
 
 		LibrisAttributes result = parseAttributes(openEvent, xmlShape, attrs);
-		if (!hasSubElements() && hasNext()) {
+		if (!(hasSubElements() || hasContent()) && hasNext()) {
 			throw new InputException(nextEvt.toString()+" is not an empty element");
 		}
 		return result;
@@ -182,7 +182,7 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 			while ((nextEvt = xmlReader.peek()).isCharacters()) {
 				if (!xmlShape.hasContent()) {
 					xmlReader.nextEvent();
-				}
+				} else return true;
 			}
 			if (checkEndElement(nextEvt)) {
 				EndElement e = nextEvt.asEndElement();
@@ -256,7 +256,7 @@ public class ElementManager implements Iterable<ElementManager>, Iterator<Elemen
 			throw new XmlException(this, e);
 		}
 
-		throw new XmlException(": unexpected end of XML element"+tagQname.toString()+", last element parsed on "+xmlReader.getSourceLine());
+		throw new XmlException(": unexpected end of XML element "+tagQname.toString()+", last element parsed on "+xmlReader.getSourceLine());
 	}
 
 	/**
