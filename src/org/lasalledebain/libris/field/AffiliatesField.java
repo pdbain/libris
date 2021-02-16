@@ -5,6 +5,7 @@ import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
@@ -131,11 +132,11 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 	}
 
 	@Override
-	public FieldValue getFirstFieldValue() {
+	public Optional<FieldValue> getFirstFieldValue() {
 		if ((null == affiliates) || (affiliates.length == 0)) {
-			return new FieldNullValue();
+			return Optional.empty();
 		} else {
-			return new FieldIntValue(affiliates[0]);
+			return Optional.of(new FieldIntValue(affiliates[0]));
 		}
 	}
 

@@ -78,12 +78,6 @@ public class EnumField extends GenericField implements Field {
 	}
 
 	@Override
-	public FieldValue getFirstFieldValue() {
-		// TODO Auto-generated method stub
-		return super.getFirstFieldValue();
-	}
-
-	@Override
 	protected boolean isValueCompatible(FieldValue fv) {
 		return fv instanceof FieldEnumValue;
 	}

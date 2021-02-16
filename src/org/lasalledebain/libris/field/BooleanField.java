@@ -23,7 +23,8 @@ public class BooleanField extends GenericField implements Field {
 	
 	@Override
 	public boolean isTrue() {
-		return getFirstFieldValue().isTrue();
+		var optV = getFirstFieldValue();
+		return optV.isPresent() && optV.get().isTrue();
 	}
 	@Override
 	public boolean isSingleValue() {

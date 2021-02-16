@@ -6,6 +6,7 @@ import static org.lasalledebain.libris.exception.Assertion.assertTrueError;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -141,7 +142,8 @@ public class ArtifactRecord extends Record {
 		FieldValue result = null;
 		Field resultField = recordFields[fieldNum];
 		if (null != resultField) {
-			result = resultField.getFirstFieldValue();
+			final Optional<FieldValue> firstFieldValueOpt = resultField.getFirstFieldValue();
+			if (firstFieldValueOpt.isPresent()) result = firstFieldValueOpt.get();
 		}
 		return result;
 	}

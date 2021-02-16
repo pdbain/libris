@@ -192,8 +192,9 @@ public abstract class GenericField implements Field {
 		return valueList;
 	}
 
-	public FieldValue getFirstFieldValue() {
-		return (valueList.isEmpty())? nullValue: valueList.get(0);
+	@Override
+	public Optional<FieldValue> getFirstFieldValue() {
+		return (valueList.isEmpty())? Optional.empty(): Optional.of(valueList.get(0));
 	}
 
 	public EnumFieldChoices getLegalValues() {

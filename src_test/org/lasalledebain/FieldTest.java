@@ -2,6 +2,7 @@ package org.lasalledebain;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Random;
 
 import org.lasalledebain.libris.EnumFieldChoices;
@@ -28,20 +29,20 @@ public class FieldTest extends TestCase {
 		Field f = ft.newField();
 
 		f.addValue("true");
-		String fd = f.getFirstFieldValue().getValueAsString();
+		String fd = f.getFirstFieldValue().get().getValueAsString();
 		assertTrue("wrong result for true boolean", fd.equalsIgnoreCase("true"));
 		f.changeValue("false");
-		fd = f.getFirstFieldValue().getValueAsString();
+		fd = f.getFirstFieldValue().get().getValueAsString();
 		assertTrue("wrong result for false boolean", fd.equalsIgnoreCase("false"));
 		FieldValue v = f.removeValue();
 		assertFalse("wrong value for remove", v.isTrue());
 		f.addValue(new FieldBooleanValue(true));
-		v = f.getFirstFieldValue();
+		v = f.getFirstFieldValue().get();
 		assertTrue("wrong value for set with FieldValue", v.isTrue());
 		f.removeValue();
 		boolean excThrown = false;
 		f.addValue(new FieldSingleStringValue("false"));
-		v = f.getFirstFieldValue();
+		v = f.getFirstFieldValue().get();
 		assertFalse("wrong value for set with string value", v.isTrue());
 		try {
 			f.addValue("true");
@@ -94,10 +95,10 @@ public class FieldTest extends TestCase {
 		Field f = ft.newField();
 		f.addIntegerValue(42);
 		assertFalse("regular view  read-only", f.isReadOnly());
-		FieldValue v = f.getFirstFieldValue();
+		FieldValue v = f.getFirstFieldValue().get();
 		assertEquals("wrong value for integer field", 42, v.getValueAsInt());
 		Field rof = f.getReadOnlyView();
-		v = rof.getFirstFieldValue();
+		v = rof.getFirstFieldValue().get();
 		assertEquals("wrong value for read-only field", 42, v.getValueAsInt());
 		assertTrue("read-only view not read-only", rof.isReadOnly());
 		boolean thrown = false;
@@ -166,7 +167,7 @@ public class FieldTest extends TestCase {
 				Field f = ft.newField();
 				String testString = Integer.toString(i);
 				f.addValue(testString);
-				FieldValue firstFieldValue = f.getFirstFieldValue();
+				FieldValue firstFieldValue = f.getFirstFieldValue().get();
 				int d = firstFieldValue.getValueAsInt();
 				assertEquals("mismatch in int data "+testString, i, d);
 				String s = firstFieldValue.getValueAsString();
@@ -188,44 +189,38 @@ public class FieldTest extends TestCase {
 		}
 
 	}
-	public void testRange() {
+	public void testRange() throws FieldDataException {
 		FieldTemplate ft = Utilities.createTemplate("f1", Field.FieldType.T_FIELD_PAIR);
-		try {
-			Field f = ft.newField();
-			try {
-				String[][] expectedData = {{"", ""}, {"testString1", ""}, {"2","3"}};
-				String[] d = getValuesAsStringPair(f);
-				checkValues(expectedData[0], d);
 
-				f.addValue(expectedData[1][0]);
-				d = getValuesAsStringPair(f);
-				checkValues(expectedData[1], d);
+		Field f = ft.newField();
 
-				f.removeValue();
-				f.addValuePair(expectedData[2][0], expectedData[2][1]);
-				d = getValuesAsStringPair(f);
-				checkValues(expectedData[2], d);
+		String[][] expectedData = {{null, null}, {"testString1", ""}, {"2","3"}};
+		String[] d = getValuesAsStringPair(f);
+		checkValues(expectedData[0], d);
 
-			} catch (Exception e) {
-				e.printStackTrace();
-				fail("unexpected exception "+e.getClass().getName()+": "+e.getMessage());
-			}
+		f.addValue(expectedData[1][0]);
+		d = getValuesAsStringPair(f);
+		checkValues(expectedData[1], d);
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail();
-		}
+		f.removeValue();
+		f.addValuePair(expectedData[2][0], expectedData[2][1]);
+		d = getValuesAsStringPair(f);
+		checkValues(expectedData[2], d);
+
 	}
 	private String[] getValuesAsStringPair(Field f) {
-		FieldValue v = f.getFirstFieldValue();
-		String[] pair = new String[2];
-		try {
-			pair[0] = v.getMainValueAsString();
-		} catch (FieldDataException e) {
-			e.printStackTrace();
-			fail();
+		String[] pair = new String[] {null, null};
+		final Optional<FieldValue> firstFieldValueOpt = f.getFirstFieldValue();
+		if (firstFieldValueOpt.isPresent()) {
+			FieldValue v = firstFieldValueOpt.get();
+			try {
+				pair[0] = v.getMainValueAsString();
+			} catch (FieldDataException e) {
+				e.printStackTrace();
+				fail();
+			}
+			pair[1] = v.getExtraValueAsString();
 		}
-		pair[1] = v.getExtraValueAsString();
 		return pair;
 	}
 	private void checkValues(String[] expectedData, String[] d) {
@@ -243,7 +238,7 @@ public class FieldTest extends TestCase {
 		for (String testString: testData) {
 
 			f.addValue(testString);
-			String d = f.getFirstFieldValue().getValueAsString();
+			String d = f.getFirstFieldValue().get().getValueAsString();
 			assertEquals("wrong result for "+testString, d, testString);
 			FieldValue r = f.removeValue();
 			if (null != r) {
@@ -353,7 +348,7 @@ public class FieldTest extends TestCase {
 		Field f = ft.newField();
 		for (int i = 0; i < valueNames.length; ++i) {
 			f.addValue(valueNames[i]);
-			FieldValue v = f.getFirstFieldValue();
+			FieldValue v = f.getFirstFieldValue().get();
 			assertEquals("enum index", i, v.getValueAsInt());
 			assertEquals("enum name", valueNames[i], v.getValueAsString());
 			f.removeValue();

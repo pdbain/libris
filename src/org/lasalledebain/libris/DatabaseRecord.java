@@ -1,7 +1,7 @@
 package org.lasalledebain.libris;
 
 import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
-
+import static java.util.Objects.nonNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -172,7 +172,11 @@ public class DatabaseRecord extends Record implements  LibrisXMLConstants {
 		if ((null == fld) || fld.isEmpty()) {
 			fld = getDefaultField(fieldNum);
 		}
-		FieldValue firstFieldValue = (null == fld) ? null: fld.getFirstFieldValue();
+		FieldValue firstFieldValue = null;
+		if (nonNull(fld)) {
+			var valueOpt = fld.getFirstFieldValue();
+			if (valueOpt.isPresent()) firstFieldValue = valueOpt.get();
+		}
 		return firstFieldValue;
 	}
 

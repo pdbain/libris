@@ -5,6 +5,7 @@ package org.lasalledebain.libris.field;
 
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
@@ -112,7 +113,7 @@ class ReadOnlyField extends GenericField {
 	}
 
 	@Override
-	public FieldValue getFirstFieldValue() {
+	public Optional<FieldValue> getFirstFieldValue() {
 		return actualField.getFirstFieldValue();
 	}
 

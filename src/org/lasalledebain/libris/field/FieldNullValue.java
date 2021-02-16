@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.field;
 
+@Deprecated
 public class FieldNullValue extends FieldValue {
 
 	@Override
