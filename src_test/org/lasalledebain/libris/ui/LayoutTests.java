@@ -24,7 +24,6 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldBooleanValue;
 import org.lasalledebain.libris.field.FieldEnumValue;
 import org.lasalledebain.libris.field.FieldIntValue;
-import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.util.Lorem;
 import org.lasalledebain.libris.util.Utilities;
 

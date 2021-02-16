@@ -1,51 +1,14 @@
 package org.lasalledebain.libris.field;
 
-import java.util.Iterator;
-
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public abstract class FieldValue {
-	FieldValue nextValue;
-	public FieldValueIterator iterator() {
-		return new RecordFieldValueIterator(this);
-	}
 	private static final EmptyFieldValue emptyFieldValueSingleton = new EmptyFieldValue();
 
 	public static EmptyFieldValue getEmptyfieldvaluesingleton() {
 		return emptyFieldValueSingleton;
-	}
-
-	public class RecordFieldValueIterator implements FieldValueIterator, Iterable<FieldValue> {
-
-		private FieldValue next;
-
-		public RecordFieldValueIterator(FieldValue head) {
-			this.next = head;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return (null != next);
-		}
-
-		@Override
-		public FieldValue next() {
-			FieldValue oldNext = next;
-			next = next.nextValue;
-			return oldNext;
-		}
-
-		@Override
-		public void remove() {
-		}
-
-		@Override
-		public Iterator<FieldValue> iterator() {
-			return this;
-		}
-
 	}
 
 	public abstract String getValueAsString();
@@ -105,14 +68,6 @@ public abstract class FieldValue {
 	}
 
 	protected abstract boolean equals(FieldValue comparand);
-
-	public void append(FieldValue temp) {
-		FieldValue cursor = this;
-		while (null != cursor.nextValue) {
-			cursor = cursor.nextValue;
-		}
-		cursor.nextValue = temp;
-	}
 
 	public abstract FieldValue duplicate();
 }
