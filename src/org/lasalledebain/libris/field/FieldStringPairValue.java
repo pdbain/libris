@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.field;
 
 import org.lasalledebain.libris.exception.FieldDataException;
+import static java.util.Objects.isNull;
 
 public class FieldStringPairValue extends FieldValue {
 	@Override
@@ -34,24 +35,27 @@ public class FieldStringPairValue extends FieldValue {
 		return values[0];
 }
 	@Override
-	public String getMainValueAsString() throws FieldDataException {
+	public String getMainValueAsString() {
 		return values[0];
 }
 	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
-		FieldStringPairValue other = (FieldStringPairValue) comparand;
-		boolean valueEquals = true;
-		if (null != values[0]) {
-			valueEquals &= values[0].equals(other.values[0]);
-		} else {
-			valueEquals &= (null == other.values[0]);
+	protected boolean equals(FieldValue comparand) {
+		boolean result = false;
+		if (comparand instanceof FieldStringPairValue) {
+			if (isEmpty() && comparand.isEmpty()) {
+				result = true;
+			} else
+				try {
+					if (getMainValueAsString().equals(comparand.getMainValueAsString())) {
+						String myExtra = getExtraValueAsString();
+						String otherExtra = comparand.getExtraValueAsString();
+						result = (isNull(myExtra) && isNull(otherExtra)) || myExtra.equals(otherExtra);
+					}
+				} catch (FieldDataException e) {
+					return false;
+				}
 		}
-		if (null != values[1]) {
-			valueEquals &= values[1].equals(other.values[1]);
-		} else {
-			valueEquals &= (null == other.values[1]);
-		}
-		return valueEquals;
+		return result;
 	}
 	@Override
 	public FieldValue duplicate() {

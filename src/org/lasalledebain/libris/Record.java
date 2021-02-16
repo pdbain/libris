@@ -224,6 +224,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 				try {
 					fld = getField(fieldId);
 				} catch (InputException e) {
+					LibrisDatabase.logException("Error in generateTitle for record " + getRecordId(), e);
 					throw new InternalError(e);
 				}
 				if ((null == fld) || !fld.isText()) {

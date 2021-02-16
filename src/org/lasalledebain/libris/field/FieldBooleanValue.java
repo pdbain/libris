@@ -66,7 +66,7 @@ public class FieldBooleanValue extends FieldValue {
 	}
 	
 	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
+	protected boolean equals(FieldValue comparand) {
 		FieldBooleanValue other = (FieldBooleanValue) comparand;
 		boolean valueEquals = (value == other.value);
 		return valueEquals;

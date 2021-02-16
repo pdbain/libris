@@ -4,8 +4,6 @@ import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Vector;
 
 import javax.swing.JComponent;
@@ -18,7 +16,6 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
-import org.lasalledebain.libris.field.FieldIntValue;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;;
@@ -118,48 +115,6 @@ public class NameList extends GuiControl {
 	@Override
 	public int getNumValues() {
 		return affiliateInfo.size();
-	}
-
-	@Override
-	public Iterable<FieldValue> getFieldValues() throws FieldDataException {
-		return new Iterable<FieldValue>() {
-
-			@Override
-			public Iterator<FieldValue> iterator() {
-				return new Iterator<FieldValue>() {
-
-					int i = 0;
-					@Override
-					public boolean hasNext() {
-						boolean result = false;
-						if ((0 == i) && (1 == affiliateInfo.size())) {
-							KeyIntegerTuple entry = affiliateInfo.get(0);
-							result = (NULL_RECORD_ID != entry.getValue());
-						} else {
-							result = (i < affiliateInfo.size());
-						}
-						return result;
-					}
-
-					@Override
-					public FieldValue next() {
-						if (!hasNext()) {
-							throw new NoSuchElementException();
-						}
-						KeyIntegerTuple v = affiliateInfo.get(i);
-						++i;
-						FieldIntValue fv = new FieldIntValue(v.getValue());
-						return fv;
-					}
-
-					@Override
-					public void remove() {
-						return;
-					}					
-				};
-			}
-			
-		};
 	}
 
 	class GroupMouseListener implements MouseListener {

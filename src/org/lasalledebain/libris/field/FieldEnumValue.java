@@ -88,7 +88,7 @@ public class FieldEnumValue extends FieldValue implements LibrisConstants {
 	}
 
 	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
+	protected boolean equals(FieldValue comparand) {
 		FieldEnumValue other = (FieldEnumValue) comparand;
 		boolean valueEquals = (choice == other.choice);
 		if (null != extraValue) {

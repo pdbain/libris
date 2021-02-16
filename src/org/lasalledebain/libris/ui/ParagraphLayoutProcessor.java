@@ -5,11 +5,11 @@ import java.awt.GridBagLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 
+import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.exception.DatabaseException;
@@ -17,6 +17,9 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
+
+import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 public class ParagraphLayoutProcessor extends LayoutProcessor {
 
@@ -26,13 +29,12 @@ public class ParagraphLayoutProcessor extends LayoutProcessor {
 
 	@Override
 	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
-		LayoutField[] fieldInfo = myLayout.getFields();
 		Record rec = recList.getRecord(recId);
 		StringBuffer windowText = new StringBuffer();
-		if (null == rec) {
+		if (isNull(rec)) {
 			windowText.append("Record "+recId+" not found");
 		} else {
-			recordToParagraph(rec, fieldInfo, windowText);
+			recordToParagraph(rec, myLayout.getFields(), windowText);
 		}
 		buff.append(windowText);
 	}
@@ -69,14 +71,13 @@ public class ParagraphLayoutProcessor extends LayoutProcessor {
 		recordPanel.setLayout(new GridBagLayout());
 		content.setContentType("text/html;");
 		content.setEditable(false);
-		LayoutField[] fieldInfo = myLayout.getFields();
-		String windowText = createHtmlParagraph(rec, fieldInfo);
+		String windowText = createHtmlParagraph(rec);
 
 		content.setText(windowText);
 		return LibrisLayout.emptyUiList;
 	}
 
-	public String createHtmlParagraph(Record rec, LayoutField[] fieldInfo)
+	public String createHtmlParagraph(Record rec)
 			throws InputException {
 		StringBuffer windowText = new StringBuffer();
 
@@ -91,19 +92,19 @@ public class ParagraphLayoutProcessor extends LayoutProcessor {
 				);
 		windowText.append("</style>\n");
 		windowText.append("</head>\n<body><p>\n");
-		recordToParagraph(rec, fieldInfo, windowText);
+		recordToParagraph(rec, myLayout.getFields(), windowText);
 		windowText.append("</p></body>\n</html>");
 		return windowText.toString();
 	}
 
-	public void recordToParagraph(Record rec, LayoutField[] fieldInfo, StringBuffer windowText)
-			throws InputException {
+	public static void recordToParagraph(Record rec, LayoutField[] fieldInfo, StringBuffer windowText) throws InputException {
 		String separator = "";
 		for (LayoutField fp: fieldInfo) {
-			FieldValue val = rec.getFieldValue(fp.fieldNum);
-			if (!Objects.isNull(val) && !val.isEmpty()) {
+			Field fld = rec.getField(fp.fieldNum);
+			if (nonNull(fld) && !fld.isEmpty()) {
+				Iterable<FieldValue> valueList = fld.getFieldValues();
 				windowText.append(separator);
-				String fieldText = GenericField.valuesToString(val);
+				String fieldText = GenericField.valuesToString(valueList);
 				windowText.append(fieldText);
 				separator = ", ";
 			}

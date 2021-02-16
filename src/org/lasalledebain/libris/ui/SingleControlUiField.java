@@ -1,5 +1,6 @@
 package org.lasalledebain.libris.ui;
 
+import java.util.Collections;
 import java.util.Iterator;
 
 import org.lasalledebain.libris.Field;
@@ -47,7 +48,7 @@ public class SingleControlUiField extends UiField {
 	@Override
 	public Iterator<FieldValue> iterator() {
 		try {
-			return control.getFieldValues().iterator();
+			return Collections.singleton(control.getFieldValue()).iterator();
 		} catch (FieldDataException e) {
 			throw new DatabaseError("error getting field values", e);
 		}

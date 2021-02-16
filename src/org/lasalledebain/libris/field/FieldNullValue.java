@@ -8,7 +8,7 @@ public class FieldNullValue extends FieldValue {
 	}
 
 	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
+	protected boolean equals(FieldValue comparand) {
 		return true;
 	}
 

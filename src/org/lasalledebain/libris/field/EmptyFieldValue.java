@@ -8,7 +8,7 @@ public class EmptyFieldValue extends FieldValue {
 	}
 
 	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
+	public boolean equals(FieldValue comparand) {
 		return false;
 	}
 

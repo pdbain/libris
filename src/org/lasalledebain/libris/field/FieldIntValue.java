@@ -21,7 +21,7 @@ public class FieldIntValue extends FieldValue {
 	}
 
 	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
+	protected boolean equals(FieldValue comparand) {
 		FieldIntValue other = (FieldIntValue) comparand;
 		boolean valueEquals = (value == other.value);
 		return valueEquals;

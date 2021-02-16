@@ -29,7 +29,6 @@ public abstract class GenericField implements Field {
 	/**
 	 * Allows a field to have multiple values;
 	 */
-	private FieldValue values = null;
 	private final ArrayList<FieldValue> valueList;
 	private static HashMap<String, FieldType> fieldTypeMap = GenericField.initializeTypeMap();
 	protected static final FieldNullValue nullValue = new FieldNullValue();
@@ -106,9 +105,6 @@ public abstract class GenericField implements Field {
 			deletedValue = valueList.get(0);
 			valueList.remove(0);
 		}
-		if (null != values) {
-			values = values.nextValue;
-		}
 		return deletedValue;
 	}
 
@@ -172,34 +168,12 @@ public abstract class GenericField implements Field {
 			throw new FieldDataException("cannot add "+v+" to "+getFieldId()+": that field does not allow multiple values");
 		}
 		
-		// TODO DEPRECATED
 		valueList.add(v);
-		if (null != v) {
-			v.nextValue = null;
-		}
-		if (null == values) {
-			values = v;
-		} else if (isSingleValue()) {
-			throw new FieldDataException("cannot add "+v+" to "+getFieldId()+": that field does not allow multiple values");
-		} else {
-			FieldValue current = values;
-			while (null != current.nextValue) {
-				current = current.nextValue;
-			}
-			current.nextValue = v;
-		}
-		
 	}
 	@Override
 	public void changeValue(FieldValue newValue) throws FieldDataException {
 		if (valueList.isEmpty()) addFieldValue(newValue);
 		else valueList.set(0, newValue);
-		// TODO DEPRECATED
-		if (null != values) {
-			values = values.nextValue;
-		}
-		newValue.nextValue = values;
-		values = newValue;
 	}
 	@Override
 	/**
@@ -264,7 +238,7 @@ public abstract class GenericField implements Field {
 			if (!other.isEmpty()) {
 				return false;
 			}
-		} else if (!values.equals(other.values)) {
+		} else if (!valueList.equals(other.valueList)) {
 			return false;
 		}
 		return true;

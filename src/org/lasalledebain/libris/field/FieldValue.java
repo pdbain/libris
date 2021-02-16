@@ -6,7 +6,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class FieldValue implements Iterable<FieldValue> {
+public abstract class FieldValue {
 	FieldValue nextValue;
 	public FieldValueIterator iterator() {
 		return new RecordFieldValueIterator(this);
@@ -46,16 +46,6 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 			return this;
 		}
 
-	}
-
-	public int getNumberOfValues() {
-		int count = 1;
-		FieldValue next = this;
-		while (null != next.nextValue) {
-			++count;
-			next = next.nextValue;
-		}
-		return count;
 	}
 
 	public abstract String getValueAsString();
@@ -114,22 +104,7 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 		else return false;
 	}
 
-	public boolean equals(FieldValue comparand) {
-		if (getNumberOfValues() != comparand.getNumberOfValues()) {
-			return false;
-		}
-
-		Iterator<FieldValue> compIterator = comparand.iterator();
-		for (FieldValue v: this) {
-			FieldValue cNext = compIterator.next();
-			if (!v.singleValueEquals(cNext)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	protected abstract boolean singleValueEquals(FieldValue comparand);
+	protected abstract boolean equals(FieldValue comparand);
 
 	public void append(FieldValue temp) {
 		FieldValue cursor = this;

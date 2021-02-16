@@ -824,10 +824,23 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 
 		public static void log(Level severity, String msg, Throwable e) {
-			librisLogger.log(severity, msg, e);
+			librisLogger.log(severity, combineMessages(msg, e), e);
+		}
+
+
+		protected static String combineMessages(String msg, Throwable e) {
+			String userMessage = nonNull(msg)? msg: "";
+			String exceptionMessage = nonNull(e)? (nonNull(e.getMessage())? e.getMessage(): ""): "";
+			String combinedMessage = userMessage;
+			if (userMessage.isEmpty()) {
+				combinedMessage = exceptionMessage;
+			} else if (!exceptionMessage.isEmpty()) {
+				combinedMessage = userMessage + " Exception message: " + exceptionMessage;
+			}
+			return combinedMessage;
 		}
 		public static void logException(String msg, Throwable e) {
-			librisLogger.log(Level.SEVERE, msg, e);
+			librisLogger.log(Level.SEVERE, combineMessages(msg, e), e);
 		}
 		public static void log(Level severity, String msg) {
 			librisLogger.log(severity, msg);
