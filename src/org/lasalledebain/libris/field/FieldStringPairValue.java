@@ -1,42 +1,57 @@
 package org.lasalledebain.libris.field;
 
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.exception.InputException;
+
 import static java.util.Objects.isNull;
 
 public class FieldStringPairValue extends FieldValue {
+	// TODO FieldStringPairValue replace array with scalars
 	@Override
 	public boolean isEmpty() {
-		return (null == values[0]) || values[0].isEmpty();
-	}
-	private final String[] values;
-	private String concatenator = "-";
-	public FieldStringPairValue(String val0, String val1) {
-		values = new String[2];
-		values[0] = val0;
-		values[1] = val1;
-	}
-	public FieldStringPairValue(String[] newValues) {
-		values = newValues;
+		return mainValue.isEmpty() && !hasExtraValue();
 	}
 	@Override
+	public boolean hasExtraValue() {
+		return extraPresent;
+	}
+	private final String mainValue, extraValue;
+	private final boolean extraPresent;
+	private String concatenator = "-";
+	public FieldStringPairValue(String val0, String val1) throws InputException {
+		Assertion.assertNotNullInputException("FieldStringPairValue main value is null", val0);
+		mainValue = val0;
+		Assertion.assertNotNullInputException("FieldStringPairValue extra value is null", val1);
+		extraValue = val1;
+		extraPresent = true;
+	}
+	public FieldStringPairValue(String val0) throws InputException {
+		Assertion.assertNotNullInputException("FieldStringPairValue main value is null", val0);
+		mainValue = val0;
+		extraValue = null;
+		extraPresent = false;
+	}
+
+	@Override
 	public String getValueAsString() {
-		return values[0]+concatenator +values[1];
+		return (extraPresent)? (mainValue + concatenator + extraValue): mainValue;
 	}
 	@Override
 	public String getExtraValueAsKey() {
-		return values[1];
+		return getExtraValueAsString();
 	}
 	@Override
 	public String getExtraValueAsString() {
-		return values[1];
+		return (extraPresent)? extraValue: "";
 	}
 	@Override
 	public String getMainValueAsKey() throws FieldDataException {
-		return values[0];
+		return mainValue;
 }
 	@Override
 	public String getMainValueAsString() {
-		return values[0];
+		return mainValue;
 }
 	@Override
 	protected boolean equals(FieldValue comparand) {
@@ -56,16 +71,5 @@ public class FieldStringPairValue extends FieldValue {
 				}
 		}
 		return result;
-	}
-	@Override
-	public FieldValue duplicate() {
-		String[] newValues = new String[values.length];
-		int i = 0;
-		for (String s: values) {
-			newValues[i] = s;
-			++i;
-		}
-		FieldStringPairValue v = new FieldStringPairValue(newValues);
-		return v;
 	}
 }

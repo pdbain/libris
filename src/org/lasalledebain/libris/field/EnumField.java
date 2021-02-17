@@ -8,7 +8,7 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.util.StringUtils;
 
-public class EnumField extends GenericField implements Field {
+public class EnumField extends GenericField<FieldEnumValue> implements Field {
 	public EnumField(FieldTemplate template) {
 		super(template);
 	}
@@ -45,6 +45,21 @@ public class EnumField extends GenericField implements Field {
 		return template.getEnumChoices().of(choiceName);
 	}
 
+	protected FieldEnumValue valueOf(int value, String extraValue) {
+		return new FieldEnumValue(template.getEnumChoices(), value, extraValue);
+	}
+
+	@Override
+	public FieldEnumValue valueOf(FieldValue original) throws FieldDataException {
+		return (original instanceof FieldEnumValue)? (FieldEnumValue) original: valueOf(original.getValueAsInt(), original.getExtraValueAsString());
+	}
+
+	@Deprecated
+	public static EnumField of(Field f) {
+		if (f instanceof EnumField) return (EnumField) f;
+		else throw new DatabaseError("Field of type "+f.getClass().getName()+" is not compatible with EnumField");
+	}
+
 	@Override
 	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
 		addValuePair(fieldData.getMainValueAsKey(), fieldData.getExtraValueAsString());
@@ -54,10 +69,6 @@ public class EnumField extends GenericField implements Field {
 	public void addValuePair(Integer value, String extraValue)
 			throws FieldDataException {
 		addFieldValue(valueOf(value, extraValue));
-	}
-
-	protected FieldEnumValue valueOf(int value, String extraValue) {
-		return new FieldEnumValue(template.getEnumChoices(), value, extraValue);
 	}
 
 	@Override
@@ -70,11 +81,6 @@ public class EnumField extends GenericField implements Field {
 		} else {
 			throw new FieldDataException("either value or extravalue field must be empty.\nfound "+"\""+value+"\",\""+value+"\"");
 		}
-	}
-
-	public static EnumField of(Field f) {
-		if (f instanceof EnumField) return (EnumField) f;
-		else throw new DatabaseError("Field of type "+f.getClass().getName()+" is not compatible with EnumField");
 	}
 
 	@Override

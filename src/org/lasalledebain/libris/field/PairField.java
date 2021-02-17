@@ -3,9 +3,22 @@ package org.lasalledebain.libris.field;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.util.StringUtils;
 
-public class PairField extends GenericField implements Field {
+public class PairField extends GenericField<FieldStringPairValue> implements Field {
+	@Override
+	public FieldStringPairValue valueOf(FieldValue original) throws FieldDataException {
+		FieldStringPairValue result;
+		try {
+			result = (original instanceof FieldStringPairValue)? 
+					(FieldStringPairValue) original: new FieldStringPairValue(original.getMainValueAsString(), original.getExtraValueAsString());
+		} catch (InputException e) {
+			throw new FieldDataException("error in field "+getFieldId(), e);
+		}
+		return result;
+	}
+
 	public PairField(FieldTemplate template) {
 		super(template);
 	}
@@ -14,8 +27,13 @@ public class PairField extends GenericField implements Field {
 		addFieldValue(valueOf(value));
 	}
 
-	protected FieldSingleStringValue valueOf(String value) {
-		return new FieldSingleStringValue(value);
+	protected FieldStringPairValue valueOf(String value) throws FieldDataException {
+		try {
+			return new FieldStringPairValue(value);
+		} catch (InputException e) {
+
+			throw new FieldDataException("error in field "+getFieldId(), e);
+		}
 	}
 
 	@Override
@@ -30,9 +48,14 @@ public class PairField extends GenericField implements Field {
 	}
 
 	@Override
-	public void addValuePair(String mainValue, String extraValue)
-	throws FieldDataException {
-		FieldValue v = (StringUtils.isStringEmpty(extraValue))? valueOf(mainValue): new FieldStringPairValue(mainValue, extraValue);
+	public void addValuePair(String mainValue, String extraValue) throws FieldDataException {
+		FieldValue v;
+		try {
+			v = (StringUtils.isStringEmpty(extraValue))? valueOf(mainValue): new FieldStringPairValue(mainValue, extraValue);
+		} catch (InputException e) {
+
+			throw new FieldDataException("error in field "+getFieldId(), e);
+		}
 		addFieldValue(v);
 	}
 

@@ -5,8 +5,10 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public abstract class FieldValue {
+	@Deprecated
 	private static final EmptyFieldValue emptyFieldValueSingleton = new EmptyFieldValue();
 
+	@Deprecated
 	public static EmptyFieldValue getEmptyfieldvaluesingleton() {
 		return emptyFieldValueSingleton;
 	}
@@ -19,9 +21,8 @@ public abstract class FieldValue {
 		if (null != mainValueAsKey) {
 			values.setAttribute(LibrisXMLConstants.XML_ENUMCHOICE_VALUE_ATTR, mainValueAsKey);
 		}
-		String extraValue = getExtraValueAsKey();
-		if (null != extraValue) {
-			values.setAttribute(LibrisXMLConstants.XML_EXTRA_VALUE_ATTR, extraValue);
+		if (hasExtraValue()) {
+			values.setAttribute(LibrisXMLConstants.XML_EXTRA_VALUE_ATTR, getExtraValueAsKey());
 		}
 		return values;
 	}
@@ -52,6 +53,10 @@ public abstract class FieldValue {
 	public boolean isEmpty() {
 		return false;
 	}
+	
+	public boolean hasExtraValue() {
+		return false;
+	}
 
 	public int getValueAsInt() {
 		return 0;
@@ -68,6 +73,4 @@ public abstract class FieldValue {
 	}
 
 	protected abstract boolean equals(FieldValue comparand);
-
-	public abstract FieldValue duplicate();
 }

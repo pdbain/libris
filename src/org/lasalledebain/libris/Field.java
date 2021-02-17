@@ -33,9 +33,9 @@ public interface Field extends XMLElement {
 	public boolean isSingleValue();
 	public boolean isEmpty();
 	public int getNumberOfValues();
-	public Iterable<FieldValue> getFieldValues();
+	public Iterable<? extends FieldValue> getFieldValues();
 	public String getValuesAsString();
-	public Optional<FieldValue> getFirstFieldValue();
+	public Optional<? extends FieldValue> getFirstFieldValue();
 	public FieldValue removeValue() throws FieldDataException;
 	public void changeValue(String string) throws FieldDataException;
 	public void changeValue(FieldValue fieldValue) throws FieldDataException;

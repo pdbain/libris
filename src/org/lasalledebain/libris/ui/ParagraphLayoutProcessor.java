@@ -102,7 +102,7 @@ public class ParagraphLayoutProcessor extends LayoutProcessor {
 		for (LayoutField fp: fieldInfo) {
 			Field fld = rec.getField(fp.fieldNum);
 			if (nonNull(fld) && !fld.isEmpty()) {
-				Iterable<FieldValue> valueList = fld.getFieldValues();
+				Iterable<? extends FieldValue> valueList = fld.getFieldValues();
 				windowText.append(separator);
 				String fieldText = GenericField.valuesToString(valueList);
 				windowText.append(fieldText);

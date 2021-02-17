@@ -105,7 +105,7 @@ public class FieldTest extends TestCase {
 		boolean thrown = false;
 		try {
 			rof.addIntegerValue(99);
-		} catch (FieldDataException e) {
+		} catch (DatabaseError e) {
 			thrown = true;
 		}
 		assertTrue("No error addIntegerValue read-only view", thrown);
@@ -130,7 +130,7 @@ public class FieldTest extends TestCase {
 		thrown = false;
 		try {
 			rof.addValue("foo");
-		} catch (FieldDataException e) {
+		} catch (DatabaseError e) {
 			thrown = true;
 		}
 		assertTrue("No error addvalue(string) read-only view", thrown);
@@ -138,7 +138,7 @@ public class FieldTest extends TestCase {
 		thrown = false;
 		try {
 			rof.addValuePair(1, "foo");
-		} catch (FieldDataException e) {
+		} catch (DatabaseError e) {
 			thrown = true;
 		}
 		assertTrue("No error addvaluepair read-only view", thrown);
@@ -146,7 +146,7 @@ public class FieldTest extends TestCase {
 		thrown = false;
 		try {
 			rof.addValuePair("foo", "bar");
-		} catch (FieldDataException e) {
+		} catch (DatabaseError e) {
 			thrown = true;
 		}
 		assertTrue("No error addvalue(string, string) read-only view", thrown);
@@ -211,7 +211,7 @@ public class FieldTest extends TestCase {
 	}
 	private String[] getValuesAsStringPair(Field f) {
 		String[] pair = new String[] {null, null};
-		final Optional<FieldValue> firstFieldValueOpt = f.getFirstFieldValue();
+		final Optional<? extends FieldValue> firstFieldValueOpt = f.getFirstFieldValue();
 		if (firstFieldValueOpt.isPresent()) {
 			FieldValue v = firstFieldValueOpt.get();
 			try {
@@ -304,7 +304,7 @@ public class FieldTest extends TestCase {
 		}
 		f.removeValue();
 		f.changeValue(myChoices[1]);
-		Iterator<FieldValue> valueIterator = f.getFieldValues().iterator();
+		Iterator<? extends FieldValue> valueIterator = f.getFieldValues().iterator();
 		assertEquals("wrong first value after change", 1, valueIterator.next().getValueAsInt());
 		assertEquals("wrong second value after change", myChoices[2], valueIterator.next().getValueAsString());
 
@@ -327,7 +327,7 @@ public class FieldTest extends TestCase {
 				}
 				int valueCount = f.getNumberOfValues();
 				assertEquals("wrong number of values", testData.length, valueCount);
-				Iterator<FieldValue> vi = f.getFieldValues().iterator();
+				Iterator<? extends FieldValue> vi = f.getFieldValues().iterator();
 				int i = 0;
 				while (vi.hasNext()) {
 					String d = vi.next().getValueAsString();

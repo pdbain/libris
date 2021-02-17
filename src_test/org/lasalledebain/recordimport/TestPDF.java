@@ -20,6 +20,7 @@ import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.MetadataHolder;
 import org.lasalledebain.libris.Repository;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.DatabaseUi;
@@ -119,31 +120,26 @@ public class TestPDF extends TestCase {
 		}
 	}
 	@Test
-	public void testImportMultipleDocuments() throws IOException {
-		try {
-			db = Utilities.buildTestDatabase(workingDirectory, Utilities.KEYWORD_DATABASE1_XML);
-	        Map<String, String> env = new HashMap<>(); 
-	        env.put("create", "true");
-	        DatabaseUi ui = db.getUi();
-			int keywordField = db.getSchema().getFieldNum("ID_keywords");
-			int abstractField = db.getSchema().getFieldNum("ID_text");
-			PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
-			DatabaseRecord parentRec = db.newRecord();
-			db.putRecord(parentRec);
-			parentRec.setName("Parent_record");
-			URI exampleDocs = URI.create("jar:file:"+(Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_DOCS_ZIP, workingDirectory).getAbsolutePath()));
-			File docDir = new File(workingDirectory, "docs");
-			ZipUtils.unzipZipFile(exampleDocs, docDir);
- 			final List<URI> fileUris = Arrays.stream(docDir.listFiles()).map(f -> f.toURI()).collect(Collectors.toList());
-			importer.importPDFDocuments(fileUris, parentRec);
-			ui.saveDatabase();
-			File dumpFile = new File(workingDirectory, "dump.libr");
-			db.exportDatabaseXml(new FileOutputStream(dumpFile), true, true, false);
-			
-		} catch (LibrisException e) {
-			e.printStackTrace();
-			fail("unexpected exception"+e.getMessage());
-		}
+	public void testImportMultipleDocuments() throws IOException, LibrisException {
+		db = Utilities.buildTestDatabase(workingDirectory, Utilities.KEYWORD_DATABASE1_XML);
+        Map<String, String> env = new HashMap<>(); 
+        env.put("create", "true");
+        DatabaseUi ui = db.getUi();
+		int keywordField = db.getSchema().getFieldNum("ID_keywords");
+		int abstractField = db.getSchema().getFieldNum("ID_text");
+		PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);
+		DatabaseRecord parentRec = db.newRecord();
+		db.putRecord(parentRec);
+		parentRec.setName("Parent_record");
+		URI exampleDocs = URI.create("jar:file:"+(Utilities.copyTestDatabaseFile(Utilities.EXAMPLE_DOCS_ZIP, workingDirectory).getAbsolutePath()));
+		File docDir = new File(workingDirectory, "docs");
+		ZipUtils.unzipZipFile(exampleDocs, docDir);
+			final List<URI> fileUris = Arrays.stream(docDir.listFiles()).map(f -> f.toURI()).collect(Collectors.toList());
+		importer.importPDFDocuments(fileUris, parentRec);
+		ui.saveDatabase();
+		File dumpFile = new File(workingDirectory, "dump.libr");
+		db.exportDatabaseXml(new FileOutputStream(dumpFile), true, true, false);
+		
 	}
 
 }

@@ -34,12 +34,4 @@ public class FieldLocationValue extends FieldValue {
 	public String getMainValueAsKey() throws FieldDataException {
 		return super.getMainValueAsKey();
 	}
-
-	@Override
-	public FieldValue duplicate() {
-		FieldLocationValue dup = new FieldLocationValue(location, locationName);
-		return dup;
-	}
-
-
 }

@@ -16,7 +16,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.index.GroupDef;;
 
-public class AffiliatesField extends GenericField implements Iterable<FieldValue>{
+public class AffiliatesField extends GenericField<FieldIntValue> implements Iterable<FieldValue>{
 	private int affiliates[];
 	private GroupDef grp;
 	private RecordIdNameMapper mapper;
@@ -69,11 +69,6 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 	public void addValuePair(Integer value, String extraValue)
 			throws FieldDataException {
 		throw new FieldDataException("addValuePair not permitted on this field");
-	}
-
-	@Override
-	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
-		throw new FieldDataException("valueOf(int, String) not permitted on this field");
 	}
 
 	@Override
@@ -156,7 +151,7 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 
 	@Override
 	public Field getReadOnlyView() {
-		return new ReadOnlyField(this);
+		return new ReadOnlyField<FieldIntValue>(this);
 	}
 
 	@Override
@@ -211,8 +206,18 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 	}
 
 	@Override
-	protected FieldValue valueOf(String valueString) throws FieldDataException {
+	protected FieldIntValue valueOf(String valueString) throws FieldDataException {
 		return null;
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		throw new FieldDataException("valueOf(int, String) not permitted on this field");
+	}
+
+	@Override
+	public FieldIntValue valueOf(FieldValue original) throws FieldDataException {
+		return (original instanceof FieldIntValue)? (FieldIntValue) original: new FieldIntValue(original.getValueAsInt());
 	}
 
 	@Override

@@ -142,7 +142,7 @@ public class ArtifactRecord extends Record {
 		FieldValue result = null;
 		Field resultField = recordFields[fieldNum];
 		if (null != resultField) {
-			final Optional<FieldValue> firstFieldValueOpt = resultField.getFirstFieldValue();
+			final Optional<? extends FieldValue> firstFieldValueOpt = resultField.getFirstFieldValue();
 			if (firstFieldValueOpt.isPresent()) result = firstFieldValueOpt.get();
 		}
 		return result;

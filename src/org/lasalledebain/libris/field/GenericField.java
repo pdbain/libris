@@ -3,6 +3,7 @@ package org.lasalledebain.libris.field;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import javax.xml.stream.XMLStreamException;
@@ -23,13 +24,14 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class GenericField implements Field {
+public abstract class GenericField<FieldValueType extends FieldValue> implements Field {
 
 	protected FieldTemplate template;
 	/**
 	 * Allows a field to have multiple values;
 	 */
 	private final ArrayList<FieldValue> valueList;
+	private final ArrayList<FieldValueType> fieldValueList;
 	private static HashMap<String, FieldType> fieldTypeMap = GenericField.initializeTypeMap();
 	
 	public GenericField(FieldTemplate template) {
@@ -40,6 +42,7 @@ public abstract class GenericField implements Field {
 	protected GenericField() {
 		super();
 		valueList = new ArrayList<FieldValue>(0);
+		fieldValueList = new ArrayList<FieldValueType>(0);
 	}
 
 	@Override
@@ -80,7 +83,7 @@ public abstract class GenericField implements Field {
 		return valuesToString(valueList);
 	}
 
-	public static String valuesToString(Iterable<FieldValue> fieldValues) {
+	public static String valuesToString(Iterable<? extends FieldValue> fieldValues) {
 		String result = "";
 		if (null != fieldValues) {
 			StringBuffer buff = new StringBuffer();
@@ -141,15 +144,29 @@ public abstract class GenericField implements Field {
 
 	@Override
 	public void addValue(FieldValue fieldData) throws FieldDataException {
-		if (isValueCompatible(fieldData))
+		addNativeFieldValue(valueOf(fieldData));
+		if (isValueCompatible(fieldData)) {
 			addFieldValue(fieldData);
-		else
+		} else
 			addValue(fieldData.getMainValueAsString());
 	}
 
-	public abstract void addValueGeneral (FieldValue fieldData) throws FieldDataException;
+	@Deprecated
+	public  void addValueGeneral (FieldValue fieldData) throws FieldDataException {
+		final FieldValueType v = valueOf(fieldData);
+		addNativeFieldValue(v);
+		addValue(v);
+	}
 	
-	public abstract void addValue(String data) throws FieldDataException;
+	public abstract FieldValueType valueOf(FieldValue original) throws FieldDataException;
+	
+	public void addValue(String fieldData) throws FieldDataException {
+
+		final FieldValueType v = valueOf(fieldData);
+		addNativeFieldValue(v);
+		addValue(v);
+			
+	}
 
 	@Override
 	public void addValuePair(String value, String extraValue)
@@ -162,6 +179,10 @@ public abstract class GenericField implements Field {
 		}
 		
 		valueList.add(v);
+	}
+	
+	public void addNativeFieldValue(FieldValueType v) {
+		fieldValueList.add(v);
 	}
 	@Override
 	public void changeValue(FieldValue newValue) throws FieldDataException {
@@ -181,12 +202,16 @@ public abstract class GenericField implements Field {
 		changeValue(valueOf(value, extraValue));
 	}
 
-	public Iterable<FieldValue> getFieldValues() {
-		return valueList;
+	public Iterable<? extends FieldValue> getFieldValues() {
+		return true? valueList: getValueList();
+	}
+	
+	public List<FieldValueType> getValueList() {
+		return fieldValueList;
 	}
 
 	@Override
-	public Optional<FieldValue> getFirstFieldValue() {
+	public Optional<? extends FieldValue> getFirstFieldValue() {
 		return (valueList.isEmpty())? Optional.empty(): Optional.of(valueList.get(0));
 	}
 
@@ -221,7 +246,7 @@ public abstract class GenericField implements Field {
 			return false;
 		if (getClass() != comparand.getClass())
 			return false;
-		GenericField other = (GenericField) comparand;
+		GenericField<?> other = (GenericField<?>) comparand;
 		if (template == null) {
 			if (other.template != null) {
 				return false;
@@ -345,18 +370,18 @@ public abstract class GenericField implements Field {
 		return template.getFtype();
 	}
 	
-	protected abstract FieldValue valueOf(String valueString) throws FieldDataException;
+	protected abstract FieldValueType valueOf(String valueString) throws FieldDataException;
 
 	protected abstract FieldValue valueOf(int value, String extraValue) throws FieldDataException;
 
-	public void copyValues(GenericField fieldCopy) throws FieldDataException {
+	public void copyValues(GenericField<FieldValueType> fieldCopy) throws FieldDataException {
 		fieldCopy.valueList.clear();
 		for (FieldValue v: getFieldValues()) {
-			fieldCopy.addFieldValue(v.duplicate());
+			fieldCopy.addFieldValue(v);
 		}
 	}
 	@Override
 	public Field getReadOnlyView() {
-		return new ReadOnlyField(this);
+		return new ReadOnlyField<FieldValueType>(this);
 	}
 }

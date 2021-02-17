@@ -24,8 +24,4 @@ public class FieldSingleStringValue extends FieldValue {
 			return false;
 		}
 	}
-	@Override
-	public FieldValue duplicate() {
-		return new FieldSingleStringValue(value);
-	}
 }

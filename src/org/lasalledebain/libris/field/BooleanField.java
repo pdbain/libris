@@ -4,7 +4,7 @@ import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
 
-public class BooleanField extends GenericField implements Field {
+public class BooleanField extends GenericField<FieldBooleanValue> implements Field {
 	public BooleanField(FieldTemplate template) {
 		super(template);
 	}
@@ -47,5 +47,9 @@ public class BooleanField extends GenericField implements Field {
 	@Override
 	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
 		throw new FieldDataException("addIntegerValue not defined for BooleanField");
+	}
+	@Override
+	public FieldBooleanValue valueOf(FieldValue original) throws FieldDataException {
+		return (original instanceof FieldBooleanValue)? (FieldBooleanValue) original: valueOf(original.getMainValueAsKey());
 	}
 }

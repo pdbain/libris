@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.field;
 
+import org.lasalledebain.libris.exception.FieldDataException;
+
 public class FieldIntValue extends FieldValue {
 	@Override
 	public int getValueAsInt() {
@@ -7,8 +9,12 @@ public class FieldIntValue extends FieldValue {
 	}
 
 	int value;
-	public FieldIntValue(String data) {
-		value = Integer.parseInt(data);
+	public FieldIntValue(String data) throws FieldDataException {
+		try {
+			value = Integer.parseInt(data);
+		} catch (NumberFormatException e) {
+			throw new FieldDataException("Cannot parse "+data+" as int", e);
+		}
 	}
 
 	public FieldIntValue(int newValue) {
@@ -26,10 +32,4 @@ public class FieldIntValue extends FieldValue {
 		boolean valueEquals = (value == other.value);
 		return valueEquals;
 	}
-
-	@Override
-	public FieldValue duplicate() {
-		return new FieldIntValue(value);
-	}
-
 }

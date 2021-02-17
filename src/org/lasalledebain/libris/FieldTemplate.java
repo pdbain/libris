@@ -12,6 +12,8 @@ import org.lasalledebain.libris.field.AffiliatesField;
 import org.lasalledebain.libris.field.BooleanField;
 import org.lasalledebain.libris.field.EnumField;
 import org.lasalledebain.libris.field.FieldBooleanValue;
+import org.lasalledebain.libris.field.FieldIntValue;
+import org.lasalledebain.libris.field.FieldStringPairValue;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.field.IntegerField;
@@ -303,7 +305,7 @@ public class FieldTemplate implements XMLElement {
 	
 		@Override
 		public
-		GenericField newField(FieldTemplate template) {
+		GenericField<FieldStringPairValue> newField(FieldTemplate template) {
 			return new PairField(template);
 		}
 	
@@ -312,7 +314,7 @@ public class FieldTemplate implements XMLElement {
 	static public class IntegerFieldFactory implements FieldFactory {
 		@Override
 		public
-		GenericField newField(FieldTemplate template) {
+		GenericField<FieldIntValue> newField(FieldTemplate template) {
 			return new IntegerField(template);
 		}
 	}
@@ -320,7 +322,7 @@ public class FieldTemplate implements XMLElement {
 	static public class AffiliatesFieldFactory implements FieldFactory {	
 		@Override
 		public
-		GenericField newField(FieldTemplate template) {
+		GenericField<FieldIntValue> newField(FieldTemplate template) {
 			return new AffiliatesField(template);
 		}
 	}

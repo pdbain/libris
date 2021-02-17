@@ -1,5 +1,5 @@
 package org.lasalledebain.libris.field;
-
+@Deprecated
 public class EmptyFieldValue extends FieldValue {
 
 	@Override
@@ -10,11 +10,6 @@ public class EmptyFieldValue extends FieldValue {
 	@Override
 	public boolean equals(FieldValue comparand) {
 		return false;
-	}
-
-	@Override
-	public FieldValue duplicate() {
-		return this;
 	}
 
 	@Override

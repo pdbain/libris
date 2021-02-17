@@ -77,12 +77,6 @@ public class FieldBooleanValue extends FieldValue {
 		return value? 1: 0; /* 1 == true, 0 == false */
 	}
 
-	@Override
-	public FieldValue duplicate() {
-		FieldBooleanValue v = new FieldBooleanValue(value);
-		return v;
-	}
-
 	public static List<FieldValue> getLegalValues() {
 		return List.of(getFalseValue(), getTrueValue());
 	}

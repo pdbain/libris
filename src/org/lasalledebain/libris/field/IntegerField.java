@@ -4,7 +4,7 @@ import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
 
-public class IntegerField extends GenericField implements Field {
+public class IntegerField extends GenericField<FieldIntValue> {
 	public IntegerField(FieldTemplate template) {
 		super(template);
 	}
@@ -19,7 +19,13 @@ public class IntegerField extends GenericField implements Field {
 		}
 	}
 
-	protected FieldIntValue valueOf(String data) {
+	@Override
+	public FieldIntValue valueOf(FieldValue original) throws FieldDataException {
+		FieldIntValue result = (original instanceof FieldIntValue)? (FieldIntValue) original: valueOf(original.getMainValueAsKey());
+		return result;
+	}
+
+	protected FieldIntValue valueOf(String data) throws FieldDataException {
 		return new FieldIntValue(data);
 	}
 
@@ -30,8 +36,12 @@ public class IntegerField extends GenericField implements Field {
 
 	@Override
 	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		addValue(fieldData.getMainValueAsKey());
-		
+		addValue(fieldData.getMainValueAsKey());		
+	}
+
+	public void addValue(FieldIntValue fieldData) throws FieldDataException {
+		// TODO Auto-generated method stub
+		super.addValue(fieldData);
 	}
 
 	@Override

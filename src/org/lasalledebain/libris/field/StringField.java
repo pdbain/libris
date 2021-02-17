@@ -3,9 +3,15 @@ package org.lasalledebain.libris.field;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.exception.InputException;
 
-public class StringField extends GenericField implements Field {
+public class StringField extends GenericField<FieldSingleStringValue> {
 	
+	@Override
+	public FieldSingleStringValue valueOf(FieldValue original) throws FieldDataException {
+		return (original instanceof FieldSingleStringValue) ? (FieldSingleStringValue) original: valueOf(original.getMainValueAsString());
+	}
+
 	@Override
 	public boolean isText() {
 		return true;
@@ -21,7 +27,11 @@ public class StringField extends GenericField implements Field {
 
 	@Override
 	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
-		return new FieldStringPairValue(Integer.toString(value), extraValue);
+		try {
+			return new FieldStringPairValue(Integer.toString(value), extraValue);
+		} catch (InputException e) {
+			throw new FieldDataException("error in field "+getFieldId(), e);
+		}
 	}
 
 	@Override
