@@ -42,7 +42,6 @@ public interface Field extends XMLElement {
 	public void changeValue(int value, String extraValue) throws FieldDataException;
 	public boolean equals(Field comparand);
 	public EnumFieldChoices getLegalValues();
-	public void setValues(FieldValue[] valueArray) throws FieldDataException;
 	public void setValues(Iterable<FieldValue> values) throws FieldDataException;
 	public Field duplicate() throws FieldDataException;
 	public Field getReadOnlyView();

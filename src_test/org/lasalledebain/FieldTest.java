@@ -1,6 +1,7 @@
 package org.lasalledebain;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Random;
@@ -111,7 +112,7 @@ public class FieldTest extends TestCase {
 
 		thrown = false;
 		try {
-			rof.setValues(new FieldValue[0]);
+			rof.setValues(Collections.emptyList());
 		} catch (DatabaseError e) {
 			thrown = true;
 		}

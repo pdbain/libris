@@ -173,11 +173,6 @@ class ReadOnlyField extends GenericField {
 	}
 
 	@Override
-	public void setValues(FieldValue[] valueArray) throws FieldDataException {
-		throw new DatabaseError("changing read-only field");
-	}
-
-	@Override
 	public void setValues(Iterable<FieldValue> values) throws FieldDataException {
 		throw new DatabaseError("changing read-only field");
 	}

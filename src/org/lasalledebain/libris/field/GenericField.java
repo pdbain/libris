@@ -120,16 +120,10 @@ public abstract class GenericField implements Field {
 		}
 	}
 
-	@Override
-	public void setValues(FieldValue[] valueArray) throws FieldDataException {
-		setValues(valueArray);
-	}
-
 	public boolean isTrue() throws FieldDataException {
 		throw new FieldDataException(getFieldId()+" is not a boolean field");
 	}
 	
-
 	@Override
 	public Optional<EnumField> asEnumField() {
 		return EnumField.class.isInstance(this)? Optional.of(EnumField.class.cast(this)): Optional.empty();

@@ -216,11 +216,6 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 	}
 
 	@Override
-	public void setValues(FieldValue[] valueArray) throws FieldDataException {
-		setValues(Arrays.asList(valueArray));
-	}
-
-	@Override
 	public void setValues(Iterable<FieldValue> values)
 			throws FieldDataException {
 		ArrayList<Integer> buff = new ArrayList<Integer>();
