@@ -31,7 +31,6 @@ public abstract class GenericField implements Field {
 	 */
 	private final ArrayList<FieldValue> valueList;
 	private static HashMap<String, FieldType> fieldTypeMap = GenericField.initializeTypeMap();
-	protected static final FieldNullValue nullValue = new FieldNullValue();
 	
 	public GenericField(FieldTemplate template) {
 		this();
