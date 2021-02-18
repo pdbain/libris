@@ -51,14 +51,4 @@ public class StringField extends GenericField<FieldSingleStringValue> {
 		return otherField;
 	}
 
-	@Override
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		addValue(fieldData.getMainValueAsString());
-	}
-
-	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		return fv instanceof FieldSingleStringValue;
-	}
-
 }

@@ -199,14 +199,4 @@ class ReadOnlyField<FieldValueType extends FieldValue> extends GenericField<Fiel
 		throwReadOnlyException();
 	}
 
-	@Override
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		throwReadOnlyException();
-	}
-
-	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		return false;
-	}
-
 }

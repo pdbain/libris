@@ -208,7 +208,6 @@ public abstract class AbstractUi implements DatabaseUi, LibrisConstants {
 	}
 	
 	@Override
-	// TODO displayRecord return record
 	public abstract Record displayRecord(int recordId) throws LibrisException;
 	
 	@Override

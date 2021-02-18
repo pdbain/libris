@@ -17,11 +17,6 @@ public class BooleanField extends GenericField<FieldBooleanValue> implements Fie
 	}
 	
 	@Override
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		addValue(fieldData.toString());
-	}
-	
-	@Override
 	public boolean isTrue() {
 		var optV = getFirstFieldValue();
 		return optV.isPresent() && optV.get().isTrue();
@@ -40,16 +35,12 @@ public class BooleanField extends GenericField<FieldBooleanValue> implements Fie
 		copyValues(fieldCopy);
 		return fieldCopy;
 	}
-	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		return fv instanceof FieldBooleanValue;
-	}
+
 	@Override
 	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
 		throw new FieldDataException("addIntegerValue not defined for BooleanField");
 	}
 	@Override
-	// TODO FieldBooleanValue valueOf return common object
 	public FieldBooleanValue valueOf(FieldValue original) throws FieldDataException {
 		return (original instanceof FieldBooleanValue)? (FieldBooleanValue) original: valueOf(original.getMainValueAsKey());
 	}

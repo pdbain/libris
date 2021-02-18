@@ -61,11 +61,6 @@ public class EnumField extends GenericField<FieldEnumValue> implements Field {
 	}
 
 	@Override
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		addValuePair(fieldData.getMainValueAsKey(), fieldData.getExtraValueAsString());
-	}
-
-	@Override
 	public void addValuePair(Integer value, String extraValue)
 			throws FieldDataException {
 		addFieldValue(valueOf(value, extraValue));
@@ -81,11 +76,6 @@ public class EnumField extends GenericField<FieldEnumValue> implements Field {
 		} else {
 			throw new FieldDataException("either value or extravalue field must be empty.\nfound "+"\""+value+"\",\""+value+"\"");
 		}
-	}
-
-	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		return fv instanceof FieldEnumValue;
 	}
 }
 

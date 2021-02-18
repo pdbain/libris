@@ -42,12 +42,6 @@ public class PairField extends GenericField<FieldStringPairValue> implements Fie
 	}
 
 	@Override
-	// TODO check type and create new object if necessary
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		addValuePair(fieldData.getMainValueAsString(), fieldData.getExtraValueAsString());		
-	}
-
-	@Override
 	public void addValuePair(String mainValue, String extraValue) throws FieldDataException {
 		FieldValue v;
 		try {
@@ -69,11 +63,6 @@ public class PairField extends GenericField<FieldStringPairValue> implements Fie
 		PairField f = new PairField(template);
 		copyValues(f);
 		return f;
-	}
-
-	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		return (fv instanceof FieldSingleStringValue) || (fv instanceof FieldStringPairValue);
 	}
 
 }	

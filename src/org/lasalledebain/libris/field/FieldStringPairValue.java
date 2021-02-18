@@ -7,7 +7,6 @@ import org.lasalledebain.libris.exception.InputException;
 import static java.util.Objects.isNull;
 
 public class FieldStringPairValue extends FieldValue {
-	// TODO FieldStringPairValue replace array with scalars
 	@Override
 	public boolean isEmpty() {
 		return mainValue.isEmpty() && !hasExtraValue();

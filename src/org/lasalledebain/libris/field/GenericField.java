@@ -12,7 +12,6 @@ import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -31,8 +30,7 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 	/**
 	 * Allows a field to have multiple values;
 	 */
-	private final ArrayList<FieldValue> valueList;
-	private final ArrayList<FieldValueType> fieldValueList;
+	private final ArrayList<FieldValueType> valueList;
 	private static HashMap<String, FieldType> fieldTypeMap = GenericField.initializeTypeMap();
 	
 	public GenericField(FieldTemplate template) {
@@ -41,9 +39,7 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 	}
 
 	protected GenericField() {
-		super();
-		valueList = new ArrayList<FieldValue>(0);
-		fieldValueList = new ArrayList<FieldValueType>(0);
+		valueList = new ArrayList<FieldValueType>(0);
 	}
 
 	@Override
@@ -61,13 +57,10 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 	public boolean isText() {
 		return false;
 	}
-	
-	protected abstract boolean isValueCompatible(FieldValue fv);
 
 	@Override
 	public boolean isEmpty() {
-		Assertion.assertTrueError("DEBUG GenericField isEmpty", valueList.isEmpty() == fieldValueList.isEmpty()); // TODO DEBUG
-		return fieldValueList.isEmpty() && valueList.isEmpty();
+		return valueList.isEmpty();
 	}
 
 	@Override
@@ -82,7 +75,7 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 
 	@Override
 	public String getValuesAsString() {
-		return valuesToString(fieldValueList);
+		return valuesToString(valueList);
 	}
 
 	public static String valuesToString(Iterable<? extends FieldValue> fieldValues) {
@@ -109,16 +102,11 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 			deletedValue = valueList.get(0);
 			valueList.remove(0);
 		}
-		if (!fieldValueList.isEmpty()) {
-			deletedValue = fieldValueList.get(0);
-			fieldValueList.remove(0);
-		}
 		return deletedValue;
 	}
 
 	public void deleteAllvalues() {
 		valueList.clear();
-		fieldValueList.clear();
 	}
 
 	public void setValues(Iterable<FieldValue> valueList) throws FieldDataException {
@@ -150,28 +138,16 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 
 	@Override
 	public void addValue(FieldValue fieldData) throws FieldDataException {
-		// TODO GenericField centralize checking
-		Assertion.assertTrueFieldDataException("Adding second value to single value field", 
-				!isSingleValue() || isEmpty());
 		FieldValueType v = valueOf(fieldData);
-		addNativeFieldValue(v);
-		valueList.add(v);
+		addFieldValueImpl(v);
 	}
 
-	@Deprecated
-	public  void addValueGeneral (FieldValue fieldData) throws FieldDataException {
-		final FieldValueType v = valueOf(fieldData);
-		addNativeFieldValue(v);
-		addValue(v);
-	}
-	
 	public abstract FieldValueType valueOf(FieldValue original) throws FieldDataException;
 	
 	public void addValue(String fieldData) throws FieldDataException {
 
 		final FieldValueType v = valueOf(fieldData);
-		addNativeFieldValue(v);
-		addValue(v);
+		addFieldValueImpl(v);
 			
 	}
 
@@ -180,6 +156,7 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 	throws FieldDataException {
 		throw new FieldDataException("Multiple values not supported in "+getFieldId());
 	}
+	
 	protected void addFieldValue(FieldValue v) throws FieldDataException {
 		addFieldValueImpl(valueOf(v));
 	}
@@ -190,19 +167,16 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 		}
 		
 		valueList.add(v);
-		fieldValueList.add(v);
 	}
 	
 	public void addNativeFieldValue(FieldValueType v) {
-		fieldValueList.add(v);
+		valueList.add(v);
 	}
 	@Override
 	public void changeValue(FieldValue newValue) throws FieldDataException {
-		if (valueList.isEmpty()) addFieldValue(newValue);
-		else valueList.set(0, newValue);
 		FieldValueType v = valueOf(newValue);
-		if (fieldValueList.isEmpty()) addFieldValueImpl(v);
-		else fieldValueList.set(0, v);
+		if (valueList.isEmpty()) addFieldValueImpl(v);
+		else valueList.set(0, v);
 	}
 	@Override
 	/**
@@ -218,16 +192,16 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 	}
 
 	public Iterable<? extends FieldValue> getFieldValues() {
-		return false? valueList: getValueList();
+		return getValueList();
 	}
 	
 	public List<FieldValueType> getValueList() {
-		return fieldValueList;
+		return valueList;
 	}
 
 	@Override
 	public Optional<? extends FieldValue> getFirstFieldValue() {
-		return (valueList.isEmpty())? Optional.empty(): Optional.of(valueList.get(0));
+		return (isEmpty())? Optional.empty(): Optional.of(valueList.get(0));
 	}
 
 	public EnumFieldChoices getLegalValues() {
@@ -272,7 +246,7 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 			if (!other.isEmpty()) {
 				return false;
 			}
-		} else if (!fieldValueList.equals(other.fieldValueList)) {
+		} else if (!valueList.equals(other.valueList)) {
 			return false;
 		}
 		return true;

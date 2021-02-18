@@ -34,11 +34,6 @@ public class IntegerField extends GenericField<FieldIntValue> {
 		throw new FieldDataException("valueOf(int, String) not defined for IntegerField");
 	}
 
-	@Override
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		addValue(fieldData.getMainValueAsKey());		
-	}
-
 	public void addValue(FieldIntValue fieldData) throws FieldDataException {
 		// TODO Auto-generated method stub
 		super.addValue(fieldData);
@@ -54,11 +49,6 @@ public class IntegerField extends GenericField<FieldIntValue> {
 		IntegerField f = new IntegerField(template);
 		copyValues(f);
 		return f;
-	}
-
-	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		return fv instanceof FieldIntValue;
 	}
 
 }
