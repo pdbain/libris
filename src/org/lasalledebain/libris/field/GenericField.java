@@ -191,7 +191,7 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 		changeValue(valueOf(value, extraValue));
 	}
 
-	public Iterable<? extends FieldValue> getFieldValues() {
+	public Iterable<? extends FieldValueType> getFieldValues() {
 		return getValueList();
 	}
 	

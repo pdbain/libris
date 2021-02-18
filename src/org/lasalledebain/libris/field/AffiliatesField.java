@@ -16,7 +16,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.index.GroupDef;;
 
-public class AffiliatesField extends GenericField<FieldIntValue> implements Iterable<FieldValue>{
+public class AffiliatesField extends GenericField<FieldIntValue> implements Iterable<FieldIntValue>{
 	private int affiliates[];
 	private GroupDef grp;
 	private RecordIdNameMapper mapper;
@@ -117,7 +117,7 @@ public class AffiliatesField extends GenericField<FieldIntValue> implements Iter
 	}
 
 	@Override
-	public Iterable<FieldValue> getFieldValues() {
+	public Iterable<FieldIntValue> getFieldValues() {
 		return this;
 	}
 
@@ -243,8 +243,8 @@ public class AffiliatesField extends GenericField<FieldIntValue> implements Iter
 	}
 
 	@Override
-	public Iterator<FieldValue> iterator() {
-		return new Iterator<FieldValue>() {
+	public Iterator<FieldIntValue> iterator() {
+		return new Iterator<FieldIntValue>() {
 
 			int index = 0;
 			@Override
@@ -253,7 +253,7 @@ public class AffiliatesField extends GenericField<FieldIntValue> implements Iter
 			}
 
 			@Override
-			public FieldValue next() {
+			public FieldIntValue next() {
 				return new FieldIntValue(affiliates[index++]);
 			}
 

@@ -18,7 +18,7 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 class ReadOnlyField<FieldValueType extends FieldValue> extends GenericField<FieldValueType> {
-	Field actualField;
+	GenericField<FieldValueType> actualField;
 	@Override
 	public String getElementTag() {
 		throw new DatabaseError("Cannot call toXml on "+getClass().getName());
@@ -34,7 +34,7 @@ class ReadOnlyField<FieldValueType extends FieldValue> extends GenericField<Fiel
 		throwReadOnlyException();
 	}
 
-	public ReadOnlyField(Field actualField) {
+	public ReadOnlyField(GenericField<FieldValueType> actualField) {
 		this.actualField = actualField;
 	}
 
@@ -114,8 +114,8 @@ class ReadOnlyField<FieldValueType extends FieldValue> extends GenericField<Fiel
 	}
 
 	@Override
-	public Iterable<? extends FieldValue> getFieldValues() {
-		return actualField.getFieldValues();
+	public Iterable<? extends FieldValueType> getFieldValues() {
+		return actualField.getValueList();
 	}
 
 	@Override

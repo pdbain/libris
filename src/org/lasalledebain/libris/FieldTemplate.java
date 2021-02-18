@@ -12,8 +12,6 @@ import org.lasalledebain.libris.field.AffiliatesField;
 import org.lasalledebain.libris.field.BooleanField;
 import org.lasalledebain.libris.field.EnumField;
 import org.lasalledebain.libris.field.FieldBooleanValue;
-import org.lasalledebain.libris.field.FieldIntValue;
-import org.lasalledebain.libris.field.FieldStringPairValue;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.field.IntegerField;
@@ -269,7 +267,7 @@ public class FieldTemplate implements XMLElement {
 		temp.put(Field.FieldType.T_FIELD_LOCATION, new PairFieldFactory());
 		temp.put(Field.FieldType.T_FIELD_INDEXENTRY, new IndexEntryFieldFactory());
 		temp.put(Field.FieldType.T_FIELD_ENUM, new FieldFactory() {
-			public GenericField newField(FieldTemplate template) {
+			public EnumField newField(FieldTemplate template) {
 				return new EnumField(template);
 			}
 		}
@@ -280,13 +278,13 @@ public class FieldTemplate implements XMLElement {
 
 	static public class StringFieldFactory implements FieldFactory {
 		
-		public GenericField newField(FieldTemplate template) {
+		public StringField newField(FieldTemplate template) {
 			return new StringField(template);
 		}
 	
 	}
 	static class BooleanFieldFactory implements FieldFactory {
-		public GenericField newField(FieldTemplate template) {
+		public BooleanField newField(FieldTemplate template) {
 			return new BooleanField(template);
 		}
 	}
@@ -294,8 +292,7 @@ public class FieldTemplate implements XMLElement {
 	static public class IndexEntryFieldFactory implements FieldFactory {
 	
 		@Override
-		public
-		GenericField newField(FieldTemplate template) {
+		public IntegerField newField(FieldTemplate template) {
 			return new IntegerField(template);
 		}
 	
@@ -304,8 +301,7 @@ public class FieldTemplate implements XMLElement {
 	static public class PairFieldFactory implements FieldFactory {
 	
 		@Override
-		public
-		GenericField<FieldStringPairValue> newField(FieldTemplate template) {
+		public PairField newField(FieldTemplate template) {
 			return new PairField(template);
 		}
 	
@@ -313,16 +309,14 @@ public class FieldTemplate implements XMLElement {
 
 	static public class IntegerFieldFactory implements FieldFactory {
 		@Override
-		public
-		GenericField<FieldIntValue> newField(FieldTemplate template) {
+		public IntegerField newField(FieldTemplate template) {
 			return new IntegerField(template);
 		}
 	}
 	
 	static public class AffiliatesFieldFactory implements FieldFactory {	
 		@Override
-		public
-		GenericField<FieldIntValue> newField(FieldTemplate template) {
+		public AffiliatesField newField(FieldTemplate template) {
 			return new AffiliatesField(template);
 		}
 	}
