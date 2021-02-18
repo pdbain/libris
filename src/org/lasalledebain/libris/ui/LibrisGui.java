@@ -648,6 +648,11 @@ public class LibrisGui extends LibrisWindowedUi {
 		return result;
 	}
 
+	@Override
+	public DatabaseUi<DatabaseRecord> getMainUi() {
+		return this;
+	}
+
 	public DatabaseRecordWindow getCurrentRecordWindow() {
 		DatabaseRecordWindow currentRecordWindow = (null == displayPanel) ? null
 				: displayPanel.getCurrentRecordWindow();

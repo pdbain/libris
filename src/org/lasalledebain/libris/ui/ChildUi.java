@@ -13,7 +13,7 @@ import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
 public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
-	protected final DatabaseUi parentUi;
+	protected final DatabaseUi<RecordType> parentUi;
 
 	@Override
 	public void addProgress(int theWork) {
@@ -28,8 +28,7 @@ public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 
 	@Override
 	public RecordType displayRecord(int recordId) throws LibrisException {
-		alert("displayRecord: Operation not available");
-		return null;
+		return parentUi.displayRecord(recordId);
 	}
 
 	@Override
@@ -57,6 +56,12 @@ public class ChildUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 	public boolean checkAndCloseDatabase(boolean force) throws DatabaseException {
 		return nonNull(parentUi)? parentUi.checkAndCloseDatabase(force): true;	
 	}
+
+	@Override
+	public DatabaseUi<RecordType> getMainUi() {
+		return nonNull(parentUi) ? parentUi.getMainUi() : this;
+	}
+
 
 	@Override
 	public GenericDatabase<DatabaseRecord> getDatabase() {

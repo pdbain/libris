@@ -20,7 +20,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public abstract class AbstractUi implements DatabaseUi, LibrisConstants {
+public abstract class AbstractUi<RecordType extends Record> implements DatabaseUi, LibrisConstants {
 	
 	@Override
 	public void setRecordName() throws InputException {
@@ -208,7 +208,7 @@ public abstract class AbstractUi implements DatabaseUi, LibrisConstants {
 	}
 	
 	@Override
-	public abstract Record displayRecord(int recordId) throws LibrisException;
+	public abstract RecordType displayRecord(int recordId) throws LibrisException;
 	
 	@Override
 	public void pasteToField() {

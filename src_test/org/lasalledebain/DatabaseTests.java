@@ -446,7 +446,7 @@ public class DatabaseTests extends TestCase {
 		}
 		String cmdline[] = new String[] {Libris.OPTION_GUI, testDatabaseFileCopy.getPath()};
 		AbstractUi ui = LibrisTestLauncher.testMain(cmdline);
-		ui.displayRecord(10);
+		ui.displayRecord(NUM_RECS/2);
 		ui.getSelectedField();
 		assertTrue("Could not close database", ui.closeDatabase(false));
 		assertTrue("Could not close database", ui.quit(false));
