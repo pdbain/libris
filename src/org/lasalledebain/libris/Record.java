@@ -1,13 +1,14 @@
 package org.lasalledebain.libris;
 
 import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
-
+import static java.util.Objects.isNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.FieldDataException;
@@ -108,7 +109,11 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public abstract void setAllFields(String[] fieldData) throws InputException;
 	public abstract void setField(int fieldNum, Field values) throws DatabaseException;
 	public Field addFieldValue(String fieldName, String fieldData) throws InputException {
+		Assertion.assertNotNullInputException("Missing value for field ",  fieldName, fieldData);
 		return addFieldValue(getFieldNum(fieldName), fieldData);
+	}
+	public Field addFieldValueChecked(String fieldName, String fieldData) throws InputException {
+		return (isNull(fieldData))? null: addFieldValue(getFieldNum(fieldName), fieldData);
 	}
 	
 	public Field addFieldValue(String fieldName, FieldValue fieldData) throws InputException {
@@ -224,6 +229,7 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 				try {
 					fld = getField(fieldId);
 				} catch (InputException e) {
+					LibrisDatabase.logException("Error in generateTitle for record " + getRecordId(), e);
 					throw new InternalError(e);
 				}
 				if ((null == fld) || !fld.isText()) {

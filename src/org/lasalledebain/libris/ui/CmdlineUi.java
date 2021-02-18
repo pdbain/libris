@@ -15,7 +15,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class CmdlineUi<RecordType extends Record> extends AbstractUi {
+public class CmdlineUi<RecordType extends Record> extends AbstractUi<RecordType> {
 
 	protected final BufferedReader cmdlineInput;
 	
@@ -30,6 +30,11 @@ public class CmdlineUi<RecordType extends Record> extends AbstractUi {
 		return null;
 	}
 
+	@Override
+	public DatabaseUi<RecordType> getMainUi() {
+		return this;
+	}
+	
 	@Override
 	public void alert(String msg, Throwable e) {
 		log(Level.SEVERE, msg, e);

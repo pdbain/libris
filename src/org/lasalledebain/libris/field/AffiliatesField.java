@@ -5,6 +5,7 @@ import static org.lasalledebain.libris.RecordId.NULL_RECORD_ID;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
@@ -15,7 +16,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.index.GroupDef;;
 
-public class AffiliatesField extends GenericField implements Iterable<FieldValue>{
+public class AffiliatesField extends GenericField<FieldIntValue> implements Iterable<FieldIntValue>{
 	private int affiliates[];
 	private GroupDef grp;
 	private RecordIdNameMapper mapper;
@@ -50,11 +51,6 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 		} catch (InputException e) {
 			throw new FieldDataException("Error looking up record "+recName, e);
 		}
-	}
-
-	@Override
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		addIntegerValue(fieldData.getValueAsInt());
 	}
 
 	@Override
@@ -121,16 +117,16 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 	}
 
 	@Override
-	public Iterable<FieldValue> getFieldValues() {
+	public Iterable<FieldIntValue> getFieldValues() {
 		return this;
 	}
 
 	@Override
-	public FieldValue getFirstFieldValue() {
+	public Optional<FieldValue> getFirstFieldValue() {
 		if ((null == affiliates) || (affiliates.length == 0)) {
-			return new FieldNullValue();
+			return Optional.empty();
 		} else {
-			return new FieldIntValue(affiliates[0]);
+			return Optional.of(new FieldIntValue(affiliates[0]));
 		}
 	}
 
@@ -150,7 +146,7 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 
 	@Override
 	public Field getReadOnlyView() {
-		return new ReadOnlyField(this);
+		return new ReadOnlyField<FieldIntValue>(this);
 	}
 
 	@Override
@@ -190,8 +186,7 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 
 	@Override
 	public FieldValue removeValue() {
-		if (isEmpty()) {
-		} else {
+		if (!isEmpty()) {
 			if (affiliates.length == 1) {
 				affiliates = null;
 			} else {
@@ -206,8 +201,18 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 	}
 
 	@Override
-	public void setValues(FieldValue[] valueArray) throws FieldDataException {
-		setValues(Arrays.asList(valueArray));
+	protected FieldIntValue valueOf(String valueString) throws FieldDataException {
+		return null;
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		throw new FieldDataException("valueOf(int, String) not permitted on this field");
+	}
+
+	@Override
+	public FieldIntValue valueOf(FieldValue original) throws FieldDataException {
+		return (original instanceof FieldIntValue)? (FieldIntValue) original: new FieldIntValue(original.getValueAsInt());
 	}
 
 	@Override
@@ -238,8 +243,8 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 	}
 
 	@Override
-	public Iterator<FieldValue> iterator() {
-		return new Iterator<FieldValue>() {
+	public Iterator<FieldIntValue> iterator() {
+		return new Iterator<FieldIntValue>() {
 
 			int index = 0;
 			@Override
@@ -248,7 +253,7 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 			}
 
 			@Override
-			public FieldValue next() {
+			public FieldIntValue next() {
 				return new FieldIntValue(affiliates[index++]);
 			}
 
@@ -258,12 +263,6 @@ public class AffiliatesField extends GenericField implements Iterable<FieldValue
 			}
 			
 		};
-	}
-
-	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

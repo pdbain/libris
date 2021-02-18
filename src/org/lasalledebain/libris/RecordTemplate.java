@@ -14,6 +14,7 @@ public class RecordTemplate implements RecordFactory<DatabaseRecord> {
 	/**
 	 * Array of the field templates in the order listed in the schema
 	 */
+	// TODO change fieldMasters and defaultFields to arrayList
 	FieldTemplate[] fieldMasters;
 
 	/**

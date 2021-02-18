@@ -5,6 +5,7 @@ package org.lasalledebain.libris.field;
 
 import java.net.URL;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field;
@@ -16,7 +17,8 @@ import org.lasalledebain.libris.xmlUtils.ElementManager;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
-class ReadOnlyField extends GenericField {
+class ReadOnlyField<FieldValueType extends FieldValue> extends GenericField<FieldValueType> {
+	GenericField<FieldValueType> actualField;
 	@Override
 	public String getElementTag() {
 		throw new DatabaseError("Cannot call toXml on "+getClass().getName());
@@ -29,10 +31,10 @@ class ReadOnlyField extends GenericField {
 
 	@Override
 	public void addURLValue(URL value) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
-	public ReadOnlyField(Field actualField) {
+	public ReadOnlyField(GenericField<FieldValueType> actualField) {
 		this.actualField = actualField;
 	}
 
@@ -41,38 +43,59 @@ class ReadOnlyField extends GenericField {
 		return (Objects.isNull(actualField))? false: actualField.isText();
 	}
 
-	Field actualField;
 	@Override
 	public void addIntegerValue(int value) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
 	public void addValue(String data) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
+	}
+
+	@Override
+	protected FieldValueType valueOf(String valueString) throws FieldDataException {
+		throwReadOnlyException();
+		return null;
+	}
+
+	@Override
+	public FieldValueType valueOf(FieldValue original) throws FieldDataException {
+		throwReadOnlyException();
+		return null;
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String valueString) throws FieldDataException {
+		throwReadOnlyException();
+		return null;
+	}
+
+	protected void throwReadOnlyException() throws DatabaseError {
+		throw new DatabaseError("field is read-only");
 	}
 
 	@Override
 	public void addValuePair(String value, String extraValue)
 			throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
 	public void addValuePair(Integer value, String extraValue)
 			throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
 	public void changeValue(String string) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
 	public void changeValue(FieldValue fieldValue)
 			throws FieldDataException {
-		throw new FieldDataException("field is read-only");
+		throwReadOnlyException();
 	}
 
 	@Override
@@ -91,12 +114,12 @@ class ReadOnlyField extends GenericField {
 	}
 
 	@Override
-	public Iterable<FieldValue> getFieldValues() {
-		return actualField.getFieldValues();
+	public Iterable<? extends FieldValueType> getFieldValues() {
+		return actualField.getValueList();
 	}
 
 	@Override
-	public FieldValue getFirstFieldValue() {
+	public Optional<? extends FieldValue> getFirstFieldValue() {
 		return actualField.getFirstFieldValue();
 	}
 
@@ -152,17 +175,13 @@ class ReadOnlyField extends GenericField {
 
 	@Override
 	public FieldValue removeValue() {
-		throw new DatabaseError("changing read-only field");
-	}
-
-	@Override
-	public void setValues(FieldValue[] valueArray) throws FieldDataException {
-		throw new DatabaseError("changing read-only field");
+		throwReadOnlyException();
+		return null;
 	}
 
 	@Override
 	public void setValues(Iterable<FieldValue> values) throws FieldDataException {
-		throw new DatabaseError("changing read-only field");
+		throwReadOnlyException();
 	}
 
 	@Override
@@ -177,17 +196,7 @@ class ReadOnlyField extends GenericField {
 
 	@Override
 	public void addValue(FieldValue fieldData) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
-	}
-
-	@Override
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		throw new FieldDataException("field is read-only");
-	}
-
-	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		return false;
+		throwReadOnlyException();
 	}
 
 }

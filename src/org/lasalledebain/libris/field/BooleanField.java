@@ -4,23 +4,22 @@ import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
 
-public class BooleanField extends GenericField implements Field {
+public class BooleanField extends GenericField<FieldBooleanValue> implements Field {
 	public BooleanField(FieldTemplate template) {
 		super(template);
 	}
 	@Override
 	public void addValue(String data) throws FieldDataException {
-		addFieldValue(FieldBooleanValue.of(data));
+		addFieldValue(valueOf(data));
 	}
-	
-	@Override
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		addValue(fieldData.toString());
+	protected FieldBooleanValue valueOf(String data) throws FieldDataException {
+		return FieldBooleanValue.of(data);
 	}
 	
 	@Override
 	public boolean isTrue() {
-		return getFirstFieldValue().isTrue();
+		var optV = getFirstFieldValue();
+		return optV.isPresent() && optV.get().isTrue();
 	}
 	@Override
 	public boolean isSingleValue() {
@@ -32,12 +31,17 @@ public class BooleanField extends GenericField implements Field {
 	}
 
 	public Field duplicate() throws FieldDataException {
-		BooleanField otherField = new BooleanField(template);
-		copyValues(otherField);
-		return otherField;
+		BooleanField fieldCopy = new BooleanField(template);
+		copyValues(fieldCopy);
+		return fieldCopy;
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		throw new FieldDataException("addIntegerValue not defined for BooleanField");
 	}
 	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		return fv instanceof FieldBooleanValue;
+	public FieldBooleanValue valueOf(FieldValue original) throws FieldDataException {
+		return (original instanceof FieldBooleanValue)? (FieldBooleanValue) original: valueOf(original.getMainValueAsKey());
 	}
 }

@@ -72,7 +72,7 @@ public class DatabaseTests extends TestCase {
 			"ID_publisher",
 			"ID_year",
 			"ID_page",
-			"ID_keywords"};
+	"ID_keywords"};
 
 	public void testBuildWithRepo() throws FileNotFoundException, IOException, LibrisException {
 		File exportedFile;
@@ -91,7 +91,7 @@ public class DatabaseTests extends TestCase {
 		}
 		exportedFile.delete();
 	}
-	
+
 	public void testBuildFromArchive() throws FileNotFoundException, IOException, LibrisException {
 		File testArchiveFile = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE1_ARCHIVE, workingDirectory);
 		LibrisDatabase db = Utilities.extractBuildAndOpenDatabase(testArchiveFile);
@@ -116,7 +116,7 @@ public class DatabaseTests extends TestCase {
 			}
 			assertTrue("no exception when creating new record in read-only database", exceptionThrown);
 		}
-		
+
 		{
 			boolean exceptionThrown = false;
 			try {
@@ -146,7 +146,7 @@ public class DatabaseTests extends TestCase {
 			}
 			assertTrue("no exception when creating new record in read-only database", exceptionThrown);
 		}
-		
+
 		{
 			boolean exceptionThrown = false;
 			try {
@@ -192,7 +192,7 @@ public class DatabaseTests extends TestCase {
 			}
 			assertTrue("no exception when creating new record in read-only database", exceptionThrown);
 		}
-		
+
 		{
 			boolean exceptionThrown = false;
 			try {
@@ -396,14 +396,14 @@ public class DatabaseTests extends TestCase {
 
 	public void testRecipe1() throws FileNotFoundException, IOException, DatabaseException, LibrisException {
 		final int NUM_RECS = 4;
-			var testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.RECIPE_DATABASE1_LIBR, workingDirectory);
-			File exportedDatabase = new File(workingDirectory, "rebuild");
-			try (LibrisDatabase myDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy)) {
+		var testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.RECIPE_DATABASE1_LIBR, workingDirectory);
+		File exportedDatabase = new File(workingDirectory, "rebuild");
+		try (LibrisDatabase myDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy)) {
 			Random rand = new Random(getName().hashCode());
 			for (int i = 1; i <= NUM_RECS; ++i) {
 				DatabaseRecord rec = myDb.newRecord();
 				for (var id: recipeFieldIds) {
-					 FieldValue fieldValue = generateFieldValue(rand, rec, id);
+					FieldValue fieldValue = generateFieldValue(rand, rec, id);
 					rec.addFieldValue(id, fieldValue);
 				}
 				myDb.putRecord(rec);
@@ -429,13 +429,13 @@ public class DatabaseTests extends TestCase {
 
 	public void testRecipeGui() throws FileNotFoundException, IOException, DatabaseException, LibrisException {
 		final int NUM_RECS = 4;
-			var testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.RECIPE_DATABASE1_LIBR, workingDirectory);
-			try (LibrisDatabase myDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy)) {
+		var testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.RECIPE_DATABASE1_LIBR, workingDirectory);
+		try (LibrisDatabase myDb = Utilities.buildAndOpenDatabase(testDatabaseFileCopy)) {
 			Random rand = new Random(getName().hashCode());
 			for (int i = 1; i <= NUM_RECS; ++i) {
 				DatabaseRecord rec = myDb.newRecord();
 				for (var id: recipeFieldIds) {
-					 FieldValue fieldValue = generateFieldValue(rand, rec, id);
+					FieldValue fieldValue = generateFieldValue(rand, rec, id);
 					rec.addFieldValue(id, fieldValue);
 				}
 				myDb.putRecord(rec);
@@ -444,12 +444,12 @@ public class DatabaseTests extends TestCase {
 			myDb.exportDatabaseXml();
 			assertTrue("Could not close database", myDb.closeDatabase(false));
 		}
-			String cmdline[] = new String[] {Libris.OPTION_GUI, testDatabaseFileCopy.getPath()};
-			AbstractUi ui = LibrisTestLauncher.testMain(cmdline);
-			ui.displayRecord(10);
-			ui.getSelectedField();
-			assertTrue("Could not close database", ui.closeDatabase(false));
-			assertTrue("Could not close database", ui.quit(false));
+		String cmdline[] = new String[] {Libris.OPTION_GUI, testDatabaseFileCopy.getPath()};
+		AbstractUi ui = LibrisTestLauncher.testMain(cmdline);
+		ui.displayRecord(NUM_RECS/2);
+		ui.getSelectedField();
+		assertTrue("Could not close database", ui.closeDatabase(false));
+		assertTrue("Could not close database", ui.quit(false));
 	}
 
 	private FieldValue generateFieldValue(Random rand, DatabaseRecord rec, String id) throws FieldDataException {
@@ -503,29 +503,24 @@ public class DatabaseTests extends TestCase {
 
 	}
 
-	public void testXmlExportAll() {
-		try {
-			rootDb = buildTestDatabase(getTestDatabase());
-			File copyDbXml = new File (workingDirectory, "database_copy.xml");
-			copyDbXml.deleteOnExit();
-			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
-			trace(getName()+": copy database to"+copyDbXml);
-			rootDb.exportDatabaseXml(copyStream, true, true, false);
-			copyStream.close();
+	public void testXmlExportAll() throws IOException, LibrisException {
+		rootDb = buildTestDatabase(getTestDatabase());
+		File copyDbXml = new File (workingDirectory, "database_copy.xml");
+		copyDbXml.deleteOnExit();
+		FileOutputStream copyStream = new FileOutputStream(copyDbXml);
+		trace(getName()+": copy database to"+copyDbXml);
+		rootDb.exportDatabaseXml(copyStream, true, true, false);
+		copyStream.close();
 
-			forkDb = Utilities.buildAndOpenDatabase(copyDbXml);
-			assertNotNull("Error rebuilding database copy", forkDb);
-			assertTrue("database copy does not match original", forkDb.equals(rootDb));
-			copyDbXml.delete();
-		} catch (Throwable e) {
-			e.printStackTrace();
-			fail("unexpected exception");
-		}
+		forkDb = Utilities.buildAndOpenDatabase(copyDbXml);
+		assertNotNull("Error rebuilding database copy", forkDb);
+		assertTrue("database copy does not match original", forkDb.equals(rootDb));
+		copyDbXml.delete();
 	}
 
 	public void testDatabaseToXml() throws IOException, LibrisException {
-			try (LibrisDatabase myDb = buildTestDatabase(getTestDatabase())) {
-				rootDb = myDb;
+		try (LibrisDatabase myDb = buildTestDatabase(getTestDatabase())) {
+			rootDb = myDb;
 			File copyDbXml = new File (workingDirectory, "database_copy.xml");
 			copyDbXml.deleteOnExit();
 			FileOutputStream copyStream = new FileOutputStream(copyDbXml);
@@ -537,7 +532,7 @@ public class DatabaseTests extends TestCase {
 			assertNotNull("Error rebuilding database copy", forkDb);
 			assertTrue("database copy does not match original", forkDb.equals(rootDb));
 			copyDbXml.delete();
-			}
+		}
 	}
 
 	public void testXmlExportAllWithGroups() {

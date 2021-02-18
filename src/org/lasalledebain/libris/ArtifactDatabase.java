@@ -119,7 +119,7 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 		protected void setRecordFields(ArtifactParameters artifactParameters, ArtifactRecord rec)
 			throws InputException, FieldDataException, DatabaseException {
 		rec.addFieldValue(ID_SOURCE, artifactParameters.getSourceString());
-		rec.addFieldValue(ID_ARCHIVEPATH, artifactParameters.getArchivePath());
+		rec.addFieldValueChecked(ID_ARCHIVEPATH, artifactParameters.getArchivePath());
 		rec.addFieldValue(ID_DATE, artifactParameters.getDate());
 		if (!artifactParameters.recordName.isEmpty()) {
 			rec.setName(artifactParameters.recordName);

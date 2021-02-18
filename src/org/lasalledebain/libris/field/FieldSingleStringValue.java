@@ -1,5 +1,7 @@
 package org.lasalledebain.libris.field;
 
+import org.lasalledebain.libris.exception.FieldDataException;
+
 public class FieldSingleStringValue extends FieldValue {
 	private final String value;
 	@Override
@@ -14,16 +16,12 @@ public class FieldSingleStringValue extends FieldValue {
 		return value;
 	}
 	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
-		FieldSingleStringValue other = (FieldSingleStringValue) comparand;
-		boolean valueEquals = (value == other.value);
-		if (!valueEquals && (null != value)) {
-			valueEquals = value.equals(other.value);
+	protected boolean equals(FieldValue comparand) {
+		try {
+			return (comparand instanceof FieldSingleStringValue) 
+					&& getMainValueAsString().equals(comparand.getMainValueAsString());
+		} catch (FieldDataException e) {
+			return false;
 		}
-		return valueEquals;
-	}
-	@Override
-	public FieldValue duplicate() {
-		return new FieldSingleStringValue(value);
 	}
 }

@@ -1,61 +1,16 @@
 package org.lasalledebain.libris.field;
 
-import java.util.Iterator;
-
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
-public abstract class FieldValue implements Iterable<FieldValue> {
-	FieldValue nextValue;
-	public FieldValueIterator iterator() {
-		return new RecordFieldValueIterator(this);
-	}
+public abstract class FieldValue {
+	@Deprecated
 	private static final EmptyFieldValue emptyFieldValueSingleton = new EmptyFieldValue();
 
+	@Deprecated
 	public static EmptyFieldValue getEmptyfieldvaluesingleton() {
 		return emptyFieldValueSingleton;
-	}
-
-	public class RecordFieldValueIterator implements FieldValueIterator, Iterable<FieldValue> {
-
-		private FieldValue next;
-
-		public RecordFieldValueIterator(FieldValue head) {
-			this.next = head;
-		}
-
-		@Override
-		public boolean hasNext() {
-			return (null != next);
-		}
-
-		@Override
-		public FieldValue next() {
-			FieldValue oldNext = next;
-			next = next.nextValue;
-			return oldNext;
-		}
-
-		@Override
-		public void remove() {
-		}
-
-		@Override
-		public Iterator<FieldValue> iterator() {
-			return this;
-		}
-
-	}
-
-	public int getNumberOfValues() {
-		int count = 1;
-		FieldValue next = this;
-		while (null != next.nextValue) {
-			++count;
-			next = next.nextValue;
-		}
-		return count;
 	}
 
 	public abstract String getValueAsString();
@@ -66,9 +21,8 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 		if (null != mainValueAsKey) {
 			values.setAttribute(LibrisXMLConstants.XML_ENUMCHOICE_VALUE_ATTR, mainValueAsKey);
 		}
-		String extraValue = getExtraValueAsKey();
-		if (null != extraValue) {
-			values.setAttribute(LibrisXMLConstants.XML_EXTRA_VALUE_ATTR, extraValue);
+		if (hasExtraValue()) {
+			values.setAttribute(LibrisXMLConstants.XML_EXTRA_VALUE_ATTR, getExtraValueAsKey());
 		}
 		return values;
 	}
@@ -99,6 +53,10 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 	public boolean isEmpty() {
 		return false;
 	}
+	
+	public boolean hasExtraValue() {
+		return false;
+	}
 
 	public int getValueAsInt() {
 		return 0;
@@ -114,30 +72,5 @@ public abstract class FieldValue implements Iterable<FieldValue> {
 		else return false;
 	}
 
-	public boolean equals(FieldValue comparand) {
-		if (getNumberOfValues() != comparand.getNumberOfValues()) {
-			return false;
-		}
-
-		Iterator<FieldValue> compIterator = comparand.iterator();
-		for (FieldValue v: this) {
-			FieldValue cNext = compIterator.next();
-			if (!v.singleValueEquals(cNext)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	protected abstract boolean singleValueEquals(FieldValue comparand);
-
-	public void append(FieldValue temp) {
-		FieldValue cursor = this;
-		while (null != cursor.nextValue) {
-			cursor = cursor.nextValue;
-		}
-		cursor.nextValue = temp;
-	}
-
-	public abstract FieldValue duplicate();
+	protected abstract boolean equals(FieldValue comparand);
 }

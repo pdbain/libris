@@ -210,7 +210,7 @@ public class RecordTests extends TestCase {
 			Record otherRec = rec.duplicate();
 			otherRec.setRecordId(rec.getRecordId());
 			
-			assertEquals("Duplicate record does not match\n", rec, otherRec);
+			assertEquals("Duplicate record does not match\n", otherRec, rec);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

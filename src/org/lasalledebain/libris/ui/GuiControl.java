@@ -3,7 +3,6 @@ package org.lasalledebain.libris.ui;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.FocusListener;
-import java.util.Arrays;
 
 import javax.swing.JComponent;
 import javax.swing.event.DocumentEvent;
@@ -80,15 +79,6 @@ public abstract class GuiControl {
 	 * @throws FieldDataException if the value in the control is illegal
 	 */
 	public abstract FieldValue getFieldValue() throws FieldDataException;
-	
-	public Iterable<FieldValue> getFieldValues() throws FieldDataException {
-		FieldValue firstField = getFieldValue();
-		if (null != firstField) {
-			return Arrays.asList();
-		} else {
-			return firstField;
-		}
-	}
 	
 	public abstract JComponent getGuiComponent();
 	public void setLegalValues(EnumFieldChoices legalValues) {

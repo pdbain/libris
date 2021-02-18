@@ -133,6 +133,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 	}
 
 	public static final String RECIPE_DATABASE1_LIBR = "RecipeDatabase1.libr";
+	public static final String TESTDATABASE3_XML = "Testdatabase3.xml";
 
 	public Layouts loadLayoutsFromXml(Schema schem, File inputFile)
 			throws FileNotFoundException, FactoryConfigurationError,

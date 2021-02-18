@@ -281,7 +281,7 @@ rw.checkClose();
 					}
 				}
 			} catch (LibrisException e) {
-				mainGui.alert("exception "+e+" "+e.getMessage()+" entering record");
+				mainGui.alert("exception "+e+"\n"+e.getMessage()+" entering record");
 				e.printStackTrace();
 			}
 			int modifiers = (null == evt)? 0: evt.getModifiers();

@@ -11,17 +11,27 @@ import org.lasalledebain.libris.exception.LibrisException;
 
 public class ConsoleUi<RecordType extends Record> extends CmdlineUi<RecordType> {
 
-	protected final AbstractUi parentUi;
+	protected final AbstractUi<RecordType> parentUi;
 
-	public ConsoleUi(AbstractUi theParentUi) {
+	@Override
+	public DatabaseUi<RecordType> getMainUi() {
+		return nonNull(parentUi)? parentUi.getMainUi(): super.getMainUi();
+	}
+
+	public ConsoleUi(AbstractUi<RecordType> theParentUi) {
 		super(nonNull(theParentUi)? theParentUi.isDatabaseReadOnly(): true);
 		parentUi = theParentUi;
 	}
 
 	@Override
 	public RecordType displayRecord(int recordId) throws LibrisException {
-		alert("displayRecord: Operation not available");
-		return null;
+		RecordType result = null;
+		if (nonNull(parentUi)) {
+			result = parentUi.displayRecord(recordId);
+		} else {
+			alert("displayRecord: Operation not available");
+		}
+		return result;
 	}
 
 	@Override

@@ -140,13 +140,13 @@ public class Repository extends Libris {
 	public int putArtifactInfo(ArtifactParameters artifactParameters) throws LibrisException {
 		repoDatabase.assertDatabaseWritable("put artifact information");
 		DatabaseRecord rec = repoDatabase.newRecordUnchecked();
-		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.getSourceString());
-		rec.addFieldValue(ArtifactDatabase.ID_DATE, artifactParameters.getDate());
-		rec.addFieldValue(ArtifactDatabase.ID_DOI, artifactParameters.getDoi());
-		rec.addFieldValue(ArtifactDatabase.ID_KEYWORDS, artifactParameters.getKeywords());
-		rec.addFieldValue(ArtifactDatabase.ID_COMMENTS, artifactParameters.getComments());
+		rec.addFieldValueChecked(ArtifactDatabase.ID_SOURCE, artifactParameters.getSourceString());
+		rec.addFieldValueChecked(ArtifactDatabase.ID_DATE, artifactParameters.getDate());
+		rec.addFieldValueChecked(ArtifactDatabase.ID_DOI, artifactParameters.getDoi());
+		rec.addFieldValueChecked(ArtifactDatabase.ID_KEYWORDS, artifactParameters.getKeywords());
+		rec.addFieldValueChecked(ArtifactDatabase.ID_COMMENTS, artifactParameters.getComments());
 		String title = artifactParameters.getTitle();
-		rec.addFieldValue(ArtifactDatabase.ID_SOURCE, artifactParameters.getSourceString());
+		rec.addFieldValueChecked(ArtifactDatabase.ID_SOURCE, artifactParameters.getSourceString());
 		if (!artifactParameters.recordName.isEmpty()) {
 			rec.setName(artifactParameters.recordName);
 		}

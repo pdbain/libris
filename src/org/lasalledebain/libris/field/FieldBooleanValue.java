@@ -66,7 +66,7 @@ public class FieldBooleanValue extends FieldValue {
 	}
 	
 	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
+	protected boolean equals(FieldValue comparand) {
 		FieldBooleanValue other = (FieldBooleanValue) comparand;
 		boolean valueEquals = (value == other.value);
 		return valueEquals;
@@ -75,12 +75,6 @@ public class FieldBooleanValue extends FieldValue {
 	@Override
 	public int getValueAsInt() {
 		return value? 1: 0; /* 1 == true, 0 == false */
-	}
-
-	@Override
-	public FieldValue duplicate() {
-		FieldBooleanValue v = new FieldBooleanValue(value);
-		return v;
 	}
 
 	public static List<FieldValue> getLegalValues() {

@@ -130,4 +130,9 @@ public class HeadlessUi extends LibrisWindowedUi {
 		return null;
 	}
 
+	@Override
+	public DatabaseUi getMainUi() {
+		return this;
+	}
+
 }

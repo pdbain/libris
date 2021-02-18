@@ -11,7 +11,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 
-public interface DatabaseUi extends ProgressTracker{
+public interface DatabaseUi<RecordType extends Record> extends ProgressTracker{
 
 	public LibrisDatabase openDatabase() throws DatabaseException;
 	public void saveDatabase();
@@ -39,7 +39,7 @@ public interface DatabaseUi extends ProgressTracker{
 
 	void recordsAccessible(boolean accessible);
 
-	public abstract Record displayRecord(int recordId) throws LibrisException;
+	public abstract RecordType displayRecord(int recordId) throws LibrisException;
 
 	/**
 	 * Create a new, empty, value for a field
@@ -51,6 +51,8 @@ public interface DatabaseUi extends ProgressTracker{
 	public abstract void fieldSelected(boolean b);
 
 	UiField getSelectedField();
+	
+	DatabaseUi<RecordType> getMainUi();
 
 	void setSelectedField(UiField selectedField);
 	public abstract String getUiTitle();

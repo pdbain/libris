@@ -50,6 +50,12 @@ public class Assertion {
 		}
 	}
 
+	public static void assertTrueFieldDataException(String message, boolean test) throws FieldDataException {
+		if (!test) {
+			throw new FieldDataException("Error: "+message);
+		}
+	}
+
 	public static void assertTrueInputException(String message1, String message2, boolean test) throws InputException {
 		if (!test) {
 			throw new InputException("Error: "+message1+message2);

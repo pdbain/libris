@@ -33,15 +33,15 @@ public interface Field extends XMLElement {
 	public boolean isSingleValue();
 	public boolean isEmpty();
 	public int getNumberOfValues();
-	public Iterable<FieldValue> getFieldValues();
+	public Iterable<? extends FieldValue> getFieldValues();
 	public String getValuesAsString();
-	public FieldValue getFirstFieldValue();
+	public Optional<? extends FieldValue> getFirstFieldValue();
 	public FieldValue removeValue() throws FieldDataException;
 	public void changeValue(String string) throws FieldDataException;
 	public void changeValue(FieldValue fieldValue) throws FieldDataException;
+	public void changeValue(int value, String extraValue) throws FieldDataException;
 	public boolean equals(Field comparand);
 	public EnumFieldChoices getLegalValues();
-	public void setValues(FieldValue[] valueArray) throws FieldDataException;
 	public void setValues(Iterable<FieldValue> values) throws FieldDataException;
 	public Field duplicate() throws FieldDataException;
 	public Field getReadOnlyView();

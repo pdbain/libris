@@ -50,7 +50,7 @@ public class Libris {
 		}
 	}
 
-	protected static AbstractUi mainImpl(String[] args) {
+	protected static AbstractUi<DatabaseRecord> mainImpl(String[] args) {
 		Thread.currentThread().setName("Console");
 		IfType myUiType = IfType.UI_DEFAULT;
 		boolean readOnly = false;

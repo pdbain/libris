@@ -6,6 +6,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.field.FieldSingleStringValue;
 import org.lasalledebain.libris.field.FieldStringPairValue;
 import org.lasalledebain.libris.field.FieldValue;
@@ -71,15 +72,18 @@ public abstract class ValuePairField extends GuiControl {
 			copyValuesFromControls();
 		}
 
-		FieldValue result;
+		FieldValue result = null;
 		if (!isEmpty()) {
 			if (extraValue.isEmpty()) {
 				result = new FieldSingleStringValue(mainValue);				
 			} else {	
-				result = new FieldStringPairValue(mainValue, extraValue);
+				try {
+					result = new FieldStringPairValue(mainValue, extraValue);
+				} catch (InputException e) {
+
+					throw new FieldDataException("error in field", e);
+				}
 			}
-		} else {
-			result = FieldValue.getEmptyfieldvaluesingleton();
 		}
 		return result;
 	}

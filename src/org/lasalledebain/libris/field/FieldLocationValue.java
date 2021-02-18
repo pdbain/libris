@@ -19,22 +19,8 @@ public class FieldLocationValue extends FieldValue {
 	}
 
 	@Override
-	public boolean equals(FieldValue comparand) {
-		if (comparand.getClass() == getClass()) {
-			FieldLocationValue otherValue = (FieldLocationValue) comparand;
-			if (location.equals(otherValue.location)) {
-				if (null == locationName) {
-					return (null == otherValue.locationName);
-				} else {
-					return locationName.equals(otherValue.locationName);
-				}
-			}
-		}
-		return false;
-	}
-	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
-		if (comparand.getClass() == getClass()) {
+	protected boolean equals(FieldValue comparand) {
+		if (comparand instanceof FieldLocationValue) {
 			FieldLocationValue otherValue = (FieldLocationValue) comparand;
 			return (location.equals(otherValue.location));
 		}
@@ -48,20 +34,4 @@ public class FieldLocationValue extends FieldValue {
 	public String getMainValueAsKey() throws FieldDataException {
 		return super.getMainValueAsKey();
 	}
-
-	/* (non-Javadoc)
-	 * @see org.lasalledebain.libris.field.FieldValue#getNumberOfValues()
-	 */
-	@Override
-	public int getNumberOfValues() {
-		return (Objects.nonNull(locationName) && !locationName.isEmpty())? 1: 0;
-	}
-
-	@Override
-	public FieldValue duplicate() {
-		FieldLocationValue dup = new FieldLocationValue(location, locationName);
-		return dup;
-	}
-
-
 }

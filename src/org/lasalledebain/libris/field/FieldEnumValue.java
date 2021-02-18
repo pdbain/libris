@@ -7,12 +7,15 @@ import org.lasalledebain.libris.exception.FieldDataException;
 public class FieldEnumValue extends FieldValue implements LibrisConstants {
 
 	private EnumFieldChoices enumChoices;
-	private int choice;
-	String extraValue;
+	private final int choice;
+	private final String extraValue;
+	private final boolean extraPresent;
 
 	public FieldEnumValue(EnumFieldChoices enumChoices, String data) throws FieldDataException {
 		this.enumChoices = enumChoices;
 		this.choice = enumChoices.indexFromId(data);
+		extraValue = null;
+		extraPresent = false;
 	}
 
 	public FieldEnumValue(EnumFieldChoices enumChoices, int data) throws FieldDataException {
@@ -21,6 +24,8 @@ public class FieldEnumValue extends FieldValue implements LibrisConstants {
 			throw new FieldDataException(data+" is not a valid value for this field");
 		} else {
 			choice = data;
+			extraValue = null;
+			extraPresent = false;
 		}
 	}
 	public FieldEnumValue(EnumFieldChoices legalValues, int currentValue,
@@ -28,6 +33,7 @@ public class FieldEnumValue extends FieldValue implements LibrisConstants {
 		this.enumChoices = legalValues;
 		choice = currentValue;
 		extraValue = selectedItem;
+		extraPresent = true;
 	}
 
 	@Override
@@ -88,7 +94,7 @@ public class FieldEnumValue extends FieldValue implements LibrisConstants {
 	}
 
 	@Override
-	protected boolean singleValueEquals(FieldValue comparand) {
+	protected boolean equals(FieldValue comparand) {
 		FieldEnumValue other = (FieldEnumValue) comparand;
 		boolean valueEquals = (choice == other.choice);
 		if (null != extraValue) {
@@ -101,9 +107,9 @@ public class FieldEnumValue extends FieldValue implements LibrisConstants {
 	public boolean isEmpty() {
 		return (EnumFieldChoices.INVALID_CHOICE == choice) &&((null == extraValue) || extraValue.isEmpty());
 	}
+
 	@Override
-	public FieldValue duplicate() {
-		FieldEnumValue v = new FieldEnumValue(enumChoices, choice, extraValue);
-		return v;
+	public boolean hasExtraValue() {
+		return extraPresent;
 	}
 }

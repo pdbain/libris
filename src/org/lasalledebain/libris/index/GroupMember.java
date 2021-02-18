@@ -12,6 +12,7 @@ import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.XmlException;
+import org.lasalledebain.libris.field.FieldIntValue;
 import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.field.GenericField;
 import org.lasalledebain.libris.xmlUtils.ElementManager;
@@ -26,7 +27,7 @@ import org.lasalledebain.libris.xmlUtils.XmlShapes;;
  * and 0 or more affiliates, with whom it has no parent-child relationship.
  *
  */
-public class GroupMember extends GenericField implements XMLElement {
+public class GroupMember extends GenericField<FieldIntValue> implements XMLElement {
 
 	private static final String memberTag = XML_MEMBER_TAG;
 	private static final String affiliationTag = XML_AFFILIATION_TAG;
@@ -161,11 +162,6 @@ public class GroupMember extends GenericField implements XMLElement {
 	}
 
 	@Override
-	public void addValueGeneral(FieldValue fieldData) throws FieldDataException {
-		addIntegerValue(fieldData.getValueAsInt()); 
-	}
-
-	@Override
 	public void addIntegerValue(int value) throws FieldDataException {
 		int tempArray[] = new int[affiliates.length + 1];
 		System.arraycopy(affiliates, 0, tempArray, 0, affiliates.length);
@@ -235,7 +231,17 @@ public class GroupMember extends GenericField implements XMLElement {
 	}
 
 	@Override
-	protected boolean isValueCompatible(FieldValue fv) {
-		return false;
+	protected FieldIntValue valueOf(String valueString) throws FieldDataException {
+		return new FieldIntValue(valueString);
+	}
+
+	@Override
+	public FieldIntValue valueOf(FieldValue original) throws FieldDataException {
+		return (original instanceof FieldIntValue)? (FieldIntValue) original: new FieldIntValue(original.getValueAsInt());
+	}
+
+	@Override
+	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
+		throw new FieldDataException("valueOf(int, String) not defined for GroupMember");
 	}
 }

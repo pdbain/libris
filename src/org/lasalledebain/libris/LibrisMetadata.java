@@ -27,6 +27,7 @@ public abstract class LibrisMetadata<RecordType extends Record> extends Database
 		this.database = database;
 	}
 
+	@Deprecated
 	public LibrisMetadata(LibrisDatabase database, Layouts myLayouts) {
 		this();
 		this.database = database;
