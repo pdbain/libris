@@ -72,7 +72,7 @@ public abstract class ValuePairField extends GuiControl {
 			copyValuesFromControls();
 		}
 
-		FieldValue result;
+		FieldValue result = null;
 		if (!isEmpty()) {
 			if (extraValue.isEmpty()) {
 				result = new FieldSingleStringValue(mainValue);				
@@ -82,10 +82,8 @@ public abstract class ValuePairField extends GuiControl {
 				} catch (InputException e) {
 
 					throw new FieldDataException("error in field", e);
-								}
+				}
 			}
-		} else {
-			result = FieldValue.getEmptyfieldvaluesingleton();
 		}
 		return result;
 	}

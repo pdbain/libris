@@ -107,12 +107,16 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 			deletedValue = valueList.get(0);
 			valueList.remove(0);
 		}
+		if (!fieldValueList.isEmpty()) {
+			deletedValue = fieldValueList.get(0);
+			fieldValueList.remove(0);
+		}
 		return deletedValue;
 	}
 
 	public void deleteAllvalues() {
 		valueList.clear();
-		while (null != removeValue());
+		fieldValueList.clear();
 	}
 
 	public void setValues(Iterable<FieldValue> valueList) throws FieldDataException {
@@ -177,8 +181,16 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 		if (isSingleValue() && !valueList.isEmpty())  {
 			throw new FieldDataException("cannot add "+v+" to "+getFieldId()+": that field does not allow multiple values");
 		}
+		addFieldValueImpl(valueOf(v));
+	}
+	
+	protected void addFieldValueImpl(FieldValueType v) throws FieldDataException {
+		if (isSingleValue() && !valueList.isEmpty())  {
+			throw new FieldDataException("cannot add "+v+" to "+getFieldId()+": that field does not allow multiple values");
+		}
 		
 		valueList.add(v);
+		fieldValueList.add(v);
 	}
 	
 	public void addNativeFieldValue(FieldValueType v) {
@@ -188,6 +200,9 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 	public void changeValue(FieldValue newValue) throws FieldDataException {
 		if (valueList.isEmpty()) addFieldValue(newValue);
 		else valueList.set(0, newValue);
+		FieldValueType v = valueOf(newValue);
+		if (fieldValueList.isEmpty()) addFieldValueImpl(v);
+		else fieldValueList.set(0, v);
 	}
 	@Override
 	/**
@@ -203,7 +218,7 @@ public abstract class GenericField<FieldValueType extends FieldValue> implements
 	}
 
 	public Iterable<? extends FieldValue> getFieldValues() {
-		return true? valueList: getValueList();
+		return false? valueList: getValueList();
 	}
 	
 	public List<FieldValueType> getValueList() {

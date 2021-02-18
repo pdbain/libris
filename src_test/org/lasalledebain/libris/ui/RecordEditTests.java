@@ -350,8 +350,9 @@ public class RecordEditTests extends TestCase {
 			RecordWindow recWindow = dispPanel.getCurrentRecordWindow();
 			int originalId = resultsWindow.getSelectedRecordId();
 			Record originalRecord = recWindow.getRecord();
-			info("selected "+originalId);
-			gui.duplicateRecord();
+			Utilities.trace("selected "+originalId);
+			Record newRecord = gui.duplicateRecord();
+			assertEquals("Duplicate record does not match original", originalRecord, newRecord);
 			gui.enterRecord();
 			gui.setRecordWindowEditable(true);
 			recWindow = dispPanel.getCurrentRecordWindow();

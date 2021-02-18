@@ -512,9 +512,9 @@ public class LibrisGui extends LibrisWindowedUi {
 		menu.setRecordDuplicateRecordEnabled(enabled);
 	}
 
-	public boolean duplicateRecord() {
+	public DatabaseRecord duplicateRecord() {
 		if (currentDatabase.isDatabaseReadOnly()) {
-			return false;
+			return null;
 		}
 		int rid = resultsPanel.getSelectedRecordId();
 		DatabaseRecord newRecord = null;
@@ -529,9 +529,9 @@ public class LibrisGui extends LibrisWindowedUi {
 			displayPanel.addRecord(newRecord, true);
 		} catch (Exception e) {
 			alert("error creating new record", e);
-			return false;
+			return null;
 		}
-		return true;
+		return newRecord;
 	}
 
 	public void enterRecord() {

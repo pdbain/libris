@@ -25,7 +25,6 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 
 
 public abstract class Record implements Comparable<Record>, XMLElement {
-	private String string;
 	static final String elementTag = XML_RECORD_TAG;
 	protected int id;
 	protected String name;
