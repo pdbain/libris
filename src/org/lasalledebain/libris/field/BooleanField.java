@@ -49,6 +49,7 @@ public class BooleanField extends GenericField<FieldBooleanValue> implements Fie
 		throw new FieldDataException("addIntegerValue not defined for BooleanField");
 	}
 	@Override
+	// TODO FieldBooleanValue valueOf return common object
 	public FieldBooleanValue valueOf(FieldValue original) throws FieldDataException {
 		return (original instanceof FieldBooleanValue)? (FieldBooleanValue) original: valueOf(original.getMainValueAsKey());
 	}
