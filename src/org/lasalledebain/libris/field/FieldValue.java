@@ -5,14 +5,6 @@ import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
 public abstract class FieldValue {
-	@Deprecated
-	private static final EmptyFieldValue emptyFieldValueSingleton = new EmptyFieldValue();
-
-	@Deprecated
-	public static EmptyFieldValue getEmptyfieldvaluesingleton() {
-		return emptyFieldValueSingleton;
-	}
-
 	public abstract String getValueAsString();
 
 	public LibrisAttributes getValueAsAttributes() throws FieldDataException {

@@ -252,7 +252,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			} else {
 				ui.setProgressNote("Loading database metadata");
 				loadDatabaseInfo(myConfiguration.isLoadMetadata());
-				mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
+				mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new GenericRecordList<DatabaseRecord>(this));
 				final File databaseFile = getDatabaseFile();
 				Records<DatabaseRecord> recs = getDatabaseRecordsUnchecked();
 				try {
@@ -787,7 +787,8 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			}
 		}
 
-		public DatabaseRecordList getRecords() {
+		@Override
+		public RecordList<DatabaseRecord> getRecords() {
 			return new DatabaseRecordList(this);	
 		}
 

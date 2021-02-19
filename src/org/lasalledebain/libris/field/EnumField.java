@@ -54,12 +54,6 @@ public class EnumField extends GenericField<FieldEnumValue> implements Field {
 		return (original instanceof FieldEnumValue)? (FieldEnumValue) original: valueOf(original.getValueAsInt(), original.getExtraValueAsString());
 	}
 
-	@Deprecated
-	public static EnumField of(Field f) {
-		if (f instanceof EnumField) return (EnumField) f;
-		else throw new DatabaseError("Field of type "+f.getClass().getName()+" is not compatible with EnumField");
-	}
-
 	@Override
 	public void addValuePair(Integer value, String extraValue)
 			throws FieldDataException {

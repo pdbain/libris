@@ -1,7 +1,6 @@
 package org.lasalledebain.libris.ui;
 
 import org.lasalledebain.libris.DatabaseRecord;
-import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 

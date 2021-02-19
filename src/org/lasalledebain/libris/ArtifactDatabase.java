@@ -273,4 +273,9 @@ public class ArtifactDatabase extends GenericDatabase<ArtifactRecord> implements
 	public static DynamicSchema getArtifactsSchema() {
 		return artifactsSchema;
 	}
+
+	@Override
+	public RecordList<ArtifactRecord> getRecords() {
+		return new GenericRecordList<ArtifactRecord>(this);
+	}
 }

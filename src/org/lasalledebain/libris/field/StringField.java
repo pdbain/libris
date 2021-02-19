@@ -4,6 +4,7 @@ import org.lasalledebain.libris.Field;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.exception.FieldDataException;
 import org.lasalledebain.libris.exception.InputException;
+import static java.util.Objects.isNull;
 
 public class StringField extends GenericField<FieldSingleStringValue> {
 	
@@ -25,10 +26,14 @@ public class StringField extends GenericField<FieldSingleStringValue> {
 		return new FieldSingleStringValue(data);
 	}
 
+	protected FieldSingleStringValue valueOf(int data) {
+		return new FieldSingleStringValue(Integer.toString(data));
+	}
+
 	@Override
 	protected FieldValue valueOf(int value, String extraValue) throws FieldDataException {
 		try {
-			return new FieldStringPairValue(Integer.toString(value), extraValue);
+			return isNull(extraValue)? valueOf(value): new FieldStringPairValue(Integer.toString(value), extraValue);
 		} catch (InputException e) {
 			throw new FieldDataException("error in field "+getFieldId(), e);
 		}
@@ -41,7 +46,7 @@ public class StringField extends GenericField<FieldSingleStringValue> {
 
 	@Override
 	public void addIntegerValue(int data) throws FieldDataException {
-		addFieldValue(valueOf(Integer.toString(data)));
+		addFieldValue(valueOf(data));
 	}
 
 	@Override

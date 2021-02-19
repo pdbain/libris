@@ -30,7 +30,7 @@ public class RecordNameFilter implements RecordFilter {
 		terms = Arrays.asList(searchTerms);
 	}
 
-	public boolean matches(Record rec) throws InputException {
+	public boolean matches(Record rec) {
 		recWords.clear();
 		String recName = rec.getName();
 		recWords.addKeyword(recName);
@@ -47,5 +47,10 @@ public class RecordNameFilter implements RecordFilter {
 	
 	public Iterable<String> getKeywords() {
 		return recWords.getKeywords();
+	}
+
+	@Override
+	public boolean test(Record rec) {
+		return matches(rec);
 	}
 }

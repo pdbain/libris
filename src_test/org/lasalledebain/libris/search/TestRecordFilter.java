@@ -142,6 +142,20 @@ public class TestRecordFilter extends TestCase {
 			checkReturnedRecords(filteredList, keyWordsAndRecords.get(term));
 		}
 	}
+	
+	/**
+	 * Test basic sanity of searching enumerated fields:
+	 * - defined value
+	 * - extra value
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 * @throws LibrisException 
+	 */
+	public void testSearchEnum() throws FileNotFoundException, IOException, LibrisException {
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
+		Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
+		fail("testSearchEnum not implemented");
+	}
 
 	public void testSearch() throws FileNotFoundException, IOException, LibrisException {
 		Random rand = new Random(314159);

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import org.junit.Test;
 import org.lasalledebain.libris.ArtifactParameters;
@@ -886,6 +887,21 @@ public class DatabaseTests extends TestCase {
 		dbInstance.delete();
 	}
 
+	/**
+	 * Exercise Records as stream.
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws LibrisException
+	 */
+	public void testRecordStream() throws FileNotFoundException, IOException, LibrisException {
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
+		LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
+		Stream<DatabaseRecord> recordStream = db.getRecords().asStream();
+		fail("testRecordStream empty list not implemented");
+		
+		fail("testRecordStream multiple records not implemented");
+	}
 	@Override
 	protected void setUp() throws Exception {
 		info("starting "+getName());

@@ -37,7 +37,7 @@ public class Records<RecordType extends Record> implements Iterable<RecordType>,
 		recMgr = db.getRecordsFileMgr();
 		myDatabase = db;
 	}
-
+	
 	public Iterable<RecordType> getNativeRecordsReader() {
 		return recMgr;
 	}

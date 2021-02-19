@@ -40,15 +40,11 @@ public class FilteredRecordList<RecordType extends Record> extends RecordList<Re
 
 		@Override
 		public boolean hasNext() {
-			try {
-				while ((null == savedRec) && recordSource.hasNext()) {
-					RecordType temp = recordSource.next();
-					if (filter.matches(temp)) {
-						savedRec = temp;
-					}
+			while ((null == savedRec) && recordSource.hasNext()) {
+				RecordType temp = recordSource.next();
+				if (filter.test(temp)) {
+					savedRec = temp;
 				}
-			} catch (InputException e) {
-				throw new DatabaseError("Error reading record", e);
 			}
 			return (null != savedRec);
 		}

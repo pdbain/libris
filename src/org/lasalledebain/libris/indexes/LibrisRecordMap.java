@@ -43,34 +43,5 @@ public abstract class LibrisRecordMap {
 	 * @param numRecords Desired number of entries
 	 * @return false if the request cannot be fulfilled
 	 */
-	public boolean setSize(int numRecords) {
-		return false;
-	}
-
-	static class IdAndPosition {
-		int id;
-		long position;
-		/**
-		 * @param id record numeric id
-		 * @param position record file position
-		 */
-		public IdAndPosition(int id, long position) {
-			setIdAndPosition(id, position);
-		}
-		/**
-		 * @param id
-		 * @param position
-		 */
-		public void setIdAndPosition(int id, long position) {
-			this.id = id;
-			this.position = position;
-		}
-		public int getId() {
-			return id;
-		}
-		public long getPosition() {
-			return position;
-		}
-		
-	}
+	public abstract boolean setSize(int numRecords);
 }

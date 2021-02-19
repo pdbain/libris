@@ -1,9 +1,10 @@
 package org.lasalledebain.libris.search;
 
-import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.exception.InputException;
+import java.util.function.Predicate;
 
-public interface RecordFilter {
+import org.lasalledebain.libris.Record;
+
+public interface RecordFilter extends Predicate<Record>{
 	public enum MATCH_TYPE {
 		MATCH_EXACT,
 		MATCH_PREFIX,
@@ -23,7 +24,6 @@ public interface RecordFilter {
 		}
 		
 	}
-	public abstract boolean matches(Record rec) throws InputException;
 	
 }
 

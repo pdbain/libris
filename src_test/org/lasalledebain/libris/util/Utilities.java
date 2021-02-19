@@ -296,15 +296,6 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		return testDir;
 	}
 
-	@Deprecated
-	public static FileSpaceManager makeFileSpaceManager(String managerName) {
-		File workDir = makeTempTestDirectory();
-		if (null == workDir) {
-			fail("could not create working directory ");
-		}
-		return makeFileSpaceManager(workDir, managerName);
-	}
-
 	public static FileSpaceManager makeFileSpaceManager(File workDir, String managerName) {
 		File testFile = new File(workDir, managerName);
 		if (!testFile.exists()) {
@@ -470,20 +461,6 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 				fail("unexpected exception "+e.getMessage());
 			}
 		}
-	}
-
-	/**
-	 * @param dirName 
-	 * 
-	 */
-	@Deprecated
-	public static File makeTestFileObject(String dirName) {
-		File workingDirectory = new File(makeTempTestDirectory(), dirName);
-		deleteRecursively(workingDirectory);
-		workingDirectory.mkdirs();
-		File tf = new File(workingDirectory, "testIndexFile");
-		tf.deleteOnExit();
-		return tf;
 	}
 
 	public static File makeTestFileObject(File parentDirectory, String fileName) {

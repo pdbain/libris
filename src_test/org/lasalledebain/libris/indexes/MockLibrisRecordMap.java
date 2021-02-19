@@ -21,7 +21,7 @@ public class MockLibrisRecordMap extends LibrisRecordMap {
 		final Long recPos = recMap.get(recordId);
 		return (recPos == null) ? 0: recPos.longValue();
 	}
-	
+
 
 	@Override
 	public int size() {
@@ -33,7 +33,7 @@ public class MockLibrisRecordMap extends LibrisRecordMap {
 	@Override
 	public void close() throws DatabaseException {
 		return;
-		}
+	}
 	@Override
 	public void flush() throws DatabaseException {
 		return;
@@ -41,6 +41,11 @@ public class MockLibrisRecordMap extends LibrisRecordMap {
 	@Override
 	public void generateReport(Reporter rpt) {
 		/* EMPTY */
+	}
+	@Override
+	public boolean setSize(int numRecords) {
+		/* not required */
+		return false;
 	}
 
 }

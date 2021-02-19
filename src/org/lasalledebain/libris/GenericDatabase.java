@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.Assertion;
@@ -208,7 +209,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	public FilteredRecordList<RecordType> makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int fieldList[], Collection<String> searchTerms) throws UserErrorException, IOException {
 		RecordList<RecordType> recList = new SignatureFilteredRecordList<RecordType>(this, searchTerms);
-		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, fieldList, searchTerms);
+		KeywordFilter filter = makeKeywordFilter(matchType, caseSensitive, fieldList, searchTerms);;
 		FilteredRecordList<RecordType> filteredList = new FilteredRecordList<RecordType>(recList, filter);
 		return filteredList;
 	}
@@ -217,9 +218,15 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 			int fieldList[], String searchTerm) throws UserErrorException, IOException {
 		Collection<String> searchTerms = Collections.singleton(searchTerm);
 		RecordList<RecordType> recList = new SignatureFilteredRecordList<RecordType>(this, searchTerms);
-		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, fieldList, searchTerms);
+		KeywordFilter filter = makeKeywordFilter(matchType, caseSensitive, fieldList, searchTerms);
 		FilteredRecordList<RecordType> filteredList = new FilteredRecordList<RecordType>(recList, filter);
 		return filteredList;
+	}
+
+	public KeywordFilter makeKeywordFilter(MATCH_TYPE matchType, boolean caseSensitive, int[] fieldList,
+			Collection<String> searchTerms) {
+		KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, fieldList, searchTerms);
+		return filter;
 	}
 
 	public synchronized ModifiedRecordList<RecordType> getModifiedRecords() {
@@ -404,4 +411,6 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 			throw new DatabaseError(message + ": not allowed while database closed");
 		}
 	}
+
+	public abstract RecordList<RecordType> getRecords();
 }

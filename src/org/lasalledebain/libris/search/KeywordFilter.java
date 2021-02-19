@@ -3,6 +3,7 @@ package org.lasalledebain.libris.search;
 import java.util.Arrays;
 
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.indexes.ContainsKeywords;
 import org.lasalledebain.libris.indexes.ExactKeywordList;
@@ -36,25 +37,15 @@ public class KeywordFilter implements RecordFilter {
 		terms = searchTerms;
 	}
 
-	public boolean matches(Record rec) throws InputException {
+	@Override
+	public boolean test(Record rec) {
 		recWords.clear();
-		rec.getKeywords(myFieldList, recWords);
+		try {
+			rec.getKeywords(myFieldList, recWords);
+		} catch (InputException e) {
+			throw new DatabaseError("Error getting keywords from record "+rec.getRecordId(), e);
+		}
 		return recWords.contains(terms);
 	}
 	
-	public MATCH_TYPE getMatchType() {
-		return recWords.getMatchType();
-	}
-	
-	public boolean isCaseSenitive() {
-		return recWords.isCaseSensitive();
-	}
-	
-	public Iterable<String> getKeywords() {
-		return recWords.getKeywords();
-	}
-
-	public int[] getFieldList() {
-		return myFieldList;
-	}
 }

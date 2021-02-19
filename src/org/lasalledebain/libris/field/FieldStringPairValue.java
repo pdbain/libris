@@ -25,6 +25,7 @@ public class FieldStringPairValue extends FieldValue {
 		extraValue = val1;
 		extraPresent = true;
 	}
+	
 	public FieldStringPairValue(String val0) throws InputException {
 		Assertion.assertNotNullInputException("FieldStringPairValue main value is null", val0);
 		mainValue = val0;

@@ -1,6 +1,6 @@
 package org.lasalledebain.libris.exception;
 
-@SuppressWarnings("serial")
+@Deprecated
 public class DatabaseNotIndexedException extends DatabaseException {
 
 }
