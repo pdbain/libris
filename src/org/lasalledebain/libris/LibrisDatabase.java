@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.DatabaseException;
-import org.lasalledebain.libris.exception.DatabaseNotIndexedException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.OutputException;
@@ -97,7 +96,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return myLogger;
 		}
 
-		public boolean openDatabase() throws DatabaseNotIndexedException, DatabaseException, LibrisException {
+		public boolean openDatabase() throws DatabaseException, LibrisException {
 			assertClosed("open database");
 			if (!reserveDatabase()) {
 				alert("database is in use");
@@ -118,10 +117,10 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		}
 
 
-		private void openDatabaseImpl() throws DatabaseNotIndexedException, DatabaseException, LibrisException {
-			mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new DatabaseRecordList(this));
+		private void openDatabaseImpl() throws DatabaseException, LibrisException {
+			mainRecordTemplate = RecordTemplate.templateFactory(mySchema, new GenericRecordList<DatabaseRecord>(this));
 			if (!isIndexed()) {
-				throw new DatabaseNotIndexedException();
+				throw new DatabaseException("Database not indexed");
 			} else {
 				FileAccessManager propsMgr = fileMgr.getAuxiliaryFileMgr(LibrisConstants.PROPERTIES_FILENAME);
 				synchronized (propsMgr) {
@@ -789,7 +788,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 
 		@Override
 		public RecordList<DatabaseRecord> getRecords() {
-			return new DatabaseRecordList(this);	
+			return new GenericRecordList<DatabaseRecord>(this);	
 		}
 
 		public int getModifiedRecordCount() {

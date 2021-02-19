@@ -167,7 +167,7 @@ public class LibrisLayout implements XMLElement {
 		return 	layoutProc.layOutFields(recList, ui, recordPanel, modTrk);
 	};
 	
-	public void layOutPage(RecordList<Record> recList, HttpParameters parameterObject, 
+	public void layOutPage(RecordList<? extends Record> recList, HttpParameters parameterObject, 
 			LibrisLayout browserLayout, DatabaseUi ui) throws InputException, IOException {
 		layoutProc.layOutPage(recList, parameterObject, browserLayout, ui);
 	}

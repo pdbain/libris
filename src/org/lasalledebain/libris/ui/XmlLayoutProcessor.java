@@ -14,7 +14,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.xmlUtils.ElementWriter;
 
-public class XmlLayoutProcessor extends LayoutProcessor {
+public class XmlLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
 	private static final String XML_TEXT_CLASS = "xmlText";
 	private static final String XML_TEXT_STYLE = "."+XML_TEXT_CLASS +"{\n"
 			+ "width: 95%;\n"
@@ -39,7 +39,7 @@ public class XmlLayoutProcessor extends LayoutProcessor {
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
 
 		Record rec = recList.getRecord(recId);
 		StringBuffer windowText = new StringBuffer();

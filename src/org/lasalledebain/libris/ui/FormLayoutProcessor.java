@@ -28,7 +28,7 @@ import org.lasalledebain.libris.index.GroupDef;
 import org.lasalledebain.libris.index.GroupDefs;
 import org.lasalledebain.libris.index.GroupMember;
 
-public class FormLayoutProcessor extends LayoutProcessor {
+public class FormLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
 
 	private static final String FORM_FIELD_GRID_CLASS = "formFieldGrid";
 	private static final String RECORD_FIELD_CLASS = "recordField";
@@ -138,8 +138,8 @@ public class FormLayoutProcessor extends LayoutProcessor {
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
-		Record rec = getRecordOrErrorMessage(recList, recId, buff);
+	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+		RecordType rec = getRecordOrErrorMessage(recList, recId, buff);
 		if (null == rec) return;
 		layoutRecordTitle(buff, rec);
 		startDiv(buff, RECORD_PANEL_CLASS); {

@@ -52,7 +52,7 @@ public class HtmlTests extends TestCase implements LibrisHTMLConstants {
 		Layouts myLayouts = db.getLayouts();
 		LibrisLayout myLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_TYPE_PARAGRAPH);
 		LibrisLayout browserLayout = myLayouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
-	 myLayout.layOutPage(db.getRecords().ofRecords(), new HttpParameters(2, 0, resp), browserLayout, db.getUi());
+	 myLayout.layOutPage(db.getRecords(), new HttpParameters(2, 0, resp), browserLayout, db.getUi());
 		String result = resp.getResponseText();
 		checkExpectedStrings(result, expectedBasicWords);
 	}

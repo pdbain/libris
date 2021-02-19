@@ -21,15 +21,15 @@ import org.lasalledebain.libris.field.GenericField;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.isNull;
 
-public class ParagraphLayoutProcessor extends LayoutProcessor {
+public class ParagraphLayoutProcessor<RecordType extends Record> extends LayoutProcessor<RecordType> {
 
 	public ParagraphLayoutProcessor(LibrisLayout theLayout) {
 		super(theLayout);
 	}
 
 	@Override
-	public void layoutDisplayPanel(RecordList<Record> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
-		Record rec = recList.getRecord(recId);
+	public void layoutDisplayPanel(RecordList<RecordType> recList, HttpParameters params, int recId, StringBuffer buff) throws InputException {
+		RecordType rec = recList.getRecord(recId);
 		StringBuffer windowText = new StringBuffer();
 		if (isNull(rec)) {
 			windowText.append("Record "+recId+" not found");
@@ -40,7 +40,7 @@ public class ParagraphLayoutProcessor extends LayoutProcessor {
 	}
 
 	@Override
-	public ArrayList<UiField> layOutFields(Record rec, LibrisWindowedUi ui, JComponent recordPanel,
+	public ArrayList<UiField> layOutFields(RecordType rec, LibrisWindowedUi ui, JComponent recordPanel,
 			ModificationTracker modTrk) throws DatabaseException, LibrisException {
 		JEditorPane content = new JEditorPane();
 		recordPanel.addComponentListener(new ComponentListener() {

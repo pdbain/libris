@@ -13,15 +13,15 @@ import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 
 @SuppressWarnings("serial")
-public class TableLayoutTableModel extends AbstractTableModel {
+public class TableLayoutTableModel<RecordType extends Record> extends AbstractTableModel {
 
 	public static final String RECORD_ID = "Record ID";
-	private final RecordList<Record> myRecList;
+	private final RecordList<RecordType> myRecList;
 	private final LibrisLayout myLayout;
 	private final String[] myFieldIds;
-	final private ArrayList<Record> recList;
-	Iterator<Record> recIterator;
-	public TableLayoutTableModel(RecordList<Record> theRecList, LibrisLayout theLayout) {
+	final private ArrayList<RecordType> recList;
+	Iterator<RecordType> recIterator;
+	public TableLayoutTableModel(RecordList<RecordType> theRecList, LibrisLayout theLayout) {
 		myRecList = theRecList;
 		myLayout = theLayout;
 		myFieldIds = myLayout.getFieldIds();
@@ -53,7 +53,7 @@ public class TableLayoutTableModel extends AbstractTableModel {
 		while ((recList.size() <= rowIndex) && recIterator.hasNext())
 			recList.add(recIterator.next());
 		if (recList.size() > rowIndex) try {
-			Record rec = recList.get(rowIndex);
+			RecordType rec = recList.get(rowIndex);
 			if (0 == columnIndex) {
 				result = Integer.toString(rec.getRecordId());
 			} else {
@@ -72,7 +72,7 @@ public class TableLayoutTableModel extends AbstractTableModel {
 		if (i >= recList.size()) {
 			i = 0;
 			while (recIterator.hasNext()) {
-				Record rec = recIterator.next();
+				RecordType rec = recIterator.next();
 				recList.add(rec);
 				if (rec.getRecordId() == recId) {
 					i = recList.size() - 1;

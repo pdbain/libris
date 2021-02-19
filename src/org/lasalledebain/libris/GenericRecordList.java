@@ -2,6 +2,7 @@ package org.lasalledebain.libris;
 
 import java.util.Iterator;
 
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 
@@ -15,7 +16,11 @@ public class GenericRecordList<RecordType extends Record> extends RecordList<Rec
 	@Override
 	public Iterator<RecordType> iterator() {
 		Iterator<RecordType> iter;
-		iter = database.getRecords().iterator();
+		try {
+			iter = database.getDatabaseRecords().iterator();
+		} catch (LibrisException e) {
+			throw new DatabaseError("Error getting records", e);
+		}
 		return iter;
 	}
 
