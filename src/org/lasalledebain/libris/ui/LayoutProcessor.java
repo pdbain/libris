@@ -112,7 +112,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	}
 
 	protected final LibrisLayout myLayout;
-	protected DatabaseUi myUi;
+	protected DatabaseUi<RecordType> myUi;
 
 	public LayoutProcessor(LibrisLayout theLayout) {
 		myLayout = theLayout;
@@ -128,7 +128,7 @@ implements LayoutHtmlProcessor<RecordType>, LayoutSwingProcessor<RecordType>, Li
 	}
 
 	/* HTML utilities */
-	protected void generateHeaderAndStylesheet(DatabaseUi ui, StringBuffer buffer) {
+	protected void generateHeaderAndStylesheet(DatabaseUi<RecordType> ui, StringBuffer buffer) {
 		buffer.append("<!DOCTYPE html>\n" + 
 				"<meta charset=utf-8>\n" + 
 				"<head>\n" + 

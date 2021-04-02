@@ -93,6 +93,7 @@
 		<record id="3" name="IEEE_computer">
 			<member group="GRP_pubinfo" parent="1" />
 			<field id="ID_journal" value="JR_ieee_computer"/>
+			<field id="ID_issue" value="someIssue"/>
 		</record>
 		<record id="4" name="IEEE_computer_jan">
 			<member group="GRP_pubinfo" parent="3" />

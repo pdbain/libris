@@ -176,10 +176,7 @@ public class LibrisLayout implements XMLElement {
 			throws LibrisException {
 		Field fld = null;
 		try {
-			fld = rec.getField(fieldNum);
-			if (null == fld) {
-				fld = rec.getDefaultField(fieldNum);
-			}
+			fld = rec.getFieldOrDefault(fieldNum);
 		} catch (InputException e) {
 			throw new DatabaseException("Error in layout \""+getId()+"\"", e);			
 		}

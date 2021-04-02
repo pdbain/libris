@@ -74,7 +74,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 		public static final String[] requiredAttributeNames = new String[] {XML_DATABASE_SCHEMA_NAME_ATTR, XML_SCHEMA_VERSION_ATTR};
 		public static final String[] subElementNames = new String[] {XML_INSTANCE_TAG, XML_METADATA_TAG, XML_RECORDS_TAG, XML_ARTIFACTS_TAG};
 
-		public LibrisDatabase(LibrisDatabaseConfiguration config, DatabaseUi theUi) throws LibrisException {
+		public LibrisDatabase(LibrisDatabaseConfiguration config, DatabaseUi<DatabaseRecord> theUi) throws LibrisException {
 			super(theUi,new FileManager(getDatabaseAuxDirectory(config)), config.isReadOnly());
 			myConfiguration = config;
 			myDatabaseFile = config.getDatabaseFile();
@@ -279,7 +279,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 					if (XmlRecordsReader.XML_ARTIFACTS_TAG.equals(nextElement)) {
 						ElementManager artifactsMgr = librisMgr.nextElement();
 						File artifactDirectory = myConfiguration.getRepositoryDirectory();
-						DatabaseUi theUi = new ChildUi<ArtifactRecord>(getUi(), false);
+						ChildUi<ArtifactRecord> theUi = new ChildUi<ArtifactRecord>(getUi(), false);
 						initializeDocumentRepository(theUi, artifactDirectory);
 						ui.addProgress(1);
 						ui.setProgressNote("Loading artifact database");
@@ -301,7 +301,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return result;
 		}
 
-		private void initializeDocumentRepository(DatabaseUi databaseUi, File artifactDirectory)
+		private void initializeDocumentRepository(DatabaseUi<DatabaseRecord> databaseUi, File artifactDirectory)
 				throws DatabaseException, LibrisException {
 			if (isNull(artifactDirectory)) {
 				artifactDirectory = getDatabaseArtifactDirectory(myConfiguration);

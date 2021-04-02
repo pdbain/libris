@@ -1,7 +1,6 @@
 package org.lasalledebain.libris;
 
 import java.io.File;
-import java.util.Objects;
 
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LastFilterSettings;

@@ -130,13 +130,20 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public Field getField(String fieldId) throws InputException {
 		return getField(getFieldNum(fieldId));
 	}
+	public abstract Field getDefaultField(int fieldNum) throws InputException;
 
 	public Field setFieldValue(String fieldId, String fieldData) throws DatabaseException, InputException {
 		return setFieldValue(getFieldNum(fieldId), fieldData);
 	}
+	public Field getFieldOrDefault(int fieldNum) throws InputException {
+		Field result = getField(fieldNum);
+		if (null == result) {
+			result = getDefaultField(fieldNum);
+		}
+		return result;
+	}
 
 	
-	public abstract Field getDefaultField(int fieldNum) throws InputException;
 	public abstract Field getField(int fieldNum) throws InputException;
 	public abstract FieldValue getFieldValue(int fieldNum) throws InputException;
 	public abstract void removeField(int fieldNum) throws LibrisException;

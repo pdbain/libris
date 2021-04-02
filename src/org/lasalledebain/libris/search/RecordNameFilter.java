@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.lasalledebain.libris.Record;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.indexes.ContainsKeywords;
 import org.lasalledebain.libris.indexes.ExactKeywordList;
 import org.lasalledebain.libris.indexes.PrefixKeywords;

@@ -1,5 +1,8 @@
 package org.lasalledebain.libris.field;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;

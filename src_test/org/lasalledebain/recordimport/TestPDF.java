@@ -20,7 +20,6 @@ import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.MetadataHolder;
 import org.lasalledebain.libris.Repository;
-import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.records.PdfRecordImporter;
 import org.lasalledebain.libris.ui.DatabaseUi;
@@ -54,13 +53,13 @@ public class TestPDF extends TestCase {
 		repoRoot = new File(workingDirectory, "repo_root");
 		assertTrue("Could not create "+repoRoot.getPath(), repoRoot.mkdir());
 		File databaseFile = Repository.getDatabaseFileFromRoot(repoRoot);
-		HeadlessUi theUi = new HeadlessUi(databaseFile, false);
+		 HeadlessUi<DatabaseRecord> theUi = new HeadlessUi(databaseFile, false);
 		Layouts theLayouts = new Layouts(ArtifactDatabase.getArtifactsSchema());
 		MetadataHolder<DatabaseRecord> metadata = new MetadataHolder<DatabaseRecord>(ArtifactDatabase.getArtifactsSchema(), theLayouts);
 		boolean success = Utilities.newDatabase(databaseFile, RepositoryTest.REPOSITORY, false, theUi, metadata);
 		final File repoDbFile = success ? databaseFile : null;
 		assertTrue("could not create database", null != repoDbFile);
-		HeadlessUi ui = new HeadlessUi(repoFile, false);
+		var ui = new HeadlessUi(repoFile, false);
 		repo = Repository.open(ui, repoRoot);
 		db = null;
 	}
@@ -124,7 +123,7 @@ public class TestPDF extends TestCase {
 		db = Utilities.buildTestDatabase(workingDirectory, Utilities.KEYWORD_DATABASE1_XML);
         Map<String, String> env = new HashMap<>(); 
         env.put("create", "true");
-        DatabaseUi ui = db.getUi();
+        DatabaseUi<DatabaseRecord>ui = db.getUi();
 		int keywordField = db.getSchema().getFieldNum("ID_keywords");
 		int abstractField = db.getSchema().getFieldNum("ID_text");
 		PdfRecordImporter importer = new PdfRecordImporter(db, repo,keywordField, abstractField);

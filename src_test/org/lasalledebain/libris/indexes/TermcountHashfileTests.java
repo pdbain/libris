@@ -154,7 +154,7 @@ public class TermcountHashfileTests extends TestCase {
 			File testDatabaseFile = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE4_XML, workingDirectory);
 			LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFile);
 			IndexField[] indexFieldList = db.getSchema().getIndexFields(LibrisXMLConstants.XML_INDEX_NAME_KEYWORDS);
-			final DatabaseUi myUi = db.getUi();
+			final DatabaseUi<DatabaseRecord>myUi = db.getUi();
 			
 			assertTrue("Could not close database", myUi.closeDatabase(false));
 			db = myUi.openDatabase();

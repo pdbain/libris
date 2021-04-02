@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -26,10 +29,12 @@ import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.XmlSchema;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
+import org.lasalledebain.libris.field.FieldEnumValue;
 import org.lasalledebain.libris.index.IndexField;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
@@ -127,7 +132,7 @@ public class TestRecordFilter extends TestCase {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.KEYWORD_DATABASE0_XML, workingDirectory);
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
-		DatabaseUi ui = database.getUi();
+		DatabaseUi<DatabaseRecord> ui = database.getUi();
 		int fieldNums[] = new int[] { 0 };
 		RandomFieldGenerator generators[] = new RandomFieldGenerator[fieldNums.length];
 		generators[0] = new RandomFieldGenerator(4, 12, 4, 4, rand, numRecs);
@@ -142,7 +147,7 @@ public class TestRecordFilter extends TestCase {
 			checkReturnedRecords(filteredList, keyWordsAndRecords.get(term));
 		}
 	}
-	
+
 	/**
 	 * Test basic sanity of searching enumerated fields:
 	 * - defined value
@@ -153,8 +158,57 @@ public class TestRecordFilter extends TestCase {
 	 */
 	public void testSearchEnum() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
-		Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
-		fail("testSearchEnum not implemented");
+		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
+		XmlSchema theSchema = db.getSchema();
+		String choiceSetName = "ENUM_publishers";
+		int pubField = theSchema.getFieldNum("ID_publisher");
+		var choices = theSchema.getEnumSet(choiceSetName);
+		FieldEnumValue searchValue = new FieldEnumValue(choices, 1);
+		var enumTest = new EnumFilter(pubField, searchValue, false);
+		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
+		assertEquals("Wrong number of records returned", 1, result.size());
+		fail("testSearchEnum extra value");
+	}
+
+	public void testSearchBoolean() throws FileNotFoundException, IOException, LibrisException {
+		fail("testSearchBoolean not implemented");
+	}
+	
+	public void testSearchInheritedEnum() throws FileNotFoundException, IOException, LibrisException {
+
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
+		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
+		XmlSchema theSchema = db.getSchema();
+		String choiceSetName = "ENUM_publishers";
+		int pubField = theSchema.getFieldNum("ID_publisher");
+		var choices = theSchema.getEnumSet(choiceSetName);
+		FieldEnumValue searchValue = new FieldEnumValue(choices, 1);
+		var enumTest = new EnumFilter(pubField, searchValue, true);
+		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
+		assertEquals("Wrong number of records returned", 4, result.size());
+	}
+	
+	public void testSearchInheritedText() throws FileNotFoundException, IOException, LibrisException {
+
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
+		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
+		XmlSchema theSchema = db.getSchema();
+		int issueField = theSchema.getFieldNum("ID_issue");
+		var kwTest = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {issueField}, "someIssue");
+		List<DatabaseRecord> result = db.getRecords().asStream().filter(kwTest).collect(Collectors.toList());
+		assertEquals("Wrong number of records returned", 2, result.size());
+	}
+	
+	public void testKeywordStreamFilter() throws FileNotFoundException, IOException, LibrisException {
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
+		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
+		Predicate<Record> filt = db.makeKeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {2}, Collections.singleton("The"));
+		List<DatabaseRecord> result = db.getRecords().asStream().collect(Collectors.toList());
+		assertEquals("too few records in unfiltered list", 4, result.size());
+		result = db.getRecords().asStream().filter(filt).collect(Collectors.toList());
+		assertEquals("Wrong record in filtered list", 2, result.get(0).getRecordId());
+		assertEquals("Wrong record in filtered list", 4, result.get(1).getRecordId());
+
 	}
 
 	public void testSearch() throws FileNotFoundException, IOException, LibrisException {
@@ -164,7 +218,7 @@ public class TestRecordFilter extends TestCase {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setSignatureLevels(2);
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
-		DatabaseUi ui = database.getUi();
+		DatabaseUi<DatabaseRecord> ui = database.getUi();
 		RandomFieldGenerator generators[] = new RandomFieldGenerator[keywordFieldNums.length];
 		final int keywordRatio = 15 * numRecs;
 		generators[0] = new RandomFieldGenerator(4, 12, 2, 8, rand, keywordRatio);
@@ -188,7 +242,7 @@ public class TestRecordFilter extends TestCase {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setSignatureLevels(2);
 		LibrisDatabase database = Utilities.buildTestDatabase(config);
-		DatabaseUi ui = database.getUi();
+		DatabaseUi<DatabaseRecord>ui = database.getUi();
 		String singleKeyword = "singleKeyword";
 		String multipleKeyword = "multipleKeyword";
 
@@ -240,7 +294,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		DatabaseUi ui = database.getUi();
+		DatabaseUi<DatabaseRecord>ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.buildDatabase(config);
 		database = ui.openDatabase();
@@ -271,7 +325,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		DatabaseUi ui = database.getUi();
+		DatabaseUi<DatabaseRecord>ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.buildDatabase(config);
 		database = ui.openDatabase();
@@ -305,7 +359,7 @@ public class TestRecordFilter extends TestCase {
 		HashMap<String, List<Integer>> keyWordsAndRecords = makeDatabase(database, numRecs, generators,
 				keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		DatabaseUi ui = database.getUi();
+		DatabaseUi<DatabaseRecord>ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.buildDatabase(config);
 		database = ui.openDatabase();
@@ -342,7 +396,7 @@ public class TestRecordFilter extends TestCase {
 		}
 		makeDatabase(database, numRecs, generators, keywordFieldNums);
 		database.exportDatabaseXml(new FileOutputStream(config.getDatabaseFile()), true, true, true);
-		DatabaseUi ui = database.getUi();
+		DatabaseUi<DatabaseRecord>ui = database.getUi();
 		ui.closeDatabase(false);
 		ui.buildDatabase(config);
 		database = ui.openDatabase();
@@ -374,7 +428,7 @@ public class TestRecordFilter extends TestCase {
 		}
 
 	}
-	
+
 	public void testIndexStress() throws FileNotFoundException, IOException, LibrisException {
 		trace("copyAndBuildDatabase");
 		LibrisDatabaseConfiguration config = copyAndBuildDatabase();
@@ -398,7 +452,7 @@ public class TestRecordFilter extends TestCase {
 			Record r = database.getRecord(i);
 			assertNotNull("Record "+i+" null", r);
 		}
-		DatabaseUi ui = database.getUi();
+		DatabaseUi<DatabaseRecord>ui = database.getUi();
 		assertTrue("Database not closed", ui.closeDatabase(false));
 		trace("buildDatabase");
 		ui.buildDatabase(config);
@@ -441,7 +495,7 @@ public class TestRecordFilter extends TestCase {
 			Record r = database.getRecord(i);
 			assertNotNull("Record "+i+" null", r);
 		}
-		DatabaseUi ui = database.getUi();
+		DatabaseUi<DatabaseRecord>ui = database.getUi();
 		assertTrue("Database not closed", ui.closeDatabase(false));
 		trace("buildDatabase");
 		ui.buildDatabase(config);

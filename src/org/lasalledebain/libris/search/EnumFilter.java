@@ -3,7 +3,6 @@ package org.lasalledebain.libris.search;
 import static java.util.Objects.nonNull;
 
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.lasalledebain.libris.Field;
@@ -17,10 +16,12 @@ public class EnumFilter implements RecordFilter {
 
 	private final int myFieldId;
 	private final FieldEnumValue myValue;
+	private final boolean includeDefault;
 
-	public EnumFilter(int fieldId, FieldEnumValue theValue) {
+	public EnumFilter(int fieldId, FieldEnumValue theValue, boolean incDefault) {
 		this.myValue = theValue;
 		myFieldId = fieldId;
+		includeDefault = incDefault;
 	}
 
 	@Override
@@ -28,14 +29,19 @@ public class EnumFilter implements RecordFilter {
 		boolean result = false;
 		Field theField;
 		try {
-			theField = rec.getField(myFieldId);
+			theField = includeDefault? 
+					rec.getFieldOrDefault(myFieldId): 
+						rec.getField(myFieldId);
 		} catch (InputException e) {
 			throw new DatabaseError("Illegal field "+myFieldId);
 		}
 		if (nonNull(theField) && (theField instanceof EnumField)) {
 			EnumField theEnumField = (EnumField) theField;
-			Stream<? extends FieldEnumValue> valueStream = StreamSupport.stream(theEnumField.getFieldValues().spliterator(), false);
-			result = valueStream.anyMatch(Predicate.isEqual(myValue));
+			result = StreamSupport
+					.stream(theEnumField
+							.getFieldValues()
+							.spliterator(), false)
+					.anyMatch(Predicate.isEqual(myValue));
 		}
 		return result;
 	}

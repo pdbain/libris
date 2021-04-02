@@ -6,6 +6,8 @@ package org.lasalledebain.libris.ui;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 
+import org.lasalledebain.libris.Record;
+
 /**
  * @author pdbain
  * keeps track of whether a data have changed. 
@@ -19,7 +21,7 @@ public class ModificationTracker {
 	 * @param parentComponent parent GUI element
 	 * @param dialogueMessage printed if database closed with modified records
 	 */
-	public ModificationTracker(DatabaseUi ui, ActionListener modificationListener, 
+	public ModificationTracker(DatabaseUi<Record> ui, ActionListener modificationListener, 
 			Component parentComponent, String dialogueMessage) {
 		this.modificationListener = modificationListener;
 		this.dialogueMessage = dialogueMessage;
@@ -42,11 +44,7 @@ public class ModificationTracker {
 
 	private ActionListener modificationListener;
 	String dialogueMessage;
-	private DatabaseUi ui;
-	public DatabaseUi getUi() {
-		return ui;
-	}
-
+	private DatabaseUi<Record> ui;
 	public synchronized boolean isModified() {
 		return modified;
 	}

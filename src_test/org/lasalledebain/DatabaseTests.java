@@ -14,8 +14,10 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Test;
@@ -898,10 +900,29 @@ public class DatabaseTests extends TestCase {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
 		LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		Stream<DatabaseRecord> recordStream = db.getRecords().asStream();
-		fail("testRecordStream empty list not implemented");
+		int lastId = db.getLastRecordId();
 		
-		fail("testRecordStream multiple records not implemented");
+		List<DatabaseRecord> actuals = recordStream.collect(Collectors.toList());
+		for (int recId = 1; recId <= lastId; ++recId) {
+			var expected = db.getRecord(recId);
+			assertEquals("Record mismatch", expected, actuals.get(recId-1));
+		}
 	}
+
+	/**
+	 * Exercise an empty database as stream.
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 * @throws LibrisException
+	 */
+	public void testEmptyRecordStream() throws FileNotFoundException, IOException, LibrisException {
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.EMPTY_DATABASE_FILE, workingDirectory);
+		LibrisDatabase db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
+		Stream<DatabaseRecord> recordStream = db.getRecords().asStream();		
+		assertFalse("Record stream not empty", recordStream.iterator().hasNext());
+	}
+
 	@Override
 	protected void setUp() throws Exception {
 		info("starting "+getName());

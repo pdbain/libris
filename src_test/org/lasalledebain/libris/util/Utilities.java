@@ -386,7 +386,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		LibrisDatabase db = null;
 		try {
 			db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
-			DatabaseUi ui = db.getUi();
+			DatabaseUi<DatabaseRecord> ui = db.getUi();
 			ui.closeDatabase(false);
 			db = ui.openDatabase();
 		} catch (LibrisException e) {
@@ -401,7 +401,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		LibrisDatabase db = null;
 		try {
 			db = Utilities.buildAndOpenDatabase(config);
-			DatabaseUi ui = db.getUi();
+			DatabaseUi<DatabaseRecord> ui = db.getUi();
 			ui.closeDatabase(false);
 			db = ui.openDatabase();
 		} catch (LibrisException e) {
@@ -529,7 +529,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		ArrayList<File> fileList = DatabaseArchive.getFilesFromArchive(archiveFile, archiveFile.getParentFile());
 		assertTrue("Archive file is empty", fileList.size() > 0);
 		File databaseFile = fileList.get(0);
-		HeadlessUi ui = new HeadlessUi(databaseFile, false);
+		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
 		ui.buildDatabase(databaseFile);
 		LibrisDatabase result = ui.openDatabase();
 		assertNotNull("Database not opened", result);
@@ -537,7 +537,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 	}
 
 	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
-		HeadlessUi ui = new HeadlessUi(databaseFile, false);
+		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
 		assertTrue("Database not built", ui.buildDatabase(databaseFile));
 	
 		LibrisDatabase result = ui.openDatabase();
@@ -546,13 +546,13 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 	}
 
 	public static LibrisDatabase buildAndOpenDatabase(LibrisDatabaseConfiguration config) throws LibrisException {
-		HeadlessUi ui = new HeadlessUi();
+		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>();
 		ui.buildDatabase(config);
 		LibrisDatabase result = ui.openDatabase(config);
 		return result;
 	}
 
-	public static boolean newDatabase(File databaseFile, String schemaName, boolean readOnly, DatabaseUi ui, LibrisMetadata<DatabaseRecord> metadata) 
+	public static boolean newDatabase(File databaseFile, String schemaName, boolean readOnly, DatabaseUi<DatabaseRecord> ui, LibrisMetadata<DatabaseRecord> metadata) 
 			throws XMLStreamException, IOException, LibrisException {
 		if (!databaseFile .createNewFile()) {
 			ui.alert("Database file "+databaseFile.getAbsolutePath()+" already exisits");

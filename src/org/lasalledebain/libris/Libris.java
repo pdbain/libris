@@ -43,7 +43,7 @@ public class Libris {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		AbstractUi result = mainImpl(args);
+		AbstractUi<DatabaseRecord> result = mainImpl(args);
 
 		if (null == result) {
 			System.exit(1);
@@ -132,7 +132,7 @@ public class Libris {
 			++i;
 		}
 
-		AbstractUi ui = null;
+		AbstractUi<DatabaseRecord> ui = null;
 		try {
 			File dbFile = (null == databaseFilePath) ? null : new File(databaseFilePath);
 			LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(dbFile);
@@ -167,7 +167,7 @@ public class Libris {
 				if (doRebuild) {
 					Assertion.assertEquals(ui, "cannot specify UI type for batch operations", IfType.UI_DEFAULT, myUiType);
 					Assertion.assertNotNullError("Database file not set", dbFile);
-					ui = new HeadlessUi(false);
+					ui = new HeadlessUi<DatabaseRecord>(false);
 					status = ui.buildDatabase(config);
 				} else {
 					switch (myUiType) {
@@ -201,7 +201,7 @@ public class Libris {
 			status = false;
 		}
 
-		AbstractUi result = null;
+		AbstractUi<DatabaseRecord> result = null;
 		if (status && !batch) {
 			if (IfType.UI_CMDLINE != myUiType) {
 				ConsoleUi<DatabaseRecord> console = new ConsoleUi<DatabaseRecord>(ui);
@@ -251,9 +251,9 @@ public class Libris {
 
 	}
 
-	public static LibrisDatabase openDatabase(File databaseFile, AbstractUi ui) throws LibrisException {
+	public static LibrisDatabase openDatabase(File databaseFile, AbstractUi<DatabaseRecord> ui) throws LibrisException {
 		if (null == ui) {
-			ui = new HeadlessUi(false);
+			ui = new HeadlessUi<DatabaseRecord>(false);
 		}
 		LibrisDatabase db = ui.openDatabase(new LibrisDatabaseConfiguration(databaseFile));
 		return db;

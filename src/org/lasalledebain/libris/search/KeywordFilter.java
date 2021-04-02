@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.search;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
@@ -18,6 +19,10 @@ public class KeywordFilter implements RecordFilter {
 
 	public KeywordFilter(MATCH_TYPE matchType, boolean caseSensitive, int fieldList[], String searchTerms[]) {
 		this(matchType, caseSensitive, fieldList, Arrays.asList(searchTerms));
+	}
+	
+	public KeywordFilter(MATCH_TYPE matchType, boolean caseSensitive, int fieldList[], String searchTerm) {
+		this(matchType, caseSensitive, fieldList, Collections.singletonList(searchTerm));
 	}
 	
 	public KeywordFilter(MATCH_TYPE matchType, boolean caseSensitive, int fieldList[], Iterable<String> searchTerms) {

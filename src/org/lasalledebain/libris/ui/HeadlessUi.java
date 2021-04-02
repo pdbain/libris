@@ -11,7 +11,7 @@ import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 
-public class HeadlessUi extends LibrisWindowedUi {
+public class HeadlessUi<RecordType extends Record> extends LibrisWindowedUi<RecordType> {
 	private String schemaPath;
 	private int confirmValue;
 	private boolean accessible; 
@@ -67,7 +67,7 @@ public class HeadlessUi extends LibrisWindowedUi {
 	}
 
 	@Override
-	public Record displayRecord(int recordId) throws LibrisException {
+	public RecordType displayRecord(int recordId) throws LibrisException {
 		log(Level.FINE, RecordId.toString(recordId));
 		return null;
 	}
@@ -131,7 +131,7 @@ public class HeadlessUi extends LibrisWindowedUi {
 	}
 
 	@Override
-	public DatabaseUi getMainUi() {
+	public DatabaseUi<?> getMainUi() {
 		return this;
 	}
 

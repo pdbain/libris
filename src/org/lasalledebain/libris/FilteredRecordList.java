@@ -3,7 +3,6 @@ package org.lasalledebain.libris;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.search.RecordFilter;
 

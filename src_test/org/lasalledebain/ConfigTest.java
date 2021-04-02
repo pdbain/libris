@@ -14,11 +14,11 @@ import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisConstants;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.LibrisDatabaseConfiguration;
 import org.lasalledebain.libris.ui.HeadlessUi;
-import org.lasalledebain.libris.ui.AbstractUi;
 import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
@@ -44,7 +44,7 @@ public class ConfigTest extends TestCase {
 	public void testReadOnly() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, workingDirectory);
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
-		AbstractUi ui = new HeadlessUi();
+		var ui = new HeadlessUi<Record>();
 		ui.buildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();
@@ -60,7 +60,7 @@ public class ConfigTest extends TestCase {
 			assertNull("Record created in closed database", rec);
 		} catch (DatabaseError e) {/* ignore */}
 
-		ui = new HeadlessUi();
+		ui = new HeadlessUi<Record>();
 		config.setReadOnly(true);
 		ui.openDatabase(config);
 		currentDb = ui.getLibrisDatabase();
@@ -80,7 +80,7 @@ public class ConfigTest extends TestCase {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DATABASE_WITH_REPO, dbDir);
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setAuxiliaryDirectory(auxDir);
-		AbstractUi ui = new HeadlessUi();
+		var ui = new HeadlessUi<Record>();
 		ui.buildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();
@@ -105,7 +105,7 @@ public class ConfigTest extends TestCase {
 		LibrisDatabaseConfiguration config = new LibrisDatabaseConfiguration(testDatabaseFileCopy);
 		config.setAuxiliaryDirectory(auxDir);
 		config.setRepositoryDirectory(artDir);
-		AbstractUi ui = new HeadlessUi();
+		var ui = new HeadlessUi<Record>();
 		ui.buildDatabase(config);
 		currentDb = ui.openDatabase(config);
 		DatabaseRecord rec = currentDb.newRecord();
