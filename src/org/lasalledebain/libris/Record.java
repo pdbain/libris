@@ -135,9 +135,9 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 	public Field setFieldValue(String fieldId, String fieldData) throws DatabaseException, InputException {
 		return setFieldValue(getFieldNum(fieldId), fieldData);
 	}
-	public Field getFieldOrDefault(int fieldNum) throws InputException {
+	public Field getField(int fieldNum, boolean includeDefault) throws InputException {
 		Field result = getField(fieldNum);
-		if (null == result) {
+		if ((null == result) && includeDefault) {
 			result = getDefaultField(fieldNum);
 		}
 		return result;
@@ -315,21 +315,27 @@ public abstract class Record implements Comparable<Record>, XMLElement {
 		return getFieldValue(getFieldNum(fieldId));
 	}
 
+	public void getKeywords(int[] fieldList, boolean includeDefault, RecordKeywords keywordList) throws InputException {
+		for (int fieldNum: fieldList) {
+			getFieldKeywords(keywordList, includeDefault, fieldNum);
+		}
+	}
+
 	public void getKeywords(int[] fieldList, RecordKeywords keywordList) throws InputException {
 		for (int fieldNum: fieldList) {
-			getFieldKeywords(keywordList, fieldNum);
+			getFieldKeywords(keywordList, false, fieldNum);
 		}
 	}
 
 	public void getKeywords(IndexField[] indexFields, RecordKeywords keywordList) throws InputException {
 		for (IndexField f: indexFields) {
 			int fieldNum = f.getFieldNum();
-			getFieldKeywords(keywordList, fieldNum);
+			getFieldKeywords(keywordList, false, fieldNum);
 		}
 	}
 
-	protected void getFieldKeywords(RecordKeywords keywordList, int fieldNum) throws InputException {
-		Field fld = getField(fieldNum);
+	protected void getFieldKeywords(RecordKeywords keywordList, boolean includeDefault, int fieldNum) throws InputException {
+		Field fld = getField(fieldNum, includeDefault);
 		if (null != fld) {
 			String values = fld.getValuesAsString();
 			if ((null != values) && !values.isEmpty()) {

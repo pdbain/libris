@@ -12,36 +12,38 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.field.EnumField;
 import org.lasalledebain.libris.field.FieldEnumValue;
 
-public class EnumFilter implements RecordFilter {
+public class EnumFilter extends GenericFilter {
 
-	private final int myFieldId;
-	private final FieldEnumValue myValue;
-	private final boolean includeDefault;
-
+	protected final FieldEnumValue myValue;
 	public EnumFilter(int fieldId, FieldEnumValue theValue, boolean incDefault) {
+		super(incDefault, new int[] {fieldId});
 		this.myValue = theValue;
-		myFieldId = fieldId;
-		includeDefault = incDefault;
+	}
+
+	public EnumFilter(int fieldIds[], FieldEnumValue theValue, boolean incDefault) {
+		super(incDefault, fieldIds);
+		this.myValue = theValue;
 	}
 
 	@Override
 	public boolean test(Record rec) {
 		boolean result = false;
 		Field theField;
-		try {
-			theField = includeDefault? 
-					rec.getFieldOrDefault(myFieldId): 
-						rec.getField(myFieldId);
-		} catch (InputException e) {
-			throw new DatabaseError("Illegal field "+myFieldId);
-		}
-		if (nonNull(theField) && (theField instanceof EnumField)) {
-			EnumField theEnumField = (EnumField) theField;
-			result = StreamSupport
-					.stream(theEnumField
-							.getFieldValues()
-							.spliterator(), false)
-					.anyMatch(Predicate.isEqual(myValue));
+		for (int myFieldId: myFieldList) {
+			try {
+				theField = rec.getField(myFieldId, doIncludeDefault);
+			} catch (InputException e) {
+				throw new DatabaseError("Illegal field "+myFieldId);
+			}
+			if (nonNull(theField) && (theField instanceof EnumField)) {
+				EnumField theEnumField = (EnumField) theField;
+				result = StreamSupport
+						.stream(theEnumField
+								.getFieldValues()
+								.spliterator(), false)
+						.anyMatch(Predicate.isEqual(myValue));
+				if (result) break;
+			}
 		}
 		return result;
 	}

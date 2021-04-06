@@ -29,7 +29,7 @@ import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
-import org.lasalledebain.libris.search.KeywordFilter;
+import org.lasalledebain.libris.search.TextFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.search.RecordNameFilter;
 import org.lasalledebain.libris.ui.AffiliateEditor.RecordSelectorByName;
@@ -225,7 +225,7 @@ class FilterDialogue {
 				searchTerms = searchTerms.toLowerCase();
 			}
 			String[] searchList = searchTerms.trim().split("\\s+");
-			KeywordFilter filter = new KeywordFilter(matchType, caseSensitive, selectedFields, searchList);
+			TextFilter filter = new TextFilter(matchType, caseSensitive, selectedFields, searchList);
 			browserWindow.doRefresh(database.getRecords(), filter);
 		}
 	}

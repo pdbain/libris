@@ -68,7 +68,7 @@ public class TestRecordFilter extends TestCase {
 
 	public void testSingleWordFilter() throws FileNotFoundException, IOException {
 		getDatabase();
-		KeywordFilter filter = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
+		TextFilter filter = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
 				new String[] { "k1", "k3" });
 		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(db.getRecords(),
 				filter);
@@ -78,11 +78,11 @@ public class TestRecordFilter extends TestCase {
 
 	public void testCascadeWordFilter() throws FileNotFoundException, IOException {
 		getDatabase();
-		KeywordFilter filter1 = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
+		TextFilter filter1 = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
 				new String[] { "k1" });
 		FilteredRecordList<DatabaseRecord> filteredList1 = new FilteredRecordList<DatabaseRecord>(db.getRecords(),
 				filter1);
-		KeywordFilter filter2 = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
+		TextFilter filter2 = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
 				new String[] { "k3" });
 		FilteredRecordList<DatabaseRecord> filteredList2 = new FilteredRecordList<DatabaseRecord>(filteredList1,
 				filter2);
@@ -95,7 +95,7 @@ public class TestRecordFilter extends TestCase {
 		DatabaseRecord rec = db.newRecord();
 		rec.addFieldValue("ID_keywords", "k2 k4 k1 k3");
 		int newId = db.putRecord(rec);
-		KeywordFilter filter = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
+		TextFilter filter = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
 				new String[] { "k1", "k3" });
 		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(db.getRecords(),
 				filter);
@@ -164,14 +164,38 @@ public class TestRecordFilter extends TestCase {
 		int pubField = theSchema.getFieldNum("ID_publisher");
 		var choices = theSchema.getEnumSet(choiceSetName);
 		FieldEnumValue searchValue = new FieldEnumValue(choices, 1);
-		var enumTest = new EnumFilter(pubField, searchValue, false);
+		GenericFilter enumTest = new EnumFilter(pubField, searchValue, false);
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned", 1, result.size());
-		fail("testSearchEnum extra value");
+	}
+
+	public void testSearchMultipleEnum() throws FileNotFoundException, IOException, LibrisException {
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
+		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
+		XmlSchema theSchema = db.getSchema();
+		String choiceSetName = "ENUM_publishers";
+		int pubFields[] = new  int[] {theSchema.getFieldNum("ID_journal"), theSchema.getFieldNum("ID_journal2")};
+		var choices = theSchema.getEnumSet(choiceSetName);
+		FieldEnumValue searchValue = new FieldEnumValue(choices, 5);
+		GenericFilter enumTest = new EnumFilter(pubFields, searchValue, false);
+		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
+		assertEquals("Wrong number of records returned", 2, result.size());
 	}
 
 	public void testSearchBoolean() throws FileNotFoundException, IOException, LibrisException {
-		fail("testSearchBoolean not implemented");
+		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML, workingDirectory);
+		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
+		XmlSchema theSchema = db.getSchema();
+		int pubFields = theSchema.getFieldNum("ID_hardcopy");
+		GenericFilter booleanTest = new BooleanFilter(pubFields, true, false);
+		List<DatabaseRecord> result = db.getRecords().asStream().filter(booleanTest).collect(Collectors.toList());
+		assertEquals("Wrong number of records returned for non-inherited", 1, result.size());
+		booleanTest = new BooleanFilter(pubFields, false, false);
+		result = db.getRecords().asStream().filter(booleanTest).collect(Collectors.toList());
+		assertEquals("Wrong number of records returned for non-inherited", 1, result.size());
+		 booleanTest = new BooleanFilter(pubFields, true, true);
+		 result = db.getRecords().asStream().filter(booleanTest).collect(Collectors.toList());
+		assertEquals("Wrong number of records returned for inherited", 5, result.size());
 	}
 	
 	public void testSearchInheritedEnum() throws FileNotFoundException, IOException, LibrisException {
@@ -183,7 +207,7 @@ public class TestRecordFilter extends TestCase {
 		int pubField = theSchema.getFieldNum("ID_publisher");
 		var choices = theSchema.getEnumSet(choiceSetName);
 		FieldEnumValue searchValue = new FieldEnumValue(choices, 1);
-		var enumTest = new EnumFilter(pubField, searchValue, true);
+		GenericFilter enumTest = new EnumFilter(pubField, searchValue, true);
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned", 4, result.size());
 	}
@@ -194,7 +218,7 @@ public class TestRecordFilter extends TestCase {
 		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		XmlSchema theSchema = db.getSchema();
 		int issueField = theSchema.getFieldNum("ID_issue");
-		var kwTest = new KeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {issueField}, "someIssue");
+		var kwTest = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, true, new int[] {issueField}, "someIssue");
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(kwTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned", 2, result.size());
 	}
@@ -202,7 +226,7 @@ public class TestRecordFilter extends TestCase {
 	public void testKeywordStreamFilter() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
-		Predicate<Record> filt = db.makeKeywordFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] {2}, Collections.singleton("The"));
+		Predicate<Record> filt = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, false, new int[] {2}, Collections.singleton("The"));
 		List<DatabaseRecord> result = db.getRecords().asStream().collect(Collectors.toList());
 		assertEquals("too few records in unfiltered list", 4, result.size());
 		result = db.getRecords().asStream().filter(filt).collect(Collectors.toList());
