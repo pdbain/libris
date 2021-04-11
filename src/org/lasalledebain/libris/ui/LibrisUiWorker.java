@@ -9,4 +9,9 @@ abstract class LibrisUiWorker extends SwingWorker<Object, Object> {
 	public void setWorkerProgress(int progress) {
 		setProgress(progress);
 	}
+	
+	@Override
+	public void done() {
+		setProgress(100);
+	}
 }

@@ -177,26 +177,6 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 	}
 
 	/**
-	 * Enable or disable File menu choices related to open files.
-	 * @param accessible if database is opened
-	 */
-	public void databaseAccessible(boolean accessible) {
-		for (JMenuItem m: databaseAccessibleCommands) {
-			m.setEnabled(accessible);
-		}
-		for (JMenuItem m: databaseNotAccessibleCommands) {
-			m.setEnabled(!accessible);
-		}
-		dbMenu.databaseAccessible(database, accessible);
-	}
-
-	public void fileMenuEnableModify(boolean enable) {
-		for (JMenuItem m: fileMenuModifyCommands) {
-			m.setEnabled(enable);
-		}
-	}
-
-	/**
 	 * @param menu
 	 * @return 
 	 */
@@ -276,6 +256,78 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		return edMenu;
 	}
 
+	private JMenu createRecordMenu() {
+		/* edit menu */
+		JMenu recMenu = new JMenu("Record");
+		JMenuItem newRecord = new JMenuItem("New record");
+		newRecord.setAccelerator(getAcceleratorKeystroke('R'));
+		newRecordHandler = new NewRecordListener();
+		newRecord.addActionListener(newRecordHandler);
+		recMenu.add(newRecord);
+	
+		viewRecord = new JMenuItem("View record");
+		viewRecordHandler = new ViewRecordListener();
+		viewRecord.addActionListener(viewRecordHandler);
+		recMenu.add(viewRecord);
+		viewRecord.setEnabled(false);
+	
+		editRecord = new JCheckBoxMenuItem("Edit record");
+		editRecord.setAccelerator(getAcceleratorKeystroke('E', java.awt.event.InputEvent.SHIFT_DOWN_MASK));
+		editRecordListener = new EditRecordListenerImpl();
+		editRecord.addActionListener(editRecordListener);
+		recMenu.add(editRecord);
+		editRecord.setEnabled(!guiMain.isDatabaseReadOnly());
+		editRecord.setState(false);
+	
+		enterRecord = new JMenuItem("Enter record");
+		enterRecord.setAccelerator(getAcceleratorKeystroke('E'));
+		enterRecord.addActionListener(new EnterRecordListener());
+		recMenu.add(enterRecord);
+		enterRecord.setEnabled(false);
+	
+		duplicateRecord = new JMenuItem("Duplicate record");
+		recMenu.add(duplicateRecord);
+		duplicateRecord.setEnabled(false);
+		duplicateRecord.addActionListener(new DuplicateRecordListener());
+	
+		JMenuItem childRecord = new JMenuItem("New child record");
+		recMenu.add(childRecord);
+		childRecord.setEnabled(false);
+		childRecord.addActionListener(e -> {
+			boolean success = false;
+			Record rec = getCurrentRecord();
+			if (null != rec) {
+				GroupDef selectedGroup = guiMain.getSelectedGroup();
+				if (nonNull(selectedGroup)) {
+					guiMain.newChildRecord(rec, selectedGroup.getGroupNum());
+					success = true;
+				}
+			}
+			if (!success) {
+				guiMain.alert("Select record and group");
+			}
+		}
+				);
+	
+		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord};
+		return recMenu;
+	}
+
+	private JMenu createSearchMenu() {
+		JMenu srchMenu = new JMenu("Search");
+		srchMenu.add("Find in record...");
+		searchRecords = srchMenu.add("Search records...");
+		searchRecords.addActionListener(new ActionListener() {
+	
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				guiMain.createSearchDialogue();
+			}
+		});
+		srchMenu.add("Quick search ...");
+		return srchMenu;
+	}
+
 	/**
 	 * @param enabled
 	 */
@@ -310,63 +362,6 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 		editRecord.setEnabled(enabled);
 	}
 
-	private JMenu createRecordMenu() {
-		/* edit menu */
-		JMenu recMenu = new JMenu("Record");
-		JMenuItem newRecord = new JMenuItem("New record");
-		newRecord.setAccelerator(getAcceleratorKeystroke('R'));
-		newRecordHandler = new NewRecordListener();
-		newRecord.addActionListener(newRecordHandler);
-		recMenu.add(newRecord);
-
-		viewRecord = new JMenuItem("View record");
-		viewRecordHandler = new ViewRecordListener();
-		viewRecord.addActionListener(viewRecordHandler);
-		recMenu.add(viewRecord);
-		viewRecord.setEnabled(false);
-
-		editRecord = new JCheckBoxMenuItem("Edit record");
-		editRecord.setAccelerator(getAcceleratorKeystroke('E', java.awt.event.InputEvent.SHIFT_DOWN_MASK));
-		editRecordListener = new EditRecordListenerImpl();
-		editRecord.addActionListener(editRecordListener);
-		recMenu.add(editRecord);
-		editRecord.setEnabled(!guiMain.isDatabaseReadOnly());
-		editRecord.setState(false);
-
-		enterRecord = new JMenuItem("Enter record");
-		enterRecord.setAccelerator(getAcceleratorKeystroke('E'));
-		enterRecord.addActionListener(new EnterRecordListener());
-		recMenu.add(enterRecord);
-		enterRecord.setEnabled(false);
-
-		duplicateRecord = new JMenuItem("Duplicate record");
-		recMenu.add(duplicateRecord);
-		duplicateRecord.setEnabled(false);
-		duplicateRecord.addActionListener(new DuplicateRecordListener());
-
-		JMenuItem childRecord = new JMenuItem("New child record");
-		recMenu.add(childRecord);
-		childRecord.setEnabled(false);
-		childRecord.addActionListener(e -> {
-			boolean success = false;
-			Record rec = getCurrentRecord();
-			if (null != rec) {
-				GroupDef selectedGroup = guiMain.getSelectedGroup();
-				if (nonNull(selectedGroup)) {
-					guiMain.newChildRecord(rec, selectedGroup.getGroupNum());
-					success = true;
-				}
-			}
-			if (!success) {
-				guiMain.alert("Select record and group");
-			}
-		}
-				);
-
-		recordWindowItems = new JMenuItem[] {duplicateRecord, childRecord, editRecord};
-		return recMenu;
-	}
-
 	public DatabaseRecord getCurrentRecord() {
 		DatabaseRecordWindow rw = guiMain.getCurrentRecordWindow();
 		DatabaseRecord rec = null;
@@ -390,21 +385,6 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 			i.setEnabled(false);
 		}
 		editRecord.setState(false);
-	}
-
-	private JMenu createSearchMenu() {
-		JMenu srchMenu = new JMenu("Search");
-		srchMenu.add("Find in record...");
-		searchRecords = srchMenu.add("Search records...");
-		searchRecords.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				guiMain.createSearchDialogue();
-			}
-		});
-		srchMenu.add("Quick search ...");
-		return srchMenu;
 	}
 
 	void setSearchMenuEnabled(boolean enabled) {
@@ -446,6 +426,26 @@ public class LibrisMenu extends AbstractLibrisMenu implements LibrisConstants {
 	private KeyStroke getAcceleratorKeystroke(char key, int modifier) {
 		return KeyStroke.getKeyStroke(key, 
 				java.awt.Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | modifier, false);
+	}
+
+	/**
+	 * Enable or disable File menu choices related to open files.
+	 * @param accessible if database is opened
+	 */
+	public void databaseAccessible(boolean accessible) {
+		for (JMenuItem m: databaseAccessibleCommands) {
+			m.setEnabled(accessible);
+		}
+		for (JMenuItem m: databaseNotAccessibleCommands) {
+			m.setEnabled(!accessible);
+		}
+		dbMenu.databaseAccessible(database, accessible);
+	}
+
+	public void fileMenuEnableModify(boolean enable) {
+		for (JMenuItem m: fileMenuModifyCommands) {
+			m.setEnabled(enable);
+		}
 	}
 
 	@Override

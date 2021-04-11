@@ -286,6 +286,7 @@ public abstract class AbstractUi<RecordType extends Record> implements DatabaseU
 		expectedWork = theTotal;
 		accomplishedWork = 0;
 	}
+	
 	@Override
 	public boolean start() {
 		return true;
