@@ -4,35 +4,47 @@ import static org.lasalledebain.libris.Field.FieldType.T_FIELD_AFFILIATES;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_PAIR;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_STRING;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_TEXT;
+import static org.lasalledebain.libris.Field.FieldType.T_FIELD_ENUM;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.lasalledebain.libris.DatabaseRecord;
+import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
+import org.lasalledebain.libris.field.FieldEnumValue;
+import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
 import org.lasalledebain.libris.search.TextFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.search.RecordNameFilter;
 import org.lasalledebain.libris.ui.AffiliateEditor.RecordSelectorByName;
+import org.lasalledebain.libris.ui.FieldChooser.FieldInfo;
 
 class FilterDialogue {
 	JRadioButton prefixButton;
@@ -138,10 +150,11 @@ class FilterDialogue {
 		}
 		return searchPanel;
 	}
-
+	
 	private void createSearchTermsField() {
 		filterWords = new JTextField();
 	}
+	
 	private JPanel createTextSearchControls() {
 		matchGroup = new ButtonGroup();
 		prefixButton = new JRadioButton("Starts with");
@@ -182,6 +195,31 @@ class FilterDialogue {
 		return controlPanel;
 	}
 	
+	private JPanel createEnumSearchDialogue() {
+		JPanel controlPanel = new JPanel();
+		EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_ENUM);
+		fChooser = new FieldChooser(dbSchema, searchFieldTypes, false, "Search fields");
+		controlPanel.add(fChooser);
+		 JComboBox<FieldEnumValue> valueList = new JComboBox<>();
+		 fChooser.addListSelectionListener​(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				int searchField = fChooser.getFieldNum();
+				valueList.removeAllItems();
+				if (searchField >= 0 ) {
+					FieldTemplate ft = dbSchema.getFieldTemplate(searchField);
+					EnumFieldChoices choices = ft.getEnumChoices();
+					List<FieldEnumValue> lv = choices.getLegalEnumValues();
+					valueList.setModel(new DefaultComboBoxModel(lv.toArray()));
+				}
+			}
+		});
+		 controlPanel.add(valueList);
+		return controlPanel;
+		
+	}
+
 	private JPanel createActionPanel() {
 		JButton okayButton = new JButton("Okay");
 		okayButton.addActionListener(new ActionListener() {

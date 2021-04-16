@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.event.ListSelectionListener;
 
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
@@ -28,7 +29,7 @@ public class FieldChooser extends JPanel {
 		setLayout(new BorderLayout());
 		includeRecordName = false;
 		this.multiSelect = multiSelect;
-		
+
 		searchFieldList = getSearchFieldList(schem,searchFieldTypes);
 		fieldList = new JList<FieldInfo>(searchFieldList);
 		numSearchFields = searchFieldList.size();
@@ -75,6 +76,10 @@ public class FieldChooser extends JPanel {
 			selectFirst();
 		}
 	}
+	public void addListSelectionListener​(ListSelectionListener listener) {
+		fieldList.addListSelectionListener(listener);
+	}
+	
 	private Vector<FieldInfo> getSearchFieldList(Schema schem, EnumSet<FieldType> searchFieldTypes) {
 		final int numSchemaFields = schem.getNumFields();
 		Vector<FieldInfo> searchList = new Vector<FieldInfo>(numSchemaFields);
@@ -86,7 +91,7 @@ public class FieldChooser extends JPanel {
 		}
 		return searchList;
 	}
-	 static class FieldInfo {
+	static class FieldInfo {
 		protected FieldInfo(int fieldNum, String title) {
 			this.fieldNum = fieldNum;
 			this.title = title;
@@ -98,29 +103,29 @@ public class FieldChooser extends JPanel {
 		String title;
 		int fieldNum;
 	}
-	 public int[] getFieldNums() {
-		 int[] selectedFields = fieldList.getSelectedIndices();
-		 int[] result = new int[selectedFields.length];
-		 for (int i = 0; i <  selectedFields.length; ++i) {
-			 FieldInfo fi = searchFieldList.get(selectedFields[i]);
-			 result[i] = fi.fieldNum;
-		 }
-		 return result;
-	 }
-	 public int getFieldNum() {
-		 int selectedField = fieldList.getSelectedIndex();
-		 return selectedField;
-	 }
-	 public void setSelectedIndex(int index) {
-		 if (index <= fieldList.getMaxSelectionIndex()) {
-			 fieldList.setSelectedIndex(index);
-		 }
-	 }
-	 public void setSelectedIndices(int[] indices) {
-		 fieldList.setSelectedIndices(indices);
-	 }
-	 
-	 private void selectAll() {
+	public int[] getFieldNums() {
+		int[] selectedFields = fieldList.getSelectedIndices();
+		int[] result = new int[selectedFields.length];
+		for (int i = 0; i <  selectedFields.length; ++i) {
+			FieldInfo fi = searchFieldList.get(selectedFields[i]);
+			result[i] = fi.fieldNum;
+		}
+		return result;
+	}
+	public int getFieldNum() {
+		int selectedField = fieldList.getSelectedIndex();
+		return selectedField;
+	}
+	public void setSelectedIndex(int index) {
+		if (index <= fieldList.getMaxSelectionIndex()) {
+			fieldList.setSelectedIndex(index);
+		}
+	}
+	public void setSelectedIndices(int[] indices) {
+		fieldList.setSelectedIndices(indices);
+	}
+
+	private void selectAll() {
 		fieldList.setSelectionInterval(0, numSearchFields-1);
 	}
 	private void selectFirst() {

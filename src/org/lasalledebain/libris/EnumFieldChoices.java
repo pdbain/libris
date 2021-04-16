@@ -26,8 +26,13 @@ public class EnumFieldChoices implements XMLElement {
 		return Collections.unmodifiableList(legalValues);
 	}
 
+	public List<FieldEnumValue> getLegalEnumValues() {
+		return Collections.unmodifiableList(legalValues);
+	}
+
 	public static final int  INVALID_CHOICE = -1;
 	int numChoices = 0;
+	@Deprecated
 	public EnumFieldChoices(String id) {
 		this();
 		this.setId = id;
@@ -37,6 +42,7 @@ public class EnumFieldChoices implements XMLElement {
 		legalValues = new ArrayList<>();
 	}
 
+	@Deprecated
 	public EnumFieldChoices(String name, String[] choices) throws DatabaseException {
 		this(name);
 		addChoices(choices);
