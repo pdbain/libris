@@ -22,4 +22,4 @@ public abstract class RecordList<RecordType extends Record> implements Iterable<
 	public Stream<RecordType> asStream() {
 		return StreamSupport.stream(spliterator(), false);
 	}
-	}
+}

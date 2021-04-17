@@ -1,8 +1,11 @@
 package org.lasalledebain.libris;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 
@@ -72,13 +75,14 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 		return enumSets.put(enumSetId, enumSet);
 	}
 
-	public int addField(FieldTemplate field) {
-		String fieldId = field.getFieldId();
+	public int addField(FieldTemplate theField) {
+		String fieldId = theField.getFieldId();
 		fieldIds.add(fieldId);
-		fieldTitles.add(field.getFieldTitle());
+		fieldTitles.add(theField.getFieldTitle());
 		fieldNumById.put(fieldId, (fieldIds.size()-1));
 		final int index = fieldIds.size()-1;
-		fieldList.add(index, field);
+		theField.setFieldNum(index);
+		fieldList.add(index, theField);
 		return index;
 	}
 
@@ -142,6 +146,16 @@ public abstract class Schema implements LibrisXMLConstants, XMLElement {
 
 	public Iterable <FieldTemplate> getFields() {
 		return fieldList;
+	}
+	
+	public int[] getFieldsOfTypes(Set<FieldType> fieldTypes) {
+		ArrayList<Integer> fieldIds = new ArrayList<Integer>();
+		for (FieldTemplate t: fieldList) {
+			if (fieldTypes.contains(t.getFtype())) {
+				fieldIds.add(t.getFieldNum());
+			}
+		}
+		return fieldIds.stream().mapToInt(Integer::intValue).toArray();
 	}
 
 	public FieldTemplate getFieldTemplate(int fieldNum) {

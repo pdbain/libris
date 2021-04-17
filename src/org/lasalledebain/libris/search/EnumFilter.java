@@ -12,7 +12,7 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.field.EnumField;
 import org.lasalledebain.libris.field.FieldEnumValue;
 
-public class EnumFilter extends GenericFilter {
+public class EnumFilter<T extends Record> extends GenericFilter<T> {
 
 	protected final FieldEnumValue myValue;
 	public EnumFilter(int fieldId, FieldEnumValue theValue, boolean incDefault) {

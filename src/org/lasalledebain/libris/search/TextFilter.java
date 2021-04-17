@@ -11,7 +11,7 @@ import org.lasalledebain.libris.indexes.ExactKeywordList;
 import org.lasalledebain.libris.indexes.PrefixKeywords;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 
-public class TextFilter extends GenericFilter {
+public class TextFilter<T extends Record> extends GenericFilter<T> {
 
 	private Iterable<String> terms;
 	private RecordKeywords recWords;

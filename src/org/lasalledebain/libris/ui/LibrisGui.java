@@ -294,7 +294,9 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 	}
 
 	FilterDialogue createSearchDialogue() {
-		return new FilterDialogue(currentDatabase, getMainFrame(), resultsPanel);
+		final FilterDialogue theDialogue = new FilterDialogue(currentDatabase, getMainFrame(), resultsPanel);
+		theDialogue.createSearchDialogue();
+		return theDialogue;
 	}
 
 	public void fatalError(Exception e) {

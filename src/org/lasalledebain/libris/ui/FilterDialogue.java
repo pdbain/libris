@@ -69,25 +69,29 @@ class FilterDialogue {
 	private JComboBox<String> affiliatesChooser;
 	private RecordSelectorByName nameBrowser;
 	private LastFilterSettings lastSettings;
-	public FilterDialogue(LibrisDatabase db, Frame ownerFrame, BrowserWindow browser) {
+	public FilterDialogue(LibrisDatabase db, Frame theFrame, BrowserWindow browser) {
 		database = db;
 		lastSettings = database.getMetadata().getLastFilterSettings();
-		this.dbSchema = db.getSchema();
-		this.ownerFrame = ownerFrame;
+		dbSchema = db.getSchema();
+		ownerFrame = theFrame;
 		browserWindow = browser;
-		dLog = new JDialog(ownerFrame, "Filter");	
 		searchTypeSelector = new JComboBox<String>(new String[] {"Keyword", "Record name", "Affiliates"});
+		createSearchDialogue();
+	}
+
+	public void createSearchDialogue() {
+		dLog = new JDialog(ownerFrame, "Filter");	
 		searchTypeSelector.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				createSearchDialogue(searchTypeSelector.getSelectedIndex());
+				selectSearchDialogue(searchTypeSelector.getSelectedIndex());
 			}
 		});	
 		searchTypeSelector.setSelectedIndex(lastSettings.lastSearchType);
-		createSearchDialogue(searchTypeSelector.getSelectedIndex());
+		selectSearchDialogue(searchTypeSelector.getSelectedIndex());
 	}
 
-	private void createSearchDialogue(int searchType) {
+	private void selectSearchDialogue(int searchType) {
 		lastSettings.lastSearchType = searchType;
 		this.searchType = searchType;
 		JPanel dialogueContent = new JPanel();

@@ -8,7 +8,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 
-public class BooleanFilter extends GenericFilter {
+public class BooleanFilter<T extends Record> extends GenericFilter<T> {
 
 	protected final boolean myValue;
 	public BooleanFilter(int fieldId, boolean theValue, boolean incDefault) {

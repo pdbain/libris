@@ -39,6 +39,7 @@ public class FieldTemplate implements XMLElement {
 	protected FieldFactory factory;
 	protected Field.FieldType ftype;
 	protected String fieldId;
+	protected int fieldNum;
 	protected String fieldTitle;
 	private String defaultData = null;
 	EnumFieldChoices legalValues; /* for enum fields */
@@ -192,6 +193,14 @@ public class FieldTemplate implements XMLElement {
 	public void setEnumChoices(EnumFieldChoices enumChoices) {
 		this.legalValues = enumChoices;
 		fieldAttributes.setAttribute(XML_FIELDDEF_ENUMSET_TAG, enumChoices.getId());
+	}
+
+	public int getFieldNum() {
+		return fieldNum;
+	}
+
+	public void setFieldNum(int fieldNum) {
+		this.fieldNum = fieldNum;
 	}
 
 	public Field.FieldType getFtype() {

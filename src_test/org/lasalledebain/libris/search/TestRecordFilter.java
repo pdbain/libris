@@ -164,7 +164,7 @@ public class TestRecordFilter extends TestCase {
 		int pubField = theSchema.getFieldNum("ID_publisher");
 		var choices = theSchema.getEnumSet(choiceSetName);
 		FieldEnumValue searchValue = new FieldEnumValue(choices, 1);
-		GenericFilter enumTest = new EnumFilter(pubField, searchValue, false);
+		GenericFilter<Record> enumTest = new EnumFilter(pubField, searchValue, false);
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned", 1, result.size());
 	}
@@ -177,7 +177,7 @@ public class TestRecordFilter extends TestCase {
 		int pubFields[] = new  int[] {theSchema.getFieldNum("ID_journal"), theSchema.getFieldNum("ID_journal2")};
 		var choices = theSchema.getEnumSet(choiceSetName);
 		FieldEnumValue searchValue = new FieldEnumValue(choices, 5);
-		GenericFilter enumTest = new EnumFilter(pubFields, searchValue, false);
+		GenericFilter<Record> enumTest = new EnumFilter(pubFields, searchValue, false);
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned", 2, result.size());
 	}
@@ -187,13 +187,13 @@ public class TestRecordFilter extends TestCase {
 		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		XmlSchema theSchema = db.getSchema();
 		int pubFields = theSchema.getFieldNum("ID_hardcopy");
-		GenericFilter booleanTest = new BooleanFilter(pubFields, true, false);
+		GenericFilter<Record> booleanTest = new BooleanFilter<Record>(pubFields, true, false);
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(booleanTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned for non-inherited", 1, result.size());
-		booleanTest = new BooleanFilter(pubFields, false, false);
+		booleanTest = new BooleanFilter<Record>(pubFields, false, false);
 		result = db.getRecords().asStream().filter(booleanTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned for non-inherited", 1, result.size());
-		 booleanTest = new BooleanFilter(pubFields, true, true);
+		 booleanTest = new BooleanFilter<Record>(pubFields, true, true);
 		 result = db.getRecords().asStream().filter(booleanTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned for inherited", 5, result.size());
 	}
@@ -207,7 +207,7 @@ public class TestRecordFilter extends TestCase {
 		int pubField = theSchema.getFieldNum("ID_publisher");
 		var choices = theSchema.getEnumSet(choiceSetName);
 		FieldEnumValue searchValue = new FieldEnumValue(choices, 1);
-		GenericFilter enumTest = new EnumFilter(pubField, searchValue, true);
+		GenericFilter<Record> enumTest = new EnumFilter<Record>(pubField, searchValue, true);
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned", 4, result.size());
 	}
@@ -218,7 +218,7 @@ public class TestRecordFilter extends TestCase {
 		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
 		XmlSchema theSchema = db.getSchema();
 		int issueField = theSchema.getFieldNum("ID_issue");
-		var kwTest = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, true, new int[] {issueField}, "someIssue");
+		var kwTest = new TextFilter<Record>(MATCH_TYPE.MATCH_EXACT, true, true, new int[] {issueField}, "someIssue");
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(kwTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned", 2, result.size());
 	}
@@ -226,7 +226,7 @@ public class TestRecordFilter extends TestCase {
 	public void testKeywordStreamFilter() throws FileNotFoundException, IOException, LibrisException {
 		File testDatabaseFileCopy = Utilities.copyTestDatabaseFile(Utilities.TEST_DB1_XML_FILE, workingDirectory);
 		db = Utilities.buildAndOpenDatabase(testDatabaseFileCopy);
-		Predicate<Record> filt = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, false, new int[] {2}, Collections.singleton("The"));
+		Predicate<Record> filt = new TextFilter<Record>(MATCH_TYPE.MATCH_EXACT, true, false, new int[] {2}, Collections.singleton("The"));
 		List<DatabaseRecord> result = db.getRecords().asStream().collect(Collectors.toList());
 		assertEquals("too few records in unfiltered list", 4, result.size());
 		result = db.getRecords().asStream().filter(filt).collect(Collectors.toList());

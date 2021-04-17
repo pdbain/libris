@@ -16,6 +16,7 @@ import org.lasalledebain.libris.indexes.TestFileRecordMap;
 import org.lasalledebain.libris.indexes.TestKeyIntegerTuple;
 import org.lasalledebain.libris.search.BloomFilterTest;
 import org.lasalledebain.libris.search.TestRecordFilter;
+import org.lasalledebain.libris.search.TestRecordStream;
 import org.lasalledebain.libris.ui.HtmlTests;
 import org.lasalledebain.libris.ui.ImportTests;
 import org.lasalledebain.libris.ui.LauncherTests;
@@ -42,6 +43,7 @@ public class LibrisTestSuite {
 		suite.addTestSuite(LayoutTests.class);
 		suite.addTestSuite(ArtifactTest.class);
 		suite.addTestSuite(TestRecordFilter.class);
+		suite.addTestSuite(TestRecordStream.class);
 		suite.addTestSuite(TermcountHashfileTests.class);
 		suite.addTestSuite(TermCountEntryBucketTest.class);
 		suite.addTestSuite(UtilitiesTest.class);

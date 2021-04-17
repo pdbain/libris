@@ -9,7 +9,7 @@ import org.lasalledebain.libris.indexes.ExactKeywordList;
 import org.lasalledebain.libris.indexes.PrefixKeywords;
 import org.lasalledebain.libris.indexes.RecordKeywords;
 
-public class RecordNameFilter implements RecordFilter {
+public class RecordNameFilter<T extends Record> implements RecordFilter<T> {
 
 	private List<String> terms;
 	private RecordKeywords recWords;

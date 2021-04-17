@@ -4,7 +4,7 @@ import java.util.function.Predicate;
 
 import org.lasalledebain.libris.Record;
 
-public interface RecordFilter extends Predicate<Record>{
+public interface RecordFilter<T extends Record> extends Predicate<T>{
 	public enum MATCH_TYPE {
 		MATCH_EXACT,
 		MATCH_PREFIX,

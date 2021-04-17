@@ -91,6 +91,7 @@ public class FieldChooser extends JPanel {
 		}
 		return searchList;
 	}
+	
 	static class FieldInfo {
 		protected FieldInfo(int fieldNum, String title) {
 			this.fieldNum = fieldNum;

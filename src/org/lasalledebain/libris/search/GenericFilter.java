@@ -2,7 +2,7 @@ package org.lasalledebain.libris.search;
 
 import org.lasalledebain.libris.Record;
 
-public class GenericFilter implements RecordFilter {
+public abstract class GenericFilter<T extends Record> implements RecordFilter<T> {
 
 	protected final int myFieldList[];
 	protected final boolean doIncludeDefault;
@@ -13,9 +13,6 @@ public class GenericFilter implements RecordFilter {
 	}
 
 	@Override
-	public boolean test(Record t) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	public abstract boolean test(T t);
 
 }
