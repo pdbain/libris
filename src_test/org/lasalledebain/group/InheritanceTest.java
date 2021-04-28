@@ -9,6 +9,8 @@ import static org.lasalledebain.libris.util.Utilities.trace;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.junit.After;
 import org.lasalledebain.libris.DatabaseRecord;
@@ -36,7 +38,7 @@ public class InheritanceTest extends TestCase {
 		final String IEEE = "IEEE";
 		final String ACM = "ACM";
 		String expectedPubs[] = {IEEE, IEEE, IEEE, IEEE, ACM, ACM};
-			setupDatabase(dbFile);
+		setupDatabase(dbFile);
 		try {
 			int index = 0;
 			for (Record r: db.getRecordReader()) {
@@ -148,6 +150,13 @@ public class InheritanceTest extends TestCase {
 		int minAff = numRecs;
 		try {
 			initializeExpectedAffiliates(expectedChildren, lastId);
+			/* DEBUG */ for (Integer parent: expectedChildren.keySet()) {
+				System.out.println("\nParent: "+parent+" children: ");
+				for (Integer c: expectedChildren.get(parent)) {
+					System.out.println(c+" ");
+
+				}
+			}
 			for (int i = lastId+1; i <= numRecs; ++i) {
 				DatabaseRecord rec = db.newRecord();
 				maxAff = (int) Math.sqrt(i);
@@ -266,19 +275,16 @@ public class InheritanceTest extends TestCase {
 			lastId = db.getLastRecordId();
 			assertEquals("database has wrong number of records",numRecs, lastId);
 			for (int i = minParent; i <= maxParent; ++i) {
-				Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
 				HashSet<Integer> childrenSet = expectedChildren.get(i);
 				if (null == childrenSet) {
 					assertNotNull("Record "+i+" has unexpected children");					
 				} else {
-					assertNotNull("Record "+i+" has no children", children);
-					int childCount = childrenSet.size();
-					for (Record r: children) {
-						int recordId = r.getRecordId();
-						assertTrue("Unexpected child "+recordId+" of record "+i, childrenSet.contains(recordId));
-						--childCount;
-					}
-					assertTrue("Too few children for "+i, 0 == childCount);
+					final int parentId = i;
+					long actualChildCount = db.getRecordChildren(i, 0).map(recordId -> {				
+						assertTrue("Unexpected affiliate "+recordId+" of record "+parentId, childrenSet.contains(recordId));
+						return recordId;
+					}).count();
+					assertEquals("Wrong number of children for record "+parentId, childrenSet.size(), actualChildCount);
 				}
 			}
 		} catch (Exception e) {
@@ -313,19 +319,16 @@ public class InheritanceTest extends TestCase {
 		}
 		try {
 			for (int i = minParent; i <= maxParent; ++i) {
-				Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
 				HashSet<Integer> childrenSet = expectedChildren.get(i);
 				if (null == childrenSet) {
 					assertNotNull("Record "+i+" has unexpected children");					
 				} else {
-					assertNotNull("Record "+i+" has no children", children);
-					int childCount = childrenSet.size();
-					for (Record r: children) {
-						int recordId = r.getRecordId();
-						assertTrue("Unexpected child "+recordId+" of record "+i, childrenSet.contains(recordId));
-						--childCount;
-					}
-					assertTrue("Too few children for "+i, 0 == childCount);
+					final int parentId = i;
+					long actualChildCount = db.getRecordChildren(i, 0).map(recordId -> {				
+						assertTrue("Unexpected affiliate "+recordId+" of record "+parentId, childrenSet.contains(recordId));
+						return recordId;
+					}).count();
+					assertEquals("Wrong number of children", childrenSet.size(), actualChildCount);
 				}
 			}
 		} catch (Exception e) {
@@ -333,6 +336,7 @@ public class InheritanceTest extends TestCase {
 			fail("unexpected exception: "+e.getMessage());
 		}
 	}
+
 	private void setupDatabase(String dbFile) {
 		try {
 			testDatabaseFileCopy = Utilities.copyTestDatabaseFile(dbFile, workingDirectory);
@@ -348,10 +352,7 @@ public class InheritanceTest extends TestCase {
 		for (int i = 1; i <= lastId; ++i) {
 			HashSet<Integer> s = new HashSet<>();
 			expectedChildren.put(i, s);
-			 Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
-			for (Record c: children) {
-				s.add(c.getRecordId());
-			}
+			db.getRecordChildren(i, 0).forEach(id -> s.add(id));
 		}
 	}
 
@@ -359,7 +360,7 @@ public class InheritanceTest extends TestCase {
 		for (int i = 1; i <= lastId; ++i) {
 			HashSet<Integer> s = new HashSet<>();
 			expectedAffiliates.put(i, s);
-			 Iterable<DatabaseRecord> affiliates = db.getAffiliateRecords(i, 0);
+			Iterable<DatabaseRecord> affiliates = db.getAffiliateRecords(i, 0);
 			for (Record c: affiliates) {
 				s.add(c.getRecordId());
 			}
@@ -382,34 +383,25 @@ public class InheritanceTest extends TestCase {
 	}
 
 	private void checkChild(int childId, final int parentId) throws InputException {
-	boolean found = false;
-	for (Record r: db.getChildRecords(parentId, 0, false)) {
-		if (r.getRecordId() == childId) {
-			found = true;
-			break;
-		}
-	}
-	assertTrue("child not found", found);
-	Record actualChild = db.getRecord(childId);
-	assertNotNull("cannot get "+childId, actualChild);
-	assertEquals("Wrong parent",  parentId, actualChild.getParent(0));
+		boolean found = db.getRecordChildren(parentId, 0).anyMatch(r -> r == childId);
+		assertTrue("child not found", found);
+		Record actualChild = db.getRecord(childId);
+		assertNotNull("cannot get "+childId, actualChild);
+		assertEquals("Wrong parent",  parentId, actualChild.getParent(0));
 	}
 
 	private void checkChildren(final int numRecs, HashMap<Integer, HashSet<Integer>> expectedChildren) {
 		for (int i = 1; i <= numRecs; ++i) {
-			Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, false);
 			HashSet<Integer> childrenSet = expectedChildren.get(i);
 			if (null == childrenSet) {
 				assertNotNull("Record "+i+" has unexpected children");					
 			} else {
-				assertNotNull("Record "+i+" has no children", children);
-				int childCount = childrenSet.size();
-				for (Record r: children) {
-					int recordId = r.getRecordId();
-					assertTrue("Unexpected child "+recordId+" of record "+i, childrenSet.contains(recordId));
-					--childCount;
-				}
-				assertTrue("Too few children for "+i, 0 == childCount);
+				final int parentId = i;
+				long actualChildCount = db.getRecordChildren(i, 0).map(recordId -> {				
+					assertTrue("Unexpected affiliate "+recordId+" of record "+parentId, childrenSet.contains(recordId));
+					return recordId;
+				}).count();
+				assertEquals("Wrong number of children for record "+parentId, childrenSet.size(), actualChildCount);
 			}
 		}
 	}
@@ -470,19 +462,16 @@ public class InheritanceTest extends TestCase {
 
 	private void checkDescendents(final int numRecs, HashMap<Integer, HashSet<Integer>> expectedDescendents) {
 		for (int i = 1; i <= numRecs; ++i) {
-			Iterable<DatabaseRecord> children = db.getChildRecords(i, 0, true);
-			HashSet<Integer> childrenSet = getExpectedDescendents(expectedDescendents, i);
-			if (null == childrenSet) {
-				assertNotNull("Record "+i+" has unexpected children");					
+			HashSet<Integer> expectedDescendants = getExpectedDescendents(expectedDescendents, i);
+			if (null == expectedDescendants) {
+				assertNotNull("Record "+i+" has unexpected descendants");					
 			} else {
-				assertNotNull("Record "+i+" has no children", children);
-				int childCount = childrenSet.size();
-				for (Record r: children) {
-					int recordId = r.getRecordId();
-					assertTrue("Unexpected child "+recordId+" of record "+i, childrenSet.contains(recordId));
-					--childCount;
-				}
-				assertTrue("Too few children for "+i, 0 == childCount);
+				final int parentId = i;
+				long actualDescendantCount = db.getRecordFamily(i, 0).map(recordId -> {				
+					assertTrue("Unexpected affiliate "+recordId+" of record "+parentId, expectedDescendants.contains(recordId));
+					return recordId;
+				}).count();
+				assertEquals("Wrong number of descendents for record "+parentId, expectedDescendants.size(), actualDescendantCount);
 			}
 		}
 	}

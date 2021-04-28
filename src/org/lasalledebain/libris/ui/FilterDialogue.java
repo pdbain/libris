@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -290,14 +291,8 @@ class FilterDialogue {
 
 		int affiliateType = affiliatesChooser.getSelectedIndex();
 		lastSettings.lastAffiliatesExtent = affiliateType;
-		Iterable<DatabaseRecord> children;
-		if (2 == affiliateType) {
-			children = database.getAffiliateRecords(parent, fieldNum);			
-		} else {
-			boolean isDescendents = (affiliateType == 1);
-			children = database.getChildRecords(parent, fieldNum, isDescendents);
-		}
-		browserWindow.doRefresh(children);
+		IntStream idStream = (1 == affiliateType)? database.getRecordFamily(parent, fieldNum): database.getRecordChildren(parent, fieldNum);
+		browserWindow.doRefresh(idStream);
 	}
 
 public class ButtonListener implements ActionListener {

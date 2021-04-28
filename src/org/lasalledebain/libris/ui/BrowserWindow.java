@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.stream.IntStream;
 
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -162,6 +163,12 @@ public class BrowserWindow extends JPanel {
 		recordsIterator = src.iterator();
 		doRefresh();
 	}
+
+	public void doRefresh(IntStream idStream) {
+		recordsIterator = database.recordIdsToRecords(idStream).iterator();
+		doRefresh();
+	}
+
 
 	public void setFilter(RecordFilter filter) {
 		this.filter = filter;

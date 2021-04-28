@@ -3,6 +3,8 @@ package org.lasalledebain.libris.indexes;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 import org.lasalledebain.libris.FileAccessManager;
 import org.lasalledebain.libris.LibrisConstants;
@@ -142,22 +144,18 @@ public class AffiliateList<RecordType extends Record> {
 		return entry;
 	}
 
-	public int[] getChildren(int recordId) {
-		AffiliateListEntry entry;
-		entry = getEntry(recordId);
-		if (null == entry) {
-			return LibrisConstants.emptyIntList;
-		} else {
-			int[] result = entry.getChildren();
-			if (null == result) {
-				return LibrisConstants.emptyIntList;
-			} else {
-				return result;
-			}
-		}
+	public IntStream getChildren(int recordId) {
+		AffiliateListEntry entry = getEntry(recordId);
+		return (null == entry) ? IntStream.empty(): Arrays.stream(entry.getChildren());
 	}
 
-	public Iterable<RecordType> getDescendents(int parent, RecordList<RecordType> masterList) {
-		return new DescendentRecordIterator<RecordType>(masterList, parent, this);
+	/**
+	 * @param recordId root
+	 * @return stream comprising depth-first traversal of the family tree starting at recordId
+	 */
+	public IntStream getFamily(int recordId) {
+		AffiliateListEntry entry = getEntry(recordId);
+		final IntStream selfStream = IntStream.of(recordId);
+		return (null == entry) ? selfStream: IntStream.concat(selfStream, getChildren(recordId).flatMap(r -> getFamily(r)));
 	}
 }

@@ -20,12 +20,14 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 
 import org.lasalledebain.libris.exception.Assertion;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
@@ -906,14 +908,27 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 			return mainRecordTemplate;
 		}
 
-		public Iterable<DatabaseRecord> getChildRecords(int parent, int groupNum, boolean allDescendents) {
+		public IntStream getRecordFamily(int parent, int groupNum) {
 			AffiliateList<DatabaseRecord> affList = indexMgr.getAffiliateList(groupNum);
-			if (allDescendents) {
-				return affList.getDescendents(parent, this.getRecords());
-			} else {
-				int[] result = affList.getChildren(parent);
-				return new ArrayRecordIterator<DatabaseRecord>(getRecords(), result);
-			}
+			IntStream ids = affList.getFamily(parent).skip(1);
+			return ids;
+		}
+
+		public IntStream getRecordChildren(int parent, int groupNum) {
+			AffiliateList<DatabaseRecord> affList = indexMgr.getAffiliateList(groupNum);
+			IntStream ids = affList.getChildren(parent);
+			return ids;
+		}
+
+		public Stream<DatabaseRecord> recordIdsToRecords(IntStream ids) {
+			RecordList<DatabaseRecord> recs = this.getRecords();
+			return ids.mapToObj(recId -> {
+				try {
+					return recs.getRecord(recId);
+				} catch (InputException e) {
+					throw new DatabaseError(e);
+				}
+			});
 		}
 
 		public Iterable<DatabaseRecord> getAffiliateRecords(int parent, int groupNum) {
@@ -955,7 +970,7 @@ public class LibrisDatabase extends GenericDatabase<DatabaseRecord> implements L
 				return null;
 			}
 		}
-		
+
 		public int getNumArtifacts() {
 			return hasDocumentRepository()? documentRepository.getNumArtifacts(): 0;
 		}
