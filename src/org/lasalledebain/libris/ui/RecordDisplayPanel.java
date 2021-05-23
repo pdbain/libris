@@ -18,6 +18,7 @@ import javax.swing.event.ChangeListener;
 
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.LibrisDatabase;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.ui.LibrisMenu.NewRecordListener;
@@ -112,7 +113,7 @@ public class RecordDisplayPanel extends JPanel {
 		String lo = "";
 		try {
 			lo = myDatabase.getLayouts().getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_NEWRECORD).getId();
-		} catch (LibrisException e) {
+		} catch (DatabaseError e) {
 			mainGui.alert("exception "+e+" "+e.getMessage()+" reading layouts");
 		}
 		for (String s: layoutIds) {

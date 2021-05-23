@@ -68,7 +68,7 @@ public class TestRecordFilter extends TestCase {
 
 	public void testSingleWordFilter() throws FileNotFoundException, IOException {
 		getDatabase();
-		TextFilter filter = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
+		TextFilter<DatabaseRecord> filter = new TextFilter<DatabaseRecord>(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
 				new String[] { "k1", "k3" });
 		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(db.getRecords(),
 				filter);
@@ -78,11 +78,11 @@ public class TestRecordFilter extends TestCase {
 
 	public void testCascadeWordFilter() throws FileNotFoundException, IOException {
 		getDatabase();
-		TextFilter filter1 = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
+		TextFilter<DatabaseRecord> filter1 = new TextFilter<DatabaseRecord>(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
 				new String[] { "k1" });
 		FilteredRecordList<DatabaseRecord> filteredList1 = new FilteredRecordList<DatabaseRecord>(db.getRecords(),
 				filter1);
-		TextFilter filter2 = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
+		TextFilter<DatabaseRecord> filter2 = new TextFilter<DatabaseRecord>(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
 				new String[] { "k3" });
 		FilteredRecordList<DatabaseRecord> filteredList2 = new FilteredRecordList<DatabaseRecord>(filteredList1,
 				filter2);
@@ -95,7 +95,7 @@ public class TestRecordFilter extends TestCase {
 		DatabaseRecord rec = db.newRecord();
 		rec.addFieldValue("ID_keywords", "k2 k4 k1 k3");
 		int newId = db.putRecord(rec);
-		TextFilter filter = new TextFilter(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
+		TextFilter<DatabaseRecord> filter = new TextFilter<DatabaseRecord>(MATCH_TYPE.MATCH_EXACT, true, new int[] { 0, 1 },
 				new String[] { "k1", "k3" });
 		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(db.getRecords(),
 				filter);
@@ -164,7 +164,7 @@ public class TestRecordFilter extends TestCase {
 		int pubField = theSchema.getFieldNum("ID_publisher");
 		var choices = theSchema.getEnumSet(choiceSetName);
 		FieldEnumValue searchValue = new FieldEnumValue(choices, 1);
-		GenericFilter<Record> enumTest = new EnumFilter(pubField, searchValue, false);
+		GenericFilter<Record> enumTest = new EnumFilter<Record>(pubField, searchValue, false);
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned", 1, result.size());
 	}
@@ -177,7 +177,7 @@ public class TestRecordFilter extends TestCase {
 		int pubFields[] = new  int[] {theSchema.getFieldNum("ID_journal"), theSchema.getFieldNum("ID_journal2")};
 		var choices = theSchema.getEnumSet(choiceSetName);
 		FieldEnumValue searchValue = new FieldEnumValue(choices, 5);
-		GenericFilter<Record> enumTest = new EnumFilter(pubFields, searchValue, false);
+		GenericFilter<Record> enumTest = new EnumFilter<Record>(pubFields, searchValue, false);
 		List<DatabaseRecord> result = db.getRecords().asStream().filter(enumTest).collect(Collectors.toList());
 		assertEquals("Wrong number of records returned", 2, result.size());
 	}

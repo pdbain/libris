@@ -117,7 +117,7 @@ public class LibrisGui extends LibrisWindowedUi<DatabaseRecord> {
 
 		displayPanel.addLayouts(currentDatabase.getLayouts());
 		RecordList<DatabaseRecord> list = currentDatabase.getRecords();
-		resultsPanel.initialize(list);
+		resultsPanel.setRecordList(list);
 		recordsAccessible(!readOnly);
 		databaseModifiable(!readOnly);
 		return currentDatabase;

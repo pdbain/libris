@@ -81,9 +81,9 @@ public class Layouts implements XMLElement {
 		return dims;
 	}
 
-	public LibrisLayout getLayoutByUsage(String user) throws DatabaseException {
+	public LibrisLayout getLayoutByUsage(String user) {
 		LibrisLayout l = layoutUsageMap.get(user);
-		assertNotNullDatabaseException("No layout defined:",  user, l);
+		Assertion.assertNotNullError("No layout defined:",  user, l);
 		return l;
 	}
 

@@ -9,9 +9,9 @@ import org.lasalledebain.libris.search.RecordFilter;
 public class FilteredRecordList<RecordType extends Record> extends RecordList<RecordType> {
 
 	RecordList<RecordType> recordSource;
-	RecordFilter filter;
+	RecordFilter<RecordType> filter;
 
-	public FilteredRecordList(RecordList<RecordType> src, RecordFilter f) {
+	public FilteredRecordList(RecordList<RecordType> src, RecordFilter<RecordType> f) {
 		recordSource = src;
 		filter = f;
 	}

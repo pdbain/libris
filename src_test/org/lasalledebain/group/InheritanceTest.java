@@ -9,8 +9,6 @@ import static org.lasalledebain.libris.util.Utilities.trace;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.junit.After;
 import org.lasalledebain.libris.DatabaseRecord;

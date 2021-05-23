@@ -1,17 +1,16 @@
 package org.lasalledebain.libris.ui;
 
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_AFFILIATES;
+import static org.lasalledebain.libris.Field.FieldType.T_FIELD_ENUM;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_PAIR;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_STRING;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_TEXT;
-import static org.lasalledebain.libris.Field.FieldType.T_FIELD_ENUM;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -23,7 +22,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -34,18 +32,17 @@ import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.EnumFieldChoices;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
+import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.LibrisDatabase;
 import org.lasalledebain.libris.Schema;
 import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.field.FieldEnumValue;
-import org.lasalledebain.libris.field.FieldValue;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
-import org.lasalledebain.libris.search.TextFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.search.RecordNameFilter;
+import org.lasalledebain.libris.search.TextFilter;
 import org.lasalledebain.libris.ui.AffiliateEditor.RecordSelectorByName;
-import org.lasalledebain.libris.ui.FieldChooser.FieldInfo;
 
 class FilterDialogue {
 	JRadioButton prefixButton;
@@ -268,8 +265,9 @@ class FilterDialogue {
 				searchTerms = searchTerms.toLowerCase();
 			}
 			String[] searchList = searchTerms.trim().split("\\s+");
-			TextFilter filter = new TextFilter(matchType, caseSensitive, selectedFields, searchList);
+			TextFilter<DatabaseRecord> filter = new TextFilter<DatabaseRecord>(matchType, caseSensitive, selectedFields, searchList);
 			browserWindow.doRefresh(database.getRecords(), filter);
+			browserWindow.setRecordList(new FilteredRecordList<>(database.getRecords(), filter));
 		}
 	}
 
@@ -280,7 +278,7 @@ class FilterDialogue {
 			searchTerms = searchTerms.toLowerCase();
 		}
 		String[] searchList = searchTerms.trim().split("\\s+");
-		RecordNameFilter filter = new RecordNameFilter(matchType, caseSensitive, searchList);
+		RecordNameFilter<DatabaseRecord> filter = new RecordNameFilter<DatabaseRecord>(matchType, caseSensitive, searchList);
 		browserWindow.doRefresh(database.getNamedRecords(), filter);
 	}
 

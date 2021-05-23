@@ -20,6 +20,7 @@ import org.lasalledebain.libris.ArtifactParameters;
 import org.lasalledebain.libris.ArtifactRecord;
 import org.lasalledebain.libris.FilteredRecordList;
 import org.lasalledebain.libris.GenericDatabase;
+import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.indexes.DatabaseConfiguration;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
@@ -221,7 +222,7 @@ public class ArtifactTest extends TestCase {
 	@Test
 	public void testGroups() throws LibrisException {
 		final int numArtifacts = 16;
-		DatabaseUi myUi = new HeadlessUi(false);
+		DatabaseUi<Record> myUi = new HeadlessUi<Record>(false);
 		try(ArtifactDatabase db = new ArtifactDatabase(myUi, workingDirectory)) {
 			db.initialize();
 			db.openDatabase();

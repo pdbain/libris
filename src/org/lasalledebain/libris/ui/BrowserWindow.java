@@ -25,6 +25,7 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.RecordId;
 import org.lasalledebain.libris.RecordList;
 import org.lasalledebain.libris.SingleRecordList;
+import org.lasalledebain.libris.exception.DatabaseError;
 import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.search.RecordFilter;
@@ -51,7 +52,8 @@ public class BrowserWindow extends JPanel {
 
 	private RecordList<DatabaseRecord> recordsSource;
 
-	private RecordFilter filter;
+	@Deprecated
+	private RecordFilter<DatabaseRecord> filter;
 
 	public BrowserWindow(LibrisDatabase db, LibrisGui ui) throws DatabaseException {
 		super();
@@ -76,7 +78,7 @@ public class BrowserWindow extends JPanel {
 			public void mouseExited(MouseEvent arg0) {}
 			public void mousePressed(MouseEvent arg0) {}
 			public void mouseReleased(MouseEvent arg0) {}
-			
+
 		});
 		add("Filter", filterView);
 		chooser = new JList<>();
@@ -99,7 +101,7 @@ public class BrowserWindow extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				recordsIterator = recordsSource.iterator();
-				setResultList();
+				updateBrowserList();
 				chooser.setModel(resultRecords);
 			}			
 		});
@@ -111,14 +113,14 @@ public class BrowserWindow extends JPanel {
 		moreButton.setVisible(true);
 	}
 
-	public void initialize(RecordList<DatabaseRecord> records) throws DatabaseException {
+	public void setRecordList(RecordList<DatabaseRecord> records) throws DatabaseError {
 		recordsSource = records;
 		enableNext(false);
 		final Layouts layouts = database.getLayouts();
 		myLayout = layouts.getLayoutByUsage(LibrisXMLConstants.XML_LAYOUT_USAGE_SUMMARYDISPLAY);
 		fieldIds = myLayout.getFieldIds();
 		recordsIterator = recordsSource.iterator();
-		setResultList();
+		updateBrowserList();
 		chooser.setModel(resultRecords);
 	}
 
@@ -148,40 +150,38 @@ public class BrowserWindow extends JPanel {
 	}
 
 	void doRefresh() {
-		setResultList(); // user records as ListModel
+		updateBrowserList(); // user records as ListModel
 		chooser.setModel(resultRecords);
 	}			
 
-	public void doRefresh(RecordList<DatabaseRecord> src, RecordFilter filter) {
+	@Deprecated
+	public void doRefresh(RecordList<DatabaseRecord> src, RecordFilter<DatabaseRecord> filter) {
 		setFilter(filter);
-		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<DatabaseRecord>(src, filter);
+		FilteredRecordList<DatabaseRecord> filteredList = new FilteredRecordList<>(src, filter);
 		recordsIterator = filteredList.iterator();
 		doRefresh();
 	}
 
-	public void doRefresh(Iterable<DatabaseRecord> src) {
-		recordsIterator = src.iterator();
-		doRefresh();
-	}
-
+	@Deprecated
 	public void doRefresh(IntStream idStream) {
 		recordsIterator = database.recordIdsToRecords(idStream).iterator();
 		doRefresh();
 	}
 
-
-	public void setFilter(RecordFilter filter) {
+	@Deprecated
+	public void setFilter(RecordFilter<DatabaseRecord> filter) {
 		this.filter = filter;
 	}
 
-	public RecordFilter getFilter() {
+	@Deprecated
+	public RecordFilter<DatabaseRecord> getFilter() {
 		return filter;
 	}
 
 	public void addRecord(DatabaseRecord rec) throws DatabaseException {
 		removeRecord(rec);
 		if (null == resultRecords) {
-			initialize(new SingleRecordList<DatabaseRecord>(rec));
+			setRecordList(new SingleRecordList<DatabaseRecord>(rec));
 		} else {
 			int index =  resultRecords.add(rec);
 			chooser.ensureIndexIsVisible(index);
@@ -195,7 +195,7 @@ public class BrowserWindow extends JPanel {
 		}
 	}
 
-	public void setResultList() {
+	protected void updateBrowserList() {
 		RandomAccessBrowserList<Record> list = new RandomAccessBrowserList<>(fieldIds);
 		int recordCount = 0;
 		while (recordsIterator.hasNext() && (LIST_LIMIT > recordCount)) {

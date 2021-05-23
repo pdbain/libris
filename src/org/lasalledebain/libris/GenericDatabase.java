@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import org.lasalledebain.libris.exception.Assertion;
@@ -16,7 +15,6 @@ import org.lasalledebain.libris.exception.InputException;
 import org.lasalledebain.libris.exception.LibrisException;
 import org.lasalledebain.libris.exception.UserErrorException;
 import org.lasalledebain.libris.exception.XmlException;
-import org.lasalledebain.libris.field.FieldEnumValue;
 import org.lasalledebain.libris.indexes.DatabaseConfiguration;
 import org.lasalledebain.libris.indexes.GroupManager;
 import org.lasalledebain.libris.indexes.KeyIntegerTuple;
@@ -25,8 +23,8 @@ import org.lasalledebain.libris.indexes.LibrisRecordsFileManager;
 import org.lasalledebain.libris.indexes.RecordPositions;
 import org.lasalledebain.libris.indexes.SortedKeyValueFileManager;
 import org.lasalledebain.libris.records.Records;
-import org.lasalledebain.libris.search.TextFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
+import org.lasalledebain.libris.search.TextFilter;
 import org.lasalledebain.libris.ui.DatabaseUi;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXmlFactory;
@@ -210,7 +208,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 	public FilteredRecordList<RecordType> makeKeywordFilteredRecordList(MATCH_TYPE matchType, boolean caseSensitive, 
 			int fieldList[], Collection<String> searchTerms) throws UserErrorException, IOException {
 		RecordList<RecordType> recList = new SignatureFilteredRecordList<RecordType>(this, searchTerms);
-		TextFilter filter = new TextFilter(matchType, caseSensitive, false, fieldList, searchTerms);;
+		TextFilter<RecordType> filter = new TextFilter<RecordType>(matchType, caseSensitive, false, fieldList, searchTerms);;
 		FilteredRecordList<RecordType> filteredList = new FilteredRecordList<RecordType>(recList, filter);
 		return filteredList;
 	}
@@ -220,7 +218,7 @@ public abstract class GenericDatabase<RecordType extends Record> implements XMLE
 			int fieldList[], String searchTerm) throws UserErrorException, IOException {
 		Collection<String> searchTerms = Collections.singleton(searchTerm);
 		RecordList<RecordType> recList = new SignatureFilteredRecordList<RecordType>(this, searchTerms);
-		TextFilter filter = new TextFilter(matchType, caseSensitive, false, fieldList, searchTerms);
+		TextFilter<RecordType> filter = new TextFilter<RecordType>(matchType, caseSensitive, false, fieldList, searchTerms);
 		FilteredRecordList<RecordType> filteredList = new FilteredRecordList<RecordType>(recList, filter);
 		return filteredList;
 	}
