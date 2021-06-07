@@ -71,7 +71,7 @@ public class FieldChooser extends JPanel {
 
 			});
 			buttonBar.add(invertSelectionButton);
-			add(buttonBar, BorderLayout.SOUTH);
+			add(buttonBar, BorderLayout.EAST);
 		} else {
 			selectFirst();
 		}

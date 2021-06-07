@@ -14,6 +14,11 @@ import org.lasalledebain.libris.field.FieldEnumValue;
 
 public class EnumFilter<T extends Record> extends GenericFilter<T> {
 
+	@Override
+	public SEARCH_TYPE getType() {
+		return SEARCH_TYPE.T_SEARCH_ENUM;
+	}
+
 	protected final FieldEnumValue myValue;
 	public EnumFilter(int fieldId, FieldEnumValue theValue, boolean incDefault) {
 		super(incDefault, new int[] {fieldId});

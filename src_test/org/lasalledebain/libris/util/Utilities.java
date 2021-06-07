@@ -365,8 +365,8 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		testLogger = Logger.getLogger("org.lasalledebain.test");
 		testLogger.setLevel(Boolean.getBoolean("org.lasalledebain.test.verbose")? Level.ALL: Level.INFO);
 		System.setProperty("java.util.logging.SimpleFormatter.format",
-	              "[%1$tF %1$tT] [%4$-7s] %5$s %n");
-		}
+				"[%1$tF %1$tT] [%4$-7s] %5$s %n");
+	}
 
 	public static void trace(String msg) {
 		testLogger.fine(msg);
@@ -539,7 +539,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 	public static LibrisDatabase buildAndOpenDatabase(File databaseFile) throws LibrisException {
 		HeadlessUi<DatabaseRecord> ui = new HeadlessUi<DatabaseRecord>(databaseFile, false);
 		assertTrue("Database not built", ui.buildDatabase(databaseFile));
-	
+
 		LibrisDatabase result = ui.openDatabase();
 		assertNotNull("Database not opened", result);
 		return result;
@@ -575,7 +575,7 @@ public class Utilities<RecordType extends Record> extends TestCase implements Li
 		databaseWriter.writeEndElement();
 		databaseWriter.flush();
 		databaseStream.close();
-	
+
 		return ui.buildDatabase(databaseFile);
 	}
 

@@ -10,8 +10,14 @@ import org.lasalledebain.libris.indexes.ContainsKeywords;
 import org.lasalledebain.libris.indexes.ExactKeywordList;
 import org.lasalledebain.libris.indexes.PrefixKeywords;
 import org.lasalledebain.libris.indexes.RecordKeywords;
+import org.lasalledebain.libris.search.RecordFilter.SEARCH_TYPE;
 
 public class TextFilter<T extends Record> extends GenericFilter<T> {
+
+	@Override
+	public SEARCH_TYPE getType() {
+		return SEARCH_TYPE.T_SEARCH_KEYWORD;
+	}
 
 	private Iterable<String> terms;
 	private RecordKeywords recWords;

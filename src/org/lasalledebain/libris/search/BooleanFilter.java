@@ -34,4 +34,8 @@ public class BooleanFilter<T extends Record> extends GenericFilter<T> {
 				});
 	}
 
+	@Override
+	public SEARCH_TYPE getType() {
+		return SEARCH_TYPE.T_SEARCH_BOOLEAN;
+	}
 }

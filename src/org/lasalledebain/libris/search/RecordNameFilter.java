@@ -11,11 +11,16 @@ import org.lasalledebain.libris.indexes.RecordKeywords;
 
 public class RecordNameFilter<T extends Record> implements RecordFilter<T> {
 
+	@Override
+	public SEARCH_TYPE getType() {
+		return SEARCH_TYPE.T_SEARCH_RECORD_NAME;
+	}
+
 	private List<String> terms;
 	private RecordKeywords recWords;
 
-	public RecordNameFilter(MATCH_TYPE matchType, boolean caseSensitive, String searchTerms[]) {
-		switch (matchType) {
+	public RecordNameFilter(MATCH_TYPE theMatchType, boolean caseSensitive, String searchTerms[]) {
+		switch (theMatchType) {
 		case MATCH_EXACT:
 			recWords = new ExactKeywordList(caseSensitive);
 			break;

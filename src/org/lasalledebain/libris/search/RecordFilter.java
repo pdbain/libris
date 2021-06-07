@@ -10,8 +10,10 @@ public interface RecordFilter<T extends Record> extends Predicate<T>{
 		MATCH_PREFIX,
 		MATCH_CONTAINS
 	}
+
 	public static enum SEARCH_TYPE {
-		T_SEARCH_KEYWORD("Keyword"), T_SEARCH_ENUM("Enumeration"), T_SEARCH_RECORD_NAME("Record name");
+		T_SEARCH_KEYWORD("Keyword"), T_SEARCH_ENUM("Enumeration"), T_SEARCH_RECORD_NAME("Record name"),
+		T_SEARCH_BOOLEAN("Boolean"), T_SEARCH_AFFILIATES("Affiliates");
 		String name;
 
 		@Override
@@ -25,5 +27,6 @@ public interface RecordFilter<T extends Record> extends Predicate<T>{
 		
 	}
 	
+	abstract SEARCH_TYPE getType();
 }
 
