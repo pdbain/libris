@@ -11,32 +11,47 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionListener;
 
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.exception.DatabaseError;
 
 @SuppressWarnings("serial")
 public class FieldChooser extends JPanel {
 	private final JList<FieldInfo> fieldList;
 	private int numSearchFields;
+	private final int[] searchFieldIndices;
 	boolean includeRecordName;
 	private Vector<FieldInfo> searchFieldList;
 	@SuppressWarnings("unused")
 	private boolean multiSelect;
-	public FieldChooser(Schema schem, EnumSet<FieldType> searchFieldTypes, boolean multiSelect, String label) {
+
+	public FieldChooser(Schema schem, EnumSet<FieldType> searchFieldTypes, String label) {
+		this(schem, searchFieldTypes, true, label, null);
+	}
+
+	public FieldChooser(Schema schem, EnumSet<FieldType> searchFieldTypes, boolean multiSelect, String label, int[] selectedFields) {
+		searchFieldIndices = new int[schem.getNumFields()];
+		searchFieldList = getSearchFieldList(schem,searchFieldTypes);
 		setLayout(new BorderLayout());
 		includeRecordName = false;
 		this.multiSelect = multiSelect;
 
-		searchFieldList = getSearchFieldList(schem,searchFieldTypes);
 		fieldList = new JList<FieldInfo>(searchFieldList);
+		JScrollPane fieldListScrollPane = new JScrollPane(fieldList);
+		fieldList.setVisibleRowCount(4);
 		numSearchFields = searchFieldList.size();
 		add(new JLabel(label), BorderLayout.NORTH);
-		add(fieldList, BorderLayout.CENTER);
+		add(fieldListScrollPane, BorderLayout.CENTER);
 		if (multiSelect) {
-			selectAll();
+			if (null == selectedFields) {
+				selectAll();
+			} else {
+				setSelectedFields(selectedFields);
+			}
 			JPanel buttonBar = new JPanel();
 			buttonBar.setLayout(new BoxLayout(buttonBar, BoxLayout.Y_AXIS));
 			final JButton selectAllButton = new JButton("Select all");
@@ -79,7 +94,7 @@ public class FieldChooser extends JPanel {
 	public void addListSelectionListener​(ListSelectionListener listener) {
 		fieldList.addListSelectionListener(listener);
 	}
-	
+
 	private Vector<FieldInfo> getSearchFieldList(Schema schem, EnumSet<FieldType> searchFieldTypes) {
 		final int numSchemaFields = schem.getNumFields();
 		Vector<FieldInfo> searchList = new Vector<FieldInfo>(numSchemaFields);
@@ -87,11 +102,12 @@ public class FieldChooser extends JPanel {
 			FieldTemplate ft = schem.getFieldTemplate(i);
 			if (searchFieldTypes.contains(ft.getFtype())) {
 				searchList.add(new FieldInfo(i, ft.getFieldTitle()));
+				searchFieldIndices[ft.getFieldNum()] = searchList.size() - 1;
 			}
 		}
 		return searchList;
 	}
-	
+
 	static class FieldInfo {
 		protected FieldInfo(int fieldNum, String title) {
 			this.fieldNum = fieldNum;
@@ -104,6 +120,7 @@ public class FieldChooser extends JPanel {
 		String title;
 		int fieldNum;
 	}
+
 	public int[] getFieldNums() {
 		int[] selectedFields = fieldList.getSelectedIndices();
 		int[] result = new int[selectedFields.length];
@@ -122,7 +139,11 @@ public class FieldChooser extends JPanel {
 			fieldList.setSelectedIndex(index);
 		}
 	}
-	public void setSelectedIndices(int[] indices) {
+	public void setSelectedFields(int[] fieldIds) {
+		int[] indices = new int[fieldIds.length];
+		for (int i = 0; i < fieldIds.length; ++i) {
+			indices[i] = searchFieldIndices[fieldIds[i]];
+		}
 		fieldList.setSelectedIndices(indices);
 	}
 

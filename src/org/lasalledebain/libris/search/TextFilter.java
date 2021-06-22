@@ -21,6 +21,11 @@ public class TextFilter<T extends Record> extends GenericFilter<T> {
 
 	private Iterable<String> terms;
 	private RecordKeywords recWords;
+	private final boolean caseSensitive;
+
+	public boolean isCaseSensitive() {
+		return caseSensitive;
+	}
 
 	public TextFilter(MATCH_TYPE matchType, boolean caseSensitive, boolean includeDefault, int fieldList[], String searchTerms[]) {
 		this(matchType, caseSensitive, includeDefault, fieldList, Arrays.asList(searchTerms));
@@ -40,6 +45,7 @@ public class TextFilter<T extends Record> extends GenericFilter<T> {
 	
 	public TextFilter(MATCH_TYPE matchType, boolean caseSensitive, boolean includeDefault, int fieldList[], Iterable<String> searchTerms) {
 		super(includeDefault, fieldList);
+		this.caseSensitive = caseSensitive;
 		switch (matchType) {
 		case MATCH_EXACT:
 			recWords = new ExactKeywordList(caseSensitive);

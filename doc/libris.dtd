@@ -12,7 +12,7 @@
 	databasename NMTOKEN #IMPLIED
 	date CDATA #IMPLIED
 	repositorylocation NMTOKEN #IMPLIED
-	locked %boolean #IMPLIED">
+	locked %boolean; #IMPLIED">
 	
 <!ATTLIST libris  %databaseAttributes; >
 
@@ -44,7 +44,7 @@
 	restricted %boolean; "false"
 	singlevalue %boolean; "false"
 	editable %boolean; "true"
-	inherit ID #IMPLIED <!-- group ID. Inherit value from parent in this group -->
+	inherit IDREF #IMPLIED 
 	>
 
 <!ELEMENT enumset (enumchoice)+>

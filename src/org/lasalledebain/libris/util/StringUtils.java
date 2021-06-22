@@ -19,6 +19,8 @@ import java.util.stream.StreamSupport;
 import org.lasalledebain.libris.LibrisConstants;
 
 public class StringUtils {
+	public static final String[] emptyStringArray = new String[0];
+
 	public static class StringHashSpliterator implements Spliterator.OfInt {
 	
 		private static final int FNV_PRIME = 16777619;
@@ -30,7 +32,7 @@ public class StringUtils {
 				nextHash(stringBytes[index]);
 			}
 		}
-	
+			
 		byte[] stringBytes;
 		int hash;
 		int index;
@@ -81,6 +83,14 @@ public class StringUtils {
 	}
 
 	public static final Charset standardCharset = Charset.forName("ISO-8859-1");
+	
+	public static String[] splitStringByWhitespace(String theString) {
+		return StringUtils.isStringEmpty(theString)? emptyStringArray: theString.split("\\s+");
+	}
+	
+	public static String joinWordsWithSpaces(String[] theWords) {
+		return String.join(" ", theWords);
+	}
 	
 	/**
 	 * Converts a string to lower case and then to bytes using a fixed character set (ISO Latin-1).

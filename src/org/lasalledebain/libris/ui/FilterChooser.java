@@ -7,6 +7,7 @@ import static org.lasalledebain.libris.Field.FieldType.T_FIELD_TEXT;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -31,10 +32,12 @@ import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.search.RecordFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.search.RecordFilter.SEARCH_TYPE;
+import org.lasalledebain.libris.search.TextFilter;
+import org.lasalledebain.libris.util.StringUtils;
 
 @SuppressWarnings("serial")
 public class FilterChooser<RecType extends Record> extends JFrame {
-	static final EnumSet<FieldType> keywordSDearchFieldTypes = EnumSet.of(T_FIELD_STRING, T_FIELD_TEXT, T_FIELD_PAIR);
+	static final EnumSet<FieldType> keywordSearchFieldTypes = EnumSet.of(T_FIELD_STRING, T_FIELD_TEXT, T_FIELD_PAIR);
 	protected List<FilterStage> filterList;
 	GenericDatabase<RecType> db;
 	final private JButton doneButton, cancelButton;
@@ -133,15 +136,28 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 		void enableRemove(boolean enabled) {
 			removeButton.setEnabled(enabled);
 		}
-		
-		public abstract RecordFilter getFilter();
+
+		public abstract RecordFilter<RecType> getFilter();
 	}
-	
-	protected class KeywordFilterStage extends FilterStage {
-		JTextField keywords;
-		JCheckBox caseSensitive;
-		private JRadioButton prefixButton;
+
+	class KeywordFilterStage extends FilterStage {
+		private JTextField keywords;
+		private boolean caseSensitive;
+		JRadioButton prefixButton;
 		private MATCH_TYPE myMatchType;
+		JRadioButton wholeWordButton;
+		JRadioButton containsButton;
+		FieldChooser fldChooser;
+		JCheckBox caseSensitiveCheckBox;
+		
+		KeywordFilterStage(TextFilter<RecType> theFilter) {
+			setCaseSensitive(theFilter.isCaseSensitive());
+		}
+		
+		KeywordFilterStage()
+		{
+			return;
+		}
 		public MATCH_TYPE getMatchType() {
 			return myMatchType;
 		}
@@ -149,9 +165,6 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 		public void setMatchType(MATCH_TYPE myMatchType) {
 			this.myMatchType = myMatchType;
 		}
-		private JRadioButton wholeWordButton;
-		private JRadioButton containsButton;
-		private FieldChooser fldChooser;
 		@Override
 		void addTitle() {
 			Border myBorder = BorderFactory.createTitledBorder("Keyword search");
@@ -163,17 +176,18 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 			add(new JLabel("Keywords"));
 			keywords = new JTextField(30);
 			add(keywords);
-			fldChooser = new FieldChooser(db.getSchema(), keywordSDearchFieldTypes, true, "Search fields");
+			fldChooser = new FieldChooser(db.getSchema(), keywordSearchFieldTypes, "Search fields");
 			add(fldChooser);
-			caseSensitive = new JCheckBox();
+			caseSensitiveCheckBox = new JCheckBox();
 			add(new JLabel("Case sensitive"));
-			add(caseSensitive);
+			caseSensitiveCheckBox.addItemListener(e -> caseSensitive = (e.getStateChange() == ItemEvent.SELECTED));
+			add(caseSensitiveCheckBox);
 			ButtonGroup matchGroup = new ButtonGroup();
 			prefixButton = new JRadioButton("Prefix");
 			prefixButton.addActionListener(e -> setMatchType(MATCH_TYPE.MATCH_PREFIX));
 			prefixButton.setSelected(true);
 			myMatchType = MATCH_TYPE.MATCH_PREFIX;
-			
+
 			wholeWordButton = new JRadioButton("Whole word");
 			wholeWordButton.addActionListener(e -> setMatchType(MATCH_TYPE.MATCH_EXACT));
 			containsButton = new JRadioButton("Contains");
@@ -188,16 +202,41 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 			buttonBar.add(wholeWordButton);
 			add(buttonBar);
 		}
+		
+		int[] getSearchFields() {
+			return fldChooser.getFieldNums();
+		}
+
+		void setSearchFields(int[] fieldNums) {
+			fldChooser.setSelectedFields(fieldNums);
+		}
+		String[] getKeywords() {
+			String keywordString = keywords.getText();
+			return StringUtils.splitStringByWhitespace(keywordString);
+		}
+
+		void setKeywords(String[] keywordList) {
+			keywords.setText(StringUtils.joinWordsWithSpaces(keywordList));
+		}
+
+		boolean isCaseSensitive() {
+			return caseSensitive;
+		}
+
+		public void setCaseSensitive(boolean caseSensitive) {
+			this.caseSensitive = caseSensitive;
+			caseSensitiveCheckBox.setSelected(caseSensitive);
+		}
 
 		@Override
-		public RecordFilter getFilter() {
-			//TextFilter<RecType> theFilter = new TextFilter<>(myMatchType, caseSensitive, true, )
-			return null;
+		public RecordFilter<RecType> getFilter() {
+			TextFilter<RecType> theFilter = new TextFilter<>(getMatchType(), isCaseSensitive(), true, getSearchFields(), getKeywords());
+			return theFilter;
 		}
-		
+
 	}
-	
+
 	protected class DefaultFilterStage extends KeywordFilterStage {
-		
+
 	}
 }

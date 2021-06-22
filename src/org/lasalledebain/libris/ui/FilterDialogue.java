@@ -174,7 +174,7 @@ class FilterDialogue {
 		
 		caseSensitiveButton = new JCheckBox("Case sensitive");
 		EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_STRING, T_FIELD_TEXT, T_FIELD_PAIR);
-		fChooser = new FieldChooser(dbSchema, searchFieldTypes, true, "Search fields");
+		fChooser = new FieldChooser(dbSchema, searchFieldTypes, "Search fields");
 		
 		JPanel controlPanel = new JPanel();
 		controlPanel.add(prefixButton);
@@ -187,7 +187,7 @@ class FilterDialogue {
 		affiliatesChooser = new JComboBox<>(new String[] {"Children", "Descendents", "Affiliates"});
 		affiliatesChooser.setSelectedIndex(lastSettings.lastAffiliatesExtent);
 		EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_AFFILIATES);
-		fChooser = new FieldChooser(dbSchema, searchFieldTypes, false, "Search fields");
+		fChooser = new FieldChooser(dbSchema, searchFieldTypes, false, "Search fields", null);
 		fChooser.setSelectedIndex(lastSettings.lastGroupNum);
 		
 		JPanel controlPanel = new JPanel();
@@ -200,7 +200,7 @@ class FilterDialogue {
 	private JPanel createEnumSearchDialogue() {
 		JPanel controlPanel = new JPanel();
 		EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_ENUM);
-		fChooser = new FieldChooser(dbSchema, searchFieldTypes, false, "Search fields");
+		fChooser = new FieldChooser(dbSchema, searchFieldTypes, false, "Search fields", null);
 		controlPanel.add(fChooser);
 		 JComboBox<FieldEnumValue> valueList = new JComboBox<>();
 		 fChooser.addListSelectionListener​(new ListSelectionListener() {

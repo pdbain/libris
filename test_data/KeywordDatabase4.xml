@@ -17,7 +17,26 @@
 		</indexdef>
 		</indexdefs>
 	</schema>
-	<layouts/>
+		<layouts>
+			<layout id="LO_shortFormDisplay" title="Condensed form layout"
+				type="form" height="400" width="700">
+				<layoutfield title="Author" id="ID_auth" control="textfield" />
+			</layout>
+			<layout id="LO_formDisplay" title="Form layout" type="form"
+				height="400" width="700">
+				<layoutusage usedby="newrecord" />
+				<layoutfield title="Author" id="ID_auth" control="textfield" />
+				<layoutfield title="Text" id="ID_text" control="textfield"
+					return="true" />
+				<layoutfield title="Keywords" id="ID_keywords" control="textfield"
+					return="true" />
+			</layout>
+			<layout id="LO_browserDisplay" title="Summary" type="list"
+				height="400" width="700">
+				<layoutusage usedby="summarydisplay" />
+				<layoutfield title="Text" id="ID_text" control="textfield" />
+			</layout>
+		</layouts>
 	</metadata>
 	<records lastid="4">
 			<record id="1">

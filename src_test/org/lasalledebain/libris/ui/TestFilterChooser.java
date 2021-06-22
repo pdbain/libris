@@ -1,11 +1,17 @@
 package org.lasalledebain.libris.ui;
 
 import static org.lasalledebain.libris.util.Utilities.KEYWORD_DATABASE1_XML;
+import static org.lasalledebain.libris.util.Utilities.KEYWORD_DATABASE4_XML;
 import static org.lasalledebain.libris.util.Utilities.testLogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.WindowConstants;
 
@@ -13,12 +19,17 @@ import org.junit.Test;
 import org.lasalledebain.libris.DatabaseRecord;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.exception.DatabaseException;
+import org.lasalledebain.libris.records.RecordStreamFilter;
+import org.lasalledebain.libris.search.RecordFilter;
+import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
+import org.lasalledebain.libris.ui.FilterChooser.KeywordFilterStage;
 import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
 
 public class TestFilterChooser extends TestCase {
 	private File workingDirectory;
+	private GenericDatabase<DatabaseRecord> theDb;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -33,20 +44,85 @@ public class TestFilterChooser extends TestCase {
 	}
 
 	@Test
-	public void testSanity() throws DatabaseException, IOException {
+	public void testKeywordControls() throws DatabaseException, IOException {
 		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI();
+		FilterChooser.KeywordFilterStage firstStage = (KeywordFilterStage) theChooser.filterList.get(0);
+		assertFalse("Wrong default for caseSensitive", firstStage.isCaseSensitive());
+		Utilities.pause();
+		firstStage.caseSensitiveCheckBox.doClick();
+		Utilities.pause();
+		assertTrue("Wrong caseSensitive for first click ", firstStage.isCaseSensitive());
+		firstStage.caseSensitiveCheckBox.doClick();
+		Utilities.pause();
+		assertFalse("Wrong caseSensitive for second click", firstStage.isCaseSensitive());
+		firstStage.setCaseSensitive(true);
+		Utilities.pause();
+		assertTrue("Wrong caseSensitive for setCaseSensitive(true)", firstStage.isCaseSensitive());
+		firstStage.caseSensitiveCheckBox.doClick();
+		Utilities.pause();
+		assertFalse("Wrong caseSensitive for third click", firstStage.isCaseSensitive());
+		firstStage.caseSensitiveCheckBox.doClick();
+		Utilities.pause();
+		firstStage.setCaseSensitive(false);
+		Utilities.pause();
+		assertFalse("Wrong caseSensitive for third click", firstStage.isCaseSensitive());
+
+		assertEquals("Wrong default match type", MATCH_TYPE.MATCH_PREFIX, firstStage.getMatchType());
+		firstStage.wholeWordButton.doClick();
+		Utilities.pause();
+		assertEquals("Wrong match type for whole word", MATCH_TYPE.MATCH_EXACT, firstStage.getMatchType());
+		firstStage.containsButton.doClick();
+		Utilities.pause();
+		assertEquals("Wrong match type for whole word", MATCH_TYPE.MATCH_CONTAINS, firstStage.getMatchType());
+		firstStage.prefixButton.doClick();
+		Utilities.pause();
+		assertEquals("Wrong match type for whole word", MATCH_TYPE.MATCH_PREFIX, firstStage.getMatchType());
+	}
+
+	@Test
+	public void testSelectFields() throws DatabaseException, IOException {
+		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI();
+		FilterChooser.KeywordFilterStage theStage = (KeywordFilterStage) theChooser.filterList.get(0);
+		int[] searchableFields = new int[] {1, 2, 4};
+		int[] searchedFields = theStage.getSearchFields();
+		assertTrue("wrong default", java.util.Arrays.compare(searchedFields, searchableFields) == 0);
+		theStage.setSearchFields(searchableFields);
+		searchedFields = theStage.getSearchFields();
+		assertTrue("wrong set to full set", java.util.Arrays.compare(searchedFields, searchableFields) == 0);
+		searchableFields = new int[] {2};
+		theStage.setSearchFields(searchableFields);
+		searchedFields = theStage.getSearchFields();
+		assertTrue("wrong set to single", java.util.Arrays.compare(searchedFields, searchableFields) == 0);
+	}
+
+	public void testKeywordFilter() throws DatabaseException, IOException {
+		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI(KEYWORD_DATABASE4_XML);
+		FilterChooser<DatabaseRecord>.KeywordFilterStage theStage = (KeywordFilterStage) theChooser.filterList.get(0);
+		theStage.setKeywords(new String[] {"k1"});
+		RecordFilter<DatabaseRecord> theFilter = theStage.getFilter();
+		RecordStreamFilter<DatabaseRecord> filt = new RecordStreamFilter<DatabaseRecord>(theFilter);
+		Stream<DatabaseRecord> filteredStream = filt.processStream(theDb.getRecords().asStream());
+		List<DatabaseRecord> result = filteredStream.collect(Collectors.toList());
+		ArrayList<Integer> foo = result.stream().map(r -> r.getRecordId()).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+		Integer[] actualIds = foo.toArray(new Integer[foo.size()]);
+		Integer[] expectedIds = new Integer[] {1, 4};
+		assertTrue("Wrong records retiurned", Arrays.compare(expectedIds, actualIds) == 0);
 	}
 
 	private FilterChooser<DatabaseRecord> createAndShowGUI() throws DatabaseException, IOException {
-		GenericDatabase<DatabaseRecord> theDb = rebuildAndOpenDatabase(getName()).getDatabase();
+		return createAndShowGUI(KEYWORD_DATABASE1_XML);
+	}
+	
+	private FilterChooser<DatabaseRecord> createAndShowGUI(String databaseFileName) throws DatabaseException, IOException {
+		theDb = rebuildAndOpenDatabase(getName(), databaseFileName).getDatabase();
 		FilterChooser<DatabaseRecord> theChooser = new FilterChooser<DatabaseRecord>(theDb);
 		theChooser.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		return theChooser;
 	}
 
-	private TestGUI rebuildAndOpenDatabase(String testName) throws IOException,
+	private TestGUI rebuildAndOpenDatabase(String testName, String databaseFileName) throws IOException,
 	DatabaseException {
-		String databaseFileName = KEYWORD_DATABASE1_XML;
+		;
 		if (null == testName) testName = "workdir";
 		return Utilities.rebuildAndOpenDatabase(testName, workingDirectory, databaseFileName);
 	}
