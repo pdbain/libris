@@ -1,8 +1,10 @@
 package org.lasalledebain.libris.ui;
 
+import static org.lasalledebain.libris.Field.FieldType.T_FIELD_ENUM;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_PAIR;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_STRING;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_TEXT;
+import static java.util.Objects.isNull;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -15,6 +17,7 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -25,10 +28,18 @@ import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.lasalledebain.libris.Field.FieldType;
+import org.lasalledebain.libris.field.FieldEnumValue;
+import org.lasalledebain.libris.EnumFieldChoices;
+import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
+import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.search.EnumFilter;
 import org.lasalledebain.libris.search.RecordFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.search.RecordFilter.SEARCH_TYPE;
@@ -37,13 +48,47 @@ import org.lasalledebain.libris.util.StringUtils;
 
 @SuppressWarnings("serial")
 public class FilterChooser<RecType extends Record> extends JFrame {
+	public class BooleanFilterControlPanel extends FilterControlPanel {
+JRadioButton fieldTrue, fieldFalse;
+		@Override
+		void addTitle() {
+			addTitle("Boolean field search");
+		}
+
+		@Override
+		void addControls() {
+			EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_ENUM);
+
+			Schema dbSchema = myDatabase.getSchema();
+			FieldChooser fChooser = new FieldChooser(dbSchema, searchFieldTypes, false, "Search fields", null);
+			add(fChooser);
+			ButtonGroup buttonState = new ButtonGroup();
+			
+		}
+
+		@Override
+		public RecordFilter<RecType> getFilter() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		SEARCH_TYPE getSearchType() {
+			return SEARCH_TYPE.T_SEARCH_BOOLEAN;
+		}
+	}
+
+
+
 	static final EnumSet<FieldType> keywordSearchFieldTypes = EnumSet.of(T_FIELD_STRING, T_FIELD_TEXT, T_FIELD_PAIR);
-	protected List<FilterStage> filterList;
-	GenericDatabase<RecType> db;
+	protected List<FilterControlPanel> filterList;
+	final GenericDatabase<RecType> myDatabase;
 	final private JButton doneButton, cancelButton;
 	private final JPanel dialoguePanel, filterPanel;
+	final Schema mySchema;
 	public FilterChooser(GenericDatabase<RecType> theDatabase) {
-		db = theDatabase;
+		myDatabase = theDatabase;
+		mySchema = theDatabase.getSchema();
 		dialoguePanel = new JPanel(new BorderLayout());
 		filterPanel = new JPanel();
 		filterList = new ArrayList<>();
@@ -56,7 +101,7 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 
 		filterPanel.setLayout(new BoxLayout(filterPanel,BoxLayout.Y_AXIS));
 		filterPanel.setOpaque(true);
-		addStage();
+		addStage(new DefaultFilterControlPanel());
 
 		dialoguePanel.add(filterPanel, BorderLayout.CENTER);
 
@@ -73,22 +118,50 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 		setVisible(true);
 	}
 
-	private void addStage() {
-		addStage(new DefaultFilterStage());
+	void addStage() {
+		addStage(new DefaultFilterControlPanel());
 	}
 
-	private void addStage(FilterStage stage) {
+	private void addStage(SEARCH_TYPE theType) {
+		FilterControlPanel theStage;
+		if (isNull(theType)) {
+			theStage = new DefaultFilterControlPanel();
+		} else switch (theType) {
+		case T_SEARCH_KEYWORD: theStage = new KeywordFilterControlPanel();
+		case T_SEARCH_ENUM: theStage = new EnumerationFilterControlPanel();
+		default: theStage = new DefaultFilterControlPanel();
+		}
+		addStage(theStage);
+	}
+
+	private void addStage(FilterControlPanel stage) {
 		filterPanel.add(stage);
 		filterList.add(stage);
 		pack();
 	}
 
-	private void removeStage(FilterStage victim) {
+	private void removeStage(FilterControlPanel victim) {
 		if (filterList.size() > 1) {
 			filterList.remove(victim);
 			filterPanel.remove(victim);
 		}
 		disableFirstRemove();
+		pack();
+	}
+
+	private void replaceStage(FilterControlPanel victim, SEARCH_TYPE newType) {
+		FilterControlPanel theStage;
+		if (isNull(newType)) {
+			theStage = new DefaultFilterControlPanel();
+		} else switch (newType) {
+		case T_SEARCH_KEYWORD: theStage = new KeywordFilterControlPanel(); break;
+		case T_SEARCH_ENUM: theStage = new EnumerationFilterControlPanel(); break;
+		default: theStage = new DefaultFilterControlPanel();
+		}
+		int pos = filterList.indexOf(victim);
+		filterList.set(pos, theStage);
+		filterPanel.remove(pos);
+		filterPanel.add(theStage, pos);
 		pack();
 	}
 
@@ -108,16 +181,21 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 		return true;
 	}
 
-	protected abstract class FilterStage extends JPanel {
+	protected abstract class FilterControlPanel extends JPanel {
 		private final JButton addButton, removeButton;
 		private final JComboBox<SEARCH_TYPE> searchTypeChooser;
+		public JComboBox<SEARCH_TYPE> getSearchTypeChooser() {
+			return searchTypeChooser;
+		}
 		abstract void addTitle();
 		abstract void addControls();
-		public FilterStage() {
+		abstract SEARCH_TYPE getSearchType();
+		public FilterControlPanel() {
 			setLayout(new FlowLayout());
 			addControls();
 
 			searchTypeChooser = new JComboBox<>(SEARCH_TYPE.values());
+			searchTypeChooser.setEditable(false);
 			JSeparator sep = new JSeparator(JSeparator.VERTICAL);
 			add(sep);
 			Dimension d = sep.getPreferredSize();
@@ -126,21 +204,29 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 			add(searchTypeChooser);
 			addButton = new JButton("+");
 			removeButton = new JButton("-");
-			addButton.addActionListener(e -> addStage());
+			addButton.addActionListener(e -> {
+				addStage();
+			});
 			removeButton.addActionListener(e -> removeStage(this));
 			add(addButton);
 			add(removeButton);
 			addTitle();
+			searchTypeChooser.setSelectedItem(getSearchType());
+			searchTypeChooser.addActionListener(e -> replaceStage(this, searchTypeChooser.getItemAt(searchTypeChooser.getSelectedIndex())));
 		}
 
-		void enableRemove(boolean enabled) {
+		 void enableRemove(boolean enabled) {
 			removeButton.setEnabled(enabled);
 		}
 
 		public abstract RecordFilter<RecType> getFilter();
+		protected void addTitle(String title) {
+			Border myBorder = BorderFactory.createTitledBorder(title);
+			setBorder(myBorder);
+		}
 	}
 
-	class KeywordFilterStage extends FilterStage {
+	class KeywordFilterControlPanel extends FilterControlPanel {
 		private JTextField keywords;
 		private boolean caseSensitive;
 		JRadioButton prefixButton;
@@ -149,12 +235,12 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 		JRadioButton containsButton;
 		FieldChooser fldChooser;
 		JCheckBox caseSensitiveCheckBox;
-		
-		KeywordFilterStage(TextFilter<RecType> theFilter) {
+
+		KeywordFilterControlPanel(TextFilter<RecType> theFilter) {
 			setCaseSensitive(theFilter.isCaseSensitive());
 		}
-		
-		KeywordFilterStage()
+
+		KeywordFilterControlPanel()
 		{
 			return;
 		}
@@ -167,8 +253,8 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 		}
 		@Override
 		void addTitle() {
-			Border myBorder = BorderFactory.createTitledBorder("Keyword search");
-			setBorder(myBorder);
+			String title = "Keyword search";
+			addTitle(title);
 		}
 
 		@Override
@@ -176,7 +262,7 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 			add(new JLabel("Keywords"));
 			keywords = new JTextField(30);
 			add(keywords);
-			fldChooser = new FieldChooser(db.getSchema(), keywordSearchFieldTypes, "Search fields");
+			fldChooser = new FieldChooser(mySchema, keywordSearchFieldTypes, "Search fields");
 			add(fldChooser);
 			caseSensitiveCheckBox = new JCheckBox();
 			add(new JLabel("Case sensitive"));
@@ -202,7 +288,7 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 			buttonBar.add(wholeWordButton);
 			add(buttonBar);
 		}
-		
+
 		int[] getSearchFields() {
 			return fldChooser.getFieldNums();
 		}
@@ -234,9 +320,87 @@ public class FilterChooser<RecType extends Record> extends JFrame {
 			return theFilter;
 		}
 
+		@Override
+		SEARCH_TYPE getSearchType() {
+			return SEARCH_TYPE.T_SEARCH_KEYWORD;
+		}
+
 	}
 
-	protected class DefaultFilterStage extends KeywordFilterStage {
+	class EnumerationFilterControlPanel extends FilterControlPanel {
+		private int searchField;
+		JComboBox<FieldEnumValue> valueList;
+		JCheckBox includeDefault;
+		private EnumFieldChoices valueChoices;
+		FieldChooser fChooser;
+
+		@Override
+		void addTitle() {
+			addTitle("Multiple choice search");
+		}
+
+		@Override
+		void addControls() {
+
+			EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_ENUM);
+			valueList = new JComboBox<>();
+
+			fChooser = new FieldChooser(mySchema, searchFieldTypes, false, "Search fields", null);
+			add(fChooser);
+			fChooser.addListSelectionListener​(new ListSelectionListener() {
+
+				@Override
+				public void valueChanged(ListSelectionEvent e) {
+					setChoices(fChooser);
+				}
+			});
+			fChooser.setSelectedIndex(0);
+			setChoices(fChooser);
+			add(valueList);
+			includeDefault = new JCheckBox("Include default/inherited value");
+			includeDefault.setSelected(true);
+			add(includeDefault);
+		}
+
+		FieldEnumValue getValueChoice() throws FieldDataException {
+			return valueChoices.getChoice(valueList.getSelectedIndex());
+		}
+		
+		void setValueChoice(String choiceId) throws FieldDataException {
+			valueList.setSelectedIndex(valueChoices.indexFromId(choiceId));
+		}
+		
+		void setValueChoice(int index) {
+			valueList.setSelectedIndex(index);
+		}
+		
+		@Override
+		public RecordFilter<RecType> getFilter() {
+			EnumFilter<RecType> theFilter = 
+					new EnumFilter<>(searchField, valueList.getItemAt(valueList.getSelectedIndex()), includeDefault.isSelected());
+			return theFilter;
+		}
+
+		@Override
+		SEARCH_TYPE getSearchType() {
+			return SEARCH_TYPE.T_SEARCH_ENUM;
+		}
+
+		protected void setChoices(FieldChooser fChooser) {
+			searchField = fChooser.getFieldNum();
+			valueList.removeAllItems();
+			if (searchField >= 0 ) {
+				FieldTemplate ft = mySchema.getFieldTemplate(searchField);
+				valueChoices = ft.getEnumChoices();
+				List<FieldEnumValue> lv = valueChoices.getLegalEnumValues();
+				valueList.setModel(new DefaultComboBoxModel<FieldEnumValue>(lv.toArray(new FieldEnumValue[lv.size()])));
+			}
+		}
+	}
+	
+	
+
+	protected class DefaultFilterControlPanel extends KeywordFilterControlPanel {
 
 	}
 }

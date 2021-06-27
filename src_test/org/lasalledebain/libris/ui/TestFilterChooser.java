@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.swing.JComboBox;
 import javax.swing.WindowConstants;
 
 import org.junit.Test;
@@ -22,7 +23,9 @@ import org.lasalledebain.libris.exception.DatabaseException;
 import org.lasalledebain.libris.records.RecordStreamFilter;
 import org.lasalledebain.libris.search.RecordFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
-import org.lasalledebain.libris.ui.FilterChooser.KeywordFilterStage;
+import org.lasalledebain.libris.search.RecordFilter.SEARCH_TYPE;
+import org.lasalledebain.libris.ui.FilterChooser.EnumerationFilterControlPanel;
+import org.lasalledebain.libris.ui.FilterChooser.KeywordFilterControlPanel;
 import org.lasalledebain.libris.util.Utilities;
 
 import junit.framework.TestCase;
@@ -46,7 +49,7 @@ public class TestFilterChooser extends TestCase {
 	@Test
 	public void testKeywordControls() throws DatabaseException, IOException {
 		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI();
-		FilterChooser.KeywordFilterStage firstStage = (KeywordFilterStage) theChooser.filterList.get(0);
+		FilterChooser.KeywordFilterControlPanel firstStage = (KeywordFilterControlPanel) theChooser.filterList.get(0);
 		assertFalse("Wrong default for caseSensitive", firstStage.isCaseSensitive());
 		Utilities.pause();
 		firstStage.caseSensitiveCheckBox.doClick();
@@ -82,7 +85,7 @@ public class TestFilterChooser extends TestCase {
 	@Test
 	public void testSelectFields() throws DatabaseException, IOException {
 		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI();
-		FilterChooser.KeywordFilterStage theStage = (KeywordFilterStage) theChooser.filterList.get(0);
+		FilterChooser.KeywordFilterControlPanel theStage = (KeywordFilterControlPanel) theChooser.filterList.get(0);
 		int[] searchableFields = new int[] {1, 2, 4};
 		int[] searchedFields = theStage.getSearchFields();
 		assertTrue("wrong default", java.util.Arrays.compare(searchedFields, searchableFields) == 0);
@@ -97,16 +100,36 @@ public class TestFilterChooser extends TestCase {
 
 	public void testKeywordFilter() throws DatabaseException, IOException {
 		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI(KEYWORD_DATABASE4_XML);
-		FilterChooser<DatabaseRecord>.KeywordFilterStage theStage = (KeywordFilterStage) theChooser.filterList.get(0);
+		FilterChooser<DatabaseRecord>.KeywordFilterControlPanel theStage = (KeywordFilterControlPanel) theChooser.filterList.get(0);
 		theStage.setKeywords(new String[] {"k1"});
+		Integer[] actualIds = doFiltering(theStage);
+		Integer[] expectedIds = new Integer[] {1, 4};
+		assertTrue("Wrong records returned", Arrays.compare(expectedIds, actualIds) == 0);
+	}
+
+	protected Integer[] doFiltering(FilterChooser<DatabaseRecord>.FilterControlPanel theStage) {
 		RecordFilter<DatabaseRecord> theFilter = theStage.getFilter();
 		RecordStreamFilter<DatabaseRecord> filt = new RecordStreamFilter<DatabaseRecord>(theFilter);
 		Stream<DatabaseRecord> filteredStream = filt.processStream(theDb.getRecords().asStream());
 		List<DatabaseRecord> result = filteredStream.collect(Collectors.toList());
 		ArrayList<Integer> foo = result.stream().map(r -> r.getRecordId()).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
 		Integer[] actualIds = foo.toArray(new Integer[foo.size()]);
-		Integer[] expectedIds = new Integer[] {1, 4};
-		assertTrue("Wrong records retiurned", Arrays.compare(expectedIds, actualIds) == 0);
+		return actualIds;
+	}
+	
+	public void testEnumFilter() throws DatabaseException, IOException {
+		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML);
+		FilterChooser<DatabaseRecord>.FilterControlPanel theStage = theChooser.filterList.get(0);
+		JComboBox<SEARCH_TYPE> c = theStage.getSearchTypeChooser();
+		c.setSelectedIndex(1);
+		@SuppressWarnings("unchecked")
+		FilterChooser<DatabaseRecord>.EnumerationFilterControlPanel ec 
+		= (FilterChooser<DatabaseRecord>.EnumerationFilterControlPanel) theChooser.filterList.get(0);
+		ec.fChooser.setSelectedIndex(1);
+		ec.setValueChoice(1);
+		Integer[] actualIds = doFiltering(ec);
+		Integer[] expectedIds = new Integer[] {3, 4};
+		assertTrue("Wrong records returned", Arrays.compare(expectedIds, actualIds) == 0);
 	}
 
 	private FilterChooser<DatabaseRecord> createAndShowGUI() throws DatabaseException, IOException {
@@ -135,9 +158,9 @@ public class TestFilterChooser extends TestCase {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					String dbName = System.getProperty("test.database.name", "KeywordDatabase4.xml");
 					testObject.setUp();
-					testObject.createAndShowGUI();
-					testObject.tearDown();
+					testObject.createAndShowGUI(dbName);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

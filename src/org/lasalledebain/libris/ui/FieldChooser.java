@@ -17,7 +17,6 @@ import javax.swing.event.ListSelectionListener;
 import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.Schema;
-import org.lasalledebain.libris.exception.DatabaseError;
 
 @SuppressWarnings("serial")
 public class FieldChooser extends JPanel {
@@ -132,12 +131,11 @@ public class FieldChooser extends JPanel {
 	}
 	public int getFieldNum() {
 		int selectedField = fieldList.getSelectedIndex();
-		return selectedField;
+		FieldInfo fi = searchFieldList.get(selectedField);
+		return fi.fieldNum;
 	}
 	public void setSelectedIndex(int index) {
-		if (index <= fieldList.getMaxSelectionIndex()) {
 			fieldList.setSelectedIndex(index);
-		}
 	}
 	public void setSelectedFields(int[] fieldIds) {
 		int[] indices = new int[fieldIds.length];
