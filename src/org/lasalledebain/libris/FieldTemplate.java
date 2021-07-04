@@ -23,6 +23,8 @@ import org.lasalledebain.libris.xmlUtils.ElementWriter;
 import org.lasalledebain.libris.xmlUtils.LibrisAttributes;
 import org.lasalledebain.libris.xmlUtils.LibrisXMLConstants;
 
+import static org.lasalledebain.libris.Field.FieldType.T_FIELD_ENUM;
+
 
 /* Create one instance for each of the field types.  Instances of the inner classes represents field instances in 
  * record instances.
@@ -254,6 +256,10 @@ public class FieldTemplate implements XMLElement {
 	
 	public boolean isContentField() {
 		return true;
+	}
+	
+	public boolean isEnumField() {
+		return T_FIELD_ENUM == ftype;
 	}
 
 	@Override

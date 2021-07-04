@@ -100,7 +100,11 @@ public class TestFilterChooser extends TestCase {
 
 	public void testKeywordFilter() throws DatabaseException, IOException {
 		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI(KEYWORD_DATABASE4_XML);
-		FilterChooser<DatabaseRecord>.KeywordFilterControlPanel theStage = (KeywordFilterControlPanel) theChooser.filterList.get(0);
+		@SuppressWarnings("unchecked")
+		FilterChooser<DatabaseRecord>.KeywordFilterControlPanel theStage = 
+		(FilterChooser<DatabaseRecord>.KeywordFilterControlPanel) theChooser.filterList.get(0);
+		JComboBox<SEARCH_TYPE> c = theStage.getSearchTypeChooser();
+		c.setSelectedIndex(SEARCH_TYPE.T_SEARCH_KEYWORD.ordinal());
 		theStage.setKeywords(new String[] {"k1"});
 		Integer[] actualIds = doFiltering(theStage);
 		Integer[] expectedIds = new Integer[] {1, 4};
@@ -116,26 +120,83 @@ public class TestFilterChooser extends TestCase {
 		Integer[] actualIds = foo.toArray(new Integer[foo.size()]);
 		return actualIds;
 	}
-	
+
 	public void testEnumFilter() throws DatabaseException, IOException {
 		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML);
 		FilterChooser<DatabaseRecord>.FilterControlPanel theStage = theChooser.filterList.get(0);
 		JComboBox<SEARCH_TYPE> c = theStage.getSearchTypeChooser();
-		c.setSelectedIndex(1);
+		c.setSelectedIndex(SEARCH_TYPE.T_SEARCH_ENUM.ordinal());
 		@SuppressWarnings("unchecked")
 		FilterChooser<DatabaseRecord>.EnumerationFilterControlPanel ec 
 		= (FilterChooser<DatabaseRecord>.EnumerationFilterControlPanel) theChooser.filterList.get(0);
-		ec.fChooser.setSelectedIndex(1);
+		ec.fldChooser.setSelectedIndex(1);
 		ec.setValueChoice(1);
-		Integer[] actualIds = doFiltering(ec);
-		Integer[] expectedIds = new Integer[] {3, 4};
-		assertTrue("Wrong records returned", Arrays.compare(expectedIds, actualIds) == 0);
+		assertTrue("Wrong default value for inherit default", ec.includeDefault.isSelected());
+		checkFilter(ec, new Integer[] {3, 4}, "Wrong records returned");
+
+		ec.includeDefault.setSelected(false);
+		checkFilter(ec, new Integer[] {3}, "Wrong records returned without defaults");
+	}
+
+	public void testBooleanFilter() throws DatabaseException, IOException {
+		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML);
+		FilterChooser<DatabaseRecord>.FilterControlPanel theStage = theChooser.filterList.get(0);
+		JComboBox<SEARCH_TYPE> c = theStage.getSearchTypeChooser();
+		c.setSelectedIndex(SEARCH_TYPE.T_SEARCH_BOOLEAN.ordinal());
+		@SuppressWarnings("unchecked")
+		FilterChooser<DatabaseRecord>.BooleanFilterControlPanel bc 
+		= (FilterChooser<DatabaseRecord>.BooleanFilterControlPanel) theChooser.filterList.get(0);
+		bc.fldChooser.setSelectedIndex(1);
+		assertTrue("Wrong default value for inherit default", bc.includeDefault.isSelected());
+		checkFilter(bc, new Integer[] {1, 2, 3, 4, 5}, "Wrong records returned");
+		bc.fieldFalse.doClick();
+		checkFilter(bc, new Integer[] {6}, "Wrong records returned false value with defaults");
+		bc.fieldTrue.doClick();
+		bc.includeDefault.setSelected(false);
+		checkFilter(bc, new Integer[] {3}, "Wrong records returned without defaults");		
+
+		bc.fieldFalse.doClick();
+		checkFilter(bc, new Integer[] {6}, "Wrong records returned false value without defaults");
+	}
+
+	protected void checkFilter(FilterChooser<DatabaseRecord>.FilterControlPanel theFilter, Integer[] expectedIds,
+			String msg) {
+		Integer[] actualIds = doFiltering(theFilter);
+		assertTrue(msg, Arrays.compare(expectedIds, actualIds) == 0);
+	}
+
+	public void testNameFilter() throws DatabaseException, IOException {
+		FilterChooser<DatabaseRecord> theChooser = createAndShowGUI(Utilities.DATABASE_WITH_GROUPS_AND_RECORDS_XML);
+		FilterChooser<DatabaseRecord>.FilterControlPanel theStage = theChooser.filterList.get(0);
+		JComboBox<SEARCH_TYPE> c = theStage.getSearchTypeChooser();
+		c.setSelectedIndex(SEARCH_TYPE.T_SEARCH_RECORD_NAME.ordinal());
+		FilterChooser<DatabaseRecord>.RecordNameFilterControlPanel cp 
+		= (FilterChooser<DatabaseRecord>.RecordNameFilterControlPanel) theChooser.filterList.get(0);
+		cp.nameField.setText("ieee");
+		checkFilter(cp, new Integer[] {1,2,3,4}, "Default settings");
+		
+		cp.caseSensitiveButton.doClick();
+		cp.nameField.setText("acm");
+		checkFilter(cp, new Integer [0], "Wrong case");
+		
+		cp.nameField.setText("ACM");
+		checkFilter(cp, new Integer [] {5, 6}, "Correct case");
+		
+		cp.nameField.setText("IEEE_micro");
+		cp.exactButton.doClick();
+		checkFilter(cp, new Integer[] {2}, "Exact match");
+		
+		cp.nameField.setText("Computer");
+		cp.containsButton.doClick();
+		cp.caseSensitiveButton.doClick();
+		checkFilter(cp, new Integer[] {3,4}, "Exact match");
+		
 	}
 
 	private FilterChooser<DatabaseRecord> createAndShowGUI() throws DatabaseException, IOException {
 		return createAndShowGUI(KEYWORD_DATABASE1_XML);
 	}
-	
+
 	private FilterChooser<DatabaseRecord> createAndShowGUI(String databaseFileName) throws DatabaseException, IOException {
 		theDb = rebuildAndOpenDatabase(getName(), databaseFileName).getDatabase();
 		FilterChooser<DatabaseRecord> theChooser = new FilterChooser<DatabaseRecord>(theDb);

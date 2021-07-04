@@ -131,11 +131,15 @@ public class FieldChooser extends JPanel {
 	}
 	public int getFieldNum() {
 		int selectedField = fieldList.getSelectedIndex();
-		FieldInfo fi = searchFieldList.get(selectedField);
-		return fi.fieldNum;
+		if (selectedField > 0) {
+			FieldInfo fi = searchFieldList.get(selectedField);
+			return fi.fieldNum;
+		} else {
+			return -1;
+		}
 	}
 	public void setSelectedIndex(int index) {
-			fieldList.setSelectedIndex(index);
+		fieldList.setSelectedIndex(index);
 	}
 	public void setSelectedFields(int[] fieldIds) {
 		int[] indices = new int[fieldIds.length];

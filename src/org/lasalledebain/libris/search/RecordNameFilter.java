@@ -1,6 +1,7 @@
 package org.lasalledebain.libris.search;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.lasalledebain.libris.Record;
@@ -16,9 +17,12 @@ public class RecordNameFilter<T extends Record> implements RecordFilter<T> {
 		return SEARCH_TYPE.T_SEARCH_RECORD_NAME;
 	}
 
+	@Deprecated
 	private List<String> terms;
+	@Deprecated
 	private RecordKeywords recWords;
 
+	@Deprecated
 	public RecordNameFilter(MATCH_TYPE theMatchType, boolean caseSensitive, String searchTerms[]) {
 		switch (theMatchType) {
 		case MATCH_EXACT:
@@ -32,6 +36,21 @@ public class RecordNameFilter<T extends Record> implements RecordFilter<T> {
 			break;
 		}
 		terms = Arrays.asList(searchTerms);
+	}
+
+	public RecordNameFilter(MATCH_TYPE theMatchType, boolean caseSensitive, String theName) {
+		switch (theMatchType) {
+		case MATCH_EXACT:
+			recWords = new ExactKeywordList(caseSensitive);
+			break;
+		case MATCH_PREFIX:
+			recWords = new PrefixKeywords(caseSensitive);
+			break;
+		case MATCH_CONTAINS:
+			recWords = new ContainsKeywords(caseSensitive);
+			break;
+		}
+		terms = Collections.singletonList(theName);
 	}
 
 	public boolean matches(Record rec) {

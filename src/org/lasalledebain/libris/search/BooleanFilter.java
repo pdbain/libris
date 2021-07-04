@@ -13,12 +13,12 @@ public class BooleanFilter<T extends Record> extends GenericFilter<T> {
 	protected final boolean myValue;
 	public BooleanFilter(int fieldId, boolean theValue, boolean incDefault) {
 		super(incDefault, new int[] {fieldId});
-		this.myValue = theValue;
+		myValue = theValue;
 	}
 
 	public BooleanFilter(int fieldIds[], boolean theValue, boolean incDefault) {
 		super(incDefault,fieldIds);
-		this.myValue = theValue;
+		myValue = theValue;
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class BooleanFilter<T extends Record> extends GenericFilter<T> {
 				.anyMatch(fieldNum -> {
 					try {
 						final Field fld = rec.getField(fieldNum, doIncludeDefault);
-						return (null != fld) && (fld.isTrue());
+						return (null != fld) && (fld.isTrue() == myValue);
 					} catch (InputException e) {
 						throw new DatabaseError("Illegal field "+fieldNum);
 					} 

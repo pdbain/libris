@@ -1,10 +1,11 @@
 package org.lasalledebain.libris.ui;
 
+import static java.util.Objects.isNull;
+import static org.lasalledebain.libris.Field.FieldType.T_FIELD_BOOLEAN;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_ENUM;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_PAIR;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_STRING;
 import static org.lasalledebain.libris.Field.FieldType.T_FIELD_TEXT;
-import static java.util.Objects.isNull;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -31,55 +32,26 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import org.lasalledebain.libris.Field.FieldType;
-import org.lasalledebain.libris.field.FieldEnumValue;
 import org.lasalledebain.libris.EnumFieldChoices;
+import org.lasalledebain.libris.Field.FieldType;
 import org.lasalledebain.libris.FieldTemplate;
 import org.lasalledebain.libris.GenericDatabase;
 import org.lasalledebain.libris.Record;
 import org.lasalledebain.libris.Schema;
+import org.lasalledebain.libris.exception.Assertion;
 import org.lasalledebain.libris.exception.FieldDataException;
+import org.lasalledebain.libris.field.FieldEnumValue;
+import org.lasalledebain.libris.search.BooleanFilter;
 import org.lasalledebain.libris.search.EnumFilter;
 import org.lasalledebain.libris.search.RecordFilter;
 import org.lasalledebain.libris.search.RecordFilter.MATCH_TYPE;
 import org.lasalledebain.libris.search.RecordFilter.SEARCH_TYPE;
+import org.lasalledebain.libris.search.RecordNameFilter;
 import org.lasalledebain.libris.search.TextFilter;
 import org.lasalledebain.libris.util.StringUtils;
 
 @SuppressWarnings("serial")
 public class FilterChooser<RecType extends Record> extends JFrame {
-	public class BooleanFilterControlPanel extends FilterControlPanel {
-JRadioButton fieldTrue, fieldFalse;
-		@Override
-		void addTitle() {
-			addTitle("Boolean field search");
-		}
-
-		@Override
-		void addControls() {
-			EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_ENUM);
-
-			Schema dbSchema = myDatabase.getSchema();
-			FieldChooser fChooser = new FieldChooser(dbSchema, searchFieldTypes, false, "Search fields", null);
-			add(fChooser);
-			ButtonGroup buttonState = new ButtonGroup();
-			
-		}
-
-		@Override
-		public RecordFilter<RecType> getFilter() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		SEARCH_TYPE getSearchType() {
-			return SEARCH_TYPE.T_SEARCH_BOOLEAN;
-		}
-	}
-
-
-
 	static final EnumSet<FieldType> keywordSearchFieldTypes = EnumSet.of(T_FIELD_STRING, T_FIELD_TEXT, T_FIELD_PAIR);
 	protected List<FilterControlPanel> filterList;
 	final GenericDatabase<RecType> myDatabase;
@@ -122,16 +94,18 @@ JRadioButton fieldTrue, fieldFalse;
 		addStage(new DefaultFilterControlPanel());
 	}
 
-	private void addStage(SEARCH_TYPE theType) {
+	protected FilterControlPanel makeStage(SEARCH_TYPE theType) {
 		FilterControlPanel theStage;
 		if (isNull(theType)) {
 			theStage = new DefaultFilterControlPanel();
 		} else switch (theType) {
-		case T_SEARCH_KEYWORD: theStage = new KeywordFilterControlPanel();
-		case T_SEARCH_ENUM: theStage = new EnumerationFilterControlPanel();
+		case T_SEARCH_KEYWORD: theStage = new KeywordFilterControlPanel(); break;
+		case T_SEARCH_ENUM: theStage = new EnumerationFilterControlPanel(); break;
+		case T_SEARCH_BOOLEAN: theStage = new BooleanFilterControlPanel(); break;
+		case T_SEARCH_RECORD_NAME: theStage = new RecordNameFilterControlPanel(); break;
 		default: theStage = new DefaultFilterControlPanel();
 		}
-		addStage(theStage);
+		return theStage;
 	}
 
 	private void addStage(FilterControlPanel stage) {
@@ -151,13 +125,7 @@ JRadioButton fieldTrue, fieldFalse;
 
 	private void replaceStage(FilterControlPanel victim, SEARCH_TYPE newType) {
 		FilterControlPanel theStage;
-		if (isNull(newType)) {
-			theStage = new DefaultFilterControlPanel();
-		} else switch (newType) {
-		case T_SEARCH_KEYWORD: theStage = new KeywordFilterControlPanel(); break;
-		case T_SEARCH_ENUM: theStage = new EnumerationFilterControlPanel(); break;
-		default: theStage = new DefaultFilterControlPanel();
-		}
+		theStage = makeStage(newType);
 		int pos = filterList.indexOf(victim);
 		filterList.set(pos, theStage);
 		filterPanel.remove(pos);
@@ -215,7 +183,7 @@ JRadioButton fieldTrue, fieldFalse;
 			searchTypeChooser.addActionListener(e -> replaceStage(this, searchTypeChooser.getItemAt(searchTypeChooser.getSelectedIndex())));
 		}
 
-		 void enableRemove(boolean enabled) {
+		void enableRemove(boolean enabled) {
 			removeButton.setEnabled(enabled);
 		}
 
@@ -226,14 +194,121 @@ JRadioButton fieldTrue, fieldFalse;
 		}
 	}
 
-	class KeywordFilterControlPanel extends FilterControlPanel {
+	public class RecordNameFilterControlPanel extends FilterControlPanel {
+
+		MATCH_TYPE myMatchType;
+		JTextField nameField;
+		JCheckBox caseSensitiveButton;
+		JRadioButton prefixButton;
+		JRadioButton exactButton;
+		JRadioButton containsButton;
+
+		@Override
+		void addTitle() {
+			addTitle("Record name search");
+		}
+
+		@Override
+		void addControls() {
+			nameField = new JTextField();
+			add(new JLabel("Record name"));
+			add(nameField);
+			ButtonGroup matchGroup = new ButtonGroup();
+			prefixButton = new JRadioButton("Starts with");
+			exactButton = new JRadioButton("Exact match");
+			containsButton = new JRadioButton("Contains");
+			containsButton.addActionListener(e -> myMatchType = MATCH_TYPE.MATCH_CONTAINS);
+			exactButton.addActionListener(e -> myMatchType = MATCH_TYPE.MATCH_EXACT);
+			prefixButton.addActionListener(e -> myMatchType = MATCH_TYPE.MATCH_PREFIX);			
+			add(prefixButton);
+			matchGroup.add(prefixButton);
+			matchGroup.add(containsButton);
+			add(containsButton);
+			matchGroup.add(exactButton);
+			add(exactButton);
+			prefixButton.doClick();
+			caseSensitiveButton = new JCheckBox("Case sensitive");
+		}
+
+		@Override
+		SEARCH_TYPE getSearchType() {
+			return SEARCH_TYPE.T_SEARCH_RECORD_NAME;
+		}
+
+		@Override
+		public RecordFilter<RecType> getFilter() {
+			String nameText = nameField.getText().trim();
+			return new RecordNameFilter<RecType>(myMatchType, caseSensitiveButton.isSelected(), nameText);
+		}
+
+	}
+
+	abstract class FieldFilterControlPanel extends FilterControlPanel {
+		FieldChooser fldChooser;
+		protected int searchField;
+
+		void addFieldChooser(EnumSet<FieldType> searchFieldTypes) {
+			fldChooser = new FieldChooser(mySchema, searchFieldTypes, "Search fields");
+			add(fldChooser);
+			fldChooser.addListSelectionListener​(
+					e -> searchField = 
+					fldChooser.getFieldNum()
+					);
+		}
+
+	}
+
+	public class BooleanFilterControlPanel extends FieldFilterControlPanel {
+		JRadioButton fieldTrue, fieldFalse;
+		JCheckBox includeDefault;
+		@Override
+		void addTitle() {
+			addTitle("Boolean field search");
+		}
+
+		@Override
+		void addControls() {
+			EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_BOOLEAN);
+
+			addFieldChooser(searchFieldTypes);
+			ButtonGroup buttonState = new ButtonGroup();
+			fieldTrue = new JRadioButton("True", true);
+			fieldFalse = new JRadioButton("False");
+			buttonState.add(fieldTrue);
+			buttonState.add(fieldFalse);
+			add(fieldTrue);
+			add(fieldFalse);
+			includeDefault = new JCheckBox("Include default/inherited value", true);
+			add(includeDefault);
+
+		}
+
+		boolean getValue() {
+			return fieldTrue.isSelected();
+		}
+
+		void setValue(boolean newValue) {
+			fieldFalse.setSelected(newValue);
+		}
+
+		@Override
+		public RecordFilter<RecType> getFilter() {
+			return  new BooleanFilter<>(fldChooser.getFieldNums(), getValue(), includeDefault.isSelected());
+		}
+
+		@Override
+		SEARCH_TYPE getSearchType() {
+			return SEARCH_TYPE.T_SEARCH_BOOLEAN;
+		}
+	}
+
+	class KeywordFilterControlPanel extends FieldFilterControlPanel {
 		private JTextField keywords;
 		private boolean caseSensitive;
 		JRadioButton prefixButton;
 		private MATCH_TYPE myMatchType;
 		JRadioButton wholeWordButton;
 		JRadioButton containsButton;
-		FieldChooser fldChooser;
 		JCheckBox caseSensitiveCheckBox;
 
 		KeywordFilterControlPanel(TextFilter<RecType> theFilter) {
@@ -259,11 +334,10 @@ JRadioButton fieldTrue, fieldFalse;
 
 		@Override
 		void addControls() {
+			addFieldChooser(keywordSearchFieldTypes);
 			add(new JLabel("Keywords"));
 			keywords = new JTextField(30);
 			add(keywords);
-			fldChooser = new FieldChooser(mySchema, keywordSearchFieldTypes, "Search fields");
-			add(fldChooser);
 			caseSensitiveCheckBox = new JCheckBox();
 			add(new JLabel("Case sensitive"));
 			caseSensitiveCheckBox.addItemListener(e -> caseSensitive = (e.getStateChange() == ItemEvent.SELECTED));
@@ -327,12 +401,10 @@ JRadioButton fieldTrue, fieldFalse;
 
 	}
 
-	class EnumerationFilterControlPanel extends FilterControlPanel {
-		private int searchField;
+	class EnumerationFilterControlPanel extends FieldFilterControlPanel {
 		JComboBox<FieldEnumValue> valueList;
 		JCheckBox includeDefault;
 		private EnumFieldChoices valueChoices;
-		FieldChooser fChooser;
 
 		@Override
 		void addTitle() {
@@ -345,35 +417,40 @@ JRadioButton fieldTrue, fieldFalse;
 			EnumSet<FieldType> searchFieldTypes = EnumSet.of(T_FIELD_ENUM);
 			valueList = new JComboBox<>();
 
-			fChooser = new FieldChooser(mySchema, searchFieldTypes, false, "Search fields", null);
-			add(fChooser);
-			fChooser.addListSelectionListener​(new ListSelectionListener() {
+			addFieldChooser(searchFieldTypes);
+			fldChooser.addListSelectionListener​(new ListSelectionListener() {
 
 				@Override
 				public void valueChanged(ListSelectionEvent e) {
-					setChoices(fChooser);
+					valueList.removeAllItems();
+					int theField = fldChooser.getFieldNum();
+					if (theField >= 0 ) {
+						FieldTemplate ft = mySchema.getFieldTemplate(theField);
+						Assertion.assertTrueError("Non-enum field", ft.isEnumField());
+						valueChoices = ft.getEnumChoices();
+						List<FieldEnumValue> lv = valueChoices.getLegalEnumValues();
+						valueList.setModel(new DefaultComboBoxModel<FieldEnumValue>(lv.toArray(new FieldEnumValue[lv.size()])));
+					}
 				}
 			});
-			fChooser.setSelectedIndex(0);
-			setChoices(fChooser);
+			fldChooser.setSelectedIndex(0);
 			add(valueList);
-			includeDefault = new JCheckBox("Include default/inherited value");
-			includeDefault.setSelected(true);
+			includeDefault = new JCheckBox("Include default/inherited value", true);
 			add(includeDefault);
 		}
 
 		FieldEnumValue getValueChoice() throws FieldDataException {
 			return valueChoices.getChoice(valueList.getSelectedIndex());
 		}
-		
+
 		void setValueChoice(String choiceId) throws FieldDataException {
 			valueList.setSelectedIndex(valueChoices.indexFromId(choiceId));
 		}
-		
+
 		void setValueChoice(int index) {
 			valueList.setSelectedIndex(index);
 		}
-		
+
 		@Override
 		public RecordFilter<RecType> getFilter() {
 			EnumFilter<RecType> theFilter = 
@@ -397,8 +474,8 @@ JRadioButton fieldTrue, fieldFalse;
 			}
 		}
 	}
-	
-	
+
+
 
 	protected class DefaultFilterControlPanel extends KeywordFilterControlPanel {
 
