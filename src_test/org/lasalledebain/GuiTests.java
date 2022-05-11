@@ -57,7 +57,7 @@ public class GuiTests extends TestCase {
 		}
 	}
 	public void testModifySaveRecord() throws FileNotFoundException, IOException, LibrisException {
-		try (LibrisDatabase db = Utilities.buildTestDatabase( workingDirectory, Utilities.TEST_DB1_XML_FILE)) {
+		LibrisDatabase db = Utilities.buildTestDatabase( workingDirectory, Utilities.TEST_DB1_XML_FILE);
 			String databaseFilePath = db.getDatabaseFile().getAbsolutePath();
 			assertTrue("Could not close database", db.closeDatabase(false));
 			AbstractUi ui = LibrisTestLauncher.testMain(new String[] {Libris.OPTION_GUI,  databaseFilePath});
@@ -74,11 +74,13 @@ public class GuiTests extends TestCase {
 			FieldSingleStringValue val = new FieldSingleStringValue(newFieldValue);
 			theField.setFieldValues(new FieldSingleStringValue[] {val});
 			assertEquals("Wrong number of values in GUI field", theField.getNumValues(), 1);
-			theWindow.enter();
-			theWindow.close();
+			theGui.enterRecord();
 			rec = ui.displayRecord(1);
 			assertEquals("Wrong number values in record", rec.getFieldValue(testFieldName).getMainValueAsString(), newFieldValue);
-		}
+			
+			theGui.saveDatabase();
+			assertFalse("database not saved", theGui.isDatabaseModified());
+			theGui.closeDatabase(true);
 	}
 
 	private LibrisDatabase buildDatabase() throws IOException {
